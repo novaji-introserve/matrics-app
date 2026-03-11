@@ -12,6 +12,10 @@
                 <field name="second_owner" optional="hide"/>
                 <field name="specific_email_recipients" optional="hide"/>
                 <field name="process_id" string="Process" optional="hide" />
+                <field name="first_owner" optional="hide" />
+                <field name="second_owner" optional="hide"/>
+                <field name="specific_email_recipients" optional="hide"/>
+                <field name="process_id" string="Process" optional="hide" />
                 <field name="status" widget="selection" string="Status" />
                 <field name="risk_rating" decoration-success="risk_rating == 'low'"
                     decoration-warning="risk_rating == 'medium'" decoration-danger="risk_rating == 'high'"
@@ -46,7 +50,7 @@
                     <field name="status" widget="statusbar" options="{'clickable':'1'}" /> -->
                 </header>
                 <sheet>
-                    
+
                     <div class="oe_title">
                         <label for="name" class="oe-edit-only" />
                         <h1>
@@ -62,48 +66,54 @@
                         <strong> Initialization Complete:</strong> This rule is now using the processing window for ongoing monitoring.
                     </div> -->
 
-                    <group string="PROCESS DETAILS">
-                        <group colspan="2">
-                            <field name="process_id" string="Process" />
-                        </group>
-                        <group>
-                            <field name="frequency_id" />
-                        </group>
-                        <group>
-                            <field name="risk_rating" string="Rating" />
-                        </group>
-                        <group string="SQL" colspan="2">
-                            <field name="sql_text" />
-                        </group>
-                    </group>
+                    <!-- Smart Initialization Status Banner -->
+                    <!-- <div class="alert alert-info" role="status" attrs="{'invisible': [('initialization_complete', '=', True)]}">
+                        <strong> Initialization Pending:</strong> This rule will use the initialization strategy on its first run.
+                    </div>
+                    <div class="alert alert-success" role="status" attrs="{'invisible': [('initialization_complete', '=', False)]}">
+                        <strong> Initialization Complete:</strong> This rule is now using the processing window for ongoing monitoring.
+                    </div> -->
 
+                    <group string="PROCESS DETAILS">
+                        <field name="process_id" string="Process" colspan="2" />
+                        <div colspan="2" style="display: flex; gap: 20px; width: 100%;">
+                            <div style="flex: 1;">
+                                <label for="frequency_id" string="Frequency" />
+                                <field name="frequency_id" />
+                            </div>
+
+                            <div style="flex: 1;">
+                                <label for="risk_rating" string="Rating" />
+                                <field name="risk_rating" />
+                            </div>
+                            <div style="flex: 1;">
+                                <label for="priority_level" string="Priority Level" />
+                                <field name="priority_level" />
+                            </div>
+
+                        </div>
+                        <label for="sql_text" string="SQL" colspan="2" />
+                        <field name="sql_text" nolabel="1" colspan="2" />
+                    </group>
                     <!-- Smart Initialization Configuration -->
                     <!-- <group string="SMART INITIALIZATION SETTINGS">
                         <group string="Initialization Strategy">
-                            <field name="initialization_strategy" widget="radio" 
-                                   help="How much historical data to process on first run" />
-                            <field name="custom_initialization_months" 
-                                   attrs="{'invisible': [('initialization_strategy', '!=', 'custom_period')], 'required': [('initialization_strategy', '=', 'custom_period')]}"
-                                   help="Number of months for custom initialization period" />
+                            <field name="initialization_strategy" widget="radio" help="How much historical data to process on first run" />
+                            <field name="custom_initialization_months" attrs="{'invisible': [('initialization_strategy', '!=', 'custom_period')], 'required': [('initialization_strategy', '=', 'custom_period')]}" help="Number of months for custom initialization period" />
                         </group>
                         <group string="Processing Configuration">
-                            <field name="processing_window_hours" 
-                                   help="Hours to look back for ongoing processing after initialization" />
-                            <field name="initialization_complete" readonly="1" widget="boolean_toggle"
-                                   help="Whether this rule has completed its first initialization run" />
+                            <field name="processing_window_hours" help="Hours to look back for ongoing processing after initialization" />
+                            <field name="initialization_complete" readonly="1" widget="boolean_toggle" help="Whether this rule has completed its first initialization run" />
                         </group>
                     </group> -->
 
                     <!-- Legacy Date Filter Settings (for backward compatibility) -->
-                    <!-- <group string="LEGACY DATE FILTER SETTINGS (Backward Compatibility)" 
-                           groups="base.group_no_one">
+                    <!-- <group string="LEGACY DATE FILTER SETTINGS (Backward Compatibility)" groups="base.group_no_one">
                         <group>
-                            <field name="query_date_column" 
-                                   help="Column name used for date filtering (legacy)" />
+                            <field name="query_date_column" help="Column name used for date filtering (legacy)" />
                         </group>
                         <group>
-                            <field name="date_filter_months" 
-                                   help="Number of months to look back (legacy)" />
+                            <field name="date_filter_months" help="Number of months to look back (legacy)" />
                         </group>
                     </group> -->
 
@@ -114,18 +124,14 @@
                             <field name="total_emails_sent" readonly="1" />
                         </group>
                         <group string="Signature Statistics">
-                            <field name="last_record_count" readonly="1" 
-                                   help="Total records found in last run" />
-                            <field name="last_new_record_count" readonly="1" 
-                                   help="New records found in last run" />
-                            <field name="total_signatures_stored" readonly="1" 
-                                   help="Total signatures stored for this rule" />
+                            <field name="last_record_count" readonly="1" help="Total records found in last run" />
+                            <field name="last_new_record_count" readonly="1" help="New records found in last run" />
+                            <field name="total_signatures_stored" readonly="1" help="Total signatures stored for this rule" />
                         </group>
                         <group string="Processing Status">
                             <field name="is_processing" readonly="1" widget="boolean_toggle" />
                             <field name="next_scheduled_run" readonly="1" widget="datetime" />
-                            <field name="processing_duration" readonly="1" 
-                                   help="Duration of last processing run in seconds" />
+                            <field name="processing_duration" readonly="1" help="Duration of last processing run in seconds" />
                         </group>
                         <group string="Last Checked">
                             <field name="last_checked" string="Last Checked" widget="datetime" readonly="1" />
@@ -135,8 +141,7 @@
 
                     <notebook>
                         <page string="Narration">
-                            <field name="narration" string="Narration" style="padding: 2rem;"
-                                placeholder="Enter narration here..." />
+                            <field name="narration" string="Narration" style="padding: 2rem;" placeholder="Enter narration here..." />
                         </page>
                         <page string="Recipients">
                             <group>

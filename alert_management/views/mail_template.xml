@@ -64,22 +64,48 @@
                                                         Download CSV
                                                     </a>
                                                
-                                                    <div style="display: flex; align-items:center; gap:0.4rem; margin-top:1rem;">
-                                                        <p>AlertId:</p>
-                                                        <h6> <span t-esc="object.alert_id" /> </h6>
+                                                    <!-- PRIORITY BADGE -->
+                                                    <t t-set="priority_color" t-value="'#CA8A04'"/>
+                                                    <t t-set="priority_bg" t-value="'#FEF9C3'"/>
+                                                    <t t-set="priority_label" t-value="'Medium'"/>
+                                                    
+                                                    <t t-if="object.priority_level == 'critical'">
+                                                        <t t-set="priority_color" t-value="'#DC2626'"/>
+                                                        <t t-set="priority_bg" t-value="'#FEE2E2'"/>
+                                                        <t t-set="priority_label" t-value="'Critical'"/>
+                                                    </t>
+                                                    <t t-elif="object.priority_level == 'high'">
+                                                        <t t-set="priority_color" t-value="'#EA580C'"/>
+                                                        <t t-set="priority_bg" t-value="'#FFEDD5'"/>
+                                                        <t t-set="priority_label" t-value="'High'"/>
+                                                    </t>
+                                                    <t t-elif="object.priority_level == 'low'">
+                                                        <t t-set="priority_color" t-value="'#2563EB'"/>
+                                                        <t t-set="priority_bg" t-value="'#DBEAFE'"/>
+                                                        <t t-set="priority_label" t-value="'Low'"/>
+                                                    </t>
+
+                                                    <div style="margin-top: 10px; margin-bottom: 5px;">
+                                                        <span t-attf-style="background-color: {{priority_bg}}; color: {{priority_color}}; border: 1px solid {{priority_color}}; padding: 4px 10px; border-radius: 12px; font-size: 13px; font-weight: bold; display: inline-block;">
+                                                            Priority: <t t-esc="priority_label"/>
+                                                        </span>
+                                                    </div>
+
+                                                    <div style="margin-top: 1rem; margin-bottom: 0.5rem;">
+                                                        <span style="margin: 0; padding: 0;">AlertId: </span>
+                                                        <span style="font-weight: bold; margin: 0; padding: 0;" t-esc="object.alert_id" />
                                                    </div>
                                                    <hr />
 
-                                                   <div style="display: flex; align-items:center; gap:0.4rem; margin: 0.5rem 0;">
-                                                        <p>Narration:</p>
-                                                        <p> <span t-esc="object.narration" /> </p>
+                                                   <div style="margin: 0.5rem 0;">
+                                                        <span style="margin: 0; padding: 0;">Narration: </span>
+                                                        <span style="margin: 0; padding: 0;" t-esc="object.narration" />
                                                    </div>
                                                 <hr />
-                                                  
-                                                <hr />
-                                                   <div style="display: flex; align-items:center; gap:0.4rem; margin: 0.5rem 0;">
-                                                        <p>Date:</p>
-                                                        <p> <span t-esc="object.last_checked" /> </p>
+
+                                                   <div style="margin: 0.5rem 0;">
+                                                        <span style="margin: 0; padding: 0;">Date: </span>
+                                                        <span style="margin: 0; padding: 0;" t-esc="object.last_checked" />
                                                    </div>
                                                 </td>
                                             </tr>
@@ -158,10 +184,6 @@
                             </tbody>
                         </table>
                     </td>
-                </tr>
-                <!-- POWERED BY -->
-                <tr class='o_email_footer'>
-                    
                 </tr>
             </table>
         </field>

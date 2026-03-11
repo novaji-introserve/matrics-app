@@ -26,6 +26,7 @@ class alert_history(models.Model):
 
     last_checked = fields.Char()
     risk_rating = fields.Char()
+    priority_level = fields.Char(string='Priority Level')
     process_id = fields.Char()
     case_ref = fields.Char()
     case_ref_display = fields.Html('Case Reference', compute='_compute_case_ref_display', sanitize=False)

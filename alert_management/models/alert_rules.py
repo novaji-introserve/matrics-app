@@ -296,10 +296,14 @@ class SmartTimeFilterEngine:
         # Generate appropriate filter
         time_filter = self._generate_time_filter(rule)
         if not time_filter:
+            _logger.info(f"Rule {rule.id} - Could not generate time filter, returning raw query")
             return query
         
         # Apply filter intelligently
-        return self._apply_filter_intelligently(query, time_filter)
+        enhanced_query = self._apply_filter_intelligently(query, time_filter)
+        
+        # Safety check: if the enhancement failed, return the raw query
+        return enhanced_query if enhanced_query else query
     
     def _generate_time_filter(self, rule):
         """
@@ -410,16 +414,11 @@ class SmartTimeFilterEngine:
     
     def _fallback_filter(self, query, rule):
         """
-        Fallback filter when analysis fails
+        Fallback filter when analysis fails.
+        Safest approach is to return the raw query to avoid breaking valid SQL.
         """
-        # Use configurable hours instead of hardcoded 72
-        hours = rule.processing_window_hours or 72
-        time_filter = f"date_created >= (CURRENT_TIMESTAMP - INTERVAL '{hours} hours')"
-        
-        if "WHERE" in query.upper():
-            return f"{query} AND {time_filter}"
-        else:
-            return f"{query} WHERE {time_filter}"
+        _logger.info(f"Rule {rule.id} - SQL analysis failed, skipping auto-date filter to prevent SQL errors.")
+        return query
 
 
 class AlertSignature(models.Model):
@@ -557,6 +556,13 @@ class AlertRules(models.Model):
         ("medium", "Medium"), 
         ("high", "High")
     ], default="low", string="Risk Rating")
+
+    priority_level = fields.Selection([
+        ("critical", "Critical"),
+        ("high", "High"),
+        ("medium", "Medium"),
+        ("low", "Low"),
+    ], default="medium", string="Priority Level", tracking=True)
     
     date_created = fields.Datetime(string="Created Date", readonly=True)
     last_checked = fields.Datetime(string="Last Checked", readonly=True)
@@ -681,7 +687,7 @@ class AlertRules(models.Model):
             
             if not alert_rules:
                 _logger.info("No active alert rules found")
-                return
+                return {'status': 'success', 'message': 'No active alert rules found', 'processed': 0}
             
             processed_count = 0
             sent_count = 0
@@ -709,6 +715,11 @@ class AlertRules(models.Model):
                     sent_count += emails_sent
                     total_signatures_created += signatures_created
                     
+                    # Commit after each successful rule processing
+                    # This ensures all data (alert history, rule updates) are immediately visible
+                    self.env.cr.commit()
+                    _logger.info(f"Rule {rule.id} - All data committed to database")
+                    
                 except Exception as e:
                     error_count += 1
                     _logger.error(f"Error processing rule {rule.id} '{rule.name}': {str(e)}")
@@ -726,9 +737,21 @@ class AlertRules(models.Model):
             duration = time.time() - start_time
             _logger.info(f"Smart alert cycle complete: {processed_count}/{total_rules} processed, {sent_count} emails, {error_count} errors in {duration:.1f}s")
             
+            return {
+                'status': 'success',
+                'processed': processed_count,
+                'total_rules': total_rules,
+                'emails_sent': sent_count,
+                'errors': error_count,
+                'duration': duration
+            }
+            
         except Exception as e:
             _logger.error(f"CRITICAL ERROR in alert processing cycle: {str(e)}")
-            raise
+            return {
+                'status': 'error',
+                'message': str(e)
+            }
 
     def _is_time_to_process(self, rule):
         """Optimized timing logic"""
@@ -807,6 +830,9 @@ class AlertRules(models.Model):
                 'processing_duration': processing_duration,
                 'last_error': False
             })
+            
+            # Commit rule updates immediately so they're visible in UI
+            self.env.cr.commit()
             
             return result
             
@@ -928,27 +954,13 @@ class AlertRules(models.Model):
     
     def _fallback_query_logic(self, rule):
         """
-        Fallback to original logic when smart analysis fails
+        Fallback to returning the exact raw query string when smart analysis fails entirely.
+        This prevents silent failures and ensures the user's raw SQL is respected.
         """
         try:
             query = rule.sql_text.query.strip()
-            
             if query.endswith(";"):
                 query = query[:-1]
-            
-            # Simple time filter with configurable hours
-            if not rule.initialization_complete:
-                time_filter = "date_created >= '2025-01-01'"
-            else:
-                hours = rule.processing_window_hours or 72
-                time_filter = f"date_created >= (CURRENT_TIMESTAMP - INTERVAL '{hours} hours')"
-            
-            # Add filter
-            if "WHERE" in query.upper():
-                query += f" AND {time_filter}"
-            else:
-                query += f" WHERE {time_filter}"
-            
             return query
             
         except Exception as e:
@@ -1125,8 +1137,9 @@ class AlertRules(models.Model):
                     # Use individual inserts for safety with constraint handling
                     for record_data in create_data:
                         try:
-                            self.env['alert.signature'].create(record_data)
-                            total_created += 1
+                            with self.env.cr.savepoint():
+                                self.env['alert.signature'].create(record_data)
+                                total_created += 1
                         except Exception as e:
                             if 'duplicate key value violates unique constraint' in str(e):
                                 # Signature already exists, skip it
@@ -1531,6 +1544,7 @@ class AlertRules(models.Model):
                 "ref_id": f"alert.rules,{rule.id}",
                 "process_id": rule.process_id or "",
                 "risk_rating": rule.risk_rating,
+                "priority_level": rule.priority_level or "medium",
                 "last_checked": rule.last_checked,
                 "email": ",".join(list(mailto)) if mailto else "",
                 "email_cc": ",".join(list(mailcc)) if mailcc else "",
@@ -1544,6 +1558,12 @@ class AlertRules(models.Model):
             
             # Send email
             mail_id = template.send_mail(alert_history.id, force_send=True)
+            
+            # CRITICAL: Commit immediately so alert history shows in UI right away
+            # Without this, alert history only commits when entire process_alert_rules() completes
+            # which can cause delays of hours/days if multiple rules are processing
+            self.env.cr.commit()
+            _logger.info(f"Rule {rule.id} - Alert history committed to database")
             
             # Check status
             mail_record = self.env['mail.mail'].browse(mail_id)
@@ -1608,6 +1628,38 @@ class AlertRules(models.Model):
                 </div>
                 """
             
+            # Determine Priority Level and Color
+            priority_level = rule.priority_level or 'medium'
+            priority_label = dict(rule._fields['priority_level'].selection).get(priority_level, 'Medium')
+            
+            if priority_level == 'critical':
+                priority_color = '#DC2626' # Red
+                priority_bg = '#FEE2E2'
+            elif priority_level == 'high':
+                priority_color = '#EA580C' # Orange
+                priority_bg = '#FFEDD5'
+            elif priority_level == 'low':
+                priority_color = '#2563EB' # Blue
+                priority_bg = '#DBEAFE'
+            else: # Medium
+                priority_color = '#CA8A04' # Yellow/Amber
+                priority_bg = '#FEF9C3'
+                
+            priority_badge = f"""
+            <div style="margin-top: 10px; margin-bottom: 5px;">
+                <span style="
+                    background-color: {priority_bg};
+                    color: {priority_color};
+                    border: 1px solid {priority_color};
+                    padding: 4px 10px;
+                    border-radius: 12px;
+                    font-size: 13px;
+                    font-weight: bold;
+                    display: inline-block;
+                ">Priority: {priority_label}</span>
+            </div>
+            """
+            
             # FIXED: Email HTML with proper responsive table container
             enhanced_html = f"""
             <div style="
@@ -1623,13 +1675,14 @@ class AlertRules(models.Model):
                     <h2 style="
                         color: {primary_color}; 
                         font-size: 20px; 
-                        margin: 0 0 10px 0;
+                        margin: 0 0 5px 0;
                         font-family: {font_family};
                     ">Alert: {rule.name}</h2>
+                    {priority_badge}
                     <p style="
                         color: #666666; 
                         font-size: 14px; 
-                        margin: 0;
+                        margin: 5px 0 0 0;
                         font-family: {font_family};
                     ">Generated on {fields.Datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
                 </div>

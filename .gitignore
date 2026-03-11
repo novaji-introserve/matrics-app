@@ -1,27 +1,89 @@
-*.pyc
-.log
-.vscode/
+# -----------------------------
+# Python
+# -----------------------------
 __pycache__/
-*:Zone.Identifier
-node_modules
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+
+# Python virtual environments
+venv/
+.env/
 .env
-.log
-.DS_Store
-media/
-internal_control/models/db_sync/db_config.json
-internal_control/models/db_sync/etl.log*
-internal_control/models/db_sync/etl_config.json
-compliance_management/demo/*
+env/
+ENV/
 
+# -----------------------------
+# Logs
+# -----------------------------
 *.log
-*.log.gz
-/risk_analysis/cache/
-/risk_analysis/config/settings.conf
+*.log.*
 
-# Ignore only the compiled binary inside risk_analysis  
-/risk_analysis/risk-processor
-/risk_analysis/risk-api-server
+# -----------------------------
+# Odoo runtime files
+# -----------------------------
+*.pid
+*.sock
 
-# Keep the Go source directory tracked
-!/risk_analysis/cmd/risk-processor/
+# -----------------------------
+# Odoo media / uploaded files
+# -----------------------------
+media/
+filestore/
 
+# -----------------------------
+# Node / frontend
+# -----------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# -----------------------------
+# VS Code / IDE
+# -----------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# -----------------------------
+# OS generated files
+# -----------------------------
+.DS_Store
+Thumbs.db
+
+# -----------------------------
+# Windows downloaded file metadata
+# -----------------------------
+*:Zone.Identifier
+
+# -----------------------------
+# Build / temporary files
+# -----------------------------
+dist/
+build/
+*.tmp
+*.temp
+
+# -----------------------------
+# Odoo specific configs
+# -----------------------------
+internal_control/models/db_sync/db_config.json
+internal_control/models/db_sync/etl_config.json
+internal_control/models/db_sync/etl.log*
+
+# -----------------------------
+# Coverage / testing
+# -----------------------------
+.coverage
+htmlcov/
+.pytest_cache/
+
+# -----------------------------
+# Misc
+# -----------------------------
+*.bak
+*.old
+*.orig
