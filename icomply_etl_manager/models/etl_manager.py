@@ -308,3 +308,51 @@ class ETLManager(models.AbstractModel):
         except Exception as e:
             _logger.error(f"Failed to cleanup old logs: {str(e)}")
             raise
+    
+    @api.model
+    def export_all_configs(self):
+        """Export all configurations for standalone ETL engine"""
+        try:
+            _logger.info("Exporting all ETL configurations...")
+            
+            # Export DB connections
+            db_config_file = self.env['etl.source.table'].export_db_config_json()
+            
+            # Export all table configs
+            exported_tables = self.env['etl.source.table'].export_all_table_configs()
+            
+            # Export sync schedule
+            schedule_file = self.env['etl.source.table'].export_sync_schedule_json()
+            
+            result = {
+                'db_config': str(db_config_file),
+                'table_configs': exported_tables,
+                'schedule': str(schedule_file),
+                'total_tables': len(exported_tables),
+            }
+            
+            _logger.info(f"Configuration export completed: {result}")
+            
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Configuration Export'),
+                    'message': f'Exported {len(exported_tables)} table configs, DB config, and schedule.',
+                    'type': 'success',
+                    'sticky': False,
+                }
+            }
+            
+        except Exception as e:
+            _logger.error(f"Failed to export configurations: {str(e)}")
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Export Failed'),
+                    'message': f'Failed to export configurations: {str(e)}',
+                    'type': 'danger',
+                    'sticky': True,
+                }
+            }

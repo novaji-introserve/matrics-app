@@ -102,7 +102,7 @@
              <field name="refno" />
              </xpath>
 
-            <xpath expr="//field[@name='date_created']" position="after">
+            <xpath expr="//field[@name='state']" position="after">
                 <field name="valuedate" string="Value Date" optional="show"/>
                 <field name="actualdate" string="Actual Date" optional="hide"/>
                 <field name="userid" optional="hide"/>

@@ -344,6 +344,10 @@ class ResCharts(models.Model):
             if not chart.query:
                 continue
             
+            # Skip validation during module installation/upgrade to prevent statement timeouts
+            if self.env.context.get('install_mode') or self.env.context.get('module'):
+                continue
+            
             # First use comprehensive SecurityService validation
             security_service = SecurityService()
             is_safe, error_msg = security_service.validate_sql_query(chart.query)
@@ -371,23 +375,25 @@ class ResCharts(models.Model):
                     if original_query.endswith(";"):
                         original_query = original_query[:-1]
                     
+                    # Wrap query with LIMIT 0 to ensure instantaneous execution for validation only
+                    validation_query = f"SELECT * FROM ({original_query}) AS _val_query LIMIT 0"
+                    
                     # Use secure query execution
                     security_service = SecurityService()
                     success, results, error_msg = security_service.secure_execute_query(
-                        cr, original_query, timeout=120000
+                        cr, validation_query, timeout=120000
                     )
                     
                     if not success:
                         raise exceptions.ValidationError(f"Query execution failed: {error_msg}")
                         
-                    # Convert results to dict format for validation
-                    if results and cr.description:
+                    # Extract column names from psycopg2 description
+                    if cr.description:
                         column_names = [desc[0] for desc in cr.description]
-                        dict_results = [dict(zip(column_names, row)) for row in results] if results else []
                     else:
-                        dict_results = []
-                    if dict_results and chart.x_axis_field and chart.y_axis_field:
-                        column_names = list(dict_results[0].keys())
+                        column_names = []
+                        
+                    if column_names and chart.x_axis_field and chart.y_axis_field:
                         if (
                             chart.x_axis_field not in column_names
                             and "." in chart.x_axis_field

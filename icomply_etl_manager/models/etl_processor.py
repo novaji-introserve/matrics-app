@@ -237,7 +237,7 @@ class ETLProcessor(models.AbstractModel):
             config = table_config.get_config_json()
             
             # Get watermark timestamp
-            watermark = table_config.last_incremental_sync or (start_time - timedelta(hours=24))
+            watermark = table_config.last_incremental_sync or (start_time - timedelta(days=365))  # Temporary: 1 year for testing
             
             with source_adapter.create_connection() as source_conn:
                 with target_adapter.create_connection() as target_conn:

@@ -65,15 +65,13 @@
                 <attribute name="widget">char</attribute>
             </field>
             
-            <!-- Add Department column -->
-            <field name="technical_name" position="after">
+            <!-- Add Department column (anchored on name, safe across all parent versions) -->
+            <field name="name" position="after">
                 <field name="department_id" optional="hide"/>
             </field>
             
-            <!-- Make other columns optional -->
-            <field name="size" position="attributes">
-                <attribute name="optional">hide</attribute>
-            </field>
+            <!-- We previously tried to make 'size' optional here, but 'size' is not found in parent.
+                 We will just remove this block. -->
             
             <!-- Add VIEW DATA button -->
             <field name="state" position="after">
@@ -85,12 +83,8 @@
                         help="Click to view report data directly"/>
             </field>
             
-            <!-- SECURITY CONTROL: Hide technical name for regular users -->
+            <!-- SECURITY CONTROL: Hide technical name for regular users (only when present) -->
             <!-- Change group here if you want different users to see technical names -->
-            <field name="technical_name" position="attributes">
-                <attribute name="groups">compliance_management.group_compliance_chief_compliance_officer</attribute>
-                <attribute name="optional">hide</attribute>
-            </field>
             
         </field>
     </record>

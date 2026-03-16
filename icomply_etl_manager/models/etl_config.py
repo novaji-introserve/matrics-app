@@ -236,7 +236,7 @@ class ETLSourceTable(models.Model):
             
             # Store with source column as key
             normalized_mappings[source_column_key] = mapping_dict
-            
+        
         return {
             'source_connection': self.source_connection_id.get_connection_string(),
             'target_connection': self.target_connection_id.get_connection_string(),
@@ -251,7 +251,206 @@ class ETLSourceTable(models.Model):
             'source_is_postgres': source_is_postgres,
             'target_is_postgres': target_is_postgres,
         }
+    
+    def export_table_config_json(self):
+        """Export table configuration to JSON file for standalone ETL engine"""
+        self.ensure_one()
+        import os
+        from pathlib import Path
+        
+        # Get module directory
+        module_path = Path(__file__).parent.parent  # models -> icomply_etl_manager
+        config_dir = module_path / 'configs'
+        config_dir.mkdir(exist_ok=True)
+        
+        # Build table config JSON (standalone format)
+        table_config = {
+            'name': self.name,
+            'source_connection_id': self.source_connection_id.id,
+            'target_connection_id': self.target_connection_id.id,
+            'source_table_name': self.source_table_name,
+            'target_table_name': self.target_table_name,
+            'primary_key_unique': self.primary_key_unique,
+            'batch_size': self.batch_size,
+            'incremental_date_column': self.incremental_date_column or None,
+            'dependencies': [dep.name for dep in self.dependency_ids],
+            'mappings': []
+        }
+        
+        # Add mappings
+        for mapping in self.mapping_ids:
+            mapping_dict = {
+                'source_column': mapping.source_column,
+                'target_column': mapping.target_column,
+                'mapping_type': mapping.mapping_type,
+            }
+            if mapping.mapping_type == 'lookup':
+                mapping_dict.update({
+                    'lookup_table': mapping.lookup_table,
+                    'lookup_key': mapping.lookup_key,
+                    'lookup_value': mapping.lookup_value,
+                })
+            table_config['mappings'].append(mapping_dict)
+        
+        # Save to file
+        config_file = config_dir / f'{self.name}_config.json'
+        with open(config_file, 'w') as f:
+            json.dump(table_config, f, indent=2)
+        
+        _logger.info(f"Exported table config to {config_file}")
+        return config_file
+    
+    @api.model
+    def export_all_table_configs(self):
+        """Export all active table configurations to JSON files"""
+        tables = self.search([('active', '=', True)])
+        exported = []
+        
+        for table in tables:
+            try:
+                config_file = table.export_table_config_json()
+                exported.append(table.name)
+            except Exception as e:
+                _logger.error(f"Failed to export config for {table.name}: {str(e)}")
+        
+        _logger.info(f"Exported {len(exported)} table configs")
+        return exported
+    
+    @api.model
+    def export_db_config_json(self):
+        """Export all database connections to JSON file for standalone ETL engine"""
+        from pathlib import Path
+        
+        # Get module directory
+        module_path = Path(__file__).parent.parent  # models -> icomply_etl_manager
+        config_dir = module_path / 'configs'
+        config_dir.mkdir(exist_ok=True)
+        
+        # Get all active connections
+        connections = self.env['etl.database.connection'].search([('active', '=', True)])
+        
+        # Build DB config JSON
+        db_config = {
+            'connections': {}
+        }
+        
+        for conn in connections:
+            conn_dict = {
+                'id': conn.id,
+                'name': conn.name,
+                'database_type': conn.database_type,
+                'host': conn.host,
+                'port': conn.port,
+                'database_name': conn.database_name,
+                'username': conn.username,
+                'password': conn.password,
+                'ssl_enabled': conn.ssl_enabled,
+                'connection_timeout': conn.connection_timeout,
+            }
+            
+            # Add additional params if present
+            if conn.additional_params:
+                try:
+                    conn_dict['additional_params'] = json.loads(conn.additional_params)
+                except:
+                    pass
+            
+            db_config['connections'][str(conn.id)] = conn_dict
+        
+        # Save to file
+        config_file = config_dir / 'db_config.json'
+        with open(config_file, 'w') as f:
+            json.dump(db_config, f, indent=2)
+        
+        _logger.info(f"Exported DB config to {config_file}")
+        return config_file
+    
+    @api.model
+    def export_sync_schedule_json(self):
+        """Export sync schedule to JSON file for standalone scheduler"""
+        from pathlib import Path
+        from datetime import datetime, timedelta
+        
+        # Get module directory
+        module_path = Path(__file__).parent.parent  # models -> icomply_etl_manager
+        config_dir = module_path / 'configs'
+        config_dir.mkdir(exist_ok=True)
+        
+        # Get all active tables with sync enabled
+        tables = self.search([
+            ('active', '=', True),
+            '|',
+            ('full_sync_enabled', '=', True),
+            ('incremental_sync_enabled', '=', True),
+        ])
+        
+        schedule = {}
+        
+        for table in tables:
+            # Determine sync type and frequency
+            if table.full_sync_enabled and table.full_sync_frequency_id:
+                # Full sync - calculate hours from frequency
+                freq = table.full_sync_frequency_id
+                interval_hours = {
+                    'minutes': freq.interval_number / 60.0,
+                    'hours': freq.interval_number,
+                    'days': freq.interval_number * 24,
+                    'weeks': freq.interval_number * 24 * 7,
+                    'months': freq.interval_number * 24 * 30,  # Approximate
+                }
+                frequency_hours = interval_hours.get(freq.interval_type, 24)
+                
+                schedule[table.name] = {
+                    'frequency_hours': frequency_hours,
+                    'sync_type': 'full',
+                    'last_run': table.last_full_sync_time.isoformat() if table.last_full_sync_time else None,
+                    'next_run': None,  # Will be calculated by scheduler
+                }
+            elif table.incremental_sync_enabled:
+                # Incremental sync
+                frequency_hours = table.incremental_frequency_minutes / 60.0
+                schedule[table.name] = {
+                    'frequency_hours': frequency_hours,
+                    'sync_type': 'incremental',
+                    'last_run': table.last_incremental_sync.isoformat() if table.last_incremental_sync else None,
+                    'next_run': None,  # Will be calculated by scheduler
+                }
+        
+        # Save to file
+        schedule_file = config_dir / 'sync_schedule.json'
+        with open(schedule_file, 'w') as f:
+            json.dump(schedule, f, indent=2)
+        
+        _logger.info(f"Exported sync schedule to {schedule_file}")
+        return schedule_file
 
+    @api.model
+    def create(self, vals):
+        """Override create to auto-export configs"""
+        result = super().create(vals)
+        # Auto-export configs after creation
+        try:
+            if result.active:
+                result.export_table_config_json()
+                result.env['etl.source.table'].export_db_config_json()
+                result.env['etl.source.table'].export_sync_schedule_json()
+        except Exception as e:
+            _logger.warning(f"Failed to auto-export configs after table create: {str(e)}")
+        return result
+    
+    def write(self, vals):
+        """Override write to auto-export configs"""
+        result = super().write(vals)
+        # Auto-export configs after update (only if still active)
+        if self.active:
+            try:
+                self.export_table_config_json()
+                self.env['etl.source.table'].export_db_config_json()
+                self.env['etl.source.table'].export_sync_schedule_json()
+            except Exception as e:
+                _logger.warning(f"Failed to auto-export configs after table update: {str(e)}")
+        return result
+    
     def action_test_connections(self):
         """Test both source and target database connections"""
         self.ensure_one()
@@ -295,45 +494,96 @@ class ETLSourceTable(models.Model):
         }
 
     def action_sync_table_full(self):
-        """Trigger full sync - immediate or queued based on threshold"""
+        """Trigger full sync - creates trigger file for standalone scheduler"""
         self.ensure_one()
         
         if not self.full_sync_enabled:
             return self._show_notification('Full Sync Disabled', 
                                          'Full sync is not enabled for this table.', 'warning')
         
-        # Get immediate sync threshold
-        threshold = int(self.env['ir.config_parameter'].sudo().get_param(
-            'etl.immediate_sync_threshold', '1000'))
-        
-        record_count = self.estimated_record_count or 0
-        
-        if record_count <= threshold and record_count > 0:
-            # Sync immediately
-            return self._sync_immediately('full')
-        else:
-            # Queue the job
-            return self._queue_sync_job('full')
+        try:
+            # Export configs if needed
+            self.export_table_config_json()
+            self.env['etl.source.table'].export_db_config_json()
+            
+            # Create trigger file
+            from pathlib import Path
+            module_path = Path(__file__).parent.parent  # models -> icomply_etl_manager
+            trigger_dir = module_path / 'configs' / 'triggers'
+            trigger_dir.mkdir(parents=True, exist_ok=True)
+            
+            trigger_file = trigger_dir / f'{self.name}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.trigger'
+            trigger_data = {
+                'table_name': self.name,
+                'sync_type': 'full',
+                'created_at': datetime.now().isoformat(),
+            }
+            
+            with open(trigger_file, 'w') as f:
+                json.dump(trigger_data, f, indent=2)
+            
+            # Update status
+            self.write({
+                'job_status': 'pending',
+                'last_sync_message': 'Full sync triggered - waiting for scheduler'
+            })
+            
+            _logger.info(f"Created trigger file: {trigger_file}")
+            
+            return self._show_notification('Full Sync Triggered', 
+                                         f'Full sync has been queued. The scheduler will process it shortly.', 'success')
+            
+        except Exception as e:
+            error_msg = str(e)
+            _logger.error(f"Failed to trigger full sync: {error_msg}")
+            return self._show_notification('Sync Trigger Failed', 
+                                         f'Failed to trigger sync: {error_msg}', 'danger')
 
     def action_sync_table_incremental(self):
-        """Trigger incremental sync - immediate or queued based on threshold"""
+        """Trigger incremental sync - creates trigger file for standalone scheduler"""
         self.ensure_one()
         
         if not self.incremental_sync_enabled:
             return self._show_notification('Incremental Sync Disabled', 
                                          'Incremental sync is not enabled for this table.', 'warning')
         
-        # Get immediate sync threshold (for incremental, use smaller threshold)
-        threshold = int(self.env['ir.config_parameter'].sudo().get_param(
-            'etl.immediate_sync_threshold', '1000'))
-        
-        # For incremental, always use immediate if under threshold
-        record_count = self.estimated_record_count or 0
-        
-        if record_count <= threshold:
-            return self._sync_immediately('incremental')
-        else:
-            return self._queue_sync_job('incremental')
+        try:
+            # Export configs if needed
+            self.export_table_config_json()
+            self.env['etl.source.table'].export_db_config_json()
+            
+            # Create trigger file
+            from pathlib import Path
+            module_path = Path(__file__).parent.parent  # models -> icomply_etl_manager
+            trigger_dir = module_path / 'configs' / 'triggers'
+            trigger_dir.mkdir(parents=True, exist_ok=True)
+            
+            trigger_file = trigger_dir / f'{self.name}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.trigger'
+            trigger_data = {
+                'table_name': self.name,
+                'sync_type': 'incremental',
+                'created_at': datetime.now().isoformat(),
+            }
+            
+            with open(trigger_file, 'w') as f:
+                json.dump(trigger_data, f, indent=2)
+            
+            # Update status
+            self.write({
+                'job_status': 'pending',
+                'last_sync_message': 'Incremental sync triggered - waiting for scheduler'
+            })
+            
+            _logger.info(f"Created trigger file: {trigger_file}")
+            
+            return self._show_notification('Incremental Sync Triggered', 
+                                         f'Incremental sync has been queued. The scheduler will process it shortly.', 'success')
+            
+        except Exception as e:
+            error_msg = str(e)
+            _logger.error(f"Failed to trigger incremental sync: {error_msg}")
+            return self._show_notification('Sync Trigger Failed', 
+                                         f'Failed to trigger sync: {error_msg}', 'danger')
 
     def _sync_immediately(self, sync_type):
         """Sync immediately without queueing"""

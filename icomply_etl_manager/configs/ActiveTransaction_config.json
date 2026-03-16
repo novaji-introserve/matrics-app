@@ -1,0 +1,150 @@
+{
+  "name": "ActiveTransaction",
+  "source_connection_id": 2,
+  "target_connection_id": 3,
+  "source_table_name": "ActiveTransaction",
+  "target_table_name": "res_customer_transaction",
+  "primary_key_unique": "ACTIVE_TRANSACTION_ID",
+  "batch_size": 50000,
+  "incremental_date_column": "TRAN_DATE",
+  "dependencies": [],
+  "mappings": [
+    {
+      "source_column": "ACTIVE_TRANSACTION_ID",
+      "target_column": "trans_id",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "ACCOUNT_NO",
+      "target_column": "account_id",
+      "mapping_type": "lookup",
+      "lookup_table": "res_partner_account",
+      "lookup_key": "name",
+      "lookup_value": "id"
+    },
+    {
+      "source_column": "TRANSACTION_AMOUNT",
+      "target_column": "amount",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "TRANSACTION_TYPE",
+      "target_column": "tran_type",
+      "mapping_type": "lookup",
+      "lookup_table": "res_transaction_type",
+      "lookup_key": "trancode",
+      "lookup_value": "id"
+    },
+    {
+      "source_column": "TRANSACTION_SOURCE",
+      "target_column": "tran_channel",
+      "mapping_type": "lookup",
+      "lookup_table": "res_transaction_channel",
+      "lookup_key": "code",
+      "lookup_value": "id"
+    },
+    {
+      "source_column": "CURRENCY_CODE",
+      "target_column": "currency_id",
+      "mapping_type": "lookup",
+      "lookup_table": "res_currency",
+      "lookup_key": "name",
+      "lookup_value": "id"
+    },
+    {
+      "source_column": "NARRATION",
+      "target_column": "narration",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "VALUE_DATE",
+      "target_column": "valuedate",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "TRAN_DATE",
+      "target_column": "date_created",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "POSTED_DATE",
+      "target_column": "actualdate",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "BRANCH_CODE",
+      "target_column": "branch_id",
+      "mapping_type": "lookup",
+      "lookup_table": "res_branch",
+      "lookup_key": "code",
+      "lookup_value": "id"
+    },
+    {
+      "source_column": "ACCOUNT_NAME",
+      "target_column": "n",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "CUSTOMER_ID",
+      "target_column": "customer_id",
+      "mapping_type": "lookup",
+      "lookup_table": "res_partner",
+      "lookup_key": "customer_id",
+      "lookup_value": "id"
+    },
+    {
+      "source_column": "TRANSACTION_MODE",
+      "target_column": "transaction_mode",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "TRANSACTION_STATUS",
+      "target_column": "status",
+      "mapping_type": "lookup",
+      "lookup_table": "res_transaction_status",
+      "lookup_key": "code",
+      "lookup_value": "id"
+    },
+    {
+      "source_column": "ACCOUNT_GROUP",
+      "target_column": "account_group",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "REQUEST_ID",
+      "target_column": "request_id",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "LCY_AMOUNT",
+      "target_column": "amount",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "PARENT_LEDGER_ID",
+      "target_column": "parent_ledger_id",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "SUB_GENERAL_LEDGER_CODE",
+      "target_column": "sub_general_ledger_code",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "SOURCE_BRANCH_CODE",
+      "target_column": "source_branch_code",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "POSTED_BY",
+      "target_column": "posted_by",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "ACCOUNT_NAME",
+      "target_column": "account_name",
+      "mapping_type": "direct"
+    }
+  ],
+  "last_incremental_sync": "2025-10-12 00:00:00"
+}

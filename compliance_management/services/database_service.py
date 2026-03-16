@@ -202,8 +202,14 @@ class DatabaseService:
             return []
 
         try:
-            self.env.cr.execute(f"SELECT * FROM {table_name} LIMIT 0")
-            return [desc[0] for desc in self.env.cr.description]
+            query = """
+                SELECT attname 
+                FROM pg_attribute 
+                WHERE attrelid = %s::regclass 
+                AND attnum > 0 AND NOT attisdropped
+            """
+            self.env.cr.execute(query, (table_name,))
+            return [row[0] for row in self.env.cr.fetchall()]
         except Exception as e:
             _logger.error(f"Error getting columns for {table_name}: {e}")
             return []

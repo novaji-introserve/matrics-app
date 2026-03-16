@@ -62,8 +62,13 @@ class Transaction(models.Model):
         'C', 'Credit'), ('D', 'Debit')],  index=True, string='Transaction Type')
     branch_code = fields.Char(string="Branch Code")
     
-    show_create_case= fields.Boolean(
+    show_create_case = fields.Boolean(
         string="Case Management_v2 Installed",
+        compute='_compute_is_case_manager_installed',
+        store=False,)
+
+    show_create_case_button = fields.Boolean(
+        string="Case Management Installed",
         compute='_compute_is_case_manager_installed',
         store=False,)
 
@@ -100,6 +105,10 @@ class Transaction(models.Model):
             'domain': [('transaction_id.id', 'in', [self.id])],
             'context': {'search_default_group_rule_id': 1}
         }
+
+    def action_create_case(self):
+        """Alias kept for backward-compatibility with stale database views."""
+        return self.action_create_transaction_case()
 
     def action_create_transaction_case(self):
         self.ensure_one()
@@ -149,12 +158,13 @@ class Transaction(models.Model):
     
     @api.depends('customer_id')
     def _compute_is_case_manager_installed(self):
+        case_installed = bool(self.env['ir.module.module'].search([
+            ('name', '=', 'case_management_v2'),
+            ('state', '=', 'installed')
+        ], limit=1))
         for record in self:
-            case_model = bool(self.env['ir.module.module'].search([
-                ('name', '=', 'case_management_v2'),
-                ('state', '=', 'installed')
-            ], limit=1))
-            record.show_create_case = bool(case_model)
+            record.show_create_case = case_installed
+            record.show_create_case_button = case_installed
 
 
 
@@ -196,6 +206,8 @@ class Transaction(models.Model):
                 print(f"Error screening transaction {e.name}: {ex}")
 
     def action_screen(self):
+        if not self:
+            return
         self.ensure_one()
         rules = self.env['res.transaction.screening.rule'].search(
             [('state', '=', 'active')], order='priority')

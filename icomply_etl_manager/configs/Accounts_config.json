@@ -1,0 +1,170 @@
+{
+  "name": "Accounts",
+  "source_connection_id": 2,
+  "target_connection_id": 3,
+  "source_table_name": "Accounts",
+  "target_table_name": "res_partner_account",
+  "primary_key_unique": "ACCOUNT_NO",
+  "batch_size": 50000,
+  "incremental_date_column": null,
+  "dependencies": [
+    "customer_profile"
+  ],
+  "mappings": [
+    {
+      "source_column": "ACCOUNT_NO",
+      "target_column": "name",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "ACOUNT_ID",
+      "target_column": "source_account_id",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "CUSTOMER_ID",
+      "target_column": "customer_id",
+      "mapping_type": "lookup",
+      "lookup_table": "res_partner",
+      "lookup_key": "customer_id",
+      "lookup_value": "id"
+    },
+    {
+      "source_column": "ACCOUNT_NAME",
+      "target_column": "account_name",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "ACCOUNT_STATUS",
+      "target_column": "account_status",
+      "mapping_type": "lookup",
+      "lookup_table": "res_partner_account_status",
+      "lookup_key": "code",
+      "lookup_value": "id"
+    },
+    {
+      "source_column": "DATE_OPENED",
+      "target_column": "opening_date",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "DATE_CLOSED",
+      "target_column": "date_closed",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "BRANCH_CODE",
+      "target_column": "branch_id",
+      "mapping_type": "lookup",
+      "lookup_table": "res_branch",
+      "lookup_key": "code",
+      "lookup_value": "id"
+    },
+    {
+      "source_column": "UNCLEARED_BALANCE",
+      "target_column": "uncleared_balance",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "OVERDRAFT_LIMIT",
+      "target_column": "overdraft_limit",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "CURRENCY_CODE",
+      "target_column": "currency_id",
+      "mapping_type": "lookup",
+      "lookup_table": "res_currency",
+      "lookup_key": "code",
+      "lookup_value": "id"
+    },
+    {
+      "source_column": "LIEN_AMOUNT",
+      "target_column": "lien",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "LAST_TRANSACTION_DATE",
+      "target_column": "last_transaction_date",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "IS_COLLECTION_ACCOUNT",
+      "target_column": "is_collection_account",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "HIGH_TRANSACTIONS_ACCOUNT",
+      "target_column": "high_transactions_account",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "DATE_CREATED",
+      "target_column": "date_created",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "DATE_DELETED",
+      "target_column": "date_deleted",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "ACCOUNT_POSITION",
+      "target_column": "account_position",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "LCY_BALANCE",
+      "target_column": "balance",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "ACCOUNT_GROUP",
+      "target_column": "account_group",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "HAS_OVERDRAFT",
+      "target_column": "has_overdraft",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "ACCOUNT_CLASS",
+      "target_column": "account_class",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "BVN",
+      "target_column": "bvn",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "FREEZE_CODE",
+      "target_column": "freeze_code",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "ACCOUNT_CODE",
+      "target_column": "account_tier",
+      "mapping_type": "lookup",
+      "lookup_table": "res_partner_tier",
+      "lookup_key": "code",
+      "lookup_value": "id"
+    },
+    {
+      "source_column": "PHONE_NUMBER",
+      "target_column": "phone_number",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "EMAIL",
+      "target_column": "email",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "CLEARED_BALANCE",
+      "target_column": "cleared_balance",
+      "mapping_type": "direct"
+    }
+  ]
+}

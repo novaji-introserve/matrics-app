@@ -80,7 +80,7 @@ class MaterializedViewService:
 
             db_service.drop_materialized_view(view_name)
            
-            if not db_service.create_materialized_view(view_name, enhanced_query):
+            if not db_service.create_materialized_view(view_name, enhanced_query, with_data=False):
                 _logger.error(f"Failed to create materialized view {view_name}")
                 return False
 
@@ -161,16 +161,8 @@ class MaterializedViewService:
                     unique_col = col
                     break
 
-            if not unique_col and "id" in columns:
-                try:
-                    with self.env.registry.cursor() as cr:
-                        cr.execute(f"SELECT COUNT(*), COUNT(DISTINCT id) FROM {view_name}")
-                        total_count, distinct_count = cr.fetchone()
-                        if total_count == distinct_count:
-                            unique_col = "id"
-                            _logger.info(f"'id' column is unique, using it for unique index")
-                except Exception as e:
-                    _logger.debug(f"Could not determine uniqueness: {e}")
+            # Removed the SELECT COUNT(*) check as it executes the query causing statement timeouts,
+            # and 'id' is already in primary_candidates so it would be picked up automatically.
 
             if unique_col:
                 db_service.create_index_on_view(view_name, unique_col, unique=True, 
@@ -370,7 +362,7 @@ class MaterializedViewService:
             if original_query.strip().endswith(";"):
                 original_query = original_query.strip()[:-1]
                 
-            if not db_service.create_materialized_view(view_name, original_query):
+            if not db_service.create_materialized_view(view_name, original_query, with_data=False):
                 _logger.error(f"Failed to create materialized view {view_name}")
                 return False
                 

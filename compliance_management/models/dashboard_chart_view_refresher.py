@@ -151,6 +151,10 @@ class DashboardChartViewRefresher(models.Model):
         Returns:
             bool: True if the view was created successfully, False otherwise.
         """
+        if self.env.context.get('install_mode') or self.env.context.get('module'):
+            _logger.info(f"Skipping materialized view creation for chart {chart_id} during module install")
+            return True
+
         mv_service = MaterializedViewService(self.env)
         success = mv_service.create_chart_materialized_view(chart_id)
         

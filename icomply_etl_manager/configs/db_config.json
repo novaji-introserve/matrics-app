@@ -1,0 +1,28 @@
+{
+  "connections": {
+    "1": {
+      "id": 1,
+      "name": "Demo CRM Database",
+      "database_type": "postgresql",
+      "host": "localhost",
+      "port": 5432,
+      "database_name": "demo_crm_db",
+      "username": "etl_user",
+      "password": "demo_password",
+      "ssl_enabled": false,
+      "connection_timeout": 30
+    },
+    "2": {
+      "id": 2,
+      "name": "Main Odoo Database",
+      "database_type": "postgresql",
+      "host": "localhost",
+      "port": 5432,
+      "database_name": "odoo_main",
+      "username": "odoo",
+      "password": "demo_password",
+      "ssl_enabled": false,
+      "connection_timeout": 30
+    }
+  }
+}

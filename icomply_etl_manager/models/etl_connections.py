@@ -58,7 +58,24 @@ class ETLDatabaseConnection(models.Model):
                 'sqlite': 0,
             }
             vals['port'] = default_ports.get(db_type, 5432)
-        return super().create(vals)
+        result = super().create(vals)
+        # Auto-export DB config after creation
+        try:
+            self.env['etl.source.table'].export_db_config_json()
+        except Exception as e:
+            _logger.warning(f"Failed to auto-export DB config after connection create: {str(e)}")
+        return result
+    
+    def write(self, vals):
+        """Override write to auto-export configs"""
+        result = super().write(vals)
+        # Auto-export DB config after update
+        if vals.get('active', True):  # Only export if still active
+            try:
+                self.env['etl.source.table'].export_db_config_json()
+            except Exception as e:
+                _logger.warning(f"Failed to auto-export DB config after connection update: {str(e)}")
+        return result
 
     def get_connection_string(self):
         """Generate connection string based on database type"""

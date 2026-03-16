@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Dashboard: under Alerts (parent from alert_management), action from fsdh_addons -->
+    <menuitem id="menu_alert_dashboard"
+        name="Dashboard"
+        parent="alert_management.menu_alert_management_main"
+        action="action_alert_dashboard"
+        sequence="0"/>
+
+    <!-- Statistics: under Alerts > Configurations (parent from alert_management) -->
+    <menuitem id="menu_alert_statistics"
+        name="Statistics"
+        parent="alert_management.menu_alert_management_configurations"
+        sequence="5"/>
+
+    <!-- Statistics list: clickable entry under Statistics, opens statistics tree/form -->
+    <menuitem id="menu_alert_statistics_list"
+        name="Statistics"
+        parent="menu_alert_statistics"
+        action="action_alert_stat"
+        sequence="0"/>
+
+    <!-- Chart: under Alerts > Configurations > Statistics, opens dedicated chart page (fsdh_addons) -->
+    <menuitem id="menu_alert_chart"
+        name="Chart"
+        parent="menu_alert_statistics"
+        action="action_alert_chart"
+        sequence="10"/>
+</odoo>
