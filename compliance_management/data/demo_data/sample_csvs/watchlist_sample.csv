@@ -1,0 +1,101 @@
+name,watchlist_id,nationality,surname,first_name,middle_name,bvn,source
+Emeka Nwosu,WL-2026-0001,Nigerian,Nwosu,Emeka,Chukwuemeka,22000000000,EFCC
+Ngozi Bello,WL-2026-0002,Ghanaian,Bello,Ngozi,Oluwaseun,22000000001,NFIU
+Tunde Adeleke,WL-2026-0003,Kenyan,Adeleke,Tunde,Abdullahi,22000000002,Manual Entry
+Amina Okafor,WL-2026-0004,South African,Okafor,Amina,Obiageli,22000000003,CBN Watchlist
+Chidi Lawal,WL-2026-0005,Senegalese,Lawal,Chidi,Nnamdi,22000000004,Interpol
+Fatima Eze,WL-2026-0006,Nigerian,Eze,Fatima,,22000000005,EFCC
+Biodun Danjuma,WL-2026-0007,Ghanaian,Danjuma,Biodun,Chukwuemeka,22000000006,NFIU
+Kemi Obi,WL-2026-0008,Kenyan,Obi,Kemi,Oluwaseun,22000000007,Manual Entry
+Uche Abubakar,WL-2026-0009,South African,Abubakar,Uche,Abdullahi,22000000008,CBN Watchlist
+Sule Chukwu,WL-2026-0010,Senegalese,Chukwu,Sule,Obiageli,22000000009,Interpol
+Adaeze Olawale,WL-2026-0011,Nigerian,Olawale,Adaeze,Nnamdi,22000000010,EFCC
+Musa Maikudi,WL-2026-0012,Ghanaian,Maikudi,Musa,,22000000011,NFIU
+Chioma Okonkwo,WL-2026-0013,Kenyan,Okonkwo,Chioma,Chukwuemeka,22000000012,Manual Entry
+Bola Adeyemi,WL-2026-0014,South African,Adeyemi,Bola,Oluwaseun,22000000013,CBN Watchlist
+Yusuf Ibrahim,WL-2026-0015,Senegalese,Ibrahim,Yusuf,Abdullahi,22000000014,Interpol
+Emeka Nwosu,WL-2026-0016,Nigerian,Nwosu,Emeka,Obiageli,22000000015,EFCC
+Ngozi Bello,WL-2026-0017,Ghanaian,Bello,Ngozi,Nnamdi,22000000016,NFIU
+Tunde Adeleke,WL-2026-0018,Kenyan,Adeleke,Tunde,,22000000017,Manual Entry
+Amina Okafor,WL-2026-0019,South African,Okafor,Amina,Chukwuemeka,22000000018,CBN Watchlist
+Chidi Lawal,WL-2026-0020,Senegalese,Lawal,Chidi,Oluwaseun,22000000019,Interpol
+Fatima Eze,WL-2026-0021,Nigerian,Eze,Fatima,Abdullahi,22000000020,EFCC
+Biodun Danjuma,WL-2026-0022,Ghanaian,Danjuma,Biodun,Obiageli,22000000021,NFIU
+Kemi Obi,WL-2026-0023,Kenyan,Obi,Kemi,Nnamdi,22000000022,Manual Entry
+Uche Abubakar,WL-2026-0024,South African,Abubakar,Uche,,22000000023,CBN Watchlist
+Sule Chukwu,WL-2026-0025,Senegalese,Chukwu,Sule,Chukwuemeka,22000000024,Interpol
+Adaeze Olawale,WL-2026-0026,Nigerian,Olawale,Adaeze,Oluwaseun,22000000025,EFCC
+Musa Maikudi,WL-2026-0027,Ghanaian,Maikudi,Musa,Abdullahi,22000000026,NFIU
+Chioma Okonkwo,WL-2026-0028,Kenyan,Okonkwo,Chioma,Obiageli,22000000027,Manual Entry
+Bola Adeyemi,WL-2026-0029,South African,Adeyemi,Bola,Nnamdi,22000000028,CBN Watchlist
+Yusuf Ibrahim,WL-2026-0030,Senegalese,Ibrahim,Yusuf,,22000000029,Interpol
+Emeka Nwosu,WL-2026-0031,Nigerian,Nwosu,Emeka,Chukwuemeka,22000000030,EFCC
+Ngozi Bello,WL-2026-0032,Ghanaian,Bello,Ngozi,Oluwaseun,22000000031,NFIU
+Tunde Adeleke,WL-2026-0033,Kenyan,Adeleke,Tunde,Abdullahi,22000000032,Manual Entry
+Amina Okafor,WL-2026-0034,South African,Okafor,Amina,Obiageli,22000000033,CBN Watchlist
+Chidi Lawal,WL-2026-0035,Senegalese,Lawal,Chidi,Nnamdi,22000000034,Interpol
+Fatima Eze,WL-2026-0036,Nigerian,Eze,Fatima,,22000000035,EFCC
+Biodun Danjuma,WL-2026-0037,Ghanaian,Danjuma,Biodun,Chukwuemeka,22000000036,NFIU
+Kemi Obi,WL-2026-0038,Kenyan,Obi,Kemi,Oluwaseun,22000000037,Manual Entry
+Uche Abubakar,WL-2026-0039,South African,Abubakar,Uche,Abdullahi,22000000038,CBN Watchlist
+Sule Chukwu,WL-2026-0040,Senegalese,Chukwu,Sule,Obiageli,22000000039,Interpol
+Adaeze Olawale,WL-2026-0041,Nigerian,Olawale,Adaeze,Nnamdi,22000000040,EFCC
+Musa Maikudi,WL-2026-0042,Ghanaian,Maikudi,Musa,,22000000041,NFIU
+Chioma Okonkwo,WL-2026-0043,Kenyan,Okonkwo,Chioma,Chukwuemeka,22000000042,Manual Entry
+Bola Adeyemi,WL-2026-0044,South African,Adeyemi,Bola,Oluwaseun,22000000043,CBN Watchlist
+Yusuf Ibrahim,WL-2026-0045,Senegalese,Ibrahim,Yusuf,Abdullahi,22000000044,Interpol
+Emeka Nwosu,WL-2026-0046,Nigerian,Nwosu,Emeka,Obiageli,22000000045,EFCC
+Ngozi Bello,WL-2026-0047,Ghanaian,Bello,Ngozi,Nnamdi,22000000046,NFIU
+Tunde Adeleke,WL-2026-0048,Kenyan,Adeleke,Tunde,,22000000047,Manual Entry
+Amina Okafor,WL-2026-0049,South African,Okafor,Amina,Chukwuemeka,22000000048,CBN Watchlist
+Chidi Lawal,WL-2026-0050,Senegalese,Lawal,Chidi,Oluwaseun,22000000049,Interpol
+Fatima Eze,WL-2026-0051,Nigerian,Eze,Fatima,Abdullahi,22000000050,EFCC
+Biodun Danjuma,WL-2026-0052,Ghanaian,Danjuma,Biodun,Obiageli,22000000051,NFIU
+Kemi Obi,WL-2026-0053,Kenyan,Obi,Kemi,Nnamdi,22000000052,Manual Entry
+Uche Abubakar,WL-2026-0054,South African,Abubakar,Uche,,22000000053,CBN Watchlist
+Sule Chukwu,WL-2026-0055,Senegalese,Chukwu,Sule,Chukwuemeka,22000000054,Interpol
+Adaeze Olawale,WL-2026-0056,Nigerian,Olawale,Adaeze,Oluwaseun,22000000055,EFCC
+Musa Maikudi,WL-2026-0057,Ghanaian,Maikudi,Musa,Abdullahi,22000000056,NFIU
+Chioma Okonkwo,WL-2026-0058,Kenyan,Okonkwo,Chioma,Obiageli,22000000057,Manual Entry
+Bola Adeyemi,WL-2026-0059,South African,Adeyemi,Bola,Nnamdi,22000000058,CBN Watchlist
+Yusuf Ibrahim,WL-2026-0060,Senegalese,Ibrahim,Yusuf,,22000000059,Interpol
+Emeka Nwosu,WL-2026-0061,Nigerian,Nwosu,Emeka,Chukwuemeka,22000000060,EFCC
+Ngozi Bello,WL-2026-0062,Ghanaian,Bello,Ngozi,Oluwaseun,22000000061,NFIU
+Tunde Adeleke,WL-2026-0063,Kenyan,Adeleke,Tunde,Abdullahi,22000000062,Manual Entry
+Amina Okafor,WL-2026-0064,South African,Okafor,Amina,Obiageli,22000000063,CBN Watchlist
+Chidi Lawal,WL-2026-0065,Senegalese,Lawal,Chidi,Nnamdi,22000000064,Interpol
+Fatima Eze,WL-2026-0066,Nigerian,Eze,Fatima,,22000000065,EFCC
+Biodun Danjuma,WL-2026-0067,Ghanaian,Danjuma,Biodun,Chukwuemeka,22000000066,NFIU
+Kemi Obi,WL-2026-0068,Kenyan,Obi,Kemi,Oluwaseun,22000000067,Manual Entry
+Uche Abubakar,WL-2026-0069,South African,Abubakar,Uche,Abdullahi,22000000068,CBN Watchlist
+Sule Chukwu,WL-2026-0070,Senegalese,Chukwu,Sule,Obiageli,22000000069,Interpol
+Adaeze Olawale,WL-2026-0071,Nigerian,Olawale,Adaeze,Nnamdi,22000000070,EFCC
+Musa Maikudi,WL-2026-0072,Ghanaian,Maikudi,Musa,,22000000071,NFIU
+Chioma Okonkwo,WL-2026-0073,Kenyan,Okonkwo,Chioma,Chukwuemeka,22000000072,Manual Entry
+Bola Adeyemi,WL-2026-0074,South African,Adeyemi,Bola,Oluwaseun,22000000073,CBN Watchlist
+Yusuf Ibrahim,WL-2026-0075,Senegalese,Ibrahim,Yusuf,Abdullahi,22000000074,Interpol
+Emeka Nwosu,WL-2026-0076,Nigerian,Nwosu,Emeka,Obiageli,22000000075,EFCC
+Ngozi Bello,WL-2026-0077,Ghanaian,Bello,Ngozi,Nnamdi,22000000076,NFIU
+Tunde Adeleke,WL-2026-0078,Kenyan,Adeleke,Tunde,,22000000077,Manual Entry
+Amina Okafor,WL-2026-0079,South African,Okafor,Amina,Chukwuemeka,22000000078,CBN Watchlist
+Chidi Lawal,WL-2026-0080,Senegalese,Lawal,Chidi,Oluwaseun,22000000079,Interpol
+Fatima Eze,WL-2026-0081,Nigerian,Eze,Fatima,Abdullahi,22000000080,EFCC
+Biodun Danjuma,WL-2026-0082,Ghanaian,Danjuma,Biodun,Obiageli,22000000081,NFIU
+Kemi Obi,WL-2026-0083,Kenyan,Obi,Kemi,Nnamdi,22000000082,Manual Entry
+Uche Abubakar,WL-2026-0084,South African,Abubakar,Uche,,22000000083,CBN Watchlist
+Sule Chukwu,WL-2026-0085,Senegalese,Chukwu,Sule,Chukwuemeka,22000000084,Interpol
+Adaeze Olawale,WL-2026-0086,Nigerian,Olawale,Adaeze,Oluwaseun,22000000085,EFCC
+Musa Maikudi,WL-2026-0087,Ghanaian,Maikudi,Musa,Abdullahi,22000000086,NFIU
+Chioma Okonkwo,WL-2026-0088,Kenyan,Okonkwo,Chioma,Obiageli,22000000087,Manual Entry
+Bola Adeyemi,WL-2026-0089,South African,Adeyemi,Bola,Nnamdi,22000000088,CBN Watchlist
+Yusuf Ibrahim,WL-2026-0090,Senegalese,Ibrahim,Yusuf,,22000000089,Interpol
+Emeka Nwosu,WL-2026-0091,Nigerian,Nwosu,Emeka,Chukwuemeka,22000000090,EFCC
+Ngozi Bello,WL-2026-0092,Ghanaian,Bello,Ngozi,Oluwaseun,22000000091,NFIU
+Tunde Adeleke,WL-2026-0093,Kenyan,Adeleke,Tunde,Abdullahi,22000000092,Manual Entry
+Amina Okafor,WL-2026-0094,South African,Okafor,Amina,Obiageli,22000000093,CBN Watchlist
+Chidi Lawal,WL-2026-0095,Senegalese,Lawal,Chidi,Nnamdi,22000000094,Interpol
+Fatima Eze,WL-2026-0096,Nigerian,Eze,Fatima,,22000000095,EFCC
+Biodun Danjuma,WL-2026-0097,Ghanaian,Danjuma,Biodun,Chukwuemeka,22000000096,NFIU
+Kemi Obi,WL-2026-0098,Kenyan,Obi,Kemi,Oluwaseun,22000000097,Manual Entry
+Uche Abubakar,WL-2026-0099,South African,Abubakar,Uche,Abdullahi,22000000098,CBN Watchlist
+Sule Chukwu,WL-2026-0100,Senegalese,Chukwu,Sule,Obiageli,22000000099,Interpol

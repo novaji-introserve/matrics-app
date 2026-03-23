@@ -37,7 +37,7 @@
                     <group>
                         <group>
                             <field name="event_date" attrs="{'readonly': [('case_status', '!=', 'draft')]}"/>
-                            <field name="officer_responsible" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': [('case_status', '!=', 'draft')]}"/>
+                            <field name="officer_responsible" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': [('case_status', 'not in', ['draft', 'open', 'overdue'])]}"/>
                             <field name="department_id" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': True}"/>
                             <field name="customer_id" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': [ ('case_status', '!=', 'draft')]}"/>
                             <field name="transaction_id" options="{'no_open': True, 'no_create': True}" attrs="{'readonly': [ ('case_status', '!=', 'draft')]}"/>

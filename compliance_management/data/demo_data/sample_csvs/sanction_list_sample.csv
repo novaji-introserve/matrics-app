@@ -1,0 +1,101 @@
+name,sanction_id,nationality,surname,first_name,middle_name,source,active
+Emeka Nwosu,SAN-2026-0001,Nigerian,Nwosu,Emeka,Chukwuemeka,EFCC,True
+Ngozi Bello,SAN-2026-0002,Ghanaian,Bello,Ngozi,Oluwaseun,NFIU,True
+Tunde Adeleke,SAN-2026-0003,Kenyan,Adeleke,Tunde,Abdullahi,Manual Entry,True
+Amina Okafor,SAN-2026-0004,South African,Okafor,Amina,Obiageli,CBN Watchlist,True
+Chidi Lawal,SAN-2026-0005,Senegalese,Lawal,Chidi,Nnamdi,Interpol,True
+Fatima Eze,SAN-2026-0006,Nigerian,Eze,Fatima,,EFCC,True
+Biodun Danjuma,SAN-2026-0007,Ghanaian,Danjuma,Biodun,Chukwuemeka,NFIU,True
+Kemi Obi,SAN-2026-0008,Kenyan,Obi,Kemi,Oluwaseun,Manual Entry,True
+Uche Abubakar,SAN-2026-0009,South African,Abubakar,Uche,Abdullahi,CBN Watchlist,True
+Sule Chukwu,SAN-2026-0010,Senegalese,Chukwu,Sule,Obiageli,Interpol,True
+Adaeze Olawale,SAN-2026-0011,Nigerian,Olawale,Adaeze,Nnamdi,EFCC,True
+Musa Maikudi,SAN-2026-0012,Ghanaian,Maikudi,Musa,,NFIU,True
+Chioma Okonkwo,SAN-2026-0013,Kenyan,Okonkwo,Chioma,Chukwuemeka,Manual Entry,True
+Bola Adeyemi,SAN-2026-0014,South African,Adeyemi,Bola,Oluwaseun,CBN Watchlist,True
+Yusuf Ibrahim,SAN-2026-0015,Senegalese,Ibrahim,Yusuf,Abdullahi,Interpol,True
+Emeka Nwosu,SAN-2026-0016,Nigerian,Nwosu,Emeka,Obiageli,EFCC,True
+Ngozi Bello,SAN-2026-0017,Ghanaian,Bello,Ngozi,Nnamdi,NFIU,True
+Tunde Adeleke,SAN-2026-0018,Kenyan,Adeleke,Tunde,,Manual Entry,True
+Amina Okafor,SAN-2026-0019,South African,Okafor,Amina,Chukwuemeka,CBN Watchlist,True
+Chidi Lawal,SAN-2026-0020,Senegalese,Lawal,Chidi,Oluwaseun,Interpol,True
+Fatima Eze,SAN-2026-0021,Nigerian,Eze,Fatima,Abdullahi,EFCC,True
+Biodun Danjuma,SAN-2026-0022,Ghanaian,Danjuma,Biodun,Obiageli,NFIU,True
+Kemi Obi,SAN-2026-0023,Kenyan,Obi,Kemi,Nnamdi,Manual Entry,True
+Uche Abubakar,SAN-2026-0024,South African,Abubakar,Uche,,CBN Watchlist,True
+Sule Chukwu,SAN-2026-0025,Senegalese,Chukwu,Sule,Chukwuemeka,Interpol,True
+Adaeze Olawale,SAN-2026-0026,Nigerian,Olawale,Adaeze,Oluwaseun,EFCC,True
+Musa Maikudi,SAN-2026-0027,Ghanaian,Maikudi,Musa,Abdullahi,NFIU,True
+Chioma Okonkwo,SAN-2026-0028,Kenyan,Okonkwo,Chioma,Obiageli,Manual Entry,True
+Bola Adeyemi,SAN-2026-0029,South African,Adeyemi,Bola,Nnamdi,CBN Watchlist,True
+Yusuf Ibrahim,SAN-2026-0030,Senegalese,Ibrahim,Yusuf,,Interpol,True
+Emeka Nwosu,SAN-2026-0031,Nigerian,Nwosu,Emeka,Chukwuemeka,EFCC,True
+Ngozi Bello,SAN-2026-0032,Ghanaian,Bello,Ngozi,Oluwaseun,NFIU,True
+Tunde Adeleke,SAN-2026-0033,Kenyan,Adeleke,Tunde,Abdullahi,Manual Entry,True
+Amina Okafor,SAN-2026-0034,South African,Okafor,Amina,Obiageli,CBN Watchlist,True
+Chidi Lawal,SAN-2026-0035,Senegalese,Lawal,Chidi,Nnamdi,Interpol,True
+Fatima Eze,SAN-2026-0036,Nigerian,Eze,Fatima,,EFCC,True
+Biodun Danjuma,SAN-2026-0037,Ghanaian,Danjuma,Biodun,Chukwuemeka,NFIU,True
+Kemi Obi,SAN-2026-0038,Kenyan,Obi,Kemi,Oluwaseun,Manual Entry,True
+Uche Abubakar,SAN-2026-0039,South African,Abubakar,Uche,Abdullahi,CBN Watchlist,True
+Sule Chukwu,SAN-2026-0040,Senegalese,Chukwu,Sule,Obiageli,Interpol,True
+Adaeze Olawale,SAN-2026-0041,Nigerian,Olawale,Adaeze,Nnamdi,EFCC,True
+Musa Maikudi,SAN-2026-0042,Ghanaian,Maikudi,Musa,,NFIU,True
+Chioma Okonkwo,SAN-2026-0043,Kenyan,Okonkwo,Chioma,Chukwuemeka,Manual Entry,True
+Bola Adeyemi,SAN-2026-0044,South African,Adeyemi,Bola,Oluwaseun,CBN Watchlist,True
+Yusuf Ibrahim,SAN-2026-0045,Senegalese,Ibrahim,Yusuf,Abdullahi,Interpol,True
+Emeka Nwosu,SAN-2026-0046,Nigerian,Nwosu,Emeka,Obiageli,EFCC,True
+Ngozi Bello,SAN-2026-0047,Ghanaian,Bello,Ngozi,Nnamdi,NFIU,True
+Tunde Adeleke,SAN-2026-0048,Kenyan,Adeleke,Tunde,,Manual Entry,True
+Amina Okafor,SAN-2026-0049,South African,Okafor,Amina,Chukwuemeka,CBN Watchlist,True
+Chidi Lawal,SAN-2026-0050,Senegalese,Lawal,Chidi,Oluwaseun,Interpol,True
+Fatima Eze,SAN-2026-0051,Nigerian,Eze,Fatima,Abdullahi,EFCC,True
+Biodun Danjuma,SAN-2026-0052,Ghanaian,Danjuma,Biodun,Obiageli,NFIU,True
+Kemi Obi,SAN-2026-0053,Kenyan,Obi,Kemi,Nnamdi,Manual Entry,True
+Uche Abubakar,SAN-2026-0054,South African,Abubakar,Uche,,CBN Watchlist,True
+Sule Chukwu,SAN-2026-0055,Senegalese,Chukwu,Sule,Chukwuemeka,Interpol,True
+Adaeze Olawale,SAN-2026-0056,Nigerian,Olawale,Adaeze,Oluwaseun,EFCC,True
+Musa Maikudi,SAN-2026-0057,Ghanaian,Maikudi,Musa,Abdullahi,NFIU,True
+Chioma Okonkwo,SAN-2026-0058,Kenyan,Okonkwo,Chioma,Obiageli,Manual Entry,True
+Bola Adeyemi,SAN-2026-0059,South African,Adeyemi,Bola,Nnamdi,CBN Watchlist,True
+Yusuf Ibrahim,SAN-2026-0060,Senegalese,Ibrahim,Yusuf,,Interpol,True
+Emeka Nwosu,SAN-2026-0061,Nigerian,Nwosu,Emeka,Chukwuemeka,EFCC,True
+Ngozi Bello,SAN-2026-0062,Ghanaian,Bello,Ngozi,Oluwaseun,NFIU,True
+Tunde Adeleke,SAN-2026-0063,Kenyan,Adeleke,Tunde,Abdullahi,Manual Entry,True
+Amina Okafor,SAN-2026-0064,South African,Okafor,Amina,Obiageli,CBN Watchlist,True
+Chidi Lawal,SAN-2026-0065,Senegalese,Lawal,Chidi,Nnamdi,Interpol,True
+Fatima Eze,SAN-2026-0066,Nigerian,Eze,Fatima,,EFCC,True
+Biodun Danjuma,SAN-2026-0067,Ghanaian,Danjuma,Biodun,Chukwuemeka,NFIU,True
+Kemi Obi,SAN-2026-0068,Kenyan,Obi,Kemi,Oluwaseun,Manual Entry,True
+Uche Abubakar,SAN-2026-0069,South African,Abubakar,Uche,Abdullahi,CBN Watchlist,True
+Sule Chukwu,SAN-2026-0070,Senegalese,Chukwu,Sule,Obiageli,Interpol,True
+Adaeze Olawale,SAN-2026-0071,Nigerian,Olawale,Adaeze,Nnamdi,EFCC,True
+Musa Maikudi,SAN-2026-0072,Ghanaian,Maikudi,Musa,,NFIU,True
+Chioma Okonkwo,SAN-2026-0073,Kenyan,Okonkwo,Chioma,Chukwuemeka,Manual Entry,True
+Bola Adeyemi,SAN-2026-0074,South African,Adeyemi,Bola,Oluwaseun,CBN Watchlist,True
+Yusuf Ibrahim,SAN-2026-0075,Senegalese,Ibrahim,Yusuf,Abdullahi,Interpol,True
+Emeka Nwosu,SAN-2026-0076,Nigerian,Nwosu,Emeka,Obiageli,EFCC,True
+Ngozi Bello,SAN-2026-0077,Ghanaian,Bello,Ngozi,Nnamdi,NFIU,True
+Tunde Adeleke,SAN-2026-0078,Kenyan,Adeleke,Tunde,,Manual Entry,True
+Amina Okafor,SAN-2026-0079,South African,Okafor,Amina,Chukwuemeka,CBN Watchlist,True
+Chidi Lawal,SAN-2026-0080,Senegalese,Lawal,Chidi,Oluwaseun,Interpol,True
+Fatima Eze,SAN-2026-0081,Nigerian,Eze,Fatima,Abdullahi,EFCC,True
+Biodun Danjuma,SAN-2026-0082,Ghanaian,Danjuma,Biodun,Obiageli,NFIU,True
+Kemi Obi,SAN-2026-0083,Kenyan,Obi,Kemi,Nnamdi,Manual Entry,True
+Uche Abubakar,SAN-2026-0084,South African,Abubakar,Uche,,CBN Watchlist,True
+Sule Chukwu,SAN-2026-0085,Senegalese,Chukwu,Sule,Chukwuemeka,Interpol,True
+Adaeze Olawale,SAN-2026-0086,Nigerian,Olawale,Adaeze,Oluwaseun,EFCC,True
+Musa Maikudi,SAN-2026-0087,Ghanaian,Maikudi,Musa,Abdullahi,NFIU,True
+Chioma Okonkwo,SAN-2026-0088,Kenyan,Okonkwo,Chioma,Obiageli,Manual Entry,True
+Bola Adeyemi,SAN-2026-0089,South African,Adeyemi,Bola,Nnamdi,CBN Watchlist,True
+Yusuf Ibrahim,SAN-2026-0090,Senegalese,Ibrahim,Yusuf,,Interpol,True
+Emeka Nwosu,SAN-2026-0091,Nigerian,Nwosu,Emeka,Chukwuemeka,EFCC,True
+Ngozi Bello,SAN-2026-0092,Ghanaian,Bello,Ngozi,Oluwaseun,NFIU,True
+Tunde Adeleke,SAN-2026-0093,Kenyan,Adeleke,Tunde,Abdullahi,Manual Entry,True
+Amina Okafor,SAN-2026-0094,South African,Okafor,Amina,Obiageli,CBN Watchlist,True
+Chidi Lawal,SAN-2026-0095,Senegalese,Lawal,Chidi,Nnamdi,Interpol,True
+Fatima Eze,SAN-2026-0096,Nigerian,Eze,Fatima,,EFCC,True
+Biodun Danjuma,SAN-2026-0097,Ghanaian,Danjuma,Biodun,Chukwuemeka,NFIU,True
+Kemi Obi,SAN-2026-0098,Kenyan,Obi,Kemi,Oluwaseun,Manual Entry,True
+Uche Abubakar,SAN-2026-0099,South African,Abubakar,Uche,Abdullahi,CBN Watchlist,True
+Sule Chukwu,SAN-2026-0100,Senegalese,Chukwu,Sule,Obiageli,Interpol,True

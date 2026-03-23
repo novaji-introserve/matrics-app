@@ -292,7 +292,7 @@ class PepSource(models.Model):
             source_record=self
         )
         
-        if result.get('status') == 'success':
+        if result.get('status') in ('success', 'end_of_results'):
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',

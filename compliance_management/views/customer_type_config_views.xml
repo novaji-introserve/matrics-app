@@ -100,13 +100,5 @@
             </field>
         </record>
 
-        <!-- Menu Item under Compliance Configuration -->
-        <menuitem id="menu_customer_type_config"
-                  name="Customer Type Classifications"
-                  parent="menu_compliance_configuration"
-                  action="action_customer_type_config"
-                  groups="group_compliance_compliance_officer"
-                  sequence="465"/>
-
     </data>
 </odoo>

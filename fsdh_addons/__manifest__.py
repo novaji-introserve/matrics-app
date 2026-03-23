@@ -7,7 +7,8 @@
     "author": "Novaji Introserve",
     "depends": [
         "alert_management",
-        "compliance_management",
+        "internal_control",
+        "case_management_v2",
         "web",
     ],
     "data": [

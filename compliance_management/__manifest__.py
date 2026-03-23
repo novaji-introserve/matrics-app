@@ -62,6 +62,7 @@
         "views/adverse_media_logs.xml",
         "views/adverse_media_keywords.xml",
         "views/pep_source.xml",
+        "data/demo_data/pep_source/pep_sources.xml",
         "data/data.xml",
         "data/customer_type_config.xml",
         "data/demo_data/risk_assessment/category.xml",
