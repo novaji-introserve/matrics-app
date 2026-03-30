@@ -44,7 +44,6 @@ import (
 
 const (
 	// Redis cache key patterns (all prefixed with {dbName})
-	redisMVCacheKeyPattern        = "%s_mv_%s_%d"     // {dbName}_mv_{mvName}_{partnerId}
 	redisEDDCacheKeyPattern       = "%s_edd_%d"       // {dbName}_edd_{partnerId}
 	redisRiskPlanCacheKeyPattern  = "%s_risk_plan_%d" // {dbName}_risk_plan_{partnerId}
 	redisCompositeCacheKeyPattern = "%s_composite_%d" // {dbName}_composite_{partnerId}
@@ -494,6 +493,7 @@ func (c *MVRiskCalculator) ProcessCustomerBatch(
 	type job struct {
 		index      int
 		customerID int
+		mvData     map[int]map[string]float64 // pre-loaded MV data: universeID -> riskData
 	}
 	jobs := make(chan job, len(customerIDs))
 
@@ -524,9 +524,9 @@ func (c *MVRiskCalculator) ProcessCustomerBatch(
 				c.logger.Info("Processing priority customer (NEW)",
 					zap.Int("customer_id", newCustID))
 
-				// Process new customer immediately
+				// Process new customer immediately (no pre-loaded MV data for priority customers)
 				customerStart := time.Now()
-				score, level, compositePlanLines, riskPlanLines, err := c.calculateSingleCustomerFromMV(ctx, newCustID)
+				score, level, compositePlanLines, riskPlanLines, err := c.calculateSingleCustomerFromMV(ctx, newCustID, nil)
 				customerDuration := time.Since(customerStart)
 
 				result := CustomerRiskResult{
@@ -635,9 +635,9 @@ func (c *MVRiskCalculator) ProcessCustomerBatch(
 				default:
 				}
 
-				// Process single customer using materialized views
+				// Process single customer using pre-loaded MV data
 				customerStart := time.Now()
-				score, level, compositePlanLines, riskPlanLines, err := c.calculateSingleCustomerFromMV(ctx, j.customerID)
+				score, level, compositePlanLines, riskPlanLines, err := c.calculateSingleCustomerFromMV(ctx, j.customerID, j.mvData)
 				customerDuration := time.Since(customerStart)
 
 				results[j.index] = CustomerRiskResult{
@@ -682,9 +682,16 @@ func (c *MVRiskCalculator) ProcessCustomerBatch(
 		}(w)
 	}
 
+	// Bulk-load MV data for entire batch before submitting jobs
+	batchMVData, err := c.loadBatchMVData(ctx, customerIDs)
+	if err != nil {
+		c.logger.Warn("Failed to bulk-load MV data, falling back to per-customer queries", zap.Error(err))
+		batchMVData = make(map[int]map[int]map[string]float64)
+	}
+
 	// Submit jobs
 	for i, custID := range customerIDs {
-		jobs <- job{index: i, customerID: custID}
+		jobs <- job{index: i, customerID: custID, mvData: batchMVData[custID]}
 	}
 	close(jobs)
 
@@ -770,7 +777,7 @@ func (c *MVRiskCalculator) ProcessCustomerBatch(
 }
 
 // calculateSingleCustomerFromMV calculates risk score for a single customer using materialized views
-func (c *MVRiskCalculator) calculateSingleCustomerFromMV(ctx context.Context, customerID int) (float64, string, []CompositePlanLine, []RiskPlanLine, error) {
+func (c *MVRiskCalculator) calculateSingleCustomerFromMV(ctx context.Context, customerID int, preloadedMVData map[int]map[string]float64) (float64, string, []CompositePlanLine, []RiskPlanLine, error) {
 	c.cacheMu.RLock()
 	settings := c.cachedSettings
 	universes := c.cachedUniverses
@@ -783,7 +790,7 @@ func (c *MVRiskCalculator) calculateSingleCustomerFromMV(ctx context.Context, cu
 	// Each MV contains pre-computed risk data in JSONB format
 	// Example: {"INDIVIDUAL_AMF_N_CUR122": 1.0, "BUSINESS_AMF_CUR089": 1.0}
 
-	compositeScore, compositePlanLines, err := c.calculateCompositeScoreFromMVs(ctx, c.db, customerID, settings.CompositeComputation, universes)
+	compositeScore, compositePlanLines, err := c.calculateCompositeScoreFromMVs(ctx, c.db, customerID, settings.CompositeComputation, universes, preloadedMVData)
 	if err != nil {
 		c.logger.Warn("Failed to calculate composite score from MVs",
 			zap.Int("customer_id", customerID),
@@ -884,29 +891,13 @@ func (c *MVRiskCalculator) calculateCompositeScoreFromMVs(
 	customerID int,
 	compositeComputation string,
 	universes map[int]*RiskUniverse,
+	preloadedMVData map[int]map[string]float64, // universeID -> riskData, nil triggers per-customer DB query
 ) (float64, []CompositePlanLine, error) {
 	if len(universes) == 0 {
 		return 0, nil, nil
 	}
 
-	// Try Redis cache first for complete composite score
-	if c.useRedis && c.redisClient != nil {
-		cacheKey := fmt.Sprintf(redisCompositeCacheKeyPattern, c.dbName, customerID)
-		cachedData, err := c.redisClient.Get(ctx, cacheKey).Result()
-
-		if err == nil {
-			type compositeCacheData struct {
-				Score              float64             `json:"score"`
-				CompositePlanLines []CompositePlanLine `json:"composite_plan_lines"`
-			}
-			var cached compositeCacheData
-			if err := json.Unmarshal([]byte(cachedData), &cached); err == nil {
-				return cached.Score, cached.CompositePlanLines, nil
-			}
-		}
-	}
-
-	// Query all materialized views in parallel with Redis caching
+	// Build MV results: use pre-loaded batch data if available, otherwise query DB per customer
 	type mvResult struct {
 		universeID int
 		mvName     string
@@ -914,79 +905,53 @@ func (c *MVRiskCalculator) calculateCompositeScoreFromMVs(
 		err        error
 	}
 
-	resultsChan := make(chan mvResult, len(c.mvMetadata))
-	var mvWg sync.WaitGroup
-
 	c.cacheMu.RLock()
 	mvMetadata := c.mvMetadata
 	c.cacheMu.RUnlock()
 
-	// Query each MV in parallel with Redis cache check
-	for universeID, mv := range mvMetadata {
-		mvWg.Add(1)
-		go func(univID int, mvMeta *MVMetadata) {
-			defer mvWg.Done()
+	resultsChan := make(chan mvResult, len(mvMetadata))
 
-			// Try Redis cache first if enabled
-			if c.useRedis && c.redisClient != nil {
-				cacheKey := fmt.Sprintf(redisMVCacheKeyPattern, c.dbName, mvMeta.Name, customerID)
-				cachedData, err := c.redisClient.Get(ctx, cacheKey).Result()
-
-				if err == nil {
-					// Cache hit - parse and return
-					var riskData map[string]float64
-					if err := json.Unmarshal([]byte(cachedData), &riskData); err == nil {
-						resultsChan <- mvResult{universeID: univID, mvName: mvMeta.Name, riskData: riskData}
+	if preloadedMVData != nil {
+		// Use pre-loaded batch data (fast path for batch processing)
+		for universeID, mv := range mvMetadata {
+			riskData, ok := preloadedMVData[universeID]
+			if !ok {
+				riskData = make(map[string]float64)
+			}
+			resultsChan <- mvResult{universeID: universeID, mvName: mv.Name, riskData: riskData}
+		}
+		close(resultsChan)
+	} else {
+		// Fallback: query DB per customer (used for priority/single-customer processing)
+		var mvWg sync.WaitGroup
+		for universeID, mv := range mvMetadata {
+			mvWg.Add(1)
+			go func(univID int, mvMeta *MVMetadata) {
+				defer mvWg.Done()
+				var riskDataJSON []byte
+				query := fmt.Sprintf("SELECT risk_data FROM %s WHERE partner_id = $1", mvMeta.Name)
+				err := db.QueryRow(ctx, query, customerID).Scan(&riskDataJSON)
+				if err != nil {
+					if err == pgx.ErrNoRows {
+						resultsChan <- mvResult{universeID: univID, mvName: mvMeta.Name, riskData: make(map[string]float64)}
 						return
 					}
-				}
-			}
-
-			// Cache miss or Redis disabled - query database
-			var riskDataJSON []byte
-			query := fmt.Sprintf("SELECT risk_data FROM %s WHERE partner_id = $1", mvMeta.Name)
-			err := db.QueryRow(ctx, query, customerID).Scan(&riskDataJSON)
-
-			if err != nil {
-				if err == pgx.ErrNoRows {
-					// No data for this customer in this MV - cache empty result
-					emptyData := make(map[string]float64)
-					if c.useRedis && c.redisClient != nil {
-						cacheKey := fmt.Sprintf(redisMVCacheKeyPattern, c.dbName, mvMeta.Name, customerID)
-						emptyJSON, _ := json.Marshal(emptyData)
-						c.redisClient.Set(ctx, cacheKey, emptyJSON, redisCacheTTL)
-					}
-					resultsChan <- mvResult{universeID: univID, mvName: mvMeta.Name, riskData: emptyData}
+					resultsChan <- mvResult{universeID: univID, mvName: mvMeta.Name, err: err}
 					return
 				}
-				resultsChan <- mvResult{universeID: univID, mvName: mvMeta.Name, err: err}
-				return
-			}
-
-			// Parse JSONB risk data
-			var riskData map[string]float64
-			if err := json.Unmarshal(riskDataJSON, &riskData); err != nil {
-				resultsChan <- mvResult{universeID: univID, mvName: mvMeta.Name, err: err}
-				return
-			}
-
-			// Cache to Redis if enabled
-			if c.useRedis && c.redisClient != nil {
-				cacheKey := fmt.Sprintf(redisMVCacheKeyPattern, c.dbName, mvMeta.Name, customerID)
-				if cachedJSON, err := json.Marshal(riskData); err == nil {
-					c.redisClient.Set(ctx, cacheKey, cachedJSON, redisCacheTTL)
+				var riskData map[string]float64
+				if err := json.Unmarshal(riskDataJSON, &riskData); err != nil {
+					resultsChan <- mvResult{universeID: univID, mvName: mvMeta.Name, err: err}
+					return
 				}
-			}
-
-			resultsChan <- mvResult{universeID: univID, mvName: mvMeta.Name, riskData: riskData}
-		}(universeID, mv)
+				resultsChan <- mvResult{universeID: univID, mvName: mvMeta.Name, riskData: riskData}
+			}(universeID, mv)
+		}
+		go func() {
+			mvWg.Wait()
+			close(resultsChan)
+		}()
 	}
-
-	// Wait for all queries to complete
-	go func() {
-		mvWg.Wait()
-		close(resultsChan)
-	}()
 
 	// Collect results and aggregate by universe with plan metadata lookup
 	compositePlanLines := make([]CompositePlanLine, 0)
@@ -1122,6 +1087,42 @@ func (c *MVRiskCalculator) calculateCompositeScoreFromMVs(
 	}
 
 	return compositeScore, compositePlanLines, nil
+}
+
+// loadBatchMVData bulk-loads MV data for a batch of customers using one query per MV table.
+// Returns: customerID -> universeID -> patternCode -> score
+func (c *MVRiskCalculator) loadBatchMVData(ctx context.Context, customerIDs []int) (map[int]map[int]map[string]float64, error) {
+	result := make(map[int]map[int]map[string]float64, len(customerIDs))
+
+	c.cacheMu.RLock()
+	mvMetadata := c.mvMetadata
+	c.cacheMu.RUnlock()
+
+	for universeID, mv := range mvMetadata {
+		query := fmt.Sprintf("SELECT partner_id, risk_data FROM %s WHERE partner_id = ANY($1)", mv.Name)
+		rows, err := c.db.Query(ctx, query, customerIDs)
+		if err != nil {
+			c.logger.Warn("Failed to bulk query MV", zap.String("mv", mv.Name), zap.Error(err))
+			continue
+		}
+		for rows.Next() {
+			var partnerID int
+			var riskDataJSON []byte
+			if err := rows.Scan(&partnerID, &riskDataJSON); err != nil {
+				continue
+			}
+			var riskData map[string]float64
+			if err := json.Unmarshal(riskDataJSON, &riskData); err != nil {
+				continue
+			}
+			if result[partnerID] == nil {
+				result[partnerID] = make(map[int]map[string]float64)
+			}
+			result[partnerID][universeID] = riskData
+		}
+		rows.Close()
+	}
+	return result, nil
 }
 
 // Helper methods (reused from batched calculator)
@@ -1458,10 +1459,12 @@ func (c *MVRiskCalculator) bulkInsertCompositePlanLines(ctx context.Context, res
 		return nil
 	}
 
+	
+
 	copyCount, err := c.db.CopyFrom(
 		ctx,
 		pgx.Identifier{"res_partner_composite_plan_line"},
-		[]string{"partner_id", "plan_id", "universe_id", "subject_id", "assessment_id", "matched", "risk_score", "name", "active", "create_uid", "create_date", "write_uid", "write_date"},
+		[]string{"partner_id", "plan_id", "universe_id", "subject_id", "assessment_id", "matched", "risk_score", "name", "create_uid", "create_date", "write_uid", "write_date"},
 		pgx.CopyFromSlice(len(allPlanLines), func(i int) ([]interface{}, error) {
 			line := allPlanLines[i]
 			var subjectID, assessmentID, planID interface{}
@@ -1478,7 +1481,7 @@ func (c *MVRiskCalculator) bulkInsertCompositePlanLines(ctx context.Context, res
 			return []interface{}{
 				line.PartnerID, planID, line.UniverseID, subjectID, assessmentID,
 				line.Matched, line.RiskScore, line.Name,
-				nil, 1, time.Now(), 1, time.Now(), // active=NULL to match Odoo behavior
+				1, time.Now(), 1, time.Now(),
 			}, nil
 		}),
 	)
@@ -1537,7 +1540,7 @@ func (c *MVRiskCalculator) bulkUpsertCompositePlanLines(ctx context.Context, res
 		copyCount, err := tx.CopyFrom(
 			ctx,
 			pgx.Identifier{"res_partner_composite_plan_line"},
-			[]string{"partner_id", "plan_id", "universe_id", "subject_id", "assessment_id", "matched", "risk_score", "name", "active", "create_uid", "create_date", "write_uid", "write_date"},
+			[]string{"partner_id", "plan_id", "universe_id", "subject_id", "assessment_id", "matched", "risk_score", "name", "create_uid", "create_date", "write_uid", "write_date"},
 			pgx.CopyFromSlice(len(allPlanLines), func(i int) ([]interface{}, error) {
 				line := allPlanLines[i]
 				var subjectID, assessmentID, planID interface{}
@@ -1554,7 +1557,7 @@ func (c *MVRiskCalculator) bulkUpsertCompositePlanLines(ctx context.Context, res
 				return []interface{}{
 					line.PartnerID, planID, line.UniverseID, subjectID, assessmentID,
 					line.Matched, line.RiskScore, line.Name,
-					nil, 1, time.Now(), 1, time.Now(), // active=NULL to match Odoo behavior
+					1, time.Now(), 1, time.Now(),
 				}, nil
 			}),
 		)
@@ -1914,76 +1917,10 @@ func (c *MVRiskCalculator) PreWarmCache(ctx context.Context, customerIDs []int, 
 
 // preWarmBatch pre-warms cache for a batch of customers
 func (c *MVRiskCalculator) preWarmBatch(ctx context.Context, customerIDs []int) (int, error) {
-	c.cacheMu.RLock()
-	mvMetadata := c.mvMetadata
-	cachedUniverses := c.cachedUniverses
-	c.cacheMu.RUnlock()
-
-	var cachedCount int64
-
-	// For each customer, query all MVs in parallel and cache results
-	var wg sync.WaitGroup
-	semaphore := make(chan struct{}, 50) // Limit concurrent queries
-
-	for _, customerID := range customerIDs {
-		for universeID, mvMeta := range mvMetadata {
-			wg.Add(1)
-			go func(custID int, univID int, mv *MVMetadata) {
-				defer wg.Done()
-
-				semaphore <- struct{}{}        // Acquire
-				defer func() { <-semaphore }() // Release
-
-				// Check if already cached
-				cacheKey := fmt.Sprintf(redisMVCacheKeyPattern, c.dbName, mv.Name, custID)
-				exists, _ := c.redisClient.Exists(ctx, cacheKey).Result()
-				if exists > 0 {
-					return // Already cached
-				}
-
-				// Query MV
-				var riskDataJSON []byte
-				query := fmt.Sprintf("SELECT risk_data FROM %s WHERE partner_id = $1", mv.Name)
-				err := c.db.QueryRow(ctx, query, custID).Scan(&riskDataJSON)
-
-				if err != nil {
-					if err == pgx.ErrNoRows {
-						// Cache empty result
-						emptyData := make(map[string]float64)
-						emptyJSON, _ := json.Marshal(emptyData)
-						c.redisClient.Set(ctx, cacheKey, emptyJSON, redisCacheTTL)
-					}
-					return
-				}
-
-				// Parse and cache
-				var riskData map[string]float64
-				if err := json.Unmarshal(riskDataJSON, &riskData); err == nil {
-					if cachedJSON, err := json.Marshal(riskData); err == nil {
-						c.redisClient.Set(ctx, cacheKey, cachedJSON, redisCacheTTL)
-						atomic.AddInt64(&cachedCount, 1)
-					}
-				}
-			}(customerID, universeID, mvMeta)
-		}
+	// Use bulk MV loading instead of per-customer queries
+	batchData, err := c.loadBatchMVData(ctx, customerIDs)
+	if err != nil {
+		return 0, err
 	}
-
-	wg.Wait()
-
-	// Also pre-warm composite cache by querying universes
-	compositeCount := 0
-	for _, customerID := range customerIDs {
-		compositeKey := fmt.Sprintf(redisCompositeCacheKeyPattern, c.dbName, customerID)
-		exists, _ := c.redisClient.Exists(ctx, compositeKey).Result()
-		if exists == 0 {
-			// Calculate and cache composite score
-			_, compositePlanLines, err := c.calculateCompositeScoreFromMVs(ctx, c.db, customerID, "max", cachedUniverses)
-			if err == nil {
-				// This automatically caches via calculateCompositeScoreFromMVs
-				compositeCount += len(compositePlanLines)
-			}
-		}
-	}
-
-	return int(cachedCount) + compositeCount, nil
+	return len(batchData), nil
 }

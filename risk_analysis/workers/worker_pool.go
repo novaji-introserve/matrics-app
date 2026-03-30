@@ -21,6 +21,7 @@ type WorkerPool struct {
 	jobs             chan Job
 	results          chan error
 	wg               sync.WaitGroup
+	stopOnce         sync.Once
 	logger           *zap.Logger
 	activeWorkers    int32
 	processedCount   int64
@@ -158,10 +159,12 @@ func (p *WorkerPool) Results() <-chan error {
 
 // Stop stops the worker pool and waits for all workers to finish
 func (p *WorkerPool) Stop() {
-	close(p.jobs)
-	p.wg.Wait()
-	close(p.results)
-	p.logger.Info("Worker pool stopped")
+	p.stopOnce.Do(func() {
+		close(p.jobs)
+		p.wg.Wait()
+		close(p.results)
+		p.logger.Info("Worker pool stopped")
+	})
 }
 
 // GetStats returns statistics about the worker pool

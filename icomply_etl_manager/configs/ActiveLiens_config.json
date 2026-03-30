@@ -1,0 +1,94 @@
+{
+  "name": "ActiveLiens",
+  "source_connection_id": 2,
+  "target_connection_id": 3,
+  "source_table_name": "ActiveLiens",
+  "target_table_name": "res_active_lien",
+  "primary_key_unique": "ACTIVE_LIEN_ID",
+  "batch_size": 10000,
+  "incremental_date_column": null,
+  "dependencies": [],
+  "mappings": [
+    {
+      "source_column": "ACTIVE_LIEN_ID",
+      "target_column": "active_lien_id",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "LIEN_PURPOSE",
+      "target_column": "lien_purpose",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "APPROVED_BY",
+      "target_column": "approved_by",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "CREATED_BY",
+      "target_column": "created_by",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "REQUESTED_BY",
+      "target_column": "requested_by",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "REASON_FOR_LIFTING",
+      "target_column": "reason_for_lifting",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "DELETED_BY",
+      "target_column": "deleted_by",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "DATE_APPROVED",
+      "target_column": "date_approved",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "REASON",
+      "target_column": "reason",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "BANK_NAME",
+      "target_column": "bank_name",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "START_DATE",
+      "target_column": "start_date",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "END_DATE",
+      "target_column": "end_date",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "DATE_DELETED",
+      "target_column": "date_deleted",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "ACCOUNT_NO",
+      "target_column": "account_id",
+      "mapping_type": "lookup",
+      "lookup_table": "res_partner_account",
+      "lookup_key": "name",
+      "lookup_value": "id"
+    },
+    {
+      "source_column": "BRANCH_CODE",
+      "target_column": "branch_id",
+      "mapping_type": "lookup",
+      "lookup_table": "res_branch",
+      "lookup_key": "code",
+      "lookup_value": "id"
+    }
+  ]
+}

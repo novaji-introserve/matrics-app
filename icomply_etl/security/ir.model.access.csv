@@ -1,9 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_etl_source_table_user,etl.source.table.user,model_etl_source_table,base.group_user,1,0,0,0
-access_etl_source_table_manager,etl.source.table.manager,model_etl_source_table,base.group_system,1,1,1,1
-access_etl_column_mapping_user,etl.column.mapping.user,model_etl_column_mapping,base.group_user,1,0,0,0
-access_etl_column_mapping_manager,etl.column.mapping.manager,model_etl_column_mapping,base.group_system,1,1,1,1
-access_etl_sync_log_user,etl.sync.log.user,model_etl_sync_log,base.group_user,1,0,0,0
-access_etl_sync_log_manager,etl.sync.log.manager,model_etl_sync_log,base.group_system,1,1,1,1
-access_etl_category_manager,etl.category.manager,model_etl_category,base.group_system,1,1,1,1
-access_etl_frequency_manager,etl.frequency.manager,model_etl_frequency,base.group_system,1,1,1,1

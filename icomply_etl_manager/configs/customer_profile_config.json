@@ -1,0 +1,78 @@
+{
+  "name": "customer_profile",
+  "source_connection_id": 1,
+  "target_connection_id": 3,
+  "source_table_name": "customer_profile",
+  "target_table_name": "res_partner",
+  "primary_key_unique": "customerId",
+  "batch_size": 10000,
+  "incremental_date_column": null,
+  "dependencies": [],
+  "mappings": [
+    {
+      "source_column": "customerId",
+      "target_column": "customer_id",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "title",
+      "target_column": "customer_title",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "mobileNumber",
+      "target_column": "phone",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "customerNumber",
+      "target_column": "customer_no",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "otherNames",
+      "target_column": "othername",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "surname",
+      "target_column": "lastname",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "firstName",
+      "target_column": "name",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "nin",
+      "target_column": "nin",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "bvn",
+      "target_column": "bvn",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "dateOfBirth",
+      "target_column": "dob",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "emailAddress",
+      "target_column": "email",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "taxIdentificationNumber",
+      "target_column": "vat",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "createdAt",
+      "target_column": "date_opened",
+      "mapping_type": "direct"
+    }
+  ]
+}

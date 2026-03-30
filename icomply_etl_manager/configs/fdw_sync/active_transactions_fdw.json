@@ -1,0 +1,73 @@
+{
+  "table_name": "ActiveTransaction",
+  "fdw_schema": "seabaas",
+  "source_table": "ActiveTransaction",
+  "target_table": "res_customer_transaction",
+  "unique_column": "trans_id",
+  "date_column": "TRAN_DATE",
+  "initial_load_days": 7,
+  "incremental_load_minutes": 5,
+  "batch_size": 50000,
+  "field_mappings": {
+    "ACTIVE_TRANSACTION_ID": "trans_id",
+    "TRAN_DATE": "date_created",
+    "TRANSACTION_AMOUNT": "amount",
+    "NARRATION": "narration",
+    "VALUE_DATE": "valuedate",
+    "POSTED_DATE": "actualdate",
+    "ACCOUNT_NAME": "name",
+    "TRANSACTION_MODE": "transaction_mode",
+    "ACCOUNT_GROUP": "account_group",
+    "REQUEST_ID": "request_id",
+    "LCY_AMOUNT": "amount",
+    "PARENT_LEDGER_ID": "parent_ledger_id",
+    "SUB_GENERAL_LEDGER_CODE": "sub_general_ledger_code",
+    "SOURCE_BRANCH_CODE": "source_branch_code",
+    "POSTED_BY": "posted_by"
+  },
+  "lookups": {
+    "account_id": {
+      "source_field": "ACCOUNT_NO",
+      "lookup_table": "res_partner_account",
+      "lookup_key": "name",
+      "allow_null": true
+    },
+    "tran_type": {
+      "source_field": "TRANSACTION_TYPE",
+      "lookup_table": "res_transaction_type",
+      "lookup_key": "trancode",
+      "allow_null": true
+    },
+    "tran_channel": {
+      "source_field": "TRANSACTION_SOURCE",
+      "lookup_table": "res.transaction.channel",
+      "lookup_key": "code",
+      "allow_null": true
+    },
+    "currency_id": {
+      "source_field": "CURRENCY_CODE",
+      "lookup_table": "res_currency",
+      "lookup_key": "name",
+      "allow_null": true
+    },
+    "branch_id": {
+      "source_field": "BRANCH_CODE",
+      "lookup_table": "res_branch",
+      "lookup_key": "code",
+      "allow_null": true
+    },
+    "customer_id": {
+      "source_field": "CUSTOMER_ID",
+      "lookup_table": "res_partner",
+      "lookup_key": "customer_id",
+      "allow_null": true
+    },
+    "status": {
+      "source_field": "TRANSACTION_STATUS",
+      "lookup_table": "res_transaction_status",
+      "lookup_key": "code",
+      "allow_null": true
+    }
+  }
+}
+

@@ -31,7 +31,9 @@ class CustomerAccount(models.Model):
     last_transaction_date = fields.Date(
         string='Last Transaction Date', required=False)
     opening_date = fields.Date(
-        string='Opening Date', required=False,index=True)
+        string='Opening Date', required=False, index=True)
+    # date_created = fields.Date(
+    #     string='Date Created', required=False, index=True)
 
     account_officer_id = fields.Many2one(
         comodel_name='account.officers', string='Account Officer', required=False)  # acct_officer

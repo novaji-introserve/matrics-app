@@ -1,0 +1,41 @@
+{
+  "table_name": "ActiveLien",
+  "fdw_schema": "seabaas",
+  "source_table": "ActiveLiens",
+  "target_table": "res_active_lien",
+  "unique_column": "active_lien_id",
+  "date_column": "START_DATE",
+  "initial_load_days": 7,
+  "incremental_load_minutes": 5,
+  "batch_size": 10000,
+  "field_mappings": {
+    "ACTIVE_LIEN_ID": "active_lien_id",
+    "LIEN_PURPOSE": "lien_purpose",
+    "APPROVED_BY": "approved_by",
+    "CREATED_BY": "created_by",
+    "REQUESTED_BY": "requested_by",
+    "REASON_FOR_LIFTING": "reason_for_lifting",
+    "DELETED_BY": "deleted_by",
+    "DATE_APPROVED": "date_approved",
+    "REASON": "reason",
+    "BANK_NAME": "bank_name",
+    "START_DATE": "start_date",
+    "END_DATE": "end_date",
+    "DATE_DELETED": "date_deleted"
+  },
+  "lookups": {
+    "account_id": {
+      "source_field": "ACCOUNT_NO",
+      "lookup_table": "res_partner_account",
+      "lookup_key": "name",
+      "allow_null": true
+    },
+    "branch_id": {
+      "source_field": "BRANCH_CODE",
+      "lookup_table": "res_branch",
+      "lookup_key": "code",
+      "allow_null": true
+    }
+  }
+}
+

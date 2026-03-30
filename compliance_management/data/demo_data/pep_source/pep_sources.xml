@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ============================================================
+             OPENSANCTIONS — API (Commercial, API key required)
+             Uses the OpenSanctions REST API for real-time name matching.
+             API Docs: https://www.opensanctions.org/api/
+             Auth: ApiKey <your-key>  (get key at opensanctions.org)
+             Schema values: Person | Organization | LegalEntity | Company
+        ============================================================ -->
+        <record id="pep_source_opensanctions_api" model="pep.source">
+            <field name="name">OpenSanctions (API - Commercial)</field>
+            <field name="source_type">commercial</field>
+            <field name="source_format">api</field>
+            <field name="is_opensanctions">True</field>
+            <field name="is_free">False</field>
+            <field name="use_api">True</field>
+            <field name="active">True</field>
+            <field name="domain">api.opensanctions.org</field>
+            <field name="base_url">https://data.opensanctions.org</field>
+            <field name="api_url">https://api.opensanctions.org</field>
+            <field name="api_endpoint">/search/default</field>
+            <field name="api_auth_format">ApiKey {}</field>
+            <field name="default_entity_type">Person</field>
+            <field name="description">
+OpenSanctions commercial API for real-time PEP and sanctions screening.
+Requires a paid API key from https://www.opensanctions.org/api/
+Auth header format: ApiKey &lt;your-api-key&gt;
+Endpoint: https://api.opensanctions.org/search/default
+Supports schema filtering: Person, Organization, LegalEntity, Company
+To screen organisations instead of persons, change Default Entity Type to: Organization
+            </field>
+        </record>
+
+        <!-- ============================================================
+             OPENSANCTIONS API — ORGANISATIONS SCREENING
+             Same API as above but configured for entity/company screening.
+             Use when screening corporate customers (not individuals).
+        ============================================================ -->
+        <record id="pep_source_opensanctions_api_org" model="pep.source">
+            <field name="name">OpenSanctions API — Organisation Screening</field>
+            <field name="source_type">commercial</field>
+            <field name="source_format">api</field>
+            <field name="is_opensanctions">True</field>
+            <field name="is_free">False</field>
+            <field name="use_api">True</field>
+            <field name="active">False</field>
+            <field name="domain">api.opensanctions.org</field>
+            <field name="api_url">https://api.opensanctions.org</field>
+            <field name="api_endpoint">/search/default</field>
+            <field name="api_auth_format">ApiKey {}</field>
+            <field name="default_entity_type">Organization</field>
+            <field name="description">
+OpenSanctions API configured for organisation/company screening.
+Uses schema=Organization to filter results to legal entities.
+Requires the same API key as the Person screening source.
+Supported schema values:
+  Person         — individual persons (PEPs, sanctions targets)
+  Organization   — generic organisations
+  Company        — registered companies
+  LegalEntity    — any legal entity (Person or Organisation)
+Get API key at: https://www.opensanctions.org/api/
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -8,3 +8,4 @@ access_etl_sync_log_user,etl.sync.log.user,model_etl_sync_log,base.group_user,1,
 access_etl_manager_user,etl.manager.user,model_etl_manager,base.group_user,1,0,0,0
 access_etl_processor_user,etl.processor.user,model_etl_processor,base.group_user,1,0,0,0
 access_etl_database_adapter_factory_user,etl.database.adapter.factory.user,model_etl_database_adapter_factory,base.group_user,1,0,0,0
+access_fdw_sync_watermark_user,fdw.sync.watermark.user,model_fdw_sync_watermark,base.group_user,1,1,1,1

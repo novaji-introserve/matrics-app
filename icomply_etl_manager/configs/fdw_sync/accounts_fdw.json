@@ -1,0 +1,69 @@
+{
+  "table_name": "Accounts",
+  "fdw_schema": "seabaas",
+  "source_table": "Accounts",
+  "target_table": "res_partner_account",
+  "unique_column": "name",
+  "date_column": "DATE_CREATED",
+  "initial_load_days": 7,
+  "incremental_load_minutes": 5,
+  "batch_size": 50000,
+  "field_mappings": {
+    "ACCOUNT_NO": "name",
+    "ACOUNT_ID": "source_account_id",
+    "ACCOUNT_NAME": "account_name",
+    "DATE_OPENED": "opening_date",
+    "DATE_CLOSED": "date_closed",
+    "UNCLEARED_BALANCE": "uncleared_balance",
+    "OVERDRAFT_LIMIT": "overdraft_limit",
+    "LIEN_AMOUNT": "lien",
+    "LAST_TRANSACTION_DATE": "last_transaction_date",
+    "IS_COLLECTION_ACCOUNT": "is_collection_account",
+    "HIGH_TRANSACTIONS_ACCOUNT": "high_transactions_account",
+    "DATE_CREATED": "date_created",
+    "DATE_DELETED": "date_deleted",
+    "ACCOUNT_POSITION": "account_position",
+    "LCY_BALANCE": "balance",
+    "ACCOUNT_GROUP": "account_group",
+    "HAS_OVERDRAFT": "has_overdraft",
+    "ACCOUNT_CLASS": "account_class",
+    "BVN": "bvn",
+    "FREEZE_CODE": "freeze_code",
+    "PHONE_NUMBER": "phone_number",
+    "EMAIL": "email",
+    "CLEARED_BALANCE": "cleared_balance"
+  },
+  "lookups": {
+    "customer_id": {
+      "source_field": "CUSTOMER_ID",
+      "lookup_table": "res_partner",
+      "lookup_key": "customer_id",
+      "allow_null": true
+    },
+    "account_status": {
+      "source_field": "ACCOUNT_STATUS",
+      "lookup_table": "res_partner_account_status",
+      "lookup_key": "code",
+      "allow_null": true
+    },
+    "branch_id": {
+      "source_field": "BRANCH_CODE",
+      "lookup_table": "res_branch",
+      "lookup_key": "code",
+      "allow_null": true
+    },
+    "currency_id": {
+      "source_field": "CURRENCY_CODE",
+      "lookup_table": "res_currency",
+      "lookup_key": "code",
+      "allow_null": true
+    },
+    "account_tier": {
+      "source_field": "ACCOUNT_CODE",
+      "lookup_table": "res_partner_tier",
+      "lookup_key": "code",
+      "allow_null": true
+    }
+  }
+}
+

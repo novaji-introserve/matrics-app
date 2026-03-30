@@ -63,8 +63,7 @@ A comprehensive ETL (Extract, Transform, Load) system for Odoo with enterprise-g
     'license': 'LGPL-3',
     'depends': [
         'base',
-        'mail',
-        'queue_job',  # Required for production ETL operations
+        'mail'
     ],
     'external_dependencies': {
         'python': [

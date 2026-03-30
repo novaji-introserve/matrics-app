@@ -1,0 +1,28 @@
+{
+  "table_name": "customer_profile",
+  "fdw_schema": "seabaas",
+  "source_table": "customer_profile",
+  "target_table": "res_partner",
+  "unique_column": "customer_id",
+  "date_column": "createdAt",
+  "initial_load_days": 7,
+  "incremental_load_minutes": 5,
+  "batch_size": 10000,
+  "field_mappings": {
+    "customerId": "customer_id",
+    "title": "customer_title",
+    "mobileNumber": "phone",
+    "customerNumber": "customer_no",
+    "otherNames": "othername",
+    "surname": "lastname",
+    "firstName": "name",
+    "nin": "nin",
+    "bvn": "bvn",
+    "dateOfBirth": "dob",
+    "emailAddress": "email",
+    "taxIdentificationNumber": "vat",
+    "createdAt": "date_opened"
+  },
+  "lookups": {}
+}
+
