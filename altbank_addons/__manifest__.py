@@ -16,7 +16,8 @@
     ],
     'data': [
          
-         "demo/altbank/digital_channels/channels.xml",
+        "data/mails/custom.xml",
+        "demo/altbank/digital_channels/channels.xml",
         
         # Risk Subjects
         "demo/altbank/subjects/account_product.xml",

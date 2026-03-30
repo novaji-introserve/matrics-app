@@ -1,68 +1,182 @@
 # -*- coding: utf-8 -*-
-"""
-Customer Enrichment Model for Sterling Bank
-============================================
-
-This module extends the customer.enrichment model for Sterling Bank-specific
-implementations. The structure mirrors Altbank's implementation and is ready
-to be activated when Sterling Bank provides their PEP enrichment source table.
-
-Design Rationale:
------------------
-This file is included in sterling_addons to allow bank-specific customizations
-to the enrichment model if needed in the future. Currently, it inherits the
-base implementation from altbank_addons/customer_enrichment.py.
-
-When Sterling Bank Data is Available:
---------------------------------------
-1. Create source table in Sterling's ETL database (similar to imal_altbank_pep_list_new)
-2. Add table configuration to /data/odoo/ETL_script/etl_scripts/configs/customer_etl_config.json
-3. Configure ETL mappings for:
-   - customer_no → customer_id
-   - account_name → corporate_name
-   - name_of_the_pep → individual_name
-   - status_position_designation → position
-   - relationship_with_pep → relationship
-   - source_of_fund → source_of_fund
-   - source_of_wealth → source_of_wealth
-   - nature_of_business_and_occupation → nature_of_business
-   - branch_name → branch_name
-   - bvn → bvn
-
-4. Run ETL to spool enrichment data
-5. The enrichment will automatically link to customers via customer_id
-
-Author: Olumide Awodeji
-Version: 1.0.0
-"""
-
 from odoo import api, fields, models
 import logging
 
 _logger = logging.getLogger(__name__)
 
 
-class CustomerEnrichmentSterling(models.Model):
+class CustomerEnrichment(models.Model):
     """
-    Sterling Bank Customer Enrichment Extension
+    Customer Enrichment Data for Sterling Bank.
 
-    This model is ready to receive Sterling Bank-specific enrichment data
-    when the source table becomes available. The base enrichment model
-    provides all necessary fields and functionality.
+    Stores bank-specific enrichment data linked directly to customers via
+    customer number. Provides extended compliance information including PEP
+    status, source of funds/wealth, and related attributes.
 
-    Sterling-specific customizations can be added here if needed.
+    Data is spooled from Sterling Bank's ETL source table and linked to
+    customers automatically via customer_id.
     """
 
-    _inherit = 'customer.enrichment'
+    _name = 'customer.enrichment'
+    _description = 'Customer Enrichment Data'
+    _order = 'customer_id'
 
-    # -------------------------------------------------------------------------
-    # Sterling Bank Specific Fields (if needed in future)
-    # -------------------------------------------------------------------------
-    # Add any Sterling-specific fields here when required
-    # Example:
-    # sterling_specific_field = fields.Char(string='Sterling Field')
+    _sql_constraints = [
+        (
+            'uniq_customer_enrichment',
+            'unique(customer_id)',
+            'Customer enrichment record already exists. '
+            'Each customer can only have one enrichment record.'
+        ),
+    ]
 
-    # -------------------------------------------------------------------------
-    # Sterling Bank Specific Methods (if needed in future)
-    # -------------------------------------------------------------------------
-    # Add any Sterling-specific business logic here when required
+    customer_id = fields.Char(
+        string='Customer Number',
+        required=True,
+        index=True,
+        help='The bank customer number used to link this enrichment record to res.partner.'
+    )
+
+    partner_id = fields.Many2one(
+        comodel_name='res.partner',
+        string='Customer',
+        compute='_compute_partner_id',
+        store=True,
+        help='The linked customer record computed from customer_id.'
+    )
+
+    customer_type = fields.Selection(
+        selection=[('individual', 'Individual'), ('corporate', 'Corporate')],
+        string='Customer Type',
+        compute='_compute_customer_type',
+        store=True,
+    )
+
+    display_name_enriched = fields.Char(
+        string='Display Name',
+        compute='_compute_display_name_enriched',
+        store=True,
+    )
+
+    pep_name = fields.Char(string='PEP Name')
+
+    individual_name = fields.Char(string='Individual Name')
+
+    corporate_name = fields.Char(string='Corporate Name')
+
+    position = fields.Text(
+        string='Position/Designation',
+        help='The political or official position/designation of the PEP.'
+    )
+
+    relationship = fields.Char(
+        string='Relationship with PEP',
+        help='e.g., ACCOUNT OWNER, SIGNATORY, RELATED PARTY'
+    )
+
+    source_of_fund = fields.Text(string='Source of Fund')
+
+    source_of_wealth = fields.Text(string='Source of Wealth')
+
+    nature_of_business = fields.Text(string='Nature of Business')
+
+    branch_name = fields.Char(string='Branch')
+
+    bvn = fields.Char(string='BVN')
+
+    @api.depends('customer_id')
+    def _compute_partner_id(self):
+        Partner = self.env['res.partner']
+        for record in self:
+            if record.customer_id:
+                partner = Partner.search([('customer_id', '=', record.customer_id)], limit=1)
+                record.partner_id = partner.id if partner else False
+            else:
+                record.partner_id = False
+
+    @api.depends('partner_id.account_category')
+    def _compute_customer_type(self):
+        CustomerTypeConfig = self.env['customer.type.config']
+        for record in self:
+            if record.partner_id and record.partner_id.account_category:
+                record.customer_type = CustomerTypeConfig.get_customer_type(
+                    record.partner_id.account_category
+                )
+            else:
+                record.customer_type = 'corporate'
+
+    @api.depends('customer_type', 'individual_name', 'corporate_name')
+    def _compute_display_name_enriched(self):
+        for record in self:
+            if record.customer_type == 'corporate':
+                record.display_name_enriched = record.individual_name or record.corporate_name or ''
+            else:
+                record.display_name_enriched = record.individual_name or ''
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super().create(vals_list)
+        records._link_to_partners()
+        return records
+
+    def write(self, vals):
+        if 'customer_id' in vals:
+            self._unlink_from_partners()
+        result = super().write(vals)
+        if 'customer_id' in vals:
+            self._link_to_partners()
+        return result
+
+    def unlink(self):
+        self._unlink_from_partners()
+        return super().unlink()
+
+    def _link_to_partners(self):
+        Partner = self.env['res.partner'].sudo()
+        for record in self:
+            if record.customer_id:
+                partner = Partner.search([('customer_id', '=', record.customer_id)], limit=1)
+                if partner and partner.enrichment_id != record:
+                    partner.write({'enrichment_id': record.id})
+
+    def _unlink_from_partners(self):
+        Partner = self.env['res.partner'].sudo()
+        partners = Partner.search([('enrichment_id', 'in', self.ids)])
+        if partners:
+            partners.write({'enrichment_id': False})
+
+    def init(self):
+        self.env.cr.execute("""
+            SELECT 1 FROM pg_indexes WHERE indexname = 'customer_enrichment_customer_id_idx'
+        """)
+        if not self.env.cr.fetchone():
+            self.env.cr.execute("""
+                CREATE INDEX customer_enrichment_customer_id_idx
+                ON customer_enrichment (customer_id)
+            """)
+
+        self.env.cr.execute("""
+            SELECT 1 FROM pg_indexes WHERE indexname = 'customer_enrichment_position_idx'
+        """)
+        if not self.env.cr.fetchone():
+            self.env.cr.execute("""
+                CREATE INDEX customer_enrichment_position_idx
+                ON customer_enrichment (LOWER(position))
+            """)
+
+        self.env.cr.execute("""
+            SELECT 1 FROM information_schema.columns
+            WHERE table_name = 'res_partner' AND column_name = 'enrichment_id'
+        """)
+        if self.env.cr.fetchone():
+            self.env.cr.execute("""
+                UPDATE res_partner rp
+                SET enrichment_id = ce.id
+                FROM customer_enrichment ce
+                WHERE ce.customer_id = rp.customer_id
+                  AND rp.customer_id IS NOT NULL
+                  AND (rp.enrichment_id IS NULL OR rp.enrichment_id != ce.id)
+            """)
+            linked_count = self.env.cr.rowcount
+            if linked_count > 0:
+                _logger.info(f'Linked {linked_count} partners to enrichment records')

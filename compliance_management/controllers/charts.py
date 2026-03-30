@@ -594,42 +594,35 @@ class DynamicChartController(http.Controller):
                 
             charts = request.env["res.dashboard.charts"].search([("state", "=", "active")])
             results = []
-            
+
             chart_data_service = ChartDataService(request.env)
+            snapshot_model = request.env['dashboard.snapshot']
+
             for chart in charts:
                 try:
-                    # _logger.info(f"Processing chart {chart.id}: {chart.name}")
-                    
-                    if chart.use_materialized_view:
-                        chart_data = chart_data_service.get_chart_data_from_materialized_view(
-                            chart, cco, branches_id
-                        )
+                    # Try snapshot first (pre-computed, instant)
+                    rows = snapshot_model.get_chart_data(chart, cco, branches_id, datepicked)
+                    if rows is not None:
+                        chart_data = chart_data_service._extract_chart_data(chart, rows, chart.query)
                     else:
+                        # Snapshot missing or stale — fall back to direct query
                         chart_data = chart_data_service.get_chart_data_from_direct_query(
                             chart, cco, branches_id
                         )
-                        
+
                     if chart_data:
                         results.append(chart_data)
-                        _logger.info(
-                            f"Chart {chart.id} returned {len(chart_data.get('labels', []))} results"
-                        )
                 except Exception as e:
                     _logger.error(f"Error processing chart {chart.id}: {e}")
-                    results.append(
-                        {
-                            "id": chart.id,
-                            "title": chart.name,
-                            "type": chart.chart_type,
-                            "error": "Request validation failed",
-                            "labels": [],
-                            "datasets": [{"data": [], "backgroundColor": []}],
-                        }
-                    )
-                    
-            cache_service.set_cache(cache_key, results, user_id)
-            # _logger.info(f"Returning {len(results)} charts for user {user_id}")
-            
+                    results.append({
+                        "id": chart.id,
+                        "title": chart.name,
+                        "type": chart.chart_type,
+                        "error": str(e),
+                        "labels": [],
+                        "datasets": [{"data": [], "backgroundColor": []}],
+                    })
+
             return results
         except Exception as e:
             _logger.error(f"Error in get_chart_data: {e}")

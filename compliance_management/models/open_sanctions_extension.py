@@ -386,7 +386,7 @@ class PepSource(models.Model):
                 'job_type': 'api',
                 'state': 'pending',
                 'priority': 15 if self.is_opensanctions else 10,
-                'api_limit': 1000  # Default API limit
+                'api_limit': 500  # Max allowed by OpenSanctions API
             })
             
             # Start job immediately
@@ -514,7 +514,7 @@ class PepSource(models.Model):
                     'job_type': 'api',
                     'state': 'pending',
                     'priority': 20,  # High priority for OpenSanctions jobs
-                    'api_limit': 1000  # Default API limit
+                    'api_limit': 500  # Max allowed by OpenSanctions API
                 })
             else:
                 self._complete_opensanctions_job(job_id, 'failed', 'No valid import method configured')

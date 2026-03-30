@@ -386,13 +386,18 @@ class CustomerEnrichment(models.Model):
         # This runs on every module upgrade to ensure all records are linked
         _logger.info('Linking orphaned enrichment records to partners...')
         self.env.cr.execute("""
-            UPDATE res_partner rp
-            SET enrichment_id = ce.id
-            FROM customer_enrichment ce
-            WHERE ce.customer_id = rp.customer_id
-              AND rp.customer_id IS NOT NULL
-              AND (rp.enrichment_id IS NULL OR rp.enrichment_id != ce.id)
+            SELECT 1 FROM information_schema.columns
+            WHERE table_name = 'res_partner' AND column_name = 'enrichment_id'
         """)
-        linked_count = self.env.cr.rowcount
-        if linked_count > 0:
-            _logger.info(f'Linked {linked_count} partners to enrichment records')
+        if self.env.cr.fetchone():
+            self.env.cr.execute("""
+                UPDATE res_partner rp
+                SET enrichment_id = ce.id
+                FROM customer_enrichment ce
+                WHERE ce.customer_id = rp.customer_id
+                  AND rp.customer_id IS NOT NULL
+                  AND (rp.enrichment_id IS NULL OR rp.enrichment_id != ce.id)
+            """)
+            linked_count = self.env.cr.rowcount
+            if linked_count > 0:
+                _logger.info(f'Linked {linked_count} partners to enrichment records')
