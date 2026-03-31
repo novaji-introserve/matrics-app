@@ -9,9 +9,13 @@
                 <field name="alert_id" string="Alert Reference" />
                 <field name="risk_rating" />
                 <!-- <field name="narration" /> -->
-                <field name="email" />
+                <field name="status" widget="badge"
+                    decoration-warning="status == 'pending review'"
+                    decoration-success="status == 'reviewed'"
+                    decoration-danger="status == 'fraud'"
+                    decoration-info="status == 'not fraud'" />
                 <field name="source" />
-                <field name="last_checked" string="Date"   />
+                <field name="last_checked" string="Date" />
                 <field name="time" string="Time"/>
 
             </tree>
@@ -22,28 +26,26 @@
     <record id="view_alert_history_form" model="ir.ui.view">
         <field name="name">alert.history.form</field>
         <field name="model">alert.history</field>
-        <field name="arch" type="xml" >
+        <field name="arch" type="xml">
             <form string="Alert History List" edit="false" delete="false">
-                <!-- <header>
-                    Add the button to generate and download CSV
-                    <button name="generate_csv" type="object" string="Download CSV" style="background-color: #007046;" />
-                </header> -->
-                 <!-- <button name="open_reference_record" string="View Source Record" type="object" 
-                        class="oe_highlight float-right" attrs="{'invisible': [('ref_id', '=', False)]}"/> -->
-               <sheet>
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="pending review,reviewed,fraud,not fraud" />
+                </header>
+                <!-- <button name="open_reference_record" string="View Source Record" type="object" class="oe_highlight float-right" attrs="{'invisible': [('ref_id', '=', False)]}"/> -->
+                <sheet>
                     <div class="oe_title">
-                        
+
                         <field name="case_ref" invisible="1"/>
-                        
-                        
+
+
                         <div attrs="{'invisible': [('case_ref', '!=', False)]}">
                             <label for="ref_id" string="Alert Reference" />
                             <h1>
                                 <field name="ref_id" string="Alert Reference" widget="reference" />
                             </h1>
                         </div>
-                        
-                        
+
+
                         <div attrs="{'invisible': [('case_ref', '=', False)]}">
                             <label for="case_ref_display" string="Case Reference" />
                             <h1>
@@ -51,51 +53,55 @@
                             </h1>
                         </div>
                     </div>
-                
-        
-                <group string="RELATED INFORMATION">
-                
-                    <group>
-                        <field name="risk_rating" string="Rating" />
-                          <field name="template_config_id"/>
-                        <field name="dynamic_logo_url"/>
-                    </group>
-                    <group>
-                        <field name="source" string="Source" />
-                    </group>
-                    
-                    <group attrs="{'invisible': [('process_id', '=', False)]}">
-                        <field name="process_id" string="Process"/>
-                    </group>
-                    <group>
-                        <field name="email" string="Email"/>
-                        <field name="email_cc" string="Email CC"/>
-                    </group>
-                    
-                </group>
 
 
-                <group string="DATE INFORMATION">
-                    <group>
-                        <field name="last_checked" string="Last Checked" />
+                    <group string="RELATED INFORMATION">
+
+                        <group>
+                            <field name="risk_rating" string="Rating" />
+                            <field name="template_config_id"/>
+                            <field name="dynamic_logo_url"/>
+                        </group>
+                        <group>
+                            <field name="source" string="Source" />
+                        </group>
+
+                        <group attrs="{'invisible': [('process_id', '=', False)]}">
+                            <field name="process_id" string="Process"/>
+                        </group>
+                        <group>
+                            <field name="email" string="Email"/>
+                            <field name="email_cc" string="Email CC"/>
+                        </group>
+
                     </group>
-                    <group>
-                        <field name="date_created" string="Date Created" />
+
+
+                    <group string="DATE INFORMATION">
+                        <group>
+                            <field name="last_checked" string="Last Checked" />
+                        </group>
+                        <group>
+                            <field name="date_created" string="Date Created" />
+                        </group>
                     </group>
-                </group>
-                <notebook>
-                    <page string="Record">
-                        <div style="overflow-x: auto; max-width: 100%;">
-                            <field name="html_body" widget="html" style="max-height: 800px; overflow-y: auto;" />
-                        </div>
-                    </page>
-                </notebook>
-               </sheet>
+                    <notebook>
+                        <page string="Record">
+                            <div style="overflow-x: auto; max-width: 100%;">
+                                <field name="html_body" widget="html" style="max-height: 400px; overflow-y: auto;" />
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_ids" widget="mail_thread" />
+                    <field name="activity_ids" widget="mail_activity" />
+                </div>
             </form>
         </field>
     </record>
 
-    
+
 
     <!-- Action to open the tree view -->
     <record id="action_alert_history_status" model="ir.actions.act_window">
@@ -104,7 +110,7 @@
         <field name="view_mode">list,form</field>
         <field name="domain">[('user_in_emails', '=', True)]</field>
     </record>
-    
+
     <record id="action_alert_history_individual" model="ir.actions.act_window">
         <field name="name">User Alert</field>
         <field name="res_model">alert.history</field>

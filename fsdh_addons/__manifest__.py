@@ -12,10 +12,12 @@
         "web",
     ],
     "data": [
+        "security/groups.xml",
         "security/ir.model.access.csv",
         "views/alert_stat_views.xml",
         "views/alert_dashboard.xml",
         "views/alert_chart.xml",
+        "views/escalation_period_views.xml",
         "views/menus.xml",
         # Example data removed to avoid duplicate 'total_alerts' code on re-install
         # "data/alert_stat_example.xml",
