@@ -92,7 +92,8 @@ def get_customer_tier(name):
 def get_accounts():
     """Get accounts."""
     accounts = explore(env['res.partner.account'])
-    return accounts.search([('active', '=', True)], limit=1000)
+    return accounts.search([], limit=1000)
+    #return accounts.search([('active', '=', True)], limit=1000)
 
 def generate_custom_id(prefix="TRN"):
     return f"{prefix}_{str(uuid.uuid4()).replace('-', '')[:10]}"

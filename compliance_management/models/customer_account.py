@@ -225,35 +225,20 @@ class CustomerAccount(models.Model):
         """)
         trigger_exists = self.env.cr.fetchone()[0]
 
-        # Check if the function exists
+        # Always replace the function so stale database definitions are repaired on module update.
         self.env.cr.execute("""
-            SELECT EXISTS (
-                SELECT 1 FROM information_schema.routines 
-                WHERE routine_name = 'update_customer_id_field_func'
-                AND routine_type = 'FUNCTION'
-            )
-        """)
-        function_exists = self.env.cr.fetchone()[0]
+            CREATE OR REPLACE FUNCTION update_customer_id_field_func()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                -- Keep the denormalized customer text field in sync with the relation.
+                IF (NEW.customer IS NULL OR TRIM(NEW.customer) = '') AND NEW.customer_id IS NOT NULL THEN
+                    NEW.customer = NEW.customer_id::TEXT;
+                END IF;
 
-        # Only create the function if it doesn't exist
-        if not function_exists:
-            self.env.cr.execute("""
-                CREATE FUNCTION update_customer_id_field_func()
-                RETURNS TRIGGER AS $$
-                BEGIN
-                    -- Check if customer field is empty and customer_id is set
-                    IF (NEW.customer IS NULL OR TRIM(NEW.customer) = '') AND NEW.customer_id IS NOT NULL THEN
-                        -- Set customer field to the ID value from customer_id
-                        NEW.customer = NEW.customer_id::TEXT;                    
-                    END IF;
-                
-                    
-                
-                
-                    RETURN NEW;
-                END;
-                $$ LANGUAGE plpgsql;
-            """)
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+        """)
 
         # Only create the trigger if it doesn't exist
         if not trigger_exists:

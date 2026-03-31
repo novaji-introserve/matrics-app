@@ -3,6 +3,7 @@
 from odoo import models, fields, api, _
 import logging
 from dotenv import load_dotenv
+import requests
 
 load_dotenv()
 _logger = logging.getLogger(__name__)
@@ -221,6 +222,43 @@ class Transaction(models.Model):
 
     def get_risk_level(self):
         return self.risk_level
+
+    def predict(self):
+        self.ensure_one()
+        risk_rating_map = {
+            'low': 1,
+            'medium': 2,
+            'high': 3,
+        }
+
+        payload = {
+            'amount': self.amount or 0.0,
+            'transaction_date': fields.Date.to_string(
+                fields.Datetime.to_datetime(self.date_created).date()
+            ) if self.date_created else False,
+            'currency': self.currency or self.currency_id.name or 'NGN',
+            'account_id': self.account_id.id if self.account_id else False,
+            'terminal_id': self.branch_id.id if self.branch_id else 317,
+            'cust_risk_rating': risk_rating_map.get((self.risk_level or '').lower(), 3),
+            'cust_risk_score': self.risk_score or 9,
+        }
+
+        try:
+            response = requests.post(
+                'http://fastapi:8000/fraud/predict',
+                json=payload,
+                timeout=10,
+            )
+            response.raise_for_status()
+            result = response.json()
+            return bool(result.get('fraud_prediction'))
+        except Exception as exc:
+            _logger.error(
+                "Fraud prediction failed for transaction %s: %s",
+                self.id,
+                exc,
+            )
+            return False
 
     def done(self):
         for e in self:

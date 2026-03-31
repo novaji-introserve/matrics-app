@@ -29,12 +29,12 @@
 
             <!-- Hide the original phone field -->
             <xpath expr="//field[@name='phone']" position="attributes">
-                <attribute name="invisible">1</attribute>
+                <attribute name="invisible">0</attribute>
             </xpath>
 
             <!-- Add the formatted_phone field after hiding the original phone field -->
             <xpath expr="//field[@name='phone']" position="after">
-                <field name="formatted_phone" optional="show" />
+                <field name="formatted_phone" string="Formatted Phone" optional="show" />
             </xpath>
 
             <!-- Modify activity_ids field -->
@@ -266,9 +266,8 @@
             </xpath>
 
             <xpath expr="//field[@name='phone']" position="attributes">
-                <!-- <attribute name="readonly">1</attribute> -->
-
-                <attribute name="invisible">1</attribute>
+                <attribute name="readonly">1</attribute>
+                <attribute name="invisible">0</attribute>
             </xpath>
 
             <xpath expr="//field[@name='email']" position="attributes">

@@ -84,24 +84,38 @@ def get_customer_tier(name):
     customer_tier = explore(env['res.partner.tier'])
     return customer_tier.search([('code', '=', name)], limit=1)
 
+def get_account_counts(customer_id):
+    if not customer_id:
+        return 0
+    account = env['res.partner.account']
+    return account.search_count([('customer_id', '=', customer_id)])
+
+
+def get_accounts_count(customer_id):
+    return get_account_counts(customer_id)
+
 def create_accounts():
     account = env['res.partner.account']
     currency_ids = get_currency_ids()
     account_officer_ids = get_account_officer_ids()
     account_type = get_account_type('Savings Accounts')
     account_tier = get_customer_tier('tier_1')
-    num = account.search_count([('customer_id', '!=',None)])
+    num = account.search_count([('customer_id', '!=', False)])
     print(f"Total existing partners: {num}")
-    if num > 1:
-        print("There are existing accounts, skipping account creation.")
-        return None
-    print("No existing accounts found, proceeding with account creation.")
+    # if num > 1:
+    #     print("There are existing accounts, skipping account creation.")
+    #     return None
+    # print("No existing accounts found, proceeding with account creation.")
     #return None
     customers = get_customers()
     tot_created = 0
     print(f"Found {len(customers)} customers to process")
     for customer in customers:
         if customer.customer_id:
+            existing_accounts = get_accounts_count(customer.id)
+            if existing_accounts > 0:
+                print(f"Customer {customer.name} with ID {customer.customer_id} already has {existing_accounts} account(s), skipping account creation.")
+                continue
             # Generate random data for the account
             name = customer.name or f"{customer.id}"
             print(f"Creating account for {customer.name} with ID: {customer.id}")
