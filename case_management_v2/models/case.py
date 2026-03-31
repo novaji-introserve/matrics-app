@@ -220,6 +220,8 @@ class CaseManager(models.Model):
                 if record.officer_responsible.id != vals['officer_responsible']:
                     officer_changed_records.append(record)
 
+        status_changed = 'case_status' in vals
+
         result = super(CaseManager, self).write(vals)
 
         # Send creation alert to newly assigned officer responsible
@@ -227,7 +229,26 @@ class CaseManager(models.Model):
             if record.case_status not in ('draft', 'archived'):
                 record._send_case_creation_alert()
 
+        if status_changed:
+            self._sync_alert_history_status()
+
         return result
+
+    def _sync_alert_history_status(self):
+        """Keep linked alert history records aligned with the current case stage."""
+        alert_history_model = self.env['alert.history'].sudo()
+        timestamp = fields.Datetime.now()
+
+        for record in self:
+            histories = alert_history_model.search([
+                ('source', '=', record._description),
+                ('ref_id', '=', f'{record._name},{record.id}'),
+            ])
+            if histories:
+                histories.write({
+                    'status': record.case_status,
+                    'last_checked': timestamp,
+                })
     
     def action_view_document(self):
         self.ensure_one()
@@ -695,6 +716,7 @@ class CaseManager(models.Model):
                     'email': mail_values.get('email_to', ''),
                     'email_cc': mail_values.get('email_cc', ''),
                     'source': model_description,
+                    'status': self.case_status or 'pending review',
                     'last_checked': fields.Datetime.now()
                 })
 
