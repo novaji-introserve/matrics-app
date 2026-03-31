@@ -1,0 +1,129 @@
+#version: '2'
+services:
+  db:
+    image: postgres:15
+    user: root
+    networks:
+      - odoo-net
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=odoo
+      - POSTGRES_PASSWORD=odoo16@2022      
+      - POSTGRES_DB=postgres
+    restart: always             # run as a service
+    volumes:
+        - /home/jonathan/storage/postgresql:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - /home/jonathan/storage/redis:/data
+    networks:
+      - odoo-net
+
+  odoo16:
+    image: odoo:16
+    user: root
+    networks:
+      - odoo-net
+    depends_on:
+      - db
+    ports:
+      - "10016:8069"
+      - "20016:8072" # live chat
+    tty: true
+    command: --
+    environment:
+      - HOST=db
+      - USER=odoo
+      - PASSWORD=odoo16@2022
+    volumes:
+      #- /etc/timezone:/etc/timezone:ro
+      #- /etc/localtime:/etc/localtime:ro
+      - ./entrypoint.sh:/entrypoint.sh   # if you want to install additional Python packages, uncomment this line!
+      - ./addons:/mnt/extra-addons
+      - /home/jonathan/projects/icomply_odoo:/mnt/icomply_odoo
+      - /home/jonathan/storage/odoo16/lib:/usr/local/lib
+      - ./etc:/etc/odoo
+    restart: always
+
+  fastapi:
+    build:
+      context: .
+      dockerfile: .docker/fastapi/Dockerfile
+    container_name: fastapi
+    restart: unless-stopped
+    working_dir: /app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./fastapi:/app
+      - /home/jonathan/projects/fraud_detection:/training-data:ro
+    ports:
+      - "8001:8000"
+    env_file:
+      - ./fastapi/.env
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - db
+      - redis
+      - odoo16
+    networks:
+      - odoo-net
+
+  fastapi-rq-worker:
+    build:
+      context: .
+      dockerfile: .docker/fastapi/Dockerfile
+    container_name: fastapi-rq-worker
+    restart: unless-stopped
+    working_dir: /app
+    command: python -m jobs.run_worker
+    volumes:
+      - ./fastapi:/app
+    env_file:
+      - ./fastapi/.env
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - db
+      - redis
+    networks:
+      - odoo-net
+
+  fastapi-rq-scheduler:
+    build:
+      context: .
+      dockerfile: .docker/fastapi/Dockerfile
+    container_name: fastapi-rq-scheduler
+    restart: unless-stopped
+    working_dir: /app
+    command: python -m jobs.run_scheduler
+    volumes:
+      - ./fastapi:/app
+    env_file:
+      - ./fastapi/.env
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - db
+      - redis
+      - fastapi-rq-worker
+    networks:
+      - odoo-net
+
+   
+networks:
+  odoo-net:
+    driver: bridge     
+    
+      # run as a service

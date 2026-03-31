@@ -1,0 +1,12 @@
+postgresql/
+etc/odoo-server.log
+etc/addons/
+addons/
+etc/sessions/
+etc/filestore/
+fastapi/logs/
+fastapi/.env
+seatunnel/logs/
+apache-seatunnel-2.3.12.tar.gz
+*.pyc
+__pycache__/

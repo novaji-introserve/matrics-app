@@ -1,0 +1,41 @@
+{
+  "class_labels": [
+    0,
+    1
+  ],
+  "currency_map": {
+    "EUR": 0,
+    "NGN": 1,
+    "USD": 2
+  },
+  "feature_order": [
+    "amount",
+    "transaction_year",
+    "transaction_month",
+    "transaction_day",
+    "transaction_weekday",
+    "currency_code",
+    "account_id",
+    "terminal_id",
+    "cust_risk_rating",
+    "cust_risk_score"
+  ],
+  "label_distribution": {
+    "0": 47525,
+    "1": 475
+  },
+  "label_strategy": {
+    "derived_target": 1,
+    "else_target": 0,
+    "expression": "cust_risk_rating >= 3 or cust_risk_score >= 7",
+    "rules": [
+      "cust_risk_rating >= 3",
+      "cust_risk_score >= 7"
+    ]
+  },
+  "model_version": "20260330033214",
+  "row_count": 48000,
+  "source_csv": "/training-data/transaction_training_data.csv",
+  "test_accuracy": 1.0,
+  "trained_at_utc": "2026-03-30T03:32:14.872291Z"
+}
