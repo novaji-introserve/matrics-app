@@ -8,6 +8,8 @@ class alert_history(models.Model):
     _description = "alert history"
     _rec_name = "alert_id"
     _order = 'id desc'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+
     
     alert_id = fields.Char(string="alert_id", required=True, index=True, default=lambda self: self._generate_alert_id())
     attachment_data = fields.Char()
@@ -38,6 +40,13 @@ class alert_history(models.Model):
     email_cc = fields.Char()
     time = fields.Char(compute='get_time', store=False)
     source = fields.Char(required=True)
+
+    status = fields.Selection(
+    [('pending review', 'Pending Review'), ('reviewed', 'Reviewed'), ('fraud', 'Fraud'), ('not fraud', 'Not Fraud')],
+        string="Status",
+        default='pending review',
+        tracking=True
+    )
     
     user_in_emails = fields.Boolean(compute='_compute_user_in_emails', search='_search_user_in_emails')
     

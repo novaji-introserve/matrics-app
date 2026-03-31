@@ -12,6 +12,13 @@
         name="Statistics"
         parent="alert_management.menu_alert_management_configurations"
         sequence="5"/>
+        
+    <menuitem id="menu_escalation_period"
+        name="Escalation Period"
+        groups="compliance_management.group_compliance_chief_compliance_officer"
+        parent="alert_management.menu_internal_ctrl_alert_monitoring"
+        action="action_escalation_period"
+        sequence="5"/>
 
     <!-- Statistics list: clickable entry under Statistics, opens statistics tree/form -->
     <menuitem id="menu_alert_statistics_list"

@@ -546,10 +546,10 @@ class AlertRules(models.Model):
         string="Specific Recipients", required=True, tracking=True
     )
     
-    alert_id = fields.Many2one("alert.group", string="Alert Group")
+    alert_id = fields.Many2one("alert.group", string="Alert Group", required=True)
     first_owner = fields.Many2one("res.users", string="First Line Owner") 
     second_owner = fields.Many2one("res.users", string="Second Line Owner") 
-    process_id = fields.Char(string="Process", tracking=True)
+    process_id = fields.Char(string="Process", tracking=True, required=True)
     
     risk_rating = fields.Selection([
         ("low", "Low"),
@@ -1557,7 +1557,11 @@ class AlertRules(models.Model):
             })
             
             # Send email
-            mail_id = template.send_mail(alert_history.id, force_send=True)
+            mail_id = template.send_mail(
+                alert_history.id,
+                force_send=True,
+                email_values={'model': False, 'res_id': False}  # Prevent logging full email HTML into chatter
+            )
             
             # CRITICAL: Commit immediately so alert history shows in UI right away
             # Without this, alert history only commits when entire process_alert_rules() completes
