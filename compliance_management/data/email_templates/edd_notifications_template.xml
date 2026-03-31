@@ -4,7 +4,7 @@
             <field name="name">EDD Assessment Notification</field>
             <field name="model_id" ref="model_res_partner_edd"/>
             <field name="subject">Enhanced Due Diligence (EDD) Assessment Required</field>
-            <field name="email_from"></field>
+            <field name="email_from">{{ (object.company_id.email_formatted or user.company_id.email_formatted or user.email_formatted or 'noreply@example.com') }}</field>
             <field name="auto_delete" eval="True"/>
             <field name="body_html"><![CDATA[
                <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
@@ -39,7 +39,7 @@
             <field name="name">EDD Review Completed Notification</field>
             <field name="model_id" ref="model_res_partner_edd"/>
             <field name="subject">Enhanced Due Diligence (EDD) Completed</field>
-            <field name="email_from"></field>  
+            <field name="email_from">{{ (object.company_id.email_formatted or user.company_id.email_formatted or user.email_formatted or 'noreply@example.com') }}</field>
             <field name="auto_delete" eval="True"/>
             <field name="body_html"><![CDATA[
                 <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
@@ -73,7 +73,7 @@
             <field name="name">EDD Approval required Notification</field>
             <field name="model_id" ref="model_res_partner_edd"/>
             <field name="subject">Enhanced Due Diligence (EDD) Approval required</field>
-            <field name="email_from"></field>  
+            <field name="email_from">{{ (object.company_id.email_formatted or user.company_id.email_formatted or user.email_formatted or 'noreply@example.com') }}</field>
             <field name="auto_delete" eval="True"/>
             <field name="body_html"><![CDATA[
                 <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
@@ -109,7 +109,7 @@
             <field name="name">EDD Approved Notification</field>
             <field name="model_id" ref="model_res_partner_edd"/>
             <field name="subject">Enhanced Due Diligence (EDD) Approved</field>
-            <field name="email_from"></field>  
+            <field name="email_from">{{ (object.company_id.email_formatted or user.company_id.email_formatted or user.email_formatted or 'noreply@example.com') }}</field>
             <field name="auto_delete" eval="True"/>
             <field name="body_html"><![CDATA[
                 <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
@@ -144,7 +144,7 @@
             <field name="name">EDD Archived Notification</field>
             <field name="model_id" ref="model_res_partner_edd"/>
             <field name="subject">Enhanced Due Diligence (EDD) Archived</field>
-            <field name="email_from"></field>
+            <field name="email_from">{{ (object.company_id.email_formatted or user.company_id.email_formatted or user.email_formatted or 'noreply@example.com') }}</field>
             <field name="auto_delete" eval="True"/>
             <field name="body_html">
                 <![CDATA[
@@ -187,7 +187,7 @@
             <field name="name">EDD Cancellation Notification</field>
             <field name="model_id" ref="model_res_partner_edd"/>
             <field name="subject">Enhanced Due Diligence (EDD) Canceled</field>
-            <field name="email_from"></field>
+            <field name="email_from">{{ (object.company_id.email_formatted or user.company_id.email_formatted or user.email_formatted or 'noreply@example.com') }}</field>
             <field name="auto_delete" eval="True"/>
             <field name="body_html">
                 <![CDATA[
@@ -227,7 +227,7 @@
             <field name="name">EDD Review Notification</field>
             <field name="model_id" ref="model_res_partner_edd"/>
             <field name="subject">Enhanced Due Diligence (EDD) Review Required</field>
-            <field name="email_from"></field>
+            <field name="email_from">{{ (object.company_id.email_formatted or user.company_id.email_formatted or user.email_formatted or 'noreply@example.com') }}</field>
             <field name="auto_delete" eval="True"/>
             <field name="body_html">
                 <![CDATA[
@@ -266,7 +266,7 @@
             <field name="name">EDD Sent Back to Draft Notification</field>
             <field name="model_id" ref="model_res_partner_edd"/>
             <field name="subject">Enhanced Due Diligence (EDD) Sent Back to Draft</field>
-            <field name="email_from"></field>
+            <field name="email_from">{{ (object.company_id.email_formatted or user.company_id.email_formatted or user.email_formatted or 'noreply@example.com') }}</field>
             <field name="auto_delete" eval="True"/>
             <field name="body_html">
                 <![CDATA[
@@ -303,7 +303,7 @@
             <field name="name">EDD Rejected Notification</field>
             <field name="model_id" ref="model_res_partner_edd"/>
             <field name="subject">Enhanced Due Diligence (EDD) Rejected</field>
-            <field name="email_from"></field>
+            <field name="email_from">{{ (object.company_id.email_formatted or user.company_id.email_formatted or user.email_formatted or 'noreply@example.com') }}</field>
             <field name="auto_delete" eval="True"/>
             <field name="body_html">
                 <![CDATA[
