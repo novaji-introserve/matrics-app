@@ -67,3 +67,4 @@ from . import risk_profiling
 from . import account_aggregate
 from . import customer_screening
 from . import transaction_screening_history
+from . import change_data_capture

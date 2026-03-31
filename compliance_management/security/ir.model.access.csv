@@ -200,3 +200,4 @@ compliance_management.res_transaction_screening_history,res_transaction_screenin
 access_ir_actions_act_window_manager,ir.actions.act_window for view access manager,base.model_ir_actions_act_window,compliance_management.group_tech_support,1,0,0,0
 access_res_groups_manager,res.groups for view access manager,base.model_res_groups,compliance_management.group_tech_support,1,0,0,0
 access_res.transaction_screening_rule_line,res.transaction.screening.rule.line,compliance_management.model_res_transaction_screening_rule_line,base.group_user,1,1,1,1
+compliance_management.access_change_data_capture,access_change_data_capture,compliance_management.model_change_data_capture,base.group_system,1,1,1,1
