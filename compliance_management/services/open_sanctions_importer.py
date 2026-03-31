@@ -461,7 +461,9 @@ class OpenSanctionsImporter:
                         valid_fields['create_uid'] = user_id
                     if 'write_uid' not in valid_fields:
                         valid_fields['write_uid'] = user_id
-                    
+                    if 'active' not in valid_fields:
+                        valid_fields['active'] = True
+
                     fields = list(valid_fields.keys())
                     placeholders = []
                     values = []
@@ -687,7 +689,7 @@ class OpenSanctionsImporter:
         Returns:
             dict: Processing results
         """
-        if not api_data or 'status' in api_data and api_data['status'] == 'error':
+        if not api_data or 'status' in api_data and api_data['status'] in ('error', 'end_of_results'):
             return api_data
             
         try:

@@ -15,8 +15,9 @@
         "compliance_management"
     ],
     'data': [
-         
-         "demo/sterling/digital_channels/channels.xml",
+        "security/ir.model.access.csv",
+        "data/mails/custom.xml",
+        "demo/sterling/digital_channels/channels.xml",
         
         # Risk Subjects
         "demo/sterling/subjects/account_product.xml",

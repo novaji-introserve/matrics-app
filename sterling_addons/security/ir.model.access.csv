@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+sterling_addons.access_customer_enrichment_user,access_customer_enrichment_user,sterling_addons.model_customer_enrichment,base.group_user,1,0,0,0
+sterling_addons.access_customer_enrichment_system,access_customer_enrichment_system,sterling_addons.model_customer_enrichment,base.group_system,1,1,1,1

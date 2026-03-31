@@ -227,10 +227,19 @@ func (p *RiskProcessor) InitializeCache(ctx context.Context) error {
 func (p *RiskProcessor) Run(ctx context.Context) error {
 	p.stats.startTime = time.Now()
 
+	// Clear processed customers cache so all customers are reprocessed on each MV refresh
+	if p.useRedis && p.redisCustomerCache != nil {
+		if err := p.redisCustomerCache.ClearProcessedCustomers(ctx); err != nil {
+			p.logger.Warn("Failed to clear processed customers cache", zap.Error(err))
+		} else {
+			p.logger.Info("Cleared processed customers cache for fresh processing run")
+		}
+	}
+
 	// Initialize customer IDs to process
 	var customerIDs []int
 	var err error
-	
+
 	// If specific customer IDs are provided, use them
 	if len(p.config.CustomerIDs) > 0 {
 		customerIDs = p.config.CustomerIDs
@@ -284,6 +293,12 @@ func (p *RiskProcessor) Run(ctx context.Context) error {
 		)
 	}
 	
+	// Recreate worker pool each run (needed for monitor mode where Run is called multiple times)
+	p.workerPool = workers.NewWorkerPool(
+		p.config.WorkerCount,
+		p.config.BatchSize*2,
+		p.logger,
+	)
 	// Start worker pool
 	p.workerPool.Start(ctx)
 	defer p.workerPool.Stop()

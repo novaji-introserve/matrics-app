@@ -46,7 +46,7 @@ class Statistic(models.Model):
         selection=[("active", "Active"), ("inactive", "Inactive")],
         default="active",
     )
-    val = fields.Char(string="Value", compute="_compute_val", store=True, readonly=True)
+    val = fields.Char(string="Value", compute="_compute_val", readonly=True)
     narration = fields.Text(string="Narration")
     scope_color = fields.Char()
     use_materialized_view = fields.Boolean(
@@ -373,7 +373,6 @@ class Statistic(models.Model):
 
         return result
 
-    @api.depends("sql_query", "use_materialized_view")
     def _compute_val(self):
         """Compute the value based on the SQL query or materialized view.
         This method evaluates the current SQL query or retrieves the value from

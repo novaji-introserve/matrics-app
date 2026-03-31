@@ -213,7 +213,19 @@ class CaseManager(models.Model):
             vals['new_response'] = False
             self._send_case_response_alert(response_content)
 
-        result= super(CaseManager, self).write(vals)
+        # Track officer_responsible changes before write
+        officer_changed_records = []
+        if 'officer_responsible' in vals:
+            for record in self:
+                if record.officer_responsible.id != vals['officer_responsible']:
+                    officer_changed_records.append(record)
+
+        result = super(CaseManager, self).write(vals)
+
+        # Send creation alert to newly assigned officer responsible
+        for record in officer_changed_records:
+            if record.case_status not in ('draft', 'archived'):
+                record._send_case_creation_alert()
 
         return result
     

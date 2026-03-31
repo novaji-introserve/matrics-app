@@ -17,7 +17,13 @@ import sys
 
 # Default database cnfiguration file path
 # path to your .conf file eg odoo.conf
-DEFAULT_CONFIG_FILE = "/data/odoo/debian/odoo.conf"
+DEFAULT_CONFIG_FILE = "/home/novaji/odoo/icomply_odoo/risk_analysis/config.conf"
+
+# DEFAULT_CONFIG_FILE = (
+#     os.path.join(os.path.dirname(os.path.abspath(__file__)), 'risk_analysis/config.conf')
+# )
+
+
 
 def setup_logging():
     """Configure logging with rotation based on file size"""
@@ -46,6 +52,9 @@ def get_db_connection(config_file=DEFAULT_CONFIG_FILE):
     """Create a database connection from config file"""
     config = configparser.ConfigParser()
     config.read(config_file)
+
+
+    print(config.items())
     
     # Check for Odoo's [options] section first
     if 'options' in config and config['options']:

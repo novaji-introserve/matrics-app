@@ -78,7 +78,7 @@ class BiSQLView(models.Model):
         readonly=False,
         states={"ui_valid": [("readonly", True)]},
         default="pivot,graph,tree",
-        help="Comma-separated text. Possible values:" ' "graph", "pivot" or "tree"',
+        help="Comma-separated text. Possible values:" ' "graph", "pivot", or "tree"',
     )
 
     query = fields.Text(

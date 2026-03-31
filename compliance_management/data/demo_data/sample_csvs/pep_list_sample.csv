@@ -1,0 +1,101 @@
+unique_id,firstname,lastname,name,position
+71c0aac6-b9b5-4afa-9561-f205e91044c2,Emeka,Nwosu,Emeka Nwosu,Minister of Finance
+5e5a7aee-3a20-4776-9bae-8e044f274e5d,Ngozi,Bello,Ngozi Bello,Governor
+bcb52c19-b405-4a21-ab02-f836673164dc,Tunde,Adeleke,Tunde Adeleke,Senator
+717ad96c-d297-465f-8f3e-3e8d28b71649,Amina,Okafor,Amina Okafor,Director General
+3ba57dd6-df28-4a59-9981-591d3cc16a33,Chidi,Lawal,Chidi Lawal,Permanent Secretary
+6d2c6eb5-269f-4664-96bb-d66f3247e733,Fatima,Eze,Fatima Eze,Ambassador
+4cd2eb72-08b0-46ff-901a-b2d285ee41ad,Biodun,Danjuma,Biodun Danjuma,Commissioner
+5dba8ef1-35b1-42ad-89d6-f44fa205bbb5,Kemi,Obi,Kemi Obi,Board Chairman
+4e0e9707-e06d-4b31-9ce1-01f9d6543f63,Uche,Abubakar,Uche Abubakar,Minister of Finance
+cb902b91-71fa-4ac0-b784-25fc8e7d03d4,Sule,Chukwu,Sule Chukwu,Governor
+d623efe8-4ace-4ba7-81d6-934971f30aad,Adaeze,Olawale,Adaeze Olawale,Senator
+578f58ef-8310-415d-b0cf-a99fa28342b7,Musa,Maikudi,Musa Maikudi,Director General
+6bc22d76-e1b4-4f34-93e1-a2ff936fcc3c,Chioma,Okonkwo,Chioma Okonkwo,Permanent Secretary
+e3cbbbec-257d-44ca-b326-a473e9eb8163,Bola,Adeyemi,Bola Adeyemi,Ambassador
+21cc73f3-b1c0-4e38-9030-a69064d448ca,Yusuf,Ibrahim,Yusuf Ibrahim,Commissioner
+5520d03d-fdbe-48f8-b015-562e351454c6,Emeka,Nwosu,Emeka Nwosu,Board Chairman
+2a8b0164-cf6f-4a44-af74-1e61a7e4f891,Ngozi,Bello,Ngozi Bello,Minister of Finance
+71623cfb-749d-448f-99f3-5586c6d1bd60,Tunde,Adeleke,Tunde Adeleke,Governor
+50249fcb-8cbc-4137-bd41-05b3fc356077,Amina,Okafor,Amina Okafor,Senator
+55ec2438-f07a-44b6-a9f4-df3c1a381904,Chidi,Lawal,Chidi Lawal,Director General
+65addc3a-07dd-4bc0-9c07-448d473f8bd3,Fatima,Eze,Fatima Eze,Permanent Secretary
+c709ce5e-1a8b-4dc7-ab14-5e3587d50bc5,Biodun,Danjuma,Biodun Danjuma,Ambassador
+c44fcf02-018f-438f-8d34-ce83af9173c2,Kemi,Obi,Kemi Obi,Commissioner
+14f5fdbc-a22a-477c-b4f2-4c3f741042fb,Uche,Abubakar,Uche Abubakar,Board Chairman
+daa232d6-94b8-42d7-85d4-906de6c42973,Sule,Chukwu,Sule Chukwu,Minister of Finance
+d8d6d6ca-34ef-47eb-b391-44fd6fbf01c4,Adaeze,Olawale,Adaeze Olawale,Governor
+3db7b5e2-c802-4a03-aec9-ba22caa55d14,Musa,Maikudi,Musa Maikudi,Senator
+0b9df7c6-072d-442c-8fcc-c5870b6fb404,Chioma,Okonkwo,Chioma Okonkwo,Director General
+67a7c00e-088c-40c6-81e1-bcb8f8b45893,Bola,Adeyemi,Bola Adeyemi,Permanent Secretary
+4c45d37a-ea02-4fa2-9ae1-d78bd96e8922,Yusuf,Ibrahim,Yusuf Ibrahim,Ambassador
+260f7465-0a3b-4385-817b-d1839c161e16,Emeka,Nwosu,Emeka Nwosu,Commissioner
+f768fbd2-406b-4a7b-b3a3-09761b9a053c,Ngozi,Bello,Ngozi Bello,Board Chairman
+70c87b4d-97fc-4877-bffb-c93b2605e1bc,Tunde,Adeleke,Tunde Adeleke,Minister of Finance
+08db8502-3301-4f6c-a99f-38f30f981391,Amina,Okafor,Amina Okafor,Governor
+0e6a2cae-24fb-421f-be1e-ecac4a99f967,Chidi,Lawal,Chidi Lawal,Senator
+a68afc40-d0a8-4f10-b04e-a7b40ed8790e,Fatima,Eze,Fatima Eze,Director General
+cf32648c-f3fb-4f28-ba81-f4565313f256,Biodun,Danjuma,Biodun Danjuma,Permanent Secretary
+501204b8-9165-4786-bb08-0aed7841a056,Kemi,Obi,Kemi Obi,Ambassador
+a41f08d5-ec66-4a25-baa0-ad64dc267645,Uche,Abubakar,Uche Abubakar,Commissioner
+62b87ea9-0861-454f-b15e-4ae9beb452c2,Sule,Chukwu,Sule Chukwu,Board Chairman
+a2853634-4c22-47fb-8708-ca35a00c9696,Adaeze,Olawale,Adaeze Olawale,Minister of Finance
+8b942ddf-139c-4f81-8072-93134915d296,Musa,Maikudi,Musa Maikudi,Governor
+5997c33f-8a31-412b-aa57-6ed91b9ab37a,Chioma,Okonkwo,Chioma Okonkwo,Senator
+22533db9-7c5b-4d8f-8771-49801a983b58,Bola,Adeyemi,Bola Adeyemi,Director General
+fd3e3882-1936-4eb7-8cbf-75ed281cf2d6,Yusuf,Ibrahim,Yusuf Ibrahim,Permanent Secretary
+13d12bc5-ee14-496d-8824-b3ec4f1c2622,Emeka,Nwosu,Emeka Nwosu,Ambassador
+f6680e89-8b57-412a-baee-e2bca404d552,Ngozi,Bello,Ngozi Bello,Commissioner
+1d7da4f7-2c82-44a7-8149-6b18ac08e7d9,Tunde,Adeleke,Tunde Adeleke,Board Chairman
+b4da7824-13f4-4018-ab3a-8708368ab9c7,Amina,Okafor,Amina Okafor,Minister of Finance
+e4432eb5-56d3-4868-91b3-7b6aa4075e8d,Chidi,Lawal,Chidi Lawal,Governor
+5b6a0e58-1d5d-405e-8369-83dfdefdc097,Fatima,Eze,Fatima Eze,Senator
+df2f37c0-a3bb-425b-a1b2-34c0b1bdb1c1,Biodun,Danjuma,Biodun Danjuma,Director General
+b8fada11-7dfd-4aa6-a4fd-75eeaa70f933,Kemi,Obi,Kemi Obi,Permanent Secretary
+0bcec940-7f1c-4001-b7e8-84af151f920c,Uche,Abubakar,Uche Abubakar,Ambassador
+11b53d11-bb3d-4fa7-921f-7e5ce68973b9,Sule,Chukwu,Sule Chukwu,Commissioner
+60c75afe-f97f-4901-a2d7-69ee38de24e1,Adaeze,Olawale,Adaeze Olawale,Board Chairman
+137a29f7-78e4-44e6-a7b3-4a7cb6c67219,Musa,Maikudi,Musa Maikudi,Minister of Finance
+0f741741-a8b5-460d-af6a-b3a76ba707e5,Chioma,Okonkwo,Chioma Okonkwo,Governor
+4848fcba-0af4-493e-81f7-fbfa783858be,Bola,Adeyemi,Bola Adeyemi,Senator
+ff7f89f1-1822-4551-a31f-328d9e6de171,Yusuf,Ibrahim,Yusuf Ibrahim,Director General
+f191d56e-b5e3-4059-8993-fbd1062469f9,Emeka,Nwosu,Emeka Nwosu,Permanent Secretary
+5a93552f-f680-42c9-86b0-842528441fea,Ngozi,Bello,Ngozi Bello,Ambassador
+6dd9d964-f596-4875-8a83-114f7ce9f754,Tunde,Adeleke,Tunde Adeleke,Commissioner
+167009b5-106b-4208-9153-8a2cc0222660,Amina,Okafor,Amina Okafor,Board Chairman
+ffb75245-0a96-46de-8688-d8d2140eb820,Chidi,Lawal,Chidi Lawal,Minister of Finance
+fb179ad2-5108-437e-a526-5864d0a45c08,Fatima,Eze,Fatima Eze,Governor
+7f0d1f6e-c8c3-4c73-b30c-721fa11ea61c,Biodun,Danjuma,Biodun Danjuma,Senator
+4cdb9119-54f3-4807-ae61-4f0c525cdeda,Kemi,Obi,Kemi Obi,Director General
+2373d511-1104-4e2a-be48-4015fee10535,Uche,Abubakar,Uche Abubakar,Permanent Secretary
+7e31a0f4-5fa8-4eb3-9958-9590e66f3e17,Sule,Chukwu,Sule Chukwu,Ambassador
+4cf83573-b745-407b-a10e-cdf4c9d1e92f,Adaeze,Olawale,Adaeze Olawale,Commissioner
+1f3a76c6-aed2-42d3-8c5c-0963ac0ef085,Musa,Maikudi,Musa Maikudi,Board Chairman
+cbbb0886-4828-4246-8b31-761ecbd0f9cc,Chioma,Okonkwo,Chioma Okonkwo,Minister of Finance
+be0fa6ba-89b4-45ff-87da-55e2d7bcc840,Bola,Adeyemi,Bola Adeyemi,Governor
+3c43454e-9814-40b4-9639-3189f8181cf5,Yusuf,Ibrahim,Yusuf Ibrahim,Senator
+a2052f93-2c85-41d9-9b80-4ef852f944da,Emeka,Nwosu,Emeka Nwosu,Director General
+32e0a7c8-0c47-4b44-bc1d-88b881c36a19,Ngozi,Bello,Ngozi Bello,Permanent Secretary
+0676472e-54ea-43e7-aadd-cf4db50f4f51,Tunde,Adeleke,Tunde Adeleke,Ambassador
+1eb5d2d4-3bc5-4605-874c-c229c29ddc2b,Amina,Okafor,Amina Okafor,Commissioner
+01a13f86-83f9-4853-8052-c139f9543389,Chidi,Lawal,Chidi Lawal,Board Chairman
+5a01194f-1e52-447e-977c-e88b922152b1,Fatima,Eze,Fatima Eze,Minister of Finance
+d930b28e-d393-4d05-babc-b943a56b2e0b,Biodun,Danjuma,Biodun Danjuma,Governor
+a95947f0-2997-44e6-b9e0-ddb39fb087bb,Kemi,Obi,Kemi Obi,Senator
+13525ff8-92b5-447e-afac-9145c3c7cccc,Uche,Abubakar,Uche Abubakar,Director General
+f8be5c00-bc44-43c3-bbd1-4692840ab67a,Sule,Chukwu,Sule Chukwu,Permanent Secretary
+dcf94aa4-a375-483a-8b02-1c828beab458,Adaeze,Olawale,Adaeze Olawale,Ambassador
+db8cdcf8-f825-4830-a406-b54d96cfc99f,Musa,Maikudi,Musa Maikudi,Commissioner
+212aeb59-09c0-4924-b0c9-ae0dd0c8bba6,Chioma,Okonkwo,Chioma Okonkwo,Board Chairman
+674d4bae-be7e-4176-ab89-454cb73d9b29,Bola,Adeyemi,Bola Adeyemi,Minister of Finance
+0f2c27d6-5eca-4c98-8d51-d037a770c54e,Yusuf,Ibrahim,Yusuf Ibrahim,Governor
+4fe7ba49-095b-4181-a6e0-7c3ad104587b,Emeka,Nwosu,Emeka Nwosu,Senator
+af90ea40-d252-4699-a5c5-a6f0169d013d,Ngozi,Bello,Ngozi Bello,Director General
+06af11f0-1433-44fd-a23e-47520ebd8e1b,Tunde,Adeleke,Tunde Adeleke,Permanent Secretary
+9303e99b-3993-4685-ac4f-f66dccb4ab28,Amina,Okafor,Amina Okafor,Ambassador
+668f5b4f-44b5-4c5f-b0db-cd7a5ff21eda,Chidi,Lawal,Chidi Lawal,Commissioner
+84522a3d-c79a-4cb2-9036-e8754f5d5e6d,Fatima,Eze,Fatima Eze,Board Chairman
+c5f457eb-9977-4d98-b698-658bed7c84e3,Biodun,Danjuma,Biodun Danjuma,Minister of Finance
+d978e018-8b0a-433f-bbde-a1ccb1abf28e,Kemi,Obi,Kemi Obi,Governor
+f6aeccb8-8fd9-438c-bc19-218b2145f4db,Uche,Abubakar,Uche Abubakar,Senator
+e278fc56-a40d-4207-b411-9829149588df,Sule,Chukwu,Sule Chukwu,Director General

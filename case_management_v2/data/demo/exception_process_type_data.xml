@@ -17,5 +17,9 @@
             <field name="num_id">307</field>
             <field name="name">CUSTOMER ONBOARDING</field>
         </record>
+        <record id="process_type_309" model="exception.category.">
+            <field name="num_id">309</field>
+            <field name="name">ALERT</field>
+        </record>
     </data>
 </odoo>
