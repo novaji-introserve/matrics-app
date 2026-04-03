@@ -1,0 +1,848 @@
+<odoo>
+    <data noupdate="1">
+        <record id="process_type_account_closure" model="exception.category.">
+            <field name="num_id">1</field>
+            <field name="name">Account Closure</field>
+        </record>
+        <record id="process_type_account_freeze_maintenance" model="exception.category.">
+            <field name="num_id">2</field>
+            <field name="name">Account Freeze Maintenance</field>
+        </record>
+        <record id="process_type_account_lien_maintenance" model="exception.category.">
+            <field name="num_id">3</field>
+            <field name="name">Account Lien Maintenance</field>
+        </record>
+        <record id="process_type_account_officer_confirmation" model="exception.category.">
+            <field name="num_id">4</field>
+            <field name="name">Account Officer Confirmation</field>
+        </record>
+        <record id="process_type_account_opening_documentation" model="exception.category.">
+            <field name="num_id">5</field>
+            <field name="name">Account Opening Documentation</field>
+        </record>
+        <record id="process_type_account_proofs_and_reconciliation" model="exception.category.">
+            <field name="num_id">6</field>
+            <field name="name">Account Proofs and Reconciliation</field>
+        </record>
+        <record id="process_type_acquirer_chargeback" model="exception.category.">
+            <field name="num_id">7</field>
+            <field name="name">Acquirer Chargeback</field>
+        </record>
+        <record id="process_type_acquirer_chargeback_atm" model="exception.category.">
+            <field name="num_id">8</field>
+            <field name="name">Acquirer Chargeback (ATM)</field>
+        </record>
+        <record id="process_type_administration_of_closed_circuit_television_cctv" model="exception.category.">
+            <field name="num_id">9</field>
+            <field name="name">Administration of Closed Circuit Television [CCTV]</field>
+        </record>
+        <record id="process_type_administration_of_integrity_tests_on_tellers" model="exception.category.">
+            <field name="num_id">10</field>
+            <field name="name">Administration of Integrity Tests on Tellers</field>
+        </record>
+        <record id="process_type_ambience_functional_toilet_clean_flags_etc" model="exception.category.">
+            <field name="num_id">11</field>
+            <field name="name">Ambience (Functional Toiletclean Flags Etc)</field>
+        </record>
+        <record id="process_type_aml_cft_credit_assessment_questionnaire" model="exception.category.">
+            <field name="num_id">12</field>
+            <field name="name">AML/CFT Credit Assessment Questionnaire</field>
+        </record>
+        <record id="process_type_analyse_complaints_to_provide_insight_to_management" model="exception.category.">
+            <field name="num_id">13</field>
+            <field name="name">Analyse Complaints to Provide Insight to Management</field>
+        </record>
+        <record id="process_type_atm_card_request_and_issuance" model="exception.category.">
+            <field name="num_id">14</field>
+            <field name="name">ATM Card Request and Issuance</field>
+        </record>
+        <record id="process_type_atm_operations" model="exception.category.">
+            <field name="num_id">15</field>
+            <field name="name">ATM Operations</field>
+        </record>
+        <record id="process_type_atm_overage" model="exception.category.">
+            <field name="num_id">16</field>
+            <field name="name">ATM Overage</field>
+        </record>
+        <record id="process_type_atm_shortage" model="exception.category.">
+            <field name="num_id">17</field>
+            <field name="name">ATM Shortage</field>
+        </record>
+        <record id="process_type_atm_transactions_rou_nou" model="exception.category.">
+            <field name="num_id">18</field>
+            <field name="name">ATM Transactions- ROU/NOU</field>
+        </record>
+        <record id="process_type_audit_enquiry_and_balance_confirmation" model="exception.category.">
+            <field name="num_id">19</field>
+            <field name="name">Audit Enquiry and Balance Confirmation</field>
+        </record>
+        <record id="process_type_audit_enquiry_charges" model="exception.category.">
+            <field name="num_id">20</field>
+            <field name="name">Audit Enquiry Charges</field>
+        </record>
+        <record id="process_type_automation_and_qa" model="exception.category.">
+            <field name="num_id">21</field>
+            <field name="name">Automation and QA</field>
+        </record>
+        <record id="process_type_banker_s_confirmation_reference_letter" model="exception.category.">
+            <field name="num_id">22</field>
+            <field name="name">Banker’S Confirmation/Reference Letter</field>
+        </record>
+        <record id="process_type_bills_for_collection" model="exception.category.">
+            <field name="num_id">23</field>
+            <field name="name">Bills for Collection</field>
+        </record>
+        <record id="process_type_branch_administration" model="exception.category.">
+            <field name="num_id">24</field>
+            <field name="name">Branch Administration</field>
+        </record>
+        <record id="process_type_branch_closing_time" model="exception.category.">
+            <field name="num_id">25</field>
+            <field name="name">Branch Closing Time</field>
+        </record>
+        <record id="process_type_branch_expenses" model="exception.category.">
+            <field name="num_id">26</field>
+            <field name="name">Branch Expenses</field>
+        </record>
+        <record id="process_type_branch_security" model="exception.category.">
+            <field name="num_id">27</field>
+            <field name="name">Branch Security</field>
+        </record>
+        <record id="process_type_bta_pta_processing" model="exception.category.">
+            <field name="num_id">28</field>
+            <field name="name">BTA/PTA Processing</field>
+        </record>
+        <record id="process_type_building_branch_development" model="exception.category.">
+            <field name="num_id">29</field>
+            <field name="name">Building/Branch Development</field>
+        </record>
+        <record id="process_type_capture_complaints_details_for_excess_charges" model="exception.category.">
+            <field name="num_id">30</field>
+            <field name="name">Capture Complaints Details for Excess Charges</field>
+        </record>
+        <record id="process_type_card_distribution" model="exception.category.">
+            <field name="num_id">31</field>
+            <field name="name">Card Distribution</field>
+        </record>
+        <record id="process_type_cash_advance_disbursement_and_retirement" model="exception.category.">
+            <field name="num_id">32</field>
+            <field name="name">Cash Advance Disbursement and Retirement</field>
+        </record>
+        <record id="process_type_cash_and_teller" model="exception.category.">
+            <field name="num_id">33</field>
+            <field name="name">Cash and Teller</field>
+        </record>
+        <record id="process_type_cash_lodgement_foreign_currency" model="exception.category.">
+            <field name="num_id">34</field>
+            <field name="name">Cash Lodgement Foreign Currency</field>
+        </record>
+        <record id="process_type_cash_lodgement_local_currency" model="exception.category.">
+            <field name="num_id">35</field>
+            <field name="name">Cash Lodgement Local Currency</field>
+        </record>
+        <record id="process_type_cash_swap_with_other_banks" model="exception.category.">
+            <field name="num_id">36</field>
+            <field name="name">Cash Swap with Other Banks</field>
+        </record>
+        <record id="process_type_cash_withdrawal_foreign_currency" model="exception.category.">
+            <field name="num_id">37</field>
+            <field name="name">Cash Withdrawal Foreign Currency</field>
+        </record>
+        <record id="process_type_cash_withdrawal_local_currency" model="exception.category.">
+            <field name="num_id">38</field>
+            <field name="name">Cash Withdrawal Local Currency</field>
+        </record>
+        <record id="process_type_charges_billing_visa_upsl_verve" model="exception.category.">
+            <field name="num_id">39</field>
+            <field name="name">Charges /Billing – VISA/UPSL/VERVE</field>
+        </record>
+        <record id="process_type_cheque_book_requisition_issuance_and_maintenance" model="exception.category.">
+            <field name="num_id">40</field>
+            <field name="name">Cheque Book Requisition/Issuance and Maintenance</field>
+        </record>
+        <record id="process_type_cheque_clearing_inward_and_outward" model="exception.category.">
+            <field name="num_id">41</field>
+            <field name="name">Cheque Clearing (Inward and Outward)</field>
+        </record>
+        <record id="process_type_cheque_lodgement" model="exception.category.">
+            <field name="num_id">42</field>
+            <field name="name">Cheque Lodgement</field>
+        </record>
+        <record id="process_type_cheque_payment" model="exception.category.">
+            <field name="num_id">43</field>
+            <field name="name">Cheque Payment</field>
+        </record>
+        <record id="process_type_closure_of_a_deceased_customer_s_account" model="exception.category.">
+            <field name="num_id">44</field>
+            <field name="name">Closure of a Deceased Customer’S Account</field>
+        </record>
+        <record id="process_type_collateral_lodgement" model="exception.category.">
+            <field name="num_id">45</field>
+            <field name="name">Collateral Lodgement</field>
+        </record>
+        <record id="process_type_collateral_release" model="exception.category.">
+            <field name="num_id">46</field>
+            <field name="name">Collateral Release</field>
+        </record>
+        <record id="process_type_confirmation_and_settlement" model="exception.category.">
+            <field name="num_id">47</field>
+            <field name="name">Confirmation and Settlement</field>
+        </record>
+        <record id="process_type_confirmation_of_invoices_pos_domiciliations" model="exception.category.">
+            <field name="num_id">48</field>
+            <field name="name">Confirmation of Invoices POS Domiciliations</field>
+        </record>
+        <record id="process_type_contracts_agreement_reviews" model="exception.category.">
+            <field name="num_id">49</field>
+            <field name="name">Contracts/Agreement Reviews</field>
+        </record>
+        <record id="process_type_credit_card" model="exception.category.">
+            <field name="num_id">50</field>
+            <field name="name">Credit Card</field>
+        </record>
+        <record id="process_type_credit_check_on_credit_bureau_portal" model="exception.category.">
+            <field name="num_id">51</field>
+            <field name="name">Credit Check on Credit Bureau Portal</field>
+        </record>
+        <record id="process_type_credit_disbursement" model="exception.category.">
+            <field name="num_id">52</field>
+            <field name="name">Credit Disbursement</field>
+        </record>
+        <record id="process_type_credit_documentation_and_monitoring" model="exception.category.">
+            <field name="num_id">53</field>
+            <field name="name">Credit Documentation and Monitoring</field>
+        </record>
+        <record id="process_type_credit_documentation_and_monitoring" model="exception.category.">
+            <field name="num_id">54</field>
+            <field name="name">Credit Documentation and Monitoring</field>
+        </record>
+        <record id="process_type_credit_interest_maintenance" model="exception.category.">
+            <field name="num_id">55</field>
+            <field name="name">Credit Interest Maintenance</field>
+        </record>
+        <record id="process_type_customer_complaints" model="exception.category.">
+            <field name="num_id">56</field>
+            <field name="name">Customer Complaints</field>
+        </record>
+        <record id="process_type_customer_services_modifications_of_customers_phone_number_and_email_addresses_in_finacle_and_sms_portal" model="exception.category.">
+            <field name="num_id">57</field>
+            <field name="name">Customer Services : Modifications of Customers’ Phone Number and Email Addresses in Finacle and SMS Portal</field>
+        </record>
+        <record id="process_type_customers_e_services_enrollment" model="exception.category.">
+            <field name="num_id">58</field>
+            <field name="name">Customers E-Services Enrollment</field>
+        </record>
+        <record id="process_type_customers_investment" model="exception.category.">
+            <field name="num_id">59</field>
+            <field name="name">Customers Investment</field>
+        </record>
+        <record id="process_type_customers_investment_ngn" model="exception.category.">
+            <field name="num_id">60</field>
+            <field name="name">Customers Investment (NGN)</field>
+        </record>
+        <record id="process_type_customers_request_for_account_statement_off_cycle_statement" model="exception.category.">
+            <field name="num_id">61</field>
+            <field name="name">Customers Request for Account Statement (Off Cycle Statement)</field>
+        </record>
+        <record id="process_type_daily_position_valuation_and_p_and_l_reconciliation" model="exception.category.">
+            <field name="num_id">62</field>
+            <field name="name">Daily Position Valuation and P&amp;l Reconciliation</field>
+        </record>
+        <record id="process_type_dcc" model="exception.category.">
+            <field name="num_id">63</field>
+            <field name="name">DCC</field>
+        </record>
+        <record id="process_type_deal_trade_capture" model="exception.category.">
+            <field name="num_id">64</field>
+            <field name="name">Deal Trade Capture</field>
+        </record>
+        <record id="process_type_debit_card_limit_modification" model="exception.category.">
+            <field name="num_id">65</field>
+            <field name="name">Debit Card Limit Modification</field>
+        </record>
+        <record id="process_type_debit_interest_maintenance" model="exception.category.">
+            <field name="num_id">66</field>
+            <field name="name">Debit Interest Maintenance</field>
+        </record>
+        <record id="process_type_deposit_investment_fcy" model="exception.category.">
+            <field name="num_id">67</field>
+            <field name="name">Deposit Investment [FCY]</field>
+        </record>
+        <record id="process_type_deposit_investments" model="exception.category.">
+            <field name="num_id">68</field>
+            <field name="name">Deposit Investments</field>
+        </record>
+        <record id="process_type_desk_sweep_and_environmental_scanning" model="exception.category.">
+            <field name="num_id">69</field>
+            <field name="name">Desk Sweep and Environmental Scanning</field>
+        </record>
+        <record id="process_type_desk_sweep_and_environmental_security_scanning" model="exception.category.">
+            <field name="num_id">70</field>
+            <field name="name">Desk Sweep and Environmental/ Security Scanning</field>
+        </record>
+        <record id="process_type_dispute_and_acquiring" model="exception.category.">
+            <field name="num_id">71</field>
+            <field name="name">Dispute and Acquiring</field>
+        </record>
+        <record id="process_type_document_disposal" model="exception.category.">
+            <field name="num_id">72</field>
+            <field name="name">Document Disposal</field>
+        </record>
+        <record id="process_type_document_processing" model="exception.category.">
+            <field name="num_id">73</field>
+            <field name="name">Document Processing</field>
+        </record>
+        <record id="process_type_document_receipt" model="exception.category.">
+            <field name="num_id">74</field>
+            <field name="name">Document Receipt</field>
+        </record>
+        <record id="process_type_document_retrieval" model="exception.category.">
+            <field name="num_id">75</field>
+            <field name="name">Document Retrieval</field>
+        </record>
+        <record id="process_type_document_storage" model="exception.category.">
+            <field name="num_id">76</field>
+            <field name="name">Document Storage</field>
+        </record>
+        <record id="process_type_domiciliary_inflow_processing" model="exception.category.">
+            <field name="num_id">77</field>
+            <field name="name">Domiciliary Inflow Processing</field>
+        </record>
+        <record id="process_type_domiciliary_outflow_processing" model="exception.category.">
+            <field name="num_id">78</field>
+            <field name="name">Domiciliary Outflow Processing</field>
+        </record>
+        <record id="process_type_dud_cheques_bvn_address_and_id_verification" model="exception.category.">
+            <field name="num_id">79</field>
+            <field name="name">Dud Cheques BVN Address and ID Verification</field>
+        </record>
+        <record id="process_type_due_diligence_enhanced_due_diligence_and_unusual_inflows_and_transaction_amounts_that_suggest_structuring_smurfing" model="exception.category.">
+            <field name="num_id">80</field>
+            <field name="name">Due Diligence Enhanced Due Diligence and Unusual Inflows and Transaction Amounts That Suggest Structuring/Smurfing</field>
+        </record>
+        <record id="process_type_email_indemnity" model="exception.category.">
+            <field name="num_id">81</field>
+            <field name="name">Email Indemnity</field>
+        </record>
+        <record id="process_type_enforce_data_integrity_on_all_data_capture_platforms" model="exception.category.">
+            <field name="num_id">82</field>
+            <field name="name">Enforce Data Integrity on All Data Capture Platforms</field>
+        </record>
+        <record id="process_type_ensure_record_completeness_for_all_complaint_lodged" model="exception.category.">
+            <field name="num_id">83</field>
+            <field name="name">Ensure Record Completeness for All Complaint Lodged</field>
+        </record>
+        <record id="process_type_equipment_maintenance" model="exception.category.">
+            <field name="num_id">84</field>
+            <field name="name">Equipment Maintenance</field>
+        </record>
+        <record id="process_type_etranzact_corpay_transfer" model="exception.category.">
+            <field name="num_id">85</field>
+            <field name="name">Etranzact Corpay/Transfer</field>
+        </record>
+        <record id="process_type_etranzact_settlement" model="exception.category.">
+            <field name="num_id">86</field>
+            <field name="name">Etranzact Settlement</field>
+        </record>
+        <record id="process_type_evacuation_and_replenishment_of_cash_branches_head_office" model="exception.category.">
+            <field name="num_id">87</field>
+            <field name="name">Evacuation and Replenishment of Cash (Branches/Head Office)</field>
+        </record>
+        <record id="process_type_event_management" model="exception.category.">
+            <field name="num_id">88</field>
+            <field name="name">Event Management</field>
+        </record>
+        <record id="process_type_excess_charges_and_claims" model="exception.category.">
+            <field name="num_id">89</field>
+            <field name="name">Excess Charges and Claims</field>
+        </record>
+        <record id="process_type_export_processing" model="exception.category.">
+            <field name="num_id">90</field>
+            <field name="name">Export Processing</field>
+        </record>
+        <record id="process_type_filing_dispatch_and_archiving" model="exception.category.">
+            <field name="num_id">91</field>
+            <field name="name">Filing Dispatch and Archiving</field>
+        </record>
+        <record id="process_type_firs_collection" model="exception.category.">
+            <field name="num_id">92</field>
+            <field name="name">FIRS Collection</field>
+        </record>
+        <record id="process_type_firs_vat_enforcement" model="exception.category.">
+            <field name="num_id">93</field>
+            <field name="name">FIRS VAT Enforcement</field>
+        </record>
+        <record id="process_type_fixed_assets_administration" model="exception.category.">
+            <field name="num_id">94</field>
+            <field name="name">Fixed Assets Administration</field>
+        </record>
+        <record id="process_type_fixed_assets_register" model="exception.category.">
+            <field name="num_id">95</field>
+            <field name="name">Fixed Assets Register</field>
+        </record>
+        <record id="process_type_fleet_management" model="exception.category.">
+            <field name="num_id">96</field>
+            <field name="name">Fleet Management</field>
+        </record>
+        <record id="process_type_foreign_draft_processing" model="exception.category.">
+            <field name="num_id">97</field>
+            <field name="name">Foreign Draft Processing</field>
+        </record>
+        <record id="process_type_foreign_exchange_fx_mobilization_and_disposal" model="exception.category.">
+            <field name="num_id">98</field>
+            <field name="name">Foreign Exchange (FX) Mobilization and Disposal</field>
+        </record>
+        <record id="process_type_form_a_processing" model="exception.category.">
+            <field name="num_id">99</field>
+            <field name="name">Form a Processing</field>
+        </record>
+        <record id="process_type_form_m" model="exception.category.">
+            <field name="num_id">100</field>
+            <field name="name">Form M</field>
+        </record>
+        <record id="process_type_form_m_processing" model="exception.category.">
+            <field name="num_id">101</field>
+            <field name="name">Form M Processing</field>
+        </record>
+        <record id="process_type_fresh_request_for_audit_inquiry_and_confirmation_of_balances" model="exception.category.">
+            <field name="num_id">102</field>
+            <field name="name">Fresh Request for Audit Inquiry and Confirmation of Balances</field>
+        </record>
+        <record id="process_type_fx_position_keeping" model="exception.category.">
+            <field name="num_id">103</field>
+            <field name="name">FX Position Keeping</field>
+        </record>
+        <record id="process_type_general_ledger_cfm_long_outstanding_account" model="exception.category.">
+            <field name="num_id">104</field>
+            <field name="name">General Ledger CFM/Long Outstanding Account</field>
+        </record>
+        <record id="process_type_general_ledger_management" model="exception.category.">
+            <field name="num_id">105</field>
+            <field name="name">General Ledger Management</field>
+        </record>
+        <record id="process_type_imto" model="exception.category.">
+            <field name="num_id">106</field>
+            <field name="name">IMTO</field>
+        </record>
+        <record id="process_type_in_branch_pos_transfers" model="exception.category.">
+            <field name="num_id">107</field>
+            <field name="name">In Branch POS Transfers</field>
+        </record>
+        <record id="process_type_inbound_and_outbound_correspondence" model="exception.category.">
+            <field name="num_id">108</field>
+            <field name="name">Inbound and Outbound Correspondence</field>
+        </record>
+        <record id="process_type_income_and_nibss_charges" model="exception.category.">
+            <field name="num_id">109</field>
+            <field name="name">Income and NIBSS Charges</field>
+        </record>
+        <record id="process_type_instant_alert_notification_on_ngn00023437055_long_outstanding_account_entries" model="exception.category.">
+            <field name="num_id">110</field>
+            <field name="name">Instant Alert/Notification on Ngn00023437055 (Long Outstanding Account) Entries</field>
+        </record>
+        <record id="process_type_interbank_trading_of_currencies" model="exception.category.">
+            <field name="num_id">111</field>
+            <field name="name">Interbank Trading of Currencies</field>
+        </record>
+        <record id="process_type_international_money_transfer_operators_imto" model="exception.category.">
+            <field name="num_id">112</field>
+            <field name="name">International Money Transfer Operators (IMTO)</field>
+        </record>
+        <record id="process_type_internet_banking_access" model="exception.category.">
+            <field name="num_id">113</field>
+            <field name="name">Internet Banking Access</field>
+        </record>
+        <record id="process_type_investigation_of_incidents" model="exception.category.">
+            <field name="num_id">114</field>
+            <field name="name">Investigation of Incidents</field>
+        </record>
+        <record id="process_type_inward_clearing" model="exception.category.">
+            <field name="num_id">115</field>
+            <field name="name">Inward Clearing</field>
+        </record>
+        <record id="process_type_inward_neft" model="exception.category.">
+            <field name="num_id">116</field>
+            <field name="name">Inward NEFT</field>
+        </record>
+        <record id="process_type_inward_real_time_gross_settlement_rtgs" model="exception.category.">
+            <field name="num_id">117</field>
+            <field name="name">Inward Real Time Gross Settlement (RTGS)</field>
+        </record>
+        <record id="process_type_issuance_of_manager_s_cheque_mc" model="exception.category.">
+            <field name="num_id">118</field>
+            <field name="name">Issuance of Manager’S Cheque [MC]</field>
+        </record>
+        <record id="process_type_issuer_chrageback" model="exception.category.">
+            <field name="num_id">119</field>
+            <field name="name">Issuer Chrageback</field>
+        </record>
+        <record id="process_type_kyc_cdd_edd" model="exception.category.">
+            <field name="num_id">120</field>
+            <field name="name">KYC/CDD/EDD</field>
+        </record>
+        <record id="process_type_legal_documentation" model="exception.category.">
+            <field name="num_id">121</field>
+            <field name="name">Legal Documentation</field>
+        </record>
+        <record id="process_type_letter_of_credit" model="exception.category.">
+            <field name="num_id">122</field>
+            <field name="name">Letter of Credit</field>
+        </record>
+        <record id="process_type_letter_withdrawal" model="exception.category.">
+            <field name="num_id">123</field>
+            <field name="name">Letter Withdrawal</field>
+        </record>
+        <record id="process_type_limit_setting" model="exception.category.">
+            <field name="num_id">124</field>
+            <field name="name">Limit Setting</field>
+        </record>
+        <record id="process_type_limits_maintenance" model="exception.category.">
+            <field name="num_id">125</field>
+            <field name="name">Limits Maintenance</field>
+        </record>
+        <record id="process_type_litigation_and_prosecution" model="exception.category.">
+            <field name="num_id">126</field>
+            <field name="name">Litigation and Prosecution</field>
+        </record>
+        <record id="process_type_loan_demand_satisfaction" model="exception.category.">
+            <field name="num_id">127</field>
+            <field name="name">Loan Demand Satisfaction</field>
+        </record>
+        <record id="process_type_loan_disbursement" model="exception.category.">
+            <field name="num_id">128</field>
+            <field name="name">Loan Disbursement</field>
+        </record>
+        <record id="process_type_maintenance_of_bank_s_authorizes_signatories" model="exception.category.">
+            <field name="num_id">129</field>
+            <field name="name">Maintenance of Bank'S Authorizes Signatories</field>
+        </record>
+        <record id="process_type_manage_customer_complaint_dashboard" model="exception.category.">
+            <field name="num_id">130</field>
+            <field name="name">Manage Customer Complaint Dashboard</field>
+        </record>
+        <record id="process_type_manager_s_cheque_liquidation" model="exception.category.">
+            <field name="num_id">131</field>
+            <field name="name">Manager’S Cheque Liquidation</field>
+        </record>
+        <record id="process_type_manager_s_cheques_mc_bank_drafts_issued" model="exception.category.">
+            <field name="num_id">132</field>
+            <field name="name">Manager’S Cheques (MC)/Bank Drafts Issued</field>
+        </record>
+        <record id="process_type_manpower_planning" model="exception.category.">
+            <field name="num_id">133</field>
+            <field name="name">Manpower Planning</field>
+        </record>
+        <record id="process_type_mastercard" model="exception.category.">
+            <field name="num_id">134</field>
+            <field name="name">Mastercard</field>
+        </record>
+        <record id="process_type_mastercard_international" model="exception.category.">
+            <field name="num_id">135</field>
+            <field name="name">Mastercard International</field>
+        </record>
+        <record id="process_type_media_relations" model="exception.category.">
+            <field name="num_id">136</field>
+            <field name="name">Media Relations</field>
+        </record>
+        <record id="process_type_micr" model="exception.category.">
+            <field name="num_id">137</field>
+            <field name="name">MICR</field>
+        </record>
+        <record id="process_type_micro_finance_banks_non_settlement_bank_cheques" model="exception.category.">
+            <field name="num_id">138</field>
+            <field name="name">Micro-Finance Banks (Non-Settlement Bank) Cheques</field>
+        </record>
+        <record id="process_type_mobility_report_atm_transfer_quickteller_and_other_transfer_on_all_channels" model="exception.category.">
+            <field name="num_id">139</field>
+            <field name="name">Mobility Report – ATM Transfer Quickteller and Other Transfer on All Channels</field>
+        </record>
+        <record id="process_type_monthly_cash_count" model="exception.category.">
+            <field name="num_id">140</field>
+            <field name="name">Monthly Cash Count</field>
+        </record>
+        <record id="process_type_movement_of_cash_to_cbn" model="exception.category.">
+            <field name="num_id">141</field>
+            <field name="name">Movement of Cash to CBN</field>
+        </record>
+        <record id="process_type_nibss_instant_payment_nip_out_going" model="exception.category.">
+            <field name="num_id">142</field>
+            <field name="name">NIBSS Instant Payment (NIP) [Out Going]</field>
+        </record>
+        <record id="process_type_null" model="exception.category.">
+            <field name="num_id">143</field>
+            <field name="name">Null</field>
+        </record>
+        <record id="process_type_organise_files_and_tidy_domestic_account_unit_file_room" model="exception.category.">
+            <field name="num_id">144</field>
+            <field name="name">Organise Files and Tidy Domestic Account Unit File Room</field>
+        </record>
+        <record id="process_type_outward_clearing" model="exception.category.">
+            <field name="num_id">145</field>
+            <field name="name">Outward Clearing</field>
+        </record>
+        <record id="process_type_outward_neft" model="exception.category.">
+            <field name="num_id">146</field>
+            <field name="name">Outward NEFT</field>
+        </record>
+        <record id="process_type_outward_real_time_gross_settlement_rtgs" model="exception.category.">
+            <field name="num_id">147</field>
+            <field name="name">Outward Real Time Gross Settlement (RTGS)</field>
+        </record>
+        <record id="process_type_paydirect_where_fidelity_is_collecting_bank" model="exception.category.">
+            <field name="num_id">148</field>
+            <field name="name">Paydirect – where Fidelity Is Collecting Bank</field>
+        </record>
+        <record id="process_type_paydirect_where_fidelity_is_lead_bank" model="exception.category.">
+            <field name="num_id">149</field>
+            <field name="name">Paydirect – where Fidelity Is Lead Bank</field>
+        </record>
+        <record id="process_type_paygate_web_acquired" model="exception.category.">
+            <field name="num_id">150</field>
+            <field name="name">Paygate/WEB Acquired</field>
+        </record>
+        <record id="process_type_payment_gateway_autopay_remitta" model="exception.category.">
+            <field name="num_id">151</field>
+            <field name="name">Payment Gateway- Autopay/Remitta</field>
+        </record>
+        <record id="process_type_payroll_management_ex_staff_benefits_and_indebtedness" model="exception.category.">
+            <field name="num_id">152</field>
+            <field name="name">Payroll Management - Ex-Staff Benefits and Indebtedness</field>
+        </record>
+        <record id="process_type_payroll_management_statutory_deductions_and_remittance" model="exception.category.">
+            <field name="num_id">153</field>
+            <field name="name">Payroll Management – Statutory Deductions and Remittance</field>
+        </record>
+        <record id="process_type_personnel_data_administration" model="exception.category.">
+            <field name="num_id">154</field>
+            <field name="name">Personnel Data Administration</field>
+        </record>
+        <record id="process_type_pos_acquired" model="exception.category.">
+            <field name="num_id">155</field>
+            <field name="name">POS Acquired</field>
+        </record>
+        <record id="process_type_pos_issuer_settlement" model="exception.category.">
+            <field name="num_id">156</field>
+            <field name="name">POS Issuer Settlement</field>
+        </record>
+        <record id="process_type_pos_web_merchant_terminals_set_up" model="exception.category.">
+            <field name="num_id">157</field>
+            <field name="name">POS/WEB Merchant Terminals Set Up</field>
+        </record>
+        <record id="process_type_pos_web_terminals_failed_decline_transactions" model="exception.category.">
+            <field name="num_id">158</field>
+            <field name="name">POS/WEB Terminals Failed/Decline Transactions</field>
+        </record>
+        <record id="process_type_pos_web_terminals_active_or_inactive" model="exception.category.">
+            <field name="num_id">159</field>
+            <field name="name">POS/WEB Terminals – Active or Inactive</field>
+        </record>
+        <record id="process_type_power_and_plant" model="exception.category.">
+            <field name="num_id">160</field>
+            <field name="name">Power and Plant</field>
+        </record>
+        <record id="process_type_pre_trade_documents_on_counter_parties" model="exception.category.">
+            <field name="num_id">161</field>
+            <field name="name">Pre-Trade Documents on Counter-Parties</field>
+        </record>
+        <record id="process_type_premises" model="exception.category.">
+            <field name="num_id">162</field>
+            <field name="name">Premises</field>
+        </record>
+        <record id="process_type_prepayment_and_amortization" model="exception.category.">
+            <field name="num_id">163</field>
+            <field name="name">Prepayment and Amortization</field>
+        </record>
+        <record id="process_type_priming_of_cards" model="exception.category.">
+            <field name="num_id">164</field>
+            <field name="name">Priming of Cards</field>
+        </record>
+        <record id="process_type_processed_nibbs_neft_transactions" model="exception.category.">
+            <field name="num_id">165</field>
+            <field name="name">Processed Nibbs/NEFT Transactions</field>
+        </record>
+        <record id="process_type_procurement" model="exception.category.">
+            <field name="num_id">166</field>
+            <field name="name">Procurement</field>
+        </record>
+        <record id="process_type_procurement_and_store_management" model="exception.category.">
+            <field name="num_id">167</field>
+            <field name="name">Procurement and Store Management</field>
+        </record>
+        <record id="process_type_product_marketing_and_advertising" model="exception.category.">
+            <field name="num_id">168</field>
+            <field name="name">Product Marketing and Advertising</field>
+        </record>
+        <record id="process_type_profectus_card_exemption" model="exception.category.">
+            <field name="num_id">169</field>
+            <field name="name">Profectus - Card Exemption</field>
+        </record>
+        <record id="process_type_profectus_ib_phone_change" model="exception.category.">
+            <field name="num_id">170</field>
+            <field name="name">Profectus - IB Phone Change</field>
+        </record>
+        <record id="process_type_profectus_ib_pin_reset" model="exception.category.">
+            <field name="num_id">171</field>
+            <field name="name">Profectus - IB PIN Reset</field>
+        </record>
+        <record id="process_type_profectus_ib_unlock" model="exception.category.">
+            <field name="num_id">172</field>
+            <field name="name">Profectus - IB Unlock</field>
+        </record>
+        <record id="process_type_promissory_note_trading" model="exception.category.">
+            <field name="num_id">173</field>
+            <field name="name">Promissory Note Trading</field>
+        </record>
+        <record id="process_type_protocol" model="exception.category.">
+            <field name="num_id">174</field>
+            <field name="name">Protocol</field>
+        </record>
+        <record id="process_type_reactivation_of_accounts" model="exception.category.">
+            <field name="num_id">175</field>
+            <field name="name">Reactivation of Accounts</field>
+        </record>
+        <record id="process_type_real_time_gross_settlement_rtgs_inward" model="exception.category.">
+            <field name="num_id">176</field>
+            <field name="name">Real Time Gross Settlement (RTGS) [Inward]</field>
+        </record>
+        <record id="process_type_recommend_process_improvement" model="exception.category.">
+            <field name="num_id">177</field>
+            <field name="name">Recommend Process Improvement</field>
+        </record>
+        <record id="process_type_reconcile_accounts_when_necessary" model="exception.category.">
+            <field name="num_id">178</field>
+            <field name="name">Reconcile Accounts When Necessary</field>
+        </record>
+        <record id="process_type_reconciliation" model="exception.category.">
+            <field name="num_id">179</field>
+            <field name="name">Reconciliation</field>
+        </record>
+        <record id="process_type_recruitment" model="exception.category.">
+            <field name="num_id">180</field>
+            <field name="name">Recruitment</field>
+        </record>
+        <record id="process_type_regulatory_authorities_law_enforcement_request" model="exception.category.">
+            <field name="num_id">181</field>
+            <field name="name">Regulatory Authorities/Law Enforcement Request</field>
+        </record>
+        <record id="process_type_remita_reconciliation" model="exception.category.">
+            <field name="num_id">182</field>
+            <field name="name">Remita Reconciliation</field>
+        </record>
+        <record id="process_type_returned_inward_cheques" model="exception.category.">
+            <field name="num_id">183</field>
+            <field name="name">Returned Inward Cheques</field>
+        </record>
+        <record id="process_type_returned_outward_cheques" model="exception.category.">
+            <field name="num_id">184</field>
+            <field name="name">Returned Outward Cheques</field>
+        </record>
+        <record id="process_type_returns_and_reconciliation" model="exception.category.">
+            <field name="num_id">185</field>
+            <field name="name">Returns and Reconciliation</field>
+        </record>
+        <record id="process_type_review_of_staff_and_staff_related_accounts" model="exception.category.">
+            <field name="num_id">186</field>
+            <field name="name">Review of Staff and Staff Related Accounts</field>
+        </record>
+        <record id="process_type_revoke_stop_payment_order" model="exception.category.">
+            <field name="num_id">187</field>
+            <field name="name">Revoke Stop Payment Order</field>
+        </record>
+        <record id="process_type_ria_money_transfer" model="exception.category.">
+            <field name="num_id">188</field>
+            <field name="name">Ria Money Transfer</field>
+        </record>
+        <record id="process_type_safe_keeping_items" model="exception.category.">
+            <field name="num_id">189</field>
+            <field name="name">Safe Keeping Items</field>
+        </record>
+        <record id="process_type_security" model="exception.category.">
+            <field name="num_id">190</field>
+            <field name="name">Security</field>
+        </record>
+        <record id="process_type_shipping_documents_and_risk_assessment_report_rar_processing" model="exception.category.">
+            <field name="num_id">191</field>
+            <field name="name">Shipping Documents and Risk Assessment Report (RAR) Processing</field>
+        </record>
+        <record id="process_type_sme_fx_window" model="exception.category.">
+            <field name="num_id">192</field>
+            <field name="name">Sme FX Window</field>
+        </record>
+        <record id="process_type_staff_engagement" model="exception.category.">
+            <field name="num_id">193</field>
+            <field name="name">Staff Engagement</field>
+        </record>
+        <record id="process_type_staff_returned_cheques_report" model="exception.category.">
+            <field name="num_id">194</field>
+            <field name="name">Staff Returned Cheques Report</field>
+        </record>
+        <record id="process_type_staff_welfare_health_and_medicare_services" model="exception.category.">
+            <field name="num_id">195</field>
+            <field name="name">Staff Welfare - Health and Medicare Services</field>
+        </record>
+        <record id="process_type_standing_instruction" model="exception.category.">
+            <field name="num_id">196</field>
+            <field name="name">Standing Instruction</field>
+        </record>
+        <record id="process_type_stop_payment_order" model="exception.category.">
+            <field name="num_id">197</field>
+            <field name="name">Stop Payment Order</field>
+        </record>
+        <record id="process_type_store_administration" model="exception.category.">
+            <field name="num_id">198</field>
+            <field name="name">Store Administration</field>
+        </record>
+        <record id="process_type_trading_and_banking_books_report" model="exception.category.">
+            <field name="num_id">199</field>
+            <field name="name">Trading and Banking Books Report</field>
+        </record>
+        <record id="process_type_training_and_development" model="exception.category.">
+            <field name="num_id">200</field>
+            <field name="name">Training and Development</field>
+        </record>
+        <record id="process_type_transactions_processed_on_easy_trans_portal" model="exception.category.">
+            <field name="num_id">201</field>
+            <field name="name">Transactions Processed on Easy Trans Portal</field>
+        </record>
+        <record id="process_type_treasury_bills_trading" model="exception.category.">
+            <field name="num_id">202</field>
+            <field name="name">Treasury Bills Trading</field>
+        </record>
+        <record id="process_type_unauthorized_overdrawn_account_review" model="exception.category.">
+            <field name="num_id">203</field>
+            <field name="name">Unauthorized Overdrawn Account Review</field>
+        </record>
+        <record id="process_type_various_state_collection" model="exception.category.">
+            <field name="num_id">204</field>
+            <field name="name">Various State Collection</field>
+        </record>
+        <record id="process_type_vault_administration" model="exception.category.">
+            <field name="num_id">205</field>
+            <field name="name">Vault Administration</field>
+        </record>
+        <record id="process_type_vendor_payment" model="exception.category.">
+            <field name="num_id">206</field>
+            <field name="name">Vendor Payment</field>
+        </record>
+        <record id="process_type_visacard" model="exception.category.">
+            <field name="num_id">207</field>
+            <field name="name">Visacard</field>
+        </record>
+        <record id="process_type_vtu_approved_transactions_for_recharge_web_and_others" model="exception.category.">
+            <field name="num_id">208</field>
+            <field name="name">VTU Approved Transactions for Recharge WEB &amp; Others</field>
+        </record>
+        <record id="process_type_western_union_money_transfer_wumt_money_gram_mg" model="exception.category.">
+            <field name="num_id">209</field>
+            <field name="name">Western Union Money Transfer (WUMT)/Money Gram (MG)</field>
+        </record>
+        <record id="process_type_western_union_money_transfer_moneygram" model="exception.category.">
+            <field name="num_id">210</field>
+            <field name="name">Western Union Money Transfer/Moneygram</field>
+        </record>
+        <record id="process_type_work_place_ethics" model="exception.category.">
+            <field name="num_id">211</field>
+            <field name="name">Work Place Ethics</field>
+        </record>
+    </data>
+</odoo>

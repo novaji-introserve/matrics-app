@@ -15,8 +15,7 @@
     'author': 'Novaji Introserve',
     'depends': [
         'base',
-        'web',
-        'muk_web_theme'
+        'web'
     ],
     'data': [
         'security/groups.xml',

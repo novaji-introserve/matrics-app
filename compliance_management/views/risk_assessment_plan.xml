@@ -73,7 +73,7 @@
                     <notebook colspan="4">
                         <page name='plan_query' string="Plan SQL Query" autofocus="autofocus">
                             <field name="sql_query"
-                                placeholder="SQL Query returning a single value..." />
+                                placeholder="SQL Query returning a single value..." widget="ace" />
                             <div class="alert alert-info" role="alert" name="sql_tips"> Customer ID
                                 will be replaced with the %s placeholder value and used to evaluate
                                 for each customer. The query result will be returned as the risk
@@ -83,7 +83,7 @@
                             </div>
                         </page>
                         <page name='condition_python' string="Rule Python Code">
-                            <field name="condition_python" />
+                            <field name="condition_python"  widget="ace"/>
                             <div class="alert alert-info" role="alert" name="test_warning"> You can
                                 use the following variables in the Python code:
                                 <br /> # customer: object containing the customer

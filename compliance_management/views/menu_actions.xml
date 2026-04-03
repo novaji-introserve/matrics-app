@@ -419,6 +419,7 @@
         <field name="name">Sanction List</field>
         <field name="res_model">sanction.list</field>
         <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_sanction_list_search"/>
         <field name="context">{'search_default_active': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

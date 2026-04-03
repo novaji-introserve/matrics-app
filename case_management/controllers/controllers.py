@@ -2,7 +2,7 @@
 # from odoo import http
 
 
-# class CaseManagement(http.Controller):
+# class CaseManagementV2(http.Controller):
 #     @http.route('/case_management/case_management', auth='public')
 #     def index(self, **kw):
 #         return "Hello, world"

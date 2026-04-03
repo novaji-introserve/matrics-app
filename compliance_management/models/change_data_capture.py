@@ -9,6 +9,7 @@ class ChangeDataCapture(models.Model):
     name = fields.Char(string="Name", required=True)
     model = fields.Char(string="Model", required=True, index=True)
     res_id = fields.Integer(string="Record ID", required=True, index=True)
+    res_name = fields.Char(string="Resource name")
     field_name = fields.Char(string="Field Name", required=True, index=True)
     old_val = fields.Text(string="Old Value")
     new_val = fields.Text(string="New Value")

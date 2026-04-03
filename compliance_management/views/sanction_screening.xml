@@ -106,11 +106,16 @@
             <field name="name">sanction_list.tree</field>
             <field name="model">sanction.list</field>
             <field name="arch" type="xml">
-                <tree>
-                    <!-- <field name="name"/> -->
-                    <field name="sanction_id"/>
+                <tree create="true" edit="true" delete="true">
+                    <field name="list_type"/>
+                    <field name="reference_number"/>
                     <field name="name"/>
+                    <field name="entity_name"/>
+                    <field name="surname"/>
+                    <field name="first_name"/>
                     <field name="nationality"/>
+                    <field name="sanction_date"/>
+                    <field name="record_date_list"/>
                     <field name="source"/>
                 </tree>
             </field>
@@ -121,25 +126,95 @@
             <field name="name">sanction_list.form</field>
             <field name="model">sanction.list</field>
             <field name="arch" type="xml">
-                <form>
+                <form create="true" edit="true" delete="true">
                     <sheet>
+                        <div class="oe_title">
+                            <label for="name" string="Name"/>
+                            <h1>
+                                <field name="name" placeholder="Sanction list name"/>
+                            </h1>
+                            <div class="text-muted">
+                                <field name="reference_number" placeholder="Reference Number" class="oe_inline"/>
+                                <span attrs="{'invisible': [('reference_number', '=', False), ('list_type', '=', False)]}"> | </span>
+                                <field name="list_type" class="oe_inline"/>
+                            </div>
+                        </div>
 
                         <group>
-
                             <group>
-                                <field name="sanction_id" readonly="1"/>
-                                <field name="name" readonly="1"/>
-                               
+                                <field name="entity_name"/>
+                                <field name="first_name"/>
+                                <field name="middle_name"/>
+                                <field name="surname"/>
                             </group>
-
-                            <group >
-                                <field name="nationality" readonly="1"/>
-                                <field name="source" readonly="1"/>
+                            <group>
+                                <field name="nationality"/>
+                                <field name="birth_country"/>
+                                <field name="gender"/>
+                                <field name="title"/>
+                                <field name="designation"/>
+                                <field name="source"/>
                             </group>
+                        </group>
 
+                        <group string="Record Details">
+                            <group>
+                                <field name="date_of_birth"/>
+                                <field name="place_of_birth"/>
+                                <field name="national_id_number"/>
+                                <field name="passport_details"/>
+                            </group>
+                            <group>
+                                <field name="incorporation_number"/>
+                                <field name="incorporation_date"/>
+                                <field name="sanction_date"/>
+                                <field name="record_date_list"/>
+                                <field name="record_date_detail"/>
+                            </group>
+                        </group>
+
+                        <group string="Location And Contact">
+                            <field name="address"/>
+                            <field name="aliases"/>
+                            <field name="phone_numbers"/>
+                        </group>
+
+                        <group string="Narrative">
+                            <field name="comments"/>
+                            <field name="reason_for_designation"/>
+                            <field name="press_release"/>
+                            <field name="narrative_summary"/>
+                        </group>
+
+                        <group string="Source Link">
+                            <field name="detail_url"/>
                         </group>
                     </sheet>
                 </form>
+            </field>
+        </record>
+
+        <record id="view_sanction_list_search" model="ir.ui.view">
+            <field name="name">sanction_list.search</field>
+            <field name="model">sanction.list</field>
+            <field name="arch" type="xml">
+                <search string="Search Sanction List">
+                    <field name="name"/>
+                    <field name="reference_number"/>
+                    <field name="nationality"/>
+                    <field name="source"/>
+                    <field name="designation"/>
+                    <filter string="Individuals" name="list_type_individual" domain="[('list_type', '=', 'individual')]"/>
+                    <filter string="Entities" name="list_type_entity" domain="[('list_type', '=', 'entity')]"/>
+                    <filter string="Has Nationality" name="has_nationality" domain="[('nationality', '!=', False)]"/>
+                    <filter string="Has Source" name="has_source" domain="[('source', '!=', False)]"/>
+                    <filter string="Has Designation" name="has_designation" domain="[('designation', '!=', False)]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="List Type" name="group_by_list_type" context="{'group_by': 'list_type'}"/>
+                        <filter string="Nationality" name="group_by_nationality" context="{'group_by': 'nationality'}"/>
+                        <filter string="Source" name="group_by_source" context="{'group_by': 'source'}"/>
+                    </group>
+                </search>
             </field>
         </record>
 

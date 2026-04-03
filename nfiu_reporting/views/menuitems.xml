@@ -56,8 +56,8 @@
             sequence="40" />
              <!-- Main Menu -->
     <menuitem id="menu_bank_transactions_main"
-        name="Bank Transactions"
-        web_icon="bank_transactions,static/description/icon.png"
+        name="Inter-Bank Transactions"
+        web_icon="nfiu_reporting,static/description/naira.png"
         sequence="10" />
 
     <!-- Sub Menus -->

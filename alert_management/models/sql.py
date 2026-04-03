@@ -9,7 +9,7 @@ class SqlModel(models.Model):
     _description = "sql query for process"
     _inherit = ['mail.thread', 'mail.activity.mixin']
     
-    query = fields.Char(string="Query", required=True)
+    query = fields.Text(string="Query", required=True)
     name = fields.Char(string="Name",required=True)
     
 

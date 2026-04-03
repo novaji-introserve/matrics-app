@@ -1,28 +1,7 @@
 /** @odoo-module */
 
-import { registry } from "@web/core/registry";
-import { Component } from "@odoo/owl";
+const { Component } = owl
 
-class KpiCard extends Component {
-    handleClick() {
-        if (this.props.onClick) {
-            this.props.onClick(this.props.status);
-        }
-    }
-}
+export class KpiCard extends Component {}
 
-KpiCard.template = "owl.KpiCard";
-
-//  Register KpiCard in the components registry
-registry.category("components").add("KpiCard", KpiCard);
-
-export { KpiCard };  //  Make sure it's exported
-
-
-
-
-
-
-
-
-
+KpiCard.template = "owl.KpiCard"

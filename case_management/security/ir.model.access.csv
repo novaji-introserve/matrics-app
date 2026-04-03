@@ -1,38 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_branch_user,access_branch_user,model_branch,base.group_user,1,0,0,0
-access_branch_manager,access_branch_manager,model_branch,base.group_user,1,1,1,1
-access_case_rating_user,access_case_rating_user,model_case_rating,base.group_user,1,0,0,0
-access_case_rating_manager,access_case_rating_manager,model_case_rating,base.group_user,1,1,1,1
-access_case_statistics_user,access_case_statistics_user,model_case_statistics,base.group_user,1,0,0,0
-access_case_statistics_manager,access_case_statistics_manager,model_case_statistics,base.group_user,1,1,1,1
-case_status_user_rule,Case Status User Rule,model_case_status,base.group_user,1,0,0,0
-case_status_manager_rule,Case Status Manager Rule,model_case_status,base.group_user,1,1,1,1
-case_status_admin_rule,Case Status Admin Rule,model_case_status,base.group_user,1,1,1,1
-employee_alert_statistics_user_rule,Employee Alert Statistics User Rule,model_employee_alert_statistics,base.group_user,1,0,0,0
-employee_alert_statistics_manager_rule,Employee Alert Statistics Manager Rule,model_employee_alert_statistics,base.group_user,1,1,1,1
-employee_alert_statistics_admin_rule,Employee Alert Admin Rule,model_employee_alert_statistics,base.group_user,1,1,1,1
-exception_category_user_rule,Exception Category User Rule,model_exception_category,base.group_user,1,0,0,0
-exception_category_manager_rule,Exception Category Manager Rule,model_exception_category,base.group_user,1,1,1,1
-exception_category_admin_rule,Exception Category Admin Rule,model_exception_category,base.group_user,1,1,1,1
-exception_process_type_user_rule,Exception Process Type User Rule,model_exception_process_type,base.group_user,1,0,0,0
-exception_process_type_manager_rule,Exception Process Manager Rule,model_exception_process_type,base.group_user,1,1,1,1
-exception_process_type_admin_rule,Exception Process Type Admin Rule,model_exception_process_type,base.group_user,1,1,1,1
-exception_process_user_rule,Exception Process User Rule,model_exception_process,base.group_user,1,0,0,0
-exception_process_manager_rule,Exception Process Manager Rule,model_exception_process,base.group_user,1,1,1,1
-exception_process_admin_rule,Exception Process Admin Rule,model_exception_process,base.group_user,1,1,1,1
-policy_user_rule,Policy User Rule,model_policy,base.group_user,1,0,0,0
-policy_manager_rule,Policy Manager Rule,model_policy,base.group_user,1,1,1,1
-policy_admin_rule,Policy Admin Rule,model_policy,base.group_user,1,1,1,1
-rule_list_user_rule,Rule List User Rule,model_rule_list,base.group_user,1,0,0,0
-rule_list_manager_rule,Rule List Manager Rule,model_rule_list,base.group_user,1,1,1,1
-rule_list_admin_rule,Rule List Admin Rule,model_rule_list,base.group_user,1,1,1,1
-staff_user_rule,Staff User Rule,model_staff,base.group_user,1,0,0,0
-staff_manager_rule,Staff Manager Rule,model_staff,base.group_user,1,1,1,1
-staff_admin_rule,Staff Admin Rule,model_staff,base.group_user,1,1,1,1
-team_user_rule,Team User Rule,model_team,base.group_user,1,0,0,0
-team_manager_rule,Team Manager Rule,model_team,base.group_user,1,1,1,1
-team_admin_rule,Team Admin Rule,model_team,base.group_user,1,1,1,1
-access_case_manager,Case Manager Access,model_case,base.group_user,1,1,1,1
-access_case_system,Case System Access,model_case,base.group_user,1,1,1,1
-access_case_staff,Case Staff Access,model_case,base.group_user,1,1,1,0
-access_case_manager,Case Manager Access,model_case,case_management.group_case_manager,1,1,1,1
+access_case_management_case_management,case_management.case_management,model_case_manager,base.group_user,1,1,1,0
+access_case_response,case_response,model_case_response_,base.group_user,1,1,1,0
+access_case_exception_cat,case_exception_cat,model_exception_category_,base.group_user,1,1,1,0
+access_case_exception_process,case_exception_process,model_exception_process_,base.group_user,1,1,1,0
+access_case_settings,case_settings,model_case_settings,base.group_user,1,1,1,0
