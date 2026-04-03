@@ -94,8 +94,8 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:
-      - db
       - redis
+      - odoo16
     networks:
       - odoo-net
 

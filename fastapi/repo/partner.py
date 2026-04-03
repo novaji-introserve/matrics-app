@@ -95,6 +95,7 @@ def capture_tracked_partner_changes(
             "name": f"Change in {field_name}",
             "model": "res.partner",
             "res_id": partner_id,
+            "res_name": new_record.get("name", ""),
             "field_name": field_name,
             "old_val": stringify_change_value(old_record.get(field_name)),
             "new_val": stringify_change_value(new_record.get(field_name)),
@@ -118,7 +119,9 @@ def build_partner_record(payload: dict[str, Any]) -> dict[str, Any]:
         "bvn": customer_id,
         "email": email,
         "dob": payload.get("birthdate")[:10] if payload.get("birthdate") else None,
-        "registration_date": payload.get("date_entered")[:10] if payload.get("date_entered") else None,
+        "registration_date": (
+            payload.get("date_entered")[:10] if payload.get("date_entered") else None
+        ),
     }
 
 
@@ -134,7 +137,9 @@ def build_create_partner_extra_fields() -> dict[str, Any]:
         "origin": "prod",
         "country_id": random.choice(country_ids) if country_ids else None,
         "sector_id": random.choice(sector_ids) if sector_ids else None,
-        "education_level_id": random.choice(education_level_ids) if education_level_ids else None,
+        "education_level_id": (
+            random.choice(education_level_ids) if education_level_ids else None
+        ),
     }
 
 
@@ -155,7 +160,7 @@ def get_total_partners():
 
 def get_branch_ids():
     env = get_env()
-    branches = explore(env['res.branch'])
+    branches = explore(env["res.branch"])
     branch_ids = []
     for b in branches.search([]):
         branch_ids.append(b.id)
@@ -164,7 +169,7 @@ def get_branch_ids():
 
 def get_branch(id):
     env = get_env()
-    return explore(env['res.branch']).search([('id', '=', id)], limit=1)
+    return explore(env["res.branch"]).search([("id", "=", id)], limit=1)
 
 
 def get_branch_region_id(branch_id):
@@ -183,7 +188,7 @@ def get_branch_region_id(branch_id):
 
 def get_education_level_ids():
     env = get_env()
-    education_levels = explore(env['res.education.level'])
+    education_levels = explore(env["res.education.level"])
     education_level_ids = []
     for e in education_levels.search([]):
         education_level_ids.append(e.id)
@@ -192,7 +197,7 @@ def get_education_level_ids():
 
 def get_sector_ids():
     env = get_env()
-    sectors = explore(env['res.partner.sector'])
+    sectors = explore(env["res.partner.sector"])
     sector_ids = []
     for s in sectors.search([]):
         sector_ids.append(s.id)
@@ -201,47 +206,57 @@ def get_sector_ids():
 
 def get_country_ids():
     env = get_env()
-    countries = explore(env['res.country'])
+    countries = explore(env["res.country"])
     country_ids = []
-    for c in countries.search([('code', '=', 'NG')]):  # only NG
+    for c in countries.search([("code", "=", "NG")]):  # only NG
         country_ids.append(c.id)
     return country_ids
 
 
 def get_partner_with_customer_id(customer_id):
     env = get_env()
-    return explore(env['res.partner']).search([('customer_id', '=', customer_id)], limit=1)
+    return explore(env["res.partner"]).search(
+        [("customer_id", "=", customer_id)], limit=1
+    )
 
 
 def get_partner(partner_id):
     env = get_env()
-    return explore(env['res.partner']).search([('id', '=', partner_id)], limit=1)
+    return explore(env["res.partner"]).search([("id", "=", partner_id)], limit=1)
 
 
 def refresh(model, res_id):
     env = get_env()
-    rec = explore(env[model]).search([('id', '=', res_id)], limit=1)
+    rec = explore(env[model]).search([("id", "=", res_id)], limit=1)
     if rec:
         rec.invalidate_cache()
 
 
 def add_partner(payload: dict) -> int:
     setup_job_logging()
-    # print out the payload for debugging purposes
     customer_id = payload.get("id")
     try:
+        logger.info("Starting partner sync for customer_id=%s", customer_id)
         env = get_env()
         partner_model = env["res.partner"]
         partner_record = build_partner_record(payload)
-        existing_partner_ids = partner_model.search([("customer_id", "=", customer_id)], limit=1) if customer_id else []
+        existing_partner_ids = (
+            partner_model.search([("customer_id", "=", customer_id)], limit=1)
+            if customer_id
+            else []
+        )
         if existing_partner_ids:
             tracked_fields = get_tracked_partner_fields()
             tracked_field_names = [
-                field["name"] for field in tracked_fields if field.get("name") in partner_record
+                field["name"]
+                for field in tracked_fields
+                if field.get("name") in partner_record
             ]
             old_record = {}
             if tracked_field_names:
-                old_records = partner_model.read(existing_partner_ids, tracked_field_names)
+                old_records = partner_model.read(
+                    existing_partner_ids, tracked_field_names
+                )
                 old_record = old_records[0] if old_records else {}
 
             partner_model.write(existing_partner_ids, partner_record)
@@ -254,12 +269,22 @@ def add_partner(payload: dict) -> int:
                     tracked_fields=tracked_fields,
                 )
             run_risk_assessment_safe(partner_id, customer_id)
+            logger.info(
+                "Updated partner from sync customer_id=%s partner_id=%s",
+                customer_id,
+                partner_id,
+            )
             return partner_id
 
         create_record = {**partner_record, **build_create_partner_extra_fields()}
         create_record["origin"] = "prod"
         partner_id = partner_model.create(create_record)
         run_risk_assessment_safe(partner_id, customer_id)
+        logger.info(
+            "Created partner from sync customer_id=%s partner_id=%s",
+            customer_id,
+            partner_id,
+        )
         return partner_id
     except Exception:
         logger.exception("Partner sync failed for customer_id=%s", customer_id)

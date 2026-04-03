@@ -5,8 +5,9 @@ import psycopg
 from psycopg.rows import dict_row
 
 from config.logger import setup_job_logging
-from config.settings import get_alert_job_config, load_settings
+from config.settings import load_settings
 from jobs.emailer import send_email
+from repo.alert_jobs import get_alert_job
 from router.utils import get_postgres_dsn
 
 
@@ -22,31 +23,31 @@ def _validate_query(query: str) -> str:
     return normalized
 
 
-def _build_email_body(job_id: str, rows: list[dict], query: str) -> str:
+def _build_email_body(job_id: str,name:str, rows: list[dict], query: str) -> str:
     row_count = len(rows)
     header_cells = "".join(
-        f"<th style='text-align:left;padding:8px;border:1px solid #d0d7de'>{html.escape(str(key))}</th>"
+        f"<th style='text-align:left;padding:5px;border:1px solid #d0d7de'>{html.escape(str(key).replace('_', ' ').title())}</th>"
         for key in rows[0].keys()
     )
     body_rows = []
     for row in rows:
         cells = "".join(
-            f"<td style='padding:8px;border:1px solid #d0d7de'>{html.escape(str(value))}</td>"
+            f"<td style='padding:5px;border:1px solid #d0d7de'>{html.escape(str(value))}</td>"
             for value in row.values()
         )
         body_rows.append(f"<tr>{cells}</tr>")
 
     table = (
-        "<table style='border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px'>"
+        "<table style='border: 0px solid #ddd !important;font-family:Helvetica,sans-serif;font-size:12px'>"
         f"<thead><tr>{header_cells}</tr></thead>"
         f"<tbody>{''.join(body_rows)}</tbody>"
         "</table>"
     )
 
     return (
-        "<div style='font-family:Arial,sans-serif'>"
-        f"<p><strong>Alert job</strong>: <code>{html.escape(job_id)}</code></p>"
-        f"<p>The scheduled database alert query found <strong>{row_count}</strong> record(s).</p>"
+        "<div style='font-family:Helvetica,sans-serif;font-size:12px'>"
+        f"<p><strong>Alert Rule</strong>: <code>{html.escape(name)}</code></p>"
+        f"<p>Alert manager alert query found <strong>{row_count}</strong> record(s).</p>"
         f"{table}"
         "</div>"
     )
@@ -55,7 +56,7 @@ def _build_email_body(job_id: str, rows: list[dict], query: str) -> str:
 def run_database_alert_query(job_id: str) -> None:
     setup_job_logging()
     settings = load_settings(refresh=True)
-    job = get_alert_job_config(job_id, refresh=True)
+    job = get_alert_job(job_id)
 
     query = _validate_query(job.query)
     if not job.recipients:
@@ -76,7 +77,7 @@ def run_database_alert_query(job_id: str) -> None:
         return
 
     final_subject = f"{job.subject} ({len(rows)})"
-    body = _build_email_body(job_id, rows, query)
+    body = _build_email_body(job_id, job.subject, rows, query)
     send_email(
         subject=final_subject,
         body=body,

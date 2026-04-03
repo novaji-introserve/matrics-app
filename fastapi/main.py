@@ -8,7 +8,7 @@ from router.root import router as root_router
 from router.sync import router as sync_router
 
 
-app = FastAPI(title="Odoo FastAPI Bridge", version="0.1.0")
+app = FastAPI(title="Alert Manager", version="0.1.0")
 logger = setup_logging()
 
 
