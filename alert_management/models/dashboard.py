@@ -29,7 +29,6 @@ class AlertHistoryDashboard(models.Model):
                 "title": stat.name,
                 "value": stat.val or 0,
                 "display_summary": stat.display_summary,
-                "sql_query": stat.sql_query,
                 **stat._get_dashboard_action_metadata(),
             }
             for stat in stat_records

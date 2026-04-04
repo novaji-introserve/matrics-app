@@ -767,12 +767,14 @@ export class ComplianceDashboard extends Component {
 
   getCardProps(cardItem) {
     return {
+      itemId: cardItem?.id ?? null,
+      onClick: this.openStatCardById.bind(this),
       title: cardItem?.name ?? "",
       summary: cardItem?.display_summary ?? "",
       scope: cardItem?.scope ?? "",
       total: cardItem?.val ?? 0,
       bgcolor: cardItem?.scope_color ?? "#2563eb",
-      isClickable: false,
+      isClickable: Boolean(cardItem?.resource_model_uri && cardItem?.domain !== false),
     };
   }
 }

@@ -58,14 +58,7 @@
             <div t-else="">
                 <div class="case-dashboard-cards">
                     <t t-foreach="state.stats" t-as="stat" t-key="stat.id">
-                        <KpiCard
-                            onClick.bind="openCard"
-                            stat="stat"
-                            name="stat.name"
-                            summary="stat.display_summary"
-                            value="stat.val"
-                            percentage="stat.percentage"
-                        />
+                        <KpiCard t-props="getKpiCardProps(stat)" />
                     </t>
                 </div>
 

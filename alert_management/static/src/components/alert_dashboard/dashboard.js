@@ -22,6 +22,8 @@ export class AlertDashboard extends Component {
         this.onPeriodChange = this.onPeriodChange.bind(this);
         this.onRefreshRateChange = this.onRefreshRateChange.bind(this);
         this.openCard = this.openCard.bind(this);
+        this.openCardById = this.openCardById.bind(this);
+        this.onCardClick = this.onCardClick.bind(this);
         this.openTrendDay = this.openTrendDay.bind(this);
         this.handleVisibilityRefresh = this.handleVisibilityRefresh.bind(this);
 
@@ -60,11 +62,28 @@ export class AlertDashboard extends Component {
             const data = await this.orm.call("alert.history", "get_alert_dashboard_data", [], {
                 period: this.state.period,
             });
-            this.state.cards = data.cards || [];
+            this.state.cards = this.normalizeCards(data.cards);
             this.state.trend = data.trend || { dates: [], labels: [], values: [] };
         } finally {
             this.state.isLoading = false;
         }
+    }
+
+    normalizeCards(records) {
+        if (!Array.isArray(records)) {
+            return [];
+        }
+        return records
+            .filter((card) => card && typeof card === "object")
+            .map((card, index) => ({
+                id: card.id ?? `alert_card_${index}`,
+                title: card.title || "",
+                value: card.value ?? 0,
+                display_summary: card.display_summary || "",
+                resource_model_uri: card.resource_model_uri || false,
+                search_view_id: card.search_view_id || false,
+                domain: Array.isArray(card.domain) ? card.domain : false,
+            }));
     }
 
     loadRefreshPreference() {
@@ -138,7 +157,6 @@ export class AlertDashboard extends Component {
                 type: "ir.actions.act_window",
                 name: card.title,
                 res_model: card.resource_model_uri,
-                view_mode: "tree,form",
                 domain: card.domain,
                 search_view_id: card.search_view_id || undefined,
                 context: {
@@ -146,9 +164,34 @@ export class AlertDashboard extends Component {
                     search_default_inactive: 0,
                     search_default_state: 0,
                 },
+                views: [
+                    [false, "tree"],
+                    [false, "form"],
+                ],
                 target: "current",
             });
         }
+    }
+
+    openCardById(cardId) {
+        const selectedCard = this.state.cards.find(
+            (card) => String(card.id) === String(cardId)
+        );
+        this.openCard(selectedCard);
+    }
+
+    onCardClick(ev) {
+        const cardId = ev.currentTarget?.dataset?.cardId;
+        if (!cardId) {
+            return;
+        }
+        this.openCardById(cardId);
+    }
+
+    getCardClass(card) {
+        const isClickable =
+            card && card.resource_model_uri && Array.isArray(card.domain);
+        return `alert-kpi-card${isClickable ? " alert-kpi-card--clickable" : ""}`;
     }
 
     openTrendDay(payload) {

@@ -22,7 +22,6 @@ class CaseDashboardController(http.Controller):
                 "name": stat.name,
                 "scope": stat.scope,
                 "scope_color": stat.scope_color,
-                "sql_query": stat.sql_query,
                 "display_summary": stat.display_summary,
                 **stat._get_dashboard_action_metadata(),
                 "val": stat.val or 0,

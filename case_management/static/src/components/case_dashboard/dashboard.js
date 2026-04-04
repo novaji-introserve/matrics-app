@@ -28,6 +28,7 @@ export class CaseDashboard extends Component {
     this.onRefreshRateChange = this.onRefreshRateChange.bind(this);
     this.handleVisibilityRefresh = this.handleVisibilityRefresh.bind(this);
     this.openCard = this.openCard.bind(this);
+    this.openCardById = this.openCardById.bind(this);
 
     onWillStart(async () => {
       this.loadRefreshPreference();
@@ -182,11 +183,29 @@ export class CaseDashboard extends Component {
       const result = await this.rpc("/case_dashboard/stats", {
         period: Number(this.state.period),
       });
-      this.state.stats = Array.isArray(result?.data) ? result.data : [];
+      this.state.stats = this.normalizeStats(result?.data);
     } catch (error) {
       console.error("Error fetching case card stats:", error);
       this.state.stats = [];
     }
+  }
+
+  normalizeStats(records) {
+    if (!Array.isArray(records)) {
+      return [];
+    }
+    return records
+      .filter((stat) => stat && typeof stat === "object")
+      .map((stat, index) => ({
+        id: stat.id ?? `case_stat_${index}`,
+        name: stat.name || "",
+        display_summary: stat.display_summary || "",
+        val: stat.val ?? 0,
+        percentage: stat.percentage ?? "0.00",
+        resource_model_uri: stat.resource_model_uri || false,
+        search_view_id: stat.search_view_id || false,
+        domain: Array.isArray(stat.domain) ? stat.domain : false,
+      }));
   }
 
   async openCard(stat) {
@@ -199,7 +218,6 @@ export class CaseDashboard extends Component {
         type: "ir.actions.act_window",
         name: stat.name,
         res_model: stat.resource_model_uri,
-        view_mode: "tree,form",
         domain: stat.domain,
         search_view_id: stat.search_view_id || undefined,
         context: {
@@ -207,9 +225,34 @@ export class CaseDashboard extends Component {
           search_default_inactive: 0,
           search_default_state: 0,
         },
+        views: [
+          [false, "tree"],
+          [false, "form"],
+        ],
         target: "current",
       });
     }
+  }
+
+  openCardById(statId) {
+    const selectedStat = this.state.stats.find(
+      (stat) => String(stat.id) === String(statId)
+    );
+    this.openCard(selectedStat);
+  }
+
+  getKpiCardProps(stat) {
+    const isClickable =
+      stat && stat.resource_model_uri && Array.isArray(stat.domain);
+    return {
+      itemId: stat?.id,
+      onClick: this.openCardById,
+      statName: stat?.name,
+      summary: stat?.display_summary,
+      value: stat?.val,
+      percentage: stat?.percentage,
+      isClickable: Boolean(isClickable),
+    };
   }
 
   async getCaseStatusChart() {
