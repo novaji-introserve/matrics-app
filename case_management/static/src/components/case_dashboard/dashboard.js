@@ -5,73 +5,50 @@ import { KpiCard } from "../kpi_card/kpi_card";
 import { ChartRenderer } from "../chart_renderer/chart_renderer";
 import { useService } from "@web/core/utils/hooks";
 
-const { Component, onWillStart, useState } = owl;
+const { Component, onWillStart, onWillUnmount, useState } = owl;
 
 export class CaseDashboard extends Component {
   setup() {
     this.state = useState({
-      allCases: {
-        value: 0,
-        percentage: 0,
-      },
-      draftCases: {
-        value: 0,
-        percentage: 0,
-      },
-      openCases: {
-        value: 0,
-        percentage: 0,
-      },
-      overdueCases: {
-        value: 0,
-        percentage: 0,
-      },
-      closedCases: {
-        value: 0,
-        percentage: 0,
-      },
-      archivedCases: {
-        value: 0,
-        percentage: 0,
-      },
-      period: 0,
+      stats: [],
+      period: 7,
+      refreshRate: 5,
       caseStatusChart: {},
       caseRatingChart: {},
       isLoading: true,
     });
+    this.refreshTimer = null;
 
     this.orm = useService("orm");
+    this.rpc = useService("rpc");
     this.actionService = useService("action");
     this.user = useService("user");
 
-    onWillStart(async () => {
-      try {
-        this.state.isLoading = true;
-        this.getDates();
+    this.OnChangePeriod = this.OnChangePeriod.bind(this);
+    this.onRefreshRateChange = this.onRefreshRateChange.bind(this);
+    this.handleVisibilityRefresh = this.handleVisibilityRefresh.bind(this);
+    this.openCard = this.openCard.bind(this);
 
-        // Execute these in parallel using Promise.all for better performance
-        await Promise.all([
-          this.getAllCases(),
-          this.getDraftCases(),
-          this.getOpenCases(),
-          this.getOverdueCases(),
-          this.getClosedCases(),
-          this.getArchivedCases(),
-          this.getCaseStatusChart(),
-          this.getCaseRatingChart(),
-        ]);
-      } catch (error) {
-        console.error("Error loading dashboard data:", error);
-      } finally {
-        this.state.isLoading = false;
-      }
+    onWillStart(async () => {
+      this.loadRefreshPreference();
+      await this.loadDashboard();
+      this.startAutoRefresh();
+    });
+
+    window.addEventListener("focus", this.handleVisibilityRefresh);
+    document.addEventListener("visibilitychange", this.handleVisibilityRefresh);
+
+    onWillUnmount(() => {
+      this.stopAutoRefresh();
+      window.removeEventListener("focus", this.handleVisibilityRefresh);
+      document.removeEventListener("visibilitychange", this.handleVisibilityRefresh);
     });
   }
 
   get currentPeriodLabel() {
     const period = Number(this.state.period);
     if (period === 0) {
-      return "All time";
+      return "Today";
     }
     if (period === 1) {
       return "Yesterday";
@@ -79,22 +56,12 @@ export class CaseDashboard extends Component {
     if (period === 7) {
       return "Last 7 days";
     }
-    if (period === 14) {
-      return "Last 14 days";
-    }
     if (period === 30) {
-      return "Last 30 days";
-    }
-    if (period === 90) {
-      return "Last 90 days";
-    }
-    if (period === 365) {
-      return "Last 365 days";
+      return "Last 1 month";
     }
     return `${period} day window`;
   }
 
-  // Base domain to apply user access restrictions
   getBaseDomain() {
     return [
       "|",
@@ -105,336 +72,151 @@ export class CaseDashboard extends Component {
     ];
   }
 
-  // Get Dates for filtering
   getDates() {
-    const calculatedDate = moment()
-      .subtract(this.state.period, "days")
-      .startOf("day")
-      .format("YYYY/MM/DD HH:mm:ss");
+    const period = Number(this.state.period);
+    let startDate;
+    let endDate;
 
-    this.state.current_date = calculatedDate;
+    if (period === 0) {
+      startDate = moment().startOf("day");
+      endDate = moment().endOf("day");
+    } else if (period === 1) {
+      startDate = moment().subtract(1, "day").startOf("day");
+      endDate = moment().subtract(1, "day").endOf("day");
+    } else if (period === 7) {
+      startDate = moment().subtract(6, "days").startOf("day");
+      endDate = moment().endOf("day");
+    } else {
+      startDate = moment().subtract(29, "days").startOf("day");
+      endDate = moment().endOf("day");
+    }
 
-    const PreviousDate = moment()
-      .subtract(this.state.period * 2, "days")
-      .startOf("day")
-      .format("YYYY/MM/DD HH:mm:ss");
-
-    this.state.previous_date = PreviousDate;
+    this.state.current_date = startDate.format("YYYY/MM/DD HH:mm:ss");
+    this.state.current_end_date = endDate.format("YYYY/MM/DD HH:mm:ss");
   }
 
-  // On Change Period
-  async OnChangePeriod() {
+  applyPeriodDomain(domain) {
+    domain.push(["create_date", ">=", this.state.current_date]);
+    domain.push(["create_date", "<=", this.state.current_end_date]);
+  }
+
+  async loadDashboard() {
     try {
       this.state.isLoading = true;
       this.getDates();
-
-      // Execute these in parallel for better performance
       await Promise.all([
-        this.getAllCases(),
-        this.getDraftCases(),
-        this.getOpenCases(),
-        this.getOverdueCases(),
-        this.getClosedCases(),
-        this.getArchivedCases(),
+        this.getCardStats(),
         this.getCaseStatusChart(),
         this.getCaseRatingChart(),
       ]);
     } catch (error) {
-      console.error("Error updating dashboard data:", error);
+      console.error("Error loading case dashboard:", error);
     } finally {
       this.state.isLoading = false;
     }
   }
 
-  // Get All Cases
-  async getAllCases() {
+  loadRefreshPreference() {
     try {
-      const current_date = this.state.current_date;
-      const period = this.state.period;
-      const previous_date = this.state.previous_date;
-
-      // Apply base domain
-      const domain = this.getBaseDomain();
-
-      if (period > 0) {
-        domain.push(["create_date", ">", current_date]);
+      const savedRate = Number(
+        window.localStorage.getItem("case_dashboard_refresh_rate")
+      );
+      if ([1, 5, 10, 30, 60].includes(savedRate)) {
+        this.state.refreshRate = savedRate;
       }
+    } catch (error) {
+      console.error("Could not load case refresh preference:", error);
+    }
+  }
 
-     
-      const context = {
-        active_test: false,
-        // Add additional performance optimization flags
-        bin_size: true, // Only return file sizes instead of content
-        prefetch_fields: false, // Disable prefetching of fields we don't need
-        defer_parent_store_compute: true, // Defer parent store computation
-      };
+  saveRefreshPreference() {
+    try {
+      window.localStorage.setItem(
+        "case_dashboard_refresh_rate",
+        String(this.state.refreshRate)
+      );
+    } catch (error) {
+      console.error("Could not save case refresh preference:", error);
+    }
+  }
 
-      // Use a more efficient count method when possible
-      const data = await this.orm.searchCount("case.manager", domain, {
-        context,
+  startAutoRefresh() {
+    this.stopAutoRefresh();
+    const refreshRate = Number(this.state.refreshRate);
+    if (![1, 5, 10, 30, 60].includes(refreshRate)) {
+      return;
+    }
+    this.refreshTimer = setInterval(() => {
+      this.loadDashboard().catch((error) => {
+        console.error("Error refreshing case dashboard:", error);
       });
-      
-      this.state.allCases.value = data;
+    }, refreshRate * 60 * 1000);
+  }
 
-
-      // Apply base domain to previous period as well
-      const prev_domain = this.getBaseDomain();
-      if (period > 0) {
-        prev_domain.push(
-          ["create_date", ">", previous_date],
-          ["create_date", "<=", current_date]
-        );
-      }
-
-      // Also pass the context to the previous period search
-      const prev_data = await this.orm.searchCount(
-        "case.manager",
-        prev_domain,
-        { context }
-      );
-      const percentage = prev_data ? ((data - prev_data) / prev_data) * 100 : 0;
-      this.state.allCases.percentage = isFinite(percentage)
-        ? percentage.toFixed(2)
-        : "0.00";
-    } catch (error) {
-      console.error("Error fetching all cases:", error);
-      this.state.allCases.value = 0;
-      this.state.allCases.percentage = "0.00";
+  stopAutoRefresh() {
+    if (this.refreshTimer) {
+      clearInterval(this.refreshTimer);
+      this.refreshTimer = null;
     }
   }
 
-  // Get Draft Cases
-  async getDraftCases() {
+  async OnChangePeriod() {
+    await this.loadDashboard();
+  }
+
+  async onRefreshRateChange(ev) {
+    this.state.refreshRate = Number(ev.target.value || 5);
+    this.saveRefreshPreference();
+    this.startAutoRefresh();
+  }
+
+  async handleVisibilityRefresh() {
+    if (document.visibilityState === "hidden") {
+      return;
+    }
+    await this.loadDashboard();
+  }
+
+  async getCardStats() {
     try {
-      const current_date = this.state.current_date;
-      const period = this.state.period;
-      const previous_date = this.state.previous_date;
-
-      // Apply base domain with case_status filter
-      const domain = this.getBaseDomain();
-      domain.push(["case_status", "=", "draft"]);
-
-      if (period > 0) {
-        domain.push(["create_date", ">", current_date]);
-      }
-
-      const data = await this.orm.searchCount("case.manager", domain);
-      this.state.draftCases.value = data;
-
-      // Apply base domain to previous period as well
-      const prev_domain = this.getBaseDomain();
-      prev_domain.push(["case_status", "=", "draft"]);
-
-      if (period > 0) {
-        prev_domain.push(
-          ["create_date", ">", previous_date],
-          ["create_date", "<=", current_date]
-        );
-      }
-
-      const prev_data = await this.orm.searchCount("case.manager", prev_domain);
-      const percentage = prev_data ? ((data - prev_data) / prev_data) * 100 : 0;
-      this.state.draftCases.percentage = isFinite(percentage)
-        ? percentage.toFixed(2)
-        : "0.00";
+      const result = await this.rpc("/case_dashboard/stats", {
+        period: Number(this.state.period),
+      });
+      this.state.stats = Array.isArray(result?.data) ? result.data : [];
     } catch (error) {
-      console.error("Error fetching draft cases:", error);
-      this.state.draftCases.value = 0;
-      this.state.draftCases.percentage = "0.00";
-    }
-  }
-  // Get Open Cases
-  async getOpenCases() {
-    try {
-      const current_date = this.state.current_date;
-      const period = this.state.period;
-      const previous_date = this.state.previous_date;
-
-      // Apply base domain with case_status filter
-      const domain = this.getBaseDomain();
-      domain.push(["case_status", "=", "open"]);
-
-      if (period > 0) {
-        domain.push(["create_date", ">", current_date]);
-      }
-
-      const data = await this.orm.searchCount("case.manager", domain);
-      this.state.openCases.value = data;
-
-      // Apply base domain to previous period as well
-      const prev_domain = this.getBaseDomain();
-      prev_domain.push(["case_status", "=", "open"]);
-
-      if (period > 0) {
-        prev_domain.push(
-          ["create_date", ">", previous_date],
-          ["create_date", "<=", current_date]
-        );
-      }
-
-      const prev_data = await this.orm.searchCount("case.manager", prev_domain);
-      const percentage = prev_data ? ((data - prev_data) / prev_data) * 100 : 0;
-      this.state.openCases.percentage = isFinite(percentage)
-        ? percentage.toFixed(2)
-        : "0.00";
-    } catch (error) {
-      console.error("Error fetching open cases:", error);
-      this.state.openCases.value = 0;
-      this.state.openCases.percentage = "0.00";
+      console.error("Error fetching case card stats:", error);
+      this.state.stats = [];
     }
   }
 
-  // Get Overdue Cases
-  async getOverdueCases() {
-    try {
-      const current_date = this.state.current_date;
-      const period = this.state.period;
-      const previous_date = this.state.previous_date;
-
-      // Apply base domain with case_status filter
-      const domain = this.getBaseDomain();
-      domain.push(["case_status", "=", "overdue"]);
-
-      if (period > 0) {
-        domain.push(["create_date", ">", current_date]);
-      }
-
-      const data = await this.orm.searchCount("case.manager", domain);
-      this.state.overdueCases.value = data;
-
-      // Apply base domain to previous period as well
-      const prev_domain = this.getBaseDomain();
-      prev_domain.push(["case_status", "=", "overdue"]);
-
-      if (period > 0) {
-        prev_domain.push(
-          ["create_date", ">", previous_date],
-          ["create_date", "<=", current_date]
-        );
-      }
-
-      const prev_data = await this.orm.searchCount("case.manager", prev_domain);
-      const percentage = prev_data ? ((data - prev_data) / prev_data) * 100 : 0;
-      this.state.overdueCases.percentage = isFinite(percentage)
-        ? percentage.toFixed(2)
-        : "0.00";
-    } catch (error) {
-      console.error("Error fetching overdue cases:", error);
-      this.state.overdueCases.value = 0;
-      this.state.overdueCases.percentage = "0.00";
+  async openCard(stat) {
+    if (!stat) {
+      return;
     }
-  }
 
-  // Get Closed Cases
-  async getClosedCases() {
-    try {
-      const current_date = this.state.current_date;
-      const period = this.state.period;
-      const previous_date = this.state.previous_date;
-
-      // Apply base domain with case_status filter
-      const domain = this.getBaseDomain();
-      domain.push(["case_status", "=", "closed"]);
-
-      if (period > 0) {
-        domain.push(["create_date", ">", current_date]);
-      }
-
-      const data = await this.orm.searchCount("case.manager", domain);
-      this.state.closedCases.value = data;
-
-      // Apply base domain to previous period as well
-      const prev_domain = this.getBaseDomain();
-      prev_domain.push(["case_status", "=", "closed"]);
-
-      if (period > 0) {
-        prev_domain.push(
-          ["create_date", ">", previous_date],
-          ["create_date", "<=", current_date]
-        );
-      }
-
-      const prev_data = await this.orm.searchCount("case.manager", prev_domain);
-      const percentage = prev_data ? ((data - prev_data) / prev_data) * 100 : 0;
-      this.state.closedCases.percentage = isFinite(percentage)
-        ? percentage.toFixed(2)
-        : "0.00";
-    } catch (error) {
-      console.error("Error fetching closed cases:", error);
-      this.state.closedCases.value = 0;
-      this.state.closedCases.percentage = "0.00";
+    if (stat.action_xmlid) {
+      this.actionService.doAction(stat.action_xmlid);
+      return;
     }
+
+    this.actionService.doAction("case_management.action_case_manager");
   }
-
-  // Get Archived Cases
-  async getArchivedCases() {
-    try {
-      const current_date = this.state.current_date;
-      const period = this.state.period;
-      const previous_date = this.state.previous_date;
-
-      // Apply base domain with case_status filter and active=false
-      const domain = this.getBaseDomain();
-      domain.push(["case_status", "=", "archived"], ["active", "=", false]);
-
-      if (period > 0) {
-        domain.push(["create_date", ">", current_date]);
-      }
-
-      const data = await this.orm.searchCount("case.manager", domain);
-      this.state.archivedCases.value = data;
-
-      // Apply base domain to previous period as well
-      const prev_domain = this.getBaseDomain();
-      prev_domain.push(
-        ["case_status", "=", "archived"],
-        ["active", "=", false]
-      );
-
-      if (period > 0) {
-        prev_domain.push(
-          ["create_date", ">", previous_date],
-          ["create_date", "<=", current_date]
-        );
-      }
-
-      const prev_data = await this.orm.searchCount("case.manager", prev_domain);
-      const percentage = prev_data ? ((data - prev_data) / prev_data) * 100 : 0;
-      this.state.archivedCases.percentage = isFinite(percentage)
-        ? percentage.toFixed(2)
-        : "0.00";
-    } catch (error) {
-      console.error("Error fetching archived cases:", error);
-      this.state.archivedCases.value = 0;
-      this.state.archivedCases.percentage = "0.00";
-    }
-  }
-
-  // Case Status Chart (Pie)
 
   async getCaseStatusChart() {
     try {
-      // Apply base domain - BUT DON'T FILTER BY ACTIVE YET
       const domain = this.getBaseDomain();
 
-      if (this.state.period > 0) {
-        domain.push(["create_date", ">", this.state.current_date]);
-      }
+      this.applyPeriodDomain(domain);
 
-      // IMPORTANT: Disable the active filter for this search
-      // This is needed to find all records including archived ones
       const context = { active_test: false };
-
-      // Use read_group for server-side aggregation - MUCH more efficient
       const groupedResults = await this.orm.readGroup(
         "case.manager",
         domain,
-        ["case_status_count:count(id)"], // Count records
-        ["case_status"], // Group by this field
-        { lazy: false, context: context } // Don't use lazy loading and disable active test
+        ["case_status_count:count(id)"],
+        ["case_status"],
+        { lazy: false, context: context }
       );
 
-      // Initialize data structure with all possible statuses
       const statusCounts = {
         draft: 0,
         open: 0,
@@ -443,7 +225,6 @@ export class CaseDashboard extends Component {
         archived: 0,
       };
 
-      // Fill with actual data
       groupedResults.forEach((group) => {
         const status = group.case_status;
         if (status && status in statusCounts) {
@@ -451,25 +232,20 @@ export class CaseDashboard extends Component {
         }
       });
 
-      // Additionally, make a specific query for archived records
       const archivedDomain = [...this.getBaseDomain()];
       archivedDomain.push(
         ["case_status", "=", "archived"],
         ["active", "=", false]
       );
-      if (this.state.period > 0) {
-        archivedDomain.push(["create_date", ">", this.state.current_date]);
-      }
+      this.applyPeriodDomain(archivedDomain);
       const archivedCount = await this.orm.searchCount(
         "case.manager",
         archivedDomain
       );
 
-      // Update the status counts with the specific archived count
       statusCounts.archived = archivedCount;
 
-      // ALWAYS include all statuses in consistent order for the chart
-      const labels = ["Draft","Open", "Closed", "Overdue", "Archived"];
+      const labels = ["Draft", "Open", "Closed", "Overdue", "Archived"];
       const counts = [
         statusCounts.draft,
         statusCounts.open,
@@ -477,9 +253,6 @@ export class CaseDashboard extends Component {
         statusCounts.overdue,
         statusCounts.archived,
       ];
-
-      // For debug - check if we have archived cases
-      console.log("Status counts:", statusCounts);
 
       const backgroundColors = [
         "rgba(100, 116, 139, 0.82)",
@@ -497,14 +270,11 @@ export class CaseDashboard extends Component {
         "rgb(234, 88, 12)",
       ];
 
-      // For pie charts, we need to filter out zero values to avoid empty segments
-      // BUT keep at least one value to avoid empty chart
       let filteredLabels = [...labels];
       let filteredCounts = [...counts];
       let filteredBackgroundColors = [...backgroundColors];
       let filteredBorderColors = [...borderColors];
 
-      // Only filter if we have at least one non-zero value
       if (counts.some((count) => count > 0)) {
         const nonZeroIndices = counts
           .map((count, index) => (count > 0 ? index : -1))
@@ -522,7 +292,6 @@ export class CaseDashboard extends Component {
 
       this.state.caseStatusChart = {
         data: {
-          // Use the filtered data for the chart
           labels: filteredLabels,
           datasets: [
             {
@@ -531,11 +300,10 @@ export class CaseDashboard extends Component {
               backgroundColor: filteredBackgroundColors,
               borderColor: filteredBorderColors,
               borderWidth: 1,
-              hoverOffset: 15, // Make segments move outward more on hover
+              hoverOffset: 15,
             },
           ],
         },
-        // But keep full data for click handlers
         allLabels: labels,
         allCounts: counts,
         domain,
@@ -568,7 +336,7 @@ export class CaseDashboard extends Component {
               cornerRadius: 12,
               callbacks: {
                 label: function (context) {
-                  return context.label + ": " + context.raw + " cases";
+                  return `${context.label}: ${context.raw} cases`;
                 },
               },
             },
@@ -583,32 +351,26 @@ export class CaseDashboard extends Component {
     }
   }
 
-  // Case Rating Chart (Bar)
   async getCaseRatingChart() {
     try {
       const domain = this.getBaseDomain();
 
-      if (this.state.period > 0) {
-        domain.push(["create_date", ">", this.state.current_date]);
-      }
+      this.applyPeriodDomain(domain);
 
-      // Use read_group for server-side aggregation
       const groupedResults = await this.orm.readGroup(
         "case.manager",
         domain,
-        ["case_rating_count:count(id)"], // Count records
-        ["case_rating"], // Group by this field
-        { lazy: false, context: { active_test: false } } // Include inactive records
+        ["case_rating_count:count(id)"],
+        ["case_rating"],
+        { lazy: false, context: { active_test: false } }
       );
 
-      // Initialize data structure with all possible ratings
       const ratingCounts = {
         low: 0,
         medium: 0,
         high: 0,
       };
 
-      // Fill with actual data
       groupedResults.forEach((group) => {
         const rating = group.case_rating;
         if (rating && rating in ratingCounts) {
@@ -616,7 +378,6 @@ export class CaseDashboard extends Component {
         }
       });
 
-      // Prepare chart data
       const labels = ["Low", "Medium", "High"];
       const counts = [ratingCounts.low, ratingCounts.medium, ratingCounts.high];
 
@@ -674,7 +435,7 @@ export class CaseDashboard extends Component {
               cornerRadius: 12,
               callbacks: {
                 label: function (context) {
-                  return context.label + " Rating: " + context.raw + " cases";
+                  return `${context.label} Rating: ${context.raw} cases`;
                 },
               },
             },
@@ -713,49 +474,17 @@ export class CaseDashboard extends Component {
     }
   }
 
-  // View functions for card clicks
-  async viewAllCases() {
-    this.actionService.doAction("case_management.action_case_manager");
-  }
-
-  async viewDraftCases() {
-    this.actionService.doAction("case_management.action_draft_cases");
-  }
-  async viewOpenCases() {
-    this.actionService.doAction("case_management.action_open_cases");
-  }
-
-  async viewOverdueCases() {
-    this.actionService.doAction("case_management.action_overdue_cases");
-  }
-
-  async viewClosedCases() {
-    this.actionService.doAction("case_management.action_closed_cases");
-  }
-
-  async viewArchivedCases() {
-    this.actionService.doAction("case_management.action_archived_cases");
-  }
-
-  // Chart click handlers
   async viewByStatus(status) {
-    console.log("Clicked on status:", status);
-
-    // Guard against undefined status
     if (!status) {
-      console.error("Status is undefined or null");
       return;
     }
 
-    // Get the status value - handle both string and object cases
     let statusValue;
     if (typeof status === "string") {
       statusValue = status;
     } else if (status && status.label) {
-      // Handle if we get a chart element object instead
       statusValue = status.label;
     } else {
-      console.error("Invalid status format:", status);
       return;
     }
 
@@ -770,61 +499,49 @@ export class CaseDashboard extends Component {
     const actionId = statusMap[statusValue];
     if (actionId) {
       this.actionService.doAction(actionId);
-    } else {
-      // Fallback if status doesn't have a predefined action
-      const domain = this.getBaseDomain();
-      domain.push(["case_status", "=", statusValue.toLowerCase()]);
-
-      if (this.state.period > 0) {
-        domain.push(["create_date", ">", this.state.current_date]);
-      }
-
-      this.actionService.doAction({
-        type: "ir.actions.act_window",
-        name: `${statusValue} Cases`,
-        res_model: "case.manager",
-        domain: domain,
-        views: [
-          [false, "list"],
-          [false, "form"],
-        ],
-        target: "current",
-        context:
-          statusValue.toLowerCase() === "archived"
-            ? { active_test: false }
-            : {},
-      });
-    }
-  }
-
-  async viewByRating(rating) {
-    console.log("Clicked on rating:", rating);
-
-    // Guard against undefined rating
-    if (!rating) {
-      console.error("Rating is undefined or null");
       return;
     }
 
-    // Get the rating value - handle both string and object cases
+    const domain = this.getBaseDomain();
+    domain.push(["case_status", "=", statusValue.toLowerCase()]);
+
+    this.applyPeriodDomain(domain);
+
+    this.actionService.doAction({
+      type: "ir.actions.act_window",
+      name: `${statusValue} Cases`,
+      res_model: "case.manager",
+      domain: domain,
+      views: [
+        [false, "list"],
+        [false, "form"],
+      ],
+      target: "current",
+      context:
+        statusValue.toLowerCase() === "archived"
+          ? { active_test: false }
+          : {},
+    });
+  }
+
+  async viewByRating(rating) {
+    if (!rating) {
+      return;
+    }
+
     let ratingValue;
     if (typeof rating === "string") {
       ratingValue = rating.toLowerCase();
     } else if (rating && rating.label) {
-      // Handle if we get a chart element object instead
       ratingValue = rating.label.toLowerCase();
     } else {
-      console.error("Invalid rating format:", rating);
       return;
     }
 
-    // Apply base domain with case_rating filter
     const domain = this.getBaseDomain();
     domain.push(["case_rating", "=", ratingValue]);
 
-    if (this.state.period > 0) {
-      domain.push(["create_date", ">", this.state.current_date]);
-    }
+    this.applyPeriodDomain(domain);
 
     this.actionService.doAction({
       type: "ir.actions.act_window",

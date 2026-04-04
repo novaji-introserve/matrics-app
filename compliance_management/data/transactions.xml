@@ -1,5 +1,5 @@
 <odoo>
-    <data noupdate="0">
+    <data noupdate="1">
        <!-- EZE CHIDELA - Savings Account transactions -->
         <record id="demo_transaction_1" model="res.customer.transaction">
             <field name="name">TR00000001</field>

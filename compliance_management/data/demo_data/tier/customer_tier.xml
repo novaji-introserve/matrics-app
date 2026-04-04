@@ -1,5 +1,5 @@
 <odoo>
-    <data noupdate="0">
+    <data noupdate="1">
         <!-- Tier 1 - Customers -->
         <record id="customer_tier_1" model="res.partner.tier">
             <field name="name">Tier 1</field>

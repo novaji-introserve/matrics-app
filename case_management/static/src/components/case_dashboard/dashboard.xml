@@ -14,13 +14,20 @@
                     <label class="case-dashboard-filter">
                         <span>Period</span>
                         <select class="form-select" t-model="state.period" t-on-change="OnChangePeriod" t-att-disabled="state.isLoading">
-                            <option value="0">All Time</option>
+                            <option value="0">Today</option>
                             <option value="1">Yesterday</option>
                             <option value="7">Last 7 Days</option>
-                            <option value="14">Last 14 Days</option>
-                            <option value="30">Last 30 Days</option>
-                            <option value="90">Last 90 Days</option>
-                            <option value="365">Last 365 Days</option>
+                            <option value="30">Last 1 Month</option>
+                        </select>
+                    </label>
+                    <label class="case-dashboard-filter">
+                        <span>Refresh</span>
+                        <select class="form-select" t-att-value="state.refreshRate" t-on-change="onRefreshRateChange" t-att-disabled="state.isLoading">
+                            <option value="1">1 min</option>
+                            <option value="5">5 mins</option>
+                            <option value="10">10 mins</option>
+                            <option value="30">30 mins</option>
+                            <option value="60">60 mins</option>
                         </select>
                     </label>
                 </div>
@@ -36,8 +43,8 @@
                     <strong t-esc="currentPeriodLabel" />
                 </div>
                 <div class="case-dashboard-meta__card">
-                    <span class="case-dashboard-meta__label">Charts</span>
-                    <strong>2</strong>
+                    <span class="case-dashboard-meta__label">Cards</span>
+                    <strong t-esc="state.stats.length" />
                 </div>
             </div>
 
@@ -50,12 +57,15 @@
 
             <div t-else="">
                 <div class="case-dashboard-cards">
-                    <KpiCard onClick.bind="viewAllCases" name="'All Cases'" value="state.allCases.value" percentage="state.allCases.percentage" />
-                    <KpiCard onClick.bind="viewDraftCases" name="'Draft Cases'" value="state.draftCases.value" percentage="state.draftCases.percentage" />
-                    <KpiCard onClick.bind="viewOpenCases" name="'Open Cases'" value="state.openCases.value" percentage="state.openCases.percentage" />
-                    <KpiCard onClick.bind="viewOverdueCases" name="'Overdue Cases'" value="state.overdueCases.value" percentage="state.overdueCases.percentage" />
-                    <KpiCard onClick.bind="viewClosedCases" name="'Closed Cases'" value="state.closedCases.value" percentage="state.closedCases.percentage" />
-                    <KpiCard onClick.bind="viewArchivedCases" name="'Archived Cases'" value="state.archivedCases.value" percentage="state.archivedCases.percentage" />
+                    <t t-foreach="state.stats" t-as="stat" t-key="stat.id">
+                        <KpiCard
+                            onClick.bind="openCard"
+                            stat="stat"
+                            name="stat.name"
+                            value="stat.val"
+                            percentage="stat.percentage"
+                        />
+                    </t>
                 </div>
 
                 <div class="case-dashboard-grid">

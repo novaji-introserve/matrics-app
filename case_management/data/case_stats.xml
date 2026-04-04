@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="case_stat_all_cases" model="res.compliance.stat">
+            <field name="name">All Cases</field>
+            <field name="code">case_all_cases</field>
+            <field name="scope">case</field>
+            <field name="state">active</field>
+            <field name="scope_color">#2563eb</field>
+            <field name="sql_query">SELECT COUNT(id) FROM case_manager</field>
+        </record>
+
+        <record id="case_stat_draft_cases" model="res.compliance.stat">
+            <field name="name">Draft Cases</field>
+            <field name="code">case_draft_cases</field>
+            <field name="scope">case</field>
+            <field name="state">active</field>
+            <field name="scope_color">#64748b</field>
+            <field name="sql_query">SELECT COUNT(id) FROM case_manager WHERE case_status = 'draft'</field>
+        </record>
+
+        <record id="case_stat_open_cases" model="res.compliance.stat">
+            <field name="name">Open Cases</field>
+            <field name="code">case_open_cases</field>
+            <field name="scope">case</field>
+            <field name="state">active</field>
+            <field name="scope_color">#0f766e</field>
+            <field name="sql_query">SELECT COUNT(id) FROM case_manager WHERE case_status = 'open'</field>
+        </record>
+
+        <record id="case_stat_overdue_cases" model="res.compliance.stat">
+            <field name="name">Overdue Cases</field>
+            <field name="code">case_overdue_cases</field>
+            <field name="scope">case</field>
+            <field name="state">active</field>
+            <field name="scope_color">#dc2626</field>
+            <field name="sql_query">SELECT COUNT(id) FROM case_manager WHERE case_status = 'overdue'</field>
+        </record>
+
+        <record id="case_stat_closed_cases" model="res.compliance.stat">
+            <field name="name">Closed Cases</field>
+            <field name="code">case_closed_cases</field>
+            <field name="scope">case</field>
+            <field name="state">active</field>
+            <field name="scope_color">#16a34a</field>
+            <field name="sql_query">SELECT COUNT(id) FROM case_manager WHERE case_status = 'closed'</field>
+        </record>
+
+        <record id="case_stat_archived_cases" model="res.compliance.stat">
+            <field name="name">Archived Cases</field>
+            <field name="code">case_archived_cases</field>
+            <field name="scope">case</field>
+            <field name="state">active</field>
+            <field name="scope_color">#f97316</field>
+            <field name="sql_query">SELECT COUNT(id) FROM case_manager WHERE case_status = 'archived' AND active IS FALSE</field>
+        </record>
+    </data>
+</odoo>

@@ -312,10 +312,16 @@
 }
 
 .cm-kpi-card__value {
-    font-size: 30px;
+    max-width: 100%;
+    padding-right: 52px;
+    font-size: clamp(20px, 2vw, 24px);
     font-weight: 700;
-    line-height: 1;
+    line-height: 1.1;
     color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-variant-numeric: tabular-nums;
 }
 
 .cm-kpi-card__label {

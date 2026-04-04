@@ -82,27 +82,46 @@ class Compliance(http.Controller):
         """
         return self.security_service.check_branches_id(branches_id)
 
+    def _normalize_dashboard_period(self, datepicked):
+        try:
+            datepicked = int(datepicked)
+        except (TypeError, ValueError):
+            datepicked = 7
+        return datepicked if datepicked in (0, 1, 7, 30) else 7
+
     def _dashboard_date_range(self, datepicked):
         today = datetime.now().date()
-        prev_date = today - timedelta(days=datepicked)
-        start_of_prev_day = fields.Datetime.to_string(
-            datetime.combine(prev_date, datetime.min.time())
+        if datepicked == 0:
+            start_date = today
+            end_date = today
+        elif datepicked == 1:
+            start_date = today - timedelta(days=1)
+            end_date = start_date
+        elif datepicked == 7:
+            start_date = today - timedelta(days=6)
+            end_date = today
+        else:
+            start_date = today - timedelta(days=29)
+            end_date = today
+
+        start_at = fields.Datetime.to_string(
+            datetime.combine(start_date, datetime.min.time())
         )
-        end_of_today = fields.Datetime.to_string(
-            datetime.combine(today, datetime.max.time())
+        end_at = fields.Datetime.to_string(
+            datetime.combine(end_date, datetime.max.time())
         )
-        return start_of_prev_day, end_of_today
+        return start_at, end_at
 
     def _execute_dashboard_query(self, sql, params=None):
         request.env.cr.execute(sql, params or ())
         return request.env.cr.fetchall()
 
-    def _build_case_domain(self, cco, branches_array, start_of_prev_day, end_of_today, datepicked):
+    def _build_case_domain(self, cco, branches_array, start_at, end_at, datepicked):
         case_domain = []
-        if datepicked and datepicked < 20000:
+        if datepicked in (0, 1, 7, 30):
             case_domain.extend([
-                ["create_date", ">=", start_of_prev_day],
-                ["create_date", "<=", end_of_today],
+                ["create_date", ">=", start_at],
+                ["create_date", "<=", end_at],
             ])
         return case_domain
 
@@ -120,7 +139,7 @@ class Compliance(http.Controller):
         return [row[0] for row in rows if row and row[0]]
 
     @http.route("/dashboard/focused_charts", auth="user", type="json")
-    def focused_charts(self, cco=False, branches_id=None, datepicked=20000, **kw):
+    def focused_charts(self, cco=False, branches_id=None, datepicked=7, **kw):
         try:
             sanitized_data = self.security_service.validate_and_sanitize_request_data({
                 'cco': cco,
@@ -130,7 +149,9 @@ class Compliance(http.Controller):
             })
             cco = sanitized_data.get('cco', cco)
             branches_id = sanitized_data.get('branches_id', branches_id)
-            datepicked = int(sanitized_data.get('datepicked', datepicked) or 20000)
+            datepicked = self._normalize_dashboard_period(
+                sanitized_data.get('datepicked', datepicked)
+            )
         except Exception as e:
             self.security_service.log_security_event(
                 "FOCUSED_CHARTS_INPUT_VALIDATION_FAILED",
@@ -144,7 +165,7 @@ class Compliance(http.Controller):
             cco = True
 
         branches_array = self.check_branches_id(branches_id) if branches_id else []
-        start_of_prev_day, end_of_today = self._dashboard_date_range(datepicked)
+        start_at, end_at = self._dashboard_date_range(datepicked)
 
         account_filters = []
         account_params = []
@@ -153,20 +174,20 @@ class Compliance(http.Controller):
         risk_rule_filters = []
         risk_rule_params = []
 
-        if datepicked and datepicked < 20000:
+        if datepicked in (0, 1, 7, 30):
             account_filters.append(
                 "((COALESCE(rpa.opening_date, rpa.date_created) BETWEEN %s AND %s) OR (rpa.create_date BETWEEN %s AND %s))"
             )
             account_params.extend([
-                start_of_prev_day,
-                end_of_today,
-                start_of_prev_day,
-                end_of_today,
+                start_at,
+                end_at,
+                start_at,
+                end_at,
             ])
             tx_filters.append("rct.date_created BETWEEN %s AND %s")
-            tx_params.extend([start_of_prev_day, end_of_today])
+            tx_params.extend([start_at, end_at])
             risk_rule_filters.append("rppl.create_date BETWEEN %s AND %s")
-            risk_rule_params.extend([start_of_prev_day, end_of_today])
+            risk_rule_params.extend([start_at, end_at])
 
         if not cco:
             if not branches_array:
@@ -246,16 +267,16 @@ class Compliance(http.Controller):
 
         account_domain = []
         account_domain_fallback = []
-        if datepicked and datepicked < 20000:
+        if datepicked in (0, 1, 7, 30):
             account_domain.extend([
-                ["create_date", ">=", start_of_prev_day],
-                ["create_date", "<=", end_of_today],
+                ["create_date", ">=", start_at],
+                ["create_date", "<=", end_at],
             ])
         if not cco and branches_array:
             account_domain.append(["branch_id", "in", branches_array])
             account_domain_fallback.append(["branch_id", "in", branches_array])
 
-        if datepicked and datepicked < 20000 and not top_accounts:
+        if datepicked in (0, 1, 7, 30) and not top_accounts:
             top_accounts_sql = f"""
                 SELECT rb.id, rb.name, COUNT(rpa.id) AS account_count
                 FROM res_branch rb
@@ -270,7 +291,7 @@ class Compliance(http.Controller):
             )
             account_domain = list(account_domain_fallback)
 
-        if datepicked and datepicked < 20000 and not top_high_risk:
+        if datepicked in (0, 1, 7, 30) and not top_high_risk:
             top_high_risk_sql = f"""
                 SELECT rb.id, rb.name, COUNT(rpa.id) AS high_risk_accounts
                 FROM res_branch rb
@@ -293,9 +314,9 @@ class Compliance(http.Controller):
             case_filters = []
             case_params = []
 
-            if datepicked and datepicked < 20000:
+            if datepicked in (0, 1, 7, 30):
                 case_filters.append("cm.create_date BETWEEN %s AND %s")
-                case_params.extend([start_of_prev_day, end_of_today])
+                case_params.extend([start_at, end_at])
 
             if not cco:
                 if not branches_array:
@@ -351,25 +372,25 @@ class Compliance(http.Controller):
             )
 
         tx_domain = []
-        if datepicked and datepicked < 20000:
+        if datepicked in (0, 1, 7, 30):
             tx_domain.extend([
-                ["date_created", ">=", start_of_prev_day],
-                ["date_created", "<=", end_of_today],
+                ["date_created", ">=", start_at],
+                ["date_created", "<=", end_at],
             ])
         if not cco and branches_array:
             tx_domain.append(["branch_id", "in", branches_array])
 
         risk_rule_domain = []
-        if datepicked and datepicked < 20000:
+        if datepicked in (0, 1, 7, 30):
             risk_rule_domain.extend([
-                ["create_date", ">=", start_of_prev_day],
-                ["create_date", "<=", end_of_today],
+                ["create_date", ">=", start_at],
+                ["create_date", "<=", end_at],
             ])
         if not cco and branches_array:
             risk_rule_domain.append(["partner_id.branch_id", "in", branches_array])
 
         case_domain = self._build_case_domain(
-            cco, branches_array, start_of_prev_day, end_of_today, datepicked
+            cco, branches_array, start_at, end_at, datepicked
         )
 
         return [
@@ -579,7 +600,9 @@ class Compliance(http.Controller):
             })
             cco = sanitized_data.get('cco', cco)
             branches_id = sanitized_data.get('branches_id', branches_id)
-            datepicked = sanitized_data.get('datepicked', datepicked)
+            datepicked = self._normalize_dashboard_period(
+                sanitized_data.get('datepicked', datepicked)
+            )
         except Exception as e:
             self.security_service.log_security_event(
                 "STATS_INPUT_VALIDATION_FAILED",
@@ -614,219 +637,27 @@ class Compliance(http.Controller):
         cco_str, branches_str, datepicked_str, unique_id = normalize_cache_key_components(
             cco, branches_id, datepicked, unique_id
         )
-        cache_key = f"all_stats_{cco_str}_{branches_str}_{datepicked_str}_{unique_id}"
+        cache_key = f"all_stats_v2_{cco_str}_{branches_str}_{datepicked_str}_{unique_id}"
         _logger.info(f"This is the stats cache key: {cache_key}")
 
-        cache_service = CacheService(request.env)
-        cache_data = cache_service.get_cache(cache_key, user_id)
-        
-        if cache_data:
-            return cache_data
+        stat_records = request.env["res.compliance.stat"].sudo().search(
+            [("state", "=", "active"), ("scope", "in", self.DASHBOARD_SCOPES)],
+            order="id",
+        )
 
-        excluded_tables = ["res_branch", "res_risk_universe"]
-
-        if not cco:
-            branches_array = self.check_branches_id(branches_id)
-            if not branches_array:
-                return {"data": [], "total": 0}
-                
-        query = """
-            SELECT rcs.*
-            FROM res_compliance_stat rcs
-            WHERE rcs.state = 'active'
-            ORDER BY rcs.id
-        """
-        
-        db_service = DatabaseService(request.env)
-        success, stat_records, _ = db_service.execute_query_with_timeout(query)
-        
-        if not success or not stat_records:
-            return {"data": [], "total": 0}
-            
-        computed_results = []
-        
-        for stat in stat_records:
-            with request.env.registry.cursor() as cr:
-                try:
-                    stat_id = stat["id"]
-                    view_name = f"stat_view_{stat_id}"
-                    result_value = None
-                    use_view = stat.get("use_materialized_view", False)
+        computed_results = [
+            {
+                "name": stat.name,
+                "scope": stat.scope,
+                "val": stat.val or 0,
+                "id": stat.id,
+                "scope_color": stat.scope_color,
+                "query": stat.sql_query,
+            }
+            for stat in stat_records
+        ]
                     
-                    if use_view and db_service.check_view_exists(view_name):
-
-                        columns = db_service.get_table_columns(view_name)
-                        
-                        filter_query = f"SELECT * FROM {view_name}"
-                        
-                        if not cco and branches_id:
-                            original_query = stat["sql_query"].lower()
-                            main_table = self.query_service.extract_main_table(original_query)
-                            
-                            if not cco and main_table in excluded_tables:
-                                continue
-                                
-                            branch_column = self.query_service.find_branch_column_in_view(columns)
-                            
-                            if branch_column:
-                                branches_array = list(map(int, branches_id))
-                                if branches_array:
-                                    if len(branches_array) == 1:
-                                        filter_query += f" WHERE {branch_column} = {branches_array[0]}"
-                                    else:
-                                        filter_query += f" WHERE {branch_column} IN {tuple(branches_array)}"
-                                else:
-                                    continue
-
-                        try:
-                            # Use secure query execution for materialized view
-                            success, results, error_msg = self.security_service.secure_execute_query(
-                                cr, f"{filter_query} LIMIT 1", timeout=30000
-                            )
-                            
-                            if success and results:
-                                result_value = results[0][0] if results[0] else 0
-                            else:
-                                _logger.warning(f"Secure view query failed: {error_msg}")
-                                result_value = None
-                        except Exception as view_error:
-                            _logger.warning(f"Error querying view for stat {stat_id}: {view_error}")
-                            
-                    if result_value is None:
-                        original_query = stat["sql_query"]
-                        query = original_query.lower()
-                        main_table = self.query_service.extract_main_table(query)
-                        
-                        if not cco and main_table in excluded_tables:
-                            continue
-
-                        needs_modification = False
-                        has_branch_id = False
-                        branch_column_name = None
-                        has_res_partner = (
-                            re.search(r"\bres_partner\b", query, re.IGNORECASE)
-                            is not None
-                        )
-                        
-                        if main_table:
-                            branch_column_name = db_service.check_table_for_branch_column(main_table)
-                            has_branch_id = bool(branch_column_name)
-                            
-                        if has_res_partner or has_branch_id:
-                            needs_modification = True
-                            if query.endswith(";"):
-                                query = query[:-1]
-                                original_query = original_query[:-1]
-                                
-                            has_where = bool(re.search(r"\bwhere\b", query))
-                            conditions = []
-                            
-                            if not cco and has_branch_id and branch_column_name:
-                                branches_array = (
-                                    list(map(int, branches_id)) if branches_id else []
-                                )
-                                if branches_array:
-                                    if len(branches_array) == 1:
-                                        conditions.append(
-                                            f"{branch_column_name} = {branches_array[0]}"
-                                        )
-                                    else:
-                                        conditions.append(
-                                            f"{branch_column_name} IN {tuple(branches_array)}"
-                                        )
-                                else:
-                                    conditions.append("1=0")
-                                    
-                            if conditions:
-                                if has_where:
-                                    condition_str = " AND " + " AND ".join(conditions)
-                                else:
-                                    condition_str = " WHERE " + " AND ".join(conditions)
-                               
-                                clauses = [
-                                    "group by",
-                                    "order by",
-                                    "limit",
-                                    "offset",
-                                    "having",
-                                ]
-                                clause_pos = -1
-                                
-                                for clause in clauses:
-                                    pos = query.find(" " + clause + " ")
-                                    if pos > -1:
-                                        if clause_pos == -1 or pos < clause_pos:
-                                            clause_pos = pos
-                                            
-                                if clause_pos > -1:
-                                    original_query = (
-                                        original_query[:clause_pos]
-                                        + condition_str
-                                        + original_query[clause_pos:]
-                                    )
-                                else:
-                                    original_query += condition_str
-                                    
-                        try:
-                            # Use secure query execution
-                            success, results, error_msg = self.security_service.secure_execute_query(
-                                cr, original_query, timeout=30000
-                            )
-                            
-                            if success and results:
-                                result_value = results[0][0] if results[0] else 0
-                            else:
-                                _logger.error(f"Secure query execution failed: {error_msg}")
-                                result_value = 0
-                        except Exception as e:
-                            _logger.error(
-                                f"Error executing SQL query for stat {stat['name']}: {str(e)}"
-                            )
-                            computed_results.append(
-                                {
-                                    "name": stat["name"],
-                                    "scope": stat["scope"],
-                                    "val": "Error",
-                                    "id": stat["id"],
-                                    "scope_color": stat["scope_color"],
-                                    "query": stat["sql_query"],
-                                }
-                            )
-                            continue
-                            
-                    computed_results.append(
-                        {
-                            "name": stat["name"],
-                            "scope": stat["scope"],
-                            "val": (
-                                self.format_number(result_value)
-                                if result_value is not None
-                                else 0.0
-                            ),
-                            "id": stat["id"],
-                            "scope_color": stat["scope_color"],
-                            "query": stat["sql_query"],
-                        }
-                    )
-                except Exception as e:
-                    _logger.error(
-                        f"Error processing stat {stat.get('name', 'Unknown')}: {str(e)}"
-                    )
-                    computed_results.append(
-                        {
-                            "name": stat.get("name", "Unknown"),
-                            "scope": stat.get("scope", "Unknown"),
-                            "val": "Error",
-                            "id": stat.get("id", 0),
-                            "scope_color": stat.get("scope_color", ""),
-                            "query": stat.get("sql_query", ""),
-                        }
-                    )
-                    
-        result = {"data": computed_results, "total": len(computed_results)}
-        cache_service.set_cache(cache_key, result, user_id)
-        
-        return result
+        return {"data": computed_results, "total": len(computed_results)}
 
     @log_access
     @http.route("/dashboard/statsbycategory", auth="public", type="json")
@@ -859,7 +690,9 @@ class Compliance(http.Controller):
             cco = sanitized_data.get('cco', cco)
             branches_id = sanitized_data.get('branches_id', branches_id)
             category = sanitized_data.get('category', category)
-            datepicked = sanitized_data.get('datepicked', datepicked)
+            datepicked = self._normalize_dashboard_period(
+                sanitized_data.get('datepicked', datepicked)
+            )
         except Exception as e:
             self.security_service.log_security_event(
                 "STATS_CATEGORY_INPUT_VALIDATION_FAILED",
@@ -867,15 +700,6 @@ class Compliance(http.Controller):
             )
             return {"error": "Request validation failed"}
             
-        today = datetime.now().date()
-        prevDate = today - timedelta(days=datepicked)
-        start_of_prev_day = fields.Datetime.to_string(
-            datetime.combine(prevDate, datetime.min.time())
-        )
-        end_of_today = fields.Datetime.to_string(
-            datetime.combine(today, datetime.max.time())
-        )
-
         is_cco = self.security_service.is_cco_user()
         is_co = self.security_service.is_co_user()
         
@@ -886,185 +710,27 @@ class Compliance(http.Controller):
                     f"CO user {request.env.user.id} accessing stats by category with CCO privileges"
                 )
                 
-        branches_array = list(map(int, branches_id)) if branches_id else []
+        results = request.env["res.compliance.stat"].sudo().search(
+            [
+                ("state", "=", "active"),
+                ("scope", "in", self.DASHBOARD_SCOPES),
+                ("scope", "=", category),
+            ],
+            order="id",
+        )
+
+        computed_results = [
+            {
+                "name": result.name,
+                "scope": result.scope,
+                "val": result.val or 0,
+                "id": result.id,
+                "scope_color": result.scope_color,
+                "query": result.sql_query,
+            }
+            for result in results
+        ]
+
+        return {"data": computed_results, "total": len(computed_results)}
         
-        if cco:
-            results = request.env["res.compliance.stat"].search(
-                [
-                    ("create_date", ">=", start_of_prev_day),
-                    ("create_date", "<", end_of_today),
-                    ("scope", "=", category),
-                ]
-            )
-            
-            computed_results = []
-            
-            for result in results:
-                original_query = result["sql_query"]
-                query = original_query.lower()
-                needs_modification = False
-                
-                if any(
-                    table in query
-                    for table in ["res_partner", "res.partner", "tier", "transaction"]
-                ):
-                    needs_modification = True
-                    if query.endswith(";"):
-                        query = query[:-1]
-                        original_query = original_query[:-1]
-                        
-                    has_where = bool(re.search(r"\bwhere\b", query))
-                    conditions = []
-                    
-                    if conditions:
-                        if has_where:
-                            condition_str = " AND " + " AND ".join(conditions)
-                        else:
-                            condition_str = " WHERE " + " AND ".join(conditions)
-                            
-                        clauses = ["group by", "order by", "limit", "offset", "having"]
-                        clause_pos = -1
-                        
-                        for clause in clauses:
-                            pos = query.find(" " + clause + " ")
-                            if pos > -1:
-                                if clause_pos == -1 or pos < clause_pos:
-                                    clause_pos = pos
-                                    
-                        if clause_pos > -1:
-                            original_query = (
-                                original_query[:clause_pos]
-                                + condition_str
-                                + original_query[clause_pos:]
-                            )
-                        else:
-                            original_query += condition_str
-                            
-                    # Use secure query execution
-                    success, results, error_msg = self.security_service.secure_execute_query(
-                        request.env.cr, original_query, timeout=30000
-                    )
-                    
-                    if success and results:
-                        result_value = results[0][0] if results[0] else 0
-                    else:
-                        _logger.error(f"Secure query execution failed: {error_msg}")
-                        result_value = 0
-                else:
-                    # Use secure query execution
-                    success, results, error_msg = self.security_service.secure_execute_query(
-                        request.env.cr, original_query, timeout=30000
-                    )
-                    
-                    if success and results:
-                        result_value = results[0][0] if results[0] else 0
-                    else:
-                        _logger.error(f"Secure query execution failed: {error_msg}")
-                        result_value = 0
-                
-                computed_results.append(
-                    {
-                        "name": result["name"],
-                        "scope": result["scope"],
-                        "val": self.format_number(result_value),
-                        "id": result["id"],
-                        "scope_color": result["scope_color"],
-                        "query": result["sql_query"],
-                    }
-                )
-                
-            return {"data": computed_results, "total": len(results)}
-        else:
-            query = """
-                SELECT rcs.*
-                FROM res_compliance_stat rcs
-                WHERE rcs.create_date >= %s
-                AND rcs.create_date < %s AND rcs.scope = %s;
-            """
-            
-            # Use secure parameterized query execution
-            success, results, error_msg = self.security_service.secure_execute_query(
-                request.env.cr, query, (start_of_prev_day, end_of_today, category), timeout=30000
-            )
-            
-            if not success:
-                _logger.error(f"Secure query execution failed: {error_msg}")
-                return {"data": [], "total": 0}
-                
-            stat_records = [
-                dict(zip([desc[0] for desc in request.env.cr.description], row)) 
-                for row in results
-            ]
-            
-            computed_results = []
-            
-            for stat in stat_records:
-                original_query = stat["sql_query"]
-                query = original_query.lower()
-                needs_modification = False
-                
-                if any(
-                    table in query
-                    for table in ["res_partner", "res.partner", "transaction"]
-                ):
-                    needs_modification = True
-                    if query.endswith(";"):
-                        query = query[:-1]
-                        original_query = original_query[:-1]
-                        
-                    has_where = bool(re.search(r"\bwhere\b", query))
-                    conditions = []
-                    
-                    if branches_array:
-                        conditions.append(f"branch_id IN {tuple(branches_array)}")
-                    else:
-                        conditions.append("1=0")
-                        
-                    if conditions:
-                        if has_where:
-                            condition_str = " AND " + " AND ".join(conditions)
-                        else:
-                            condition_str = " WHERE " + " AND ".join(conditions)
-                            
-                        clauses = ["group by", "order by", "limit", "offset", "having"]
-                        clause_pos = -1
-                        
-                        for clause in clauses:
-                            pos = query.find(" " + clause + " ")
-                            if pos > -1:
-                                if clause_pos == -1 or pos < clause_pos:
-                                    clause_pos = pos
-                                    
-                        if clause_pos > -1:
-                            original_query = (
-                                original_query[:clause_pos]
-                                + condition_str
-                                + original_query[clause_pos:]
-                            )
-                        else:
-                            original_query += condition_str
-                            
-                        # Use secure query execution
-                        success, results, error_msg = self.security_service.secure_execute_query(
-                            request.env.cr, original_query, timeout=30000
-                        )
-                        
-                        if success and results:
-                            result_value = results[0][0] if results[0] else 0
-                        else:
-                            _logger.error(f"Secure query execution failed: {error_msg}")
-                            result_value = 0
-                        
-                        computed_results.append(
-                            {
-                                "name": stat["name"],
-                                "scope": stat["scope"],
-                                "val": self.format_number(result_value),
-                                "id": stat["id"],
-                                "scope_color": stat["scope_color"],
-                                "query": stat["sql_query"],
-                            }
-                        )
-                        
-            return {"data": computed_results, "total": len(computed_results)}
-        
+    DASHBOARD_SCOPES = ("bank", "regulatory", "risk", "branch")

@@ -6,14 +6,6 @@
         <field name="model">res.compliance.stat</field>
         <field name="arch" type="xml">
             <form >
-                
-                <header>
-                    <!-- <button name="Validate_expression" class="oe_highlight" type="object"
-                        string="Validate Expression"
-                        groups="compliance_management.group_compliance_branch_compliance_officer" /> -->
-                    <button name="refresh_materialized_view" string="Refresh View" type="object" 
-        attrs="{'invisible': [('use_materialized_view', '=', False)]}" class="oe_highlight"/>
-                </header>
                 <sheet string="Compliance Statistic">
                     <div class="oe_title" colspan="2">
                         <label for="name" class="oe_edit_only" />
@@ -33,13 +25,6 @@
                         </group>
                         <group>
                             <field name="scope" />
-                        </group>
-                        <group>
-                        <field name="use_materialized_view"/>
-                            <field name="materialized_view_refresh_interval" attrs="{'invisible': [('use_materialized_view', '=', False)]}"/>
-                        </group>
-                        <group>
-                            <field name="materialized_view_last_refresh" attrs="{'invisible': [('use_materialized_view', '=', False)]}"/>
                         </group>
                     </group>
                     <notebook colspan="4">

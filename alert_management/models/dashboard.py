@@ -2,6 +2,13 @@ from datetime import timedelta
 
 from odoo import api, fields, models
 
+ALERT_DASHBOARD_ACTIONS = {
+    "alert_total_today": "alert_management.action_alert_history_status",
+    "alert_groups_total": "alert_management.action_alert_group",
+    "alert_rules_total": "alert_management.action_alert_rules",
+    "alert_sql_queries_total": "alert_management.action_process_sql",
+}
+
 
 class AlertHistoryDashboard(models.Model):
     _inherit = "alert.history"
@@ -9,67 +16,92 @@ class AlertHistoryDashboard(models.Model):
     @api.model
     def get_alert_dashboard_data(self, period=7):
         period = self._normalize_period(period)
-        today_start, tomorrow_start = self._today_range()
 
         return {
             "period": period,
-            "cards": [
-                {
-                    "id": "alerts_today",
-                    "title": "Total Alerts Today",
-                    "value": self.search_count(
-                        [
-                            ("date_created", ">=", fields.Datetime.to_string(today_start)),
-                            ("date_created", "<", fields.Datetime.to_string(tomorrow_start)),
-                        ]
-                    ),
-                },
-                {
-                    "id": "alert_groups",
-                    "title": "Number of Alert Groups",
-                    "value": self.env["alert.group"].search_count([]),
-                },
-                {
-                    "id": "alert_rules",
-                    "title": "Number of Alert Rules",
-                    "value": self.env["alert.rules"].search_count([]),
-                },
-                {
-                    "id": "sql_queries",
-                    "title": "Number of SQL Queries",
-                    "value": self.env["process.sql"].search_count([]),
-                },
-            ],
+            "cards": self._get_alert_cards(),
             "trend": self._get_alert_trend(period),
         }
+
+    @api.model
+    def _get_alert_cards(self):
+        stat_records = self.env["res.compliance.stat"].sudo().search(
+            [("state", "=", "active"), ("scope", "=", "alert")],
+            order="id",
+        )
+        self._refresh_alert_stat_values(stat_records)
+        return [
+            {
+                "id": stat.code,
+                "title": stat.name,
+                "value": stat.val or 0,
+                "action_xmlid": ALERT_DASHBOARD_ACTIONS.get(stat.code),
+            }
+            for stat in stat_records
+        ]
+
+    @api.model
+    def _refresh_alert_stat_values(self, stat_records):
+        for stat in stat_records:
+            try:
+                original_query, query = stat._prepare_and_validate_query(
+                    stat.sql_query, code=stat.code
+                )
+                current_value = stat._execute_query_and_get_value(original_query, query) if original_query else "0"
+            except Exception:
+                current_value = "0"
+
+            if (stat.val or "0") != current_value:
+                self.env.cr.execute(
+                    """
+                    UPDATE res_compliance_stat
+                    SET val = %s,
+                        write_date = NOW(),
+                        write_uid = %s
+                    WHERE id = %s
+                    """,
+                    (current_value, self.env.user.id, stat.id),
+                )
+
+        if stat_records:
+            stat_records.invalidate_recordset(["val", "write_date", "write_uid"])
 
     def _normalize_period(self, period):
         try:
             period = int(period)
         except (TypeError, ValueError):
             period = 7
-        return period if period in (0, 7, 30) else 7
+        return period if period in (0, 1, 7, 30) else 7
 
-    def _today_range(self):
-        now = fields.Datetime.to_datetime(fields.Datetime.now())
-        today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        tomorrow_start = today_start + timedelta(days=1)
-        return today_start, tomorrow_start
+    def _get_period_bounds(self, period):
+        now = fields.Datetime.context_timestamp(self, fields.Datetime.now())
+        end_date = now.date()
+        if period == 0:
+            start_date = end_date
+            range_end = end_date
+        elif period == 1:
+            start_date = end_date - timedelta(days=1)
+            range_end = start_date
+        elif period == 7:
+            start_date = end_date - timedelta(days=6)
+            range_end = end_date
+        else:
+            start_date = end_date - timedelta(days=29)
+            range_end = end_date
+        return start_date, range_end
 
     @api.model
     def _get_alert_trend(self, period):
-        now = fields.Datetime.context_timestamp(self, fields.Datetime.now())
-        end_date = now.date()
-        start_date = end_date if period == 0 else end_date - timedelta(days=period - 1)
+        start_date, end_date = self._get_period_bounds(period)
 
         self.env.cr.execute(
             """
-            SELECT DATE(date_created::timestamp) AS day, COUNT(*)
+            SELECT DATE(create_date) AS day, COUNT(*)
             FROM alert_history
-            WHERE date_created IS NOT NULL
-              AND DATE(date_created::timestamp) BETWEEN %s AND %s
-            GROUP BY DATE(date_created::timestamp)
-            ORDER BY DATE(date_created::timestamp)
+            WHERE create_date IS NOT NULL
+              AND DATE(create_date) BETWEEN %s AND %s
+            GROUP BY DATE(create_date)
+            ORDER BY DATE(create_date)
             """,
             [start_date, end_date],
         )

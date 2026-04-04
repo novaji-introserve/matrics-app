@@ -1,68 +1,54 @@
-<odoo>  
+<odoo>
+  <data noupdate="1">
   <!-- Compliance Stats  -->
     <record id="res_compl_stat_1" model="res.compliance.stat">
         <field name="name">Avg. Customer Risk Score</field>
         <field name="code">avg_cust_risk_score</field>
         <field name="scope">bank</field>
-        <field name="sql_query">select round(avg(risk_score),2) from res_partner</field>
-        <field name="use_materialized_view">true</field>
-        <field name="materialized_view_refresh_interval">60</field>
+        <field name="sql_query">SELECT ROUND(AVG(risk_score), 2) FROM res_partner WHERE internal_category = 'customer' AND active IS TRUE</field>
     </record>
     <record id="res_compl_stat_2" model="res.compliance.stat">
         <field name="name">Total Customers</field>
         <field name="code">total_cust</field>
         <field name="scope">bank</field>
-        <field name="sql_query">select count(id) from res_partner</field>
-        <field name="use_materialized_view">true</field>
-        <field name="materialized_view_refresh_interval">60</field>
+        <field name="sql_query">SELECT COUNT(id) FROM res_partner WHERE internal_category = 'customer' AND active IS TRUE</field>
     </record>
     <record id="res_compl_stat_3" model="res.compliance.stat">
         <field name="name">Customers without BVN</field>
         <field name="code">customers_no_bvn</field>
         <field name="scope">regulatory</field>
-        <field name="sql_query">SELECT count(id) FROM res_partner WHERE (bvn IS NULL OR bvn LIKE 'NOBVN%')</field>
+        <field name="sql_query">SELECT COUNT(id) FROM res_partner WHERE internal_category = 'customer' AND active IS TRUE AND (bvn IS NULL OR bvn LIKE 'NOBVN%')</field>
         <!-- <field name="sql_query">select count(id) from res_partner where bvn is null </field> -->
-        <field name="use_materialized_view">true</field>
-        <field name="materialized_view_refresh_interval">60</field>
     </record>
     <record id="res_compl_stat_4" model="res.compliance.stat">
         <field name="name">PEP Customers</field>
         <field name="code">pep_customers</field>
         <field name="scope">regulatory</field>
-        <field name="sql_query">select count(id) from res_partner where is_pep is true </field>
-        <field name="use_materialized_view">true</field>
-        <field name="materialized_view_refresh_interval">60</field>
+        <field name="sql_query">SELECT COUNT(id) FROM res_partner WHERE internal_category = 'customer' AND active IS TRUE AND is_pep IS TRUE</field>
     </record>
     <record id="res_compl_stat_5" model="res.compliance.stat">
         <field name="name">Branches</field>
         <field name="code">branch_tot</field>
         <field name="scope">branch</field>
         <field name="sql_query">select count(id) from res_branch</field>
-        <field name="use_materialized_view">true</field>
-        <field name="materialized_view_refresh_interval">60</field>
     </record>
     <record id="res_compl_stat_6" model="res.compliance.stat">
         <field name="name">Risk Universe</field>
         <field name="code">risk_univ_cnt</field>
         <field name="scope">risk</field>
         <field name="sql_query">select count(id) from res_risk_universe</field>
-        <field name="use_materialized_view">true</field>
-        <field name="materialized_view_refresh_interval">60</field>
     </record>
     <record id="res_compl_stat_7" model="res.compliance.stat">
         <field name="name">Global PEP List</field>
         <field name="code">global_pep</field>
         <field name="scope">regulatory</field>
         <field name="sql_query">select count(id) from res_pep</field>
-        <field name="use_materialized_view">true</field>
-        <field name="materialized_view_refresh_interval">60</field>
     </record>
     <record id="res_compl_stat_8" model="res.compliance.stat">
         <field name="name">WatchList</field>
         <field name="code">watch_list</field>
         <field name="scope">regulatory</field>
         <field name="sql_query">select count(id) from res_partner_watchlist</field>
-        <field name="use_materialized_view">true</field>
-        <field name="materialized_view_refresh_interval">60</field>
     </record>
-</odoo>    
+  </data>
+</odoo>

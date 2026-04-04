@@ -15,8 +15,19 @@
                         <span>Period</span>
                         <select class="form-select" t-att-value="state.period" t-on-change="onPeriodChange">
                             <option value="0">Today</option>
+                            <option value="1">Yesterday</option>
                             <option value="7">Last 7 Days</option>
-                            <option value="30">Last 30 Days</option>
+                            <option value="30">Last 1 Month</option>
+                        </select>
+                    </label>
+                    <label class="alert-dashboard-filter">
+                        <span>Refresh</span>
+                        <select class="form-select" t-att-value="state.refreshRate" t-on-change="onRefreshRateChange">
+                            <option value="1">1 min</option>
+                            <option value="5">5 mins</option>
+                            <option value="10">10 mins</option>
+                            <option value="30">30 mins</option>
+                            <option value="60">60 mins</option>
                         </select>
                     </label>
                 </div>
@@ -33,7 +44,7 @@
                 </div>
                 <div class="alert-dashboard-meta__card">
                     <span class="alert-dashboard-meta__label">Cards</span>
-                    <strong>4</strong>
+                    <strong t-esc="state.cards.length" />
                 </div>
             </div>
 

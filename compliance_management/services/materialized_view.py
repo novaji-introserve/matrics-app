@@ -291,94 +291,6 @@ class MaterializedViewService:
                 _logger.error(f"Failed to update error status: {write_err}")
             return False
 
-    def create_stat_materialized_view(self, stat_id):
-        """Create or update a materialized view for a statistic.
-
-        Args:
-            stat_id (int): The ID of the statistic for which to create the view.
-
-        Returns:
-            bool: True if the view was created successfully, False otherwise.
-        """
-        if not self.env:
-            return False
-            
-        try:
-            stat = self.env["res.compliance.stat"].browse(stat_id)
-            if not stat.exists():
-                _logger.error(f"Statistic {stat_id} not found")
-                return False
-                
-            view_name = f"stat_view_{stat_id}"
-            
-            db_service = DatabaseService(self.env)
-            
-            if db_service.check_view_exists(view_name):
-                _logger.info(f"Materialized view {view_name} already exists, skipping creation")
-                return True
-                
-            original_query, query = stat._prepare_and_validate_query(stat.sql_query)
-            if not original_query:
-                _logger.error(f"Invalid query for statistic {stat_id}")
-                return False
-                
-            if original_query.strip().endswith(";"):
-                original_query = original_query.strip()[:-1]
-                
-            if not db_service.create_materialized_view(view_name, original_query):
-                _logger.error(f"Failed to create materialized view {view_name}")
-                return False
-                
-            stat.write({
-                "materialized_view_last_refresh": fields.Datetime.now(),
-            })
-            
-            _logger.info(f"Successfully created materialized view {view_name} for statistic {stat_id}")
-            return True
-        except Exception as e:
-            _logger.error(f"Error creating materialized view for statistic {stat_id}: {e}")
-            return False
-
-    def refresh_stat_view(self, stat_id, low_priority=False):
-        """Refresh a materialized view for a statistic.
-
-        Args:
-            stat_id (int): The ID of the statistic to refresh.
-            low_priority (bool, optional): Indicates if the refresh should be low priority.
-
-        Returns:
-            bool: True if the refresh was successful, False otherwise.
-        """
-        if not self.env:
-            return False
-            
-        try:
-            registry = self.env.registry
-            with registry.cursor() as cr:
-                if low_priority:
-                    cr.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
-                cr.execute("SELECT pg_try_advisory_xact_lock(%s)", (stat_id,))
-                lock_acquired = cr.fetchone()[0]
-                if not lock_acquired:
-                    _logger.info(f"Another process is refreshing view for statistic {stat_id}, skipping")
-                    return False
-                    
-            view_name = f"stat_view_{stat_id}"
-            
-            db_service = DatabaseService(self.env)
-            
-            if not db_service.check_view_exists(view_name):
-                return self.create_stat_materialized_view(stat_id)
-                
-            if not db_service.refresh_materialized_view(view_name, concurrently=False):
-                _logger.error(f"Failed to refresh materialized view {view_name}")
-                return False
-                
-            return True
-        except Exception as e:
-            _logger.error(f"Error refreshing materialized view for statistic {stat_id}: {e}")
-            return False
-
     def refresh_all_chart_views(self, low_priority=False):
         """Refresh all chart materialized views with isolated transactions.
         
@@ -420,42 +332,6 @@ class MaterializedViewService:
             _logger.error(f"Error in refresh_all_chart_views: {e}")
             return {"refreshed": refreshed, "errors": errors}
 
-    def refresh_all_stat_views(self, low_priority=False):
-        """Refresh all statistic materialized views.
-        
-        Args:
-            low_priority (bool, optional): Indicates if the refresh should be low priority.
-            
-        Returns:
-            dict: A dictionary containing success and error counts.
-        """
-        if not self.env:
-            return {"refreshed": 0, "errors": 0}
-            
-        refreshed = 0
-        errors = 0
-        
-        try:
-            stats = self.env["res.compliance.stat"].search([("state", "=", "active"), ("use_materialized_view", "=", True)])
-            
-            _logger.info(f"Found {len(stats)} statistics with materialized views to refresh")
-            
-            for stat in stats:
-                try:
-                    if self.refresh_stat_view(stat.id, low_priority):
-                        refreshed += 1
-                    else:
-                        errors += 1
-                except Exception as stat_error:
-                    _logger.error(f"Error processing statistic {stat.id}: {stat_error}")
-                    errors += 1
-                    
-            _logger.info(f"Refreshed {refreshed} statistic views, {errors} errors")
-            return {"refreshed": refreshed, "errors": errors}
-        except Exception as e:
-            _logger.error(f"Error refreshing statistic views: {e}")
-            return {"refreshed": refreshed, "errors": errors}
-
     def ensure_all_views_exist(self):
         """Ensure all materialized views exist and are properly created.
         
@@ -463,12 +339,10 @@ class MaterializedViewService:
             dict: A dictionary containing the results of the operation.
         """
         if not self.env:
-            return {"chart_created": 0, "chart_errors": 0, "stat_created": 0, "stat_errors": 0}
+            return {"chart_created": 0, "chart_errors": 0}
             
         chart_created = 0
         chart_errors = 0
-        stat_created = 0
-        stat_errors = 0
         
         try:
             charts = self.env["res.dashboard.charts"].search(
@@ -487,36 +361,19 @@ class MaterializedViewService:
                             chart_created += 1
                         else:
                             chart_errors += 1
-                            
-            stats = self.env["res.compliance.stat"].search([("state", "=", "active"), ("use_materialized_view", "=", True)])
             
-            if stats:
-                _logger.info(f"Found {len(stats)} statistics with materialized views")
-                for stat in stats:
-                    view_name = f"stat_view_{stat.id}"
-                    
-                    db_service = DatabaseService(self.env)
-                    if not db_service.check_view_exists(view_name):
-                        _logger.info(f"View for statistic {stat.id} needs creation")
-                        if self.create_stat_materialized_view(stat.id):
-                            stat_created += 1
-                        else:
-                            stat_errors += 1
-                            
-            _logger.info(f"View initialization complete: {chart_created} charts, {stat_created} stats created, {chart_errors + stat_errors} errors")
+            _logger.info(
+                f"View initialization complete: {chart_created} charts created, {chart_errors} errors"
+            )
             return {
                 "chart_created": chart_created,
                 "chart_errors": chart_errors,
-                "stat_created": stat_created,
-                "stat_errors": stat_errors,
             }
         except Exception as e:
             _logger.error(f"Error ensuring all views exist: {e}")
             return {
                 "chart_created": chart_created,
                 "chart_errors": chart_errors,
-                "stat_created": stat_created,
-                "stat_errors": stat_errors,
                 "error": str(e),
             }
             

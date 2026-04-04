@@ -8,7 +8,7 @@
     'website': 'https://novajii.com',
     "category": "iComply",
     # any module necessary for this one to work correctly
-    'depends': ['base','web', 'mail', 'alert_management'],
+    'depends': ['base','web', 'mail', 'alert_management', 'compliance_management'],
 
     # always loaded
     'data': [
@@ -17,6 +17,7 @@
         'data/demo/exception_process_type.xml',
         'data/demo/exception_process.xml',
         'data/demo/settings.xml',
+        'data/case_stats.xml',
         'views/case.xml',
         'views/menu_items.xml',
         'views/exception.xml',

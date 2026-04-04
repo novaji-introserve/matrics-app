@@ -16,14 +16,14 @@
 
     <menuitem
         id="menu_alert_dashboard"
-        name="Alert Monitoring"
+        name="Monitoring"
         parent="menu_alert_management_main"
         action="action_alert_dashboard"
         sequence="0"
     />
 
     <menuitem 
-        id="menu_alert_history" name="Alert History" 
+        id="menu_alert_history" name="History" 
         parent="menu_alert_management_main"
         action="action_alert_history_status" 
         sequence="1" 

@@ -61,7 +61,7 @@ export class ComplianceDashboard extends Component {
       branches_id: [],
       stats: [],
       totalstat: 0,
-      datepicked: 20000,
+      datepicked: 7,
       refreshRate: 5,
       dynamic_chart: [],
       chartError: null,
@@ -77,6 +77,7 @@ export class ComplianceDashboard extends Component {
     // Models that should trigger a refresh
     this.refreshModels = ['res.partner', 'res.branch'];
     this.refreshTimer = null;
+    this.handleVisibilityRefresh = this.handleVisibilityRefresh.bind(this);
 
     // Setup bus listener for refreshing the dashboard
     useBusListener('dashboard_refresh_channel', this.handleRefreshNotification.bind(this));
@@ -96,10 +97,14 @@ export class ComplianceDashboard extends Component {
     
     useEffect(() => {
       let cardContainer = document.querySelector(".card-container");
+      window.addEventListener("focus", this.handleVisibilityRefresh);
+      document.addEventListener("visibilitychange", this.handleVisibilityRefresh);
       if (cardContainer) {
         cardContainer.addEventListener("scroll", this._onHorizontalScroll.bind(this));
       }
       return () => {
+        window.removeEventListener("focus", this.handleVisibilityRefresh);
+        document.removeEventListener("visibilitychange", this.handleVisibilityRefresh);
         if (cardContainer) {
           cardContainer.removeEventListener("scroll", this._onHorizontalScroll);
         }
@@ -126,19 +131,16 @@ export class ComplianceDashboard extends Component {
     if (days === 0) {
       return "Today";
     }
+    if (days === 1) {
+      return "Yesterday";
+    }
     if (days === 7) {
       return "Last 7 days";
     }
-    if (days === 14) {
-      return "Last 14 days";
-    }
     if (days === 30) {
-      return "Last 30 days";
+      return "Last 1 month";
     }
-    if (days === 60) {
-      return "Last 60 days";
-    }
-    return "All time";
+    return "Last 7 days";
   }
 
   get selectedCharts() {
@@ -229,8 +231,11 @@ export class ComplianceDashboard extends Component {
     }
 
     this.refreshTimer = setInterval(() => {
-      this.fetchDashboardCharts({ silent: true }).catch((error) => {
-        logDebug("Background chart refresh failed:", error);
+      Promise.all([
+        this.getAllStats(),
+        this.fetchDashboardCharts({ silent: true }),
+      ]).catch((error) => {
+        logDebug("Background dashboard refresh failed:", error);
       });
     }, refreshRate * 60 * 1000);
   }
@@ -241,10 +246,10 @@ export class ComplianceDashboard extends Component {
   _generateStatsCacheKey() {
     const cco = String(this.state.cco || false).toLowerCase();
     const branches = JSON.stringify(this.state.branches_id || []);
-    const datepicked = String(this.state.datepicked || 20000);
+      const datepicked = String(this.state.datepicked ?? 7);
     const uniqueId = String(this.state.uniqueId || '');
     
-    return `all_stats_${cco}_${branches}_${datepicked}_${uniqueId}`;
+    return `all_stats_v2_${cco}_${branches}_${datepicked}_${uniqueId}`;
   }
 
   /**
@@ -253,7 +258,7 @@ export class ComplianceDashboard extends Component {
   _generateChartsCacheKey() {
     const cco = String(this.state.cco || false).toLowerCase();
     const branches = JSON.stringify(this.state.branches_id || []);
-    const datepicked = String(this.state.datepicked || 20000);
+    const datepicked = String(this.state.datepicked ?? 7);
     const uniqueId = String(this.state.uniqueId || '');
     
     return `charts_data_v6_${cco}_${branches}_${datepicked}_${uniqueId}`;
@@ -265,7 +270,7 @@ export class ComplianceDashboard extends Component {
   _generateCategoryStatsCacheKey(category) {
     const cco = String(this.state.cco || false).toLowerCase();
     const branches = JSON.stringify(this.state.branches_id || []);
-    const datepicked = String(this.state.datepicked || 20000);
+    const datepicked = String(this.state.datepicked ?? 7);
     const uniqueId = String(this.state.uniqueId || '');
     
     return `stats_category_${cco}_${branches}_${category}_${datepicked}_${uniqueId}`;
@@ -382,12 +387,12 @@ export class ComplianceDashboard extends Component {
   async _clearStaleCache(oldCcoValue) {
     try {
       const branches = JSON.stringify(this.state.branches_id || []);
-      const datepicked = String(this.state.datepicked || 20000);
+    const datepicked = String(this.state.datepicked ?? 7);
       const uniqueId = String(this.state.uniqueId || '');
       const oldCcoStr = String(oldCcoValue).toLowerCase();
       
       const staleCacheKeys = [
-        `all_stats_${oldCcoStr}_${branches}_${datepicked}_${uniqueId}`,
+        `all_stats_v2_${oldCcoStr}_${branches}_${datepicked}_${uniqueId}`,
         `charts_data_${oldCcoStr}_${branches}_${datepicked}_${uniqueId}`,
       ];
       
@@ -425,28 +430,7 @@ export class ComplianceDashboard extends Component {
   async getAllStats() {
     try {
       this.state.loadingStates.stats = true;
-      
-      const cacheKey = this._generateStatsCacheKey();
-      logDebug(`Fetching stats with cache key: ${cacheKey}`);
-      
-      const cachedData = await this.serverCache.getCache(cacheKey);
-      
-      if (cachedData && this._validateStatsData(cachedData)) {
-        logDebug('Using cached stats data');
-        
-        if (Array.isArray(cachedData.data)) {
-          this.state.stats = [...cachedData.data];
-          this.state.totalstat = cachedData.total || cachedData.data.length;
-        } else if (Array.isArray(cachedData)) {
-          this.state.stats = [...cachedData];
-          this.state.totalstat = cachedData.length;
-        }
-        
-        this.state.loadingStates.stats = false;
-        return cachedData;
-      }
-      
-      logDebug('Fetching stats from server');
+
       const result = await this.rpc(`/dashboard/stats`, {
         cco: this.state.cco,
         branches_id: this.state.branches_id,
@@ -462,12 +446,6 @@ export class ComplianceDashboard extends Component {
         } else if (Array.isArray(result)) {
           this.state.stats = [...result];
           this.state.totalstat = result.length;
-          const normalizedResult = { data: result, total: result.length };
-          await this.serverCache.setCache(cacheKey, normalizedResult);
-        }
-        
-        if (result.data) {
-          await this.serverCache.setCache(cacheKey, result);
         }
       } else {
         logDebug('No valid stats data returned');
@@ -492,31 +470,7 @@ export class ComplianceDashboard extends Component {
   async getStatsByCategory(category) {
     try {
       this.state.loadingStates.stats = true;
-      
-      const cacheKey = this._generateCategoryStatsCacheKey(category);
-      logDebug(`Fetching category stats with cache key: ${cacheKey}`);
-      
-      const cachedData = await this.serverCache.getCache(cacheKey);
-      
-      if (cachedData && this._validateStatsData(cachedData)) {
-        logDebug('Using cached category stats data');
-        
-        if (cachedData.data && Array.isArray(cachedData.data)) {
-          this.state.stats = [...cachedData.data];
-          this.state.totalstat = cachedData.total || cachedData.data.length;
-        } else if (Array.isArray(cachedData)) {
-          this.state.stats = [...cachedData];
-          this.state.totalstat = cachedData.length;
-        } else {
-          this.state.stats = [];
-          this.state.totalstat = 0;
-        }
-        
-        this.state.loadingStates.stats = false;
-        return cachedData;
-      }
-      
-      logDebug('Fetching category stats from server');
+
       const result = await this.rpc(`/dashboard/statsbycategory`, {
         cco: this.state.cco,
         branches_id: this.state.branches_id,
@@ -535,7 +489,6 @@ export class ComplianceDashboard extends Component {
           this.state.stats = [];
           this.state.totalstat = 0;
         }
-        await this.serverCache.setCache(cacheKey, result);
       } else {
         this.state.stats = [];
         this.state.totalstat = 0;
@@ -605,6 +558,20 @@ export class ComplianceDashboard extends Component {
       if (!silent) {
         this.state.loadingStates.charts = false;
       }
+    }
+  }
+
+  async handleVisibilityRefresh() {
+    if (document.visibilityState && document.visibilityState !== "visible") {
+      return;
+    }
+    if (this.state.cco === null) {
+      return;
+    }
+    try {
+      await this.getAllStats();
+    } catch (error) {
+      logDebug("Error refreshing stats on visibility change:", error);
     }
   }
 

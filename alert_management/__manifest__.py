@@ -35,6 +35,7 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+        'data/alert_stats.xml',
         'views/dashboard.xml',
         'views/alert_group.xml',
         'views/alert_history.xml',

@@ -1,6 +1,6 @@
 
 <odoo>
-    <data noupdate="0">
+    <data noupdate="1">
           <!-- res_partners demo accounts -->
         <record id="demo_account_1" model="res.partner.account">
             <field name="customer_id" ref="demo_partner_9"/>

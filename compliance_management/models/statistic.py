@@ -5,9 +5,12 @@ from odoo.exceptions import ValidationError
 import re
 import logging
 import sqlparse
+import time
 from sqlparse import sql, tokens as T, keywords as K
 
 _logger = logging.getLogger(__name__)
+STAT_REFRESH_ADVISORY_LOCK = 972451
+DEFAULT_STAT_REFRESH_TIMEOUT_MS = 5000
 
 class Statistic(models.Model):
     """Model for managing compliance statistics."""
@@ -33,8 +36,10 @@ class Statistic(models.Model):
     scope = fields.Selection(
         string="Scope",
         selection=[
+            ("alert", "Alert Management"),
             ("bank", "Bank Wide"),
             ("branch", "Branch"),
+            ("case", "Case Management"),
             ("compliance", "Compliance"),
             ("regulatory", "Regulatory"),
             ("risk", "Risk Assessment"),
@@ -49,21 +54,6 @@ class Statistic(models.Model):
     val = fields.Char(string="Value", compute="_compute_val", store=True, readonly=True)
     narration = fields.Text(string="Narration")
     scope_color = fields.Char()
-    use_materialized_view = fields.Boolean(
-        string="Use Materialized View",
-        default=False,
-        help="If enabled, a materialized view will be created for this statistic to optimize performance",
-        tracking=True,
-    )
-    materialized_view_refresh_interval = fields.Integer(
-        string="Refresh Interval (minutes)",
-        default=60,
-        help="How often the materialized view should be refreshed (in minutes)",
-        readonly=True
-    )
-    materialized_view_last_refresh = fields.Datetime(
-        string="Last View Refresh", readonly=True
-    )
     last_execution_time = fields.Float(
         string="Last Execution Time (ms)",
         readonly=True,
@@ -77,7 +67,121 @@ class Statistic(models.Model):
     last_error_message = fields.Text(string="Last Error Message", readonly=True)
 
     active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
-    
+
+
+    def _get_stat_refresh_config(self):
+        params = self.env["ir.config_parameter"].sudo()
+        timeout_ms = int(
+            params.get_param(
+                "compliance_management.stat_refresh_timeout_ms",
+                DEFAULT_STAT_REFRESH_TIMEOUT_MS,
+            )
+        )
+        return max(timeout_ms, 1000)
+
+    def _acquire_stat_refresh_lock(self):
+        self.env.cr.execute("SELECT pg_try_advisory_lock(%s)", (STAT_REFRESH_ADVISORY_LOCK,))
+        row = self.env.cr.fetchone()
+        return bool(row and row[0])
+
+    def _release_stat_refresh_lock(self):
+        try:
+            self.env.cr.execute("SELECT pg_advisory_unlock(%s)", (STAT_REFRESH_ADVISORY_LOCK,))
+        except Exception:
+            _logger.exception("Failed to release statistic refresh advisory lock")
+
+    def _update_stat_refresh_metadata(
+        self, stat_id, *, value=None, execution_time_ms=0.0, status="success", error_message=None
+    ):
+        value_to_store = "0" if value is None else str(value)
+        truncated_error = error_message[:1000] if error_message else None
+        self.env.cr.execute(
+            """
+            UPDATE res_compliance_stat
+            SET val = CASE WHEN COALESCE(val, '') <> %s THEN %s ELSE val END,
+                last_execution_time = %s,
+                last_execution_status = %s,
+                last_error_message = %s,
+                write_date = NOW(),
+                write_uid = %s
+            WHERE id = %s
+            """,
+            (
+                value_to_store,
+                value_to_store,
+                execution_time_ms,
+                status,
+                truncated_error,
+                self.env.user.id,
+                stat_id,
+            ),
+        )
+
+    def _compute_stat_value_for_refresh(self, record, timeout_ms):
+        start = time.time()
+        self.env.cr.execute(f"SET LOCAL statement_timeout = {int(timeout_ms)}")
+        original_query, query = record._prepare_and_validate_query(record.sql_query)
+        value = record._execute_query_and_get_value(original_query, query) if original_query else "0"
+        execution_time_ms = (time.time() - start) * 1000
+        return value, execution_time_ms
+
+    @api.model
+    def update_stat(self, limit=None):
+        if not self._acquire_stat_refresh_lock():
+            _logger.info("Statistic refresh skipped because another run is already active")
+            return False
+
+        timeout_ms = self._get_stat_refresh_config()
+        search_kwargs = {"order": "id"}
+        if limit:
+            search_kwargs["limit"] = int(limit)
+        stats = self.sudo().search(
+            [("state", "=", "active"), ("active", "=", True)],
+            **search_kwargs,
+        )
+
+        _logger.info(
+            "Starting statistic refresh run for %s records with timeout=%sms",
+            len(stats),
+            timeout_ms,
+        )
+
+        try:
+            for record in stats:
+                with self.env.cr.savepoint():
+                    try:
+                        value, execution_time_ms = self._compute_stat_value_for_refresh(
+                            record, timeout_ms
+                        )
+                        self._update_stat_refresh_metadata(
+                            record.id,
+                            value=value,
+                            execution_time_ms=execution_time_ms,
+                            status="success",
+                            error_message=None,
+                        )
+                    except Exception as exc:
+                        _logger.warning(
+                            "Statistic refresh failed for %s (%s): %s",
+                            record.name,
+                            record.code,
+                            exc,
+                        )
+                        self._update_stat_refresh_metadata(
+                            record.id,
+                            value=record.val or "0",
+                            execution_time_ms=0.0,
+                            status="error",
+                            error_message=str(exc),
+                        )
+
+            stats.invalidate_recordset(
+                ["val", "last_execution_time", "last_execution_status", "last_error_message"]
+            )
+            return True
+        finally:
+            self._release_stat_refresh_lock()
+
     def _validate_sql_query_structure(self, parsed_query):
         """Validate the structure of a parsed SQL query to prevent injection attacks.
         
@@ -339,6 +443,7 @@ class Statistic(models.Model):
         """
         if "sql_query" in vals:
             sql_query = vals["sql_query"]
+        if "sql_query" in vals:
             try:
                 original_query, query = self._prepare_and_validate_query(sql_query)
                 self._execute_query_and_get_value(original_query, query)
@@ -346,25 +451,15 @@ class Statistic(models.Model):
                 raise ValidationError(f"Invalid SQL query:\n{str(e)}")
         return super(Statistic, self).write(vals)
 
-    @api.depends("sql_query", "use_materialized_view")
+    @api.depends("sql_query")
     def _compute_val(self):
-        """Compute the value based on the SQL query or materialized view.
-        This method evaluates the current SQL query or retrieves the value from
-        the materialized view if enabled.
-        """
+        """Compute the value directly from the statistic SQL query."""
         for record in self:
             if not record.sql_query:
                 record.val = "0"
                 continue
-            if record.use_materialized_view:
-                view_value = record.get_value_from_materialized_view()
-                if view_value is not None:
-                    record.val = view_value
-                    continue
             try:
-                original_query, query = record._prepare_and_validate_query(
-                    record.sql_query
-                )
+                original_query, query = record._prepare_and_validate_query(record.sql_query)
                 if original_query:
                     record.val = record._execute_query_and_get_value(
                         original_query, query
@@ -377,90 +472,4 @@ class Statistic(models.Model):
     def _onchange_sql_query(self):
         """Trigger value computation when the SQL query is changed."""
         self._compute_val()
-
-    def get_value_from_materialized_view(self):
-        """Retrieve the value from the materialized view if it exists and is enabled.
-        Returns:
-            str: The value from the materialized view or None if not available.
-        """
-        self.ensure_one()
-        if not self.use_materialized_view:
-            return None
-        view_name = f"stat_view_{self.id}"
-        self.env.cr.execute(
-            """
-            SELECT EXISTS (
-                SELECT FROM pg_catalog.pg_class c
-                WHERE c.relname = %s AND c.relkind = 'm'
-            )
-        """,
-            (view_name,),
-        )
-        view_exists = self.env.cr.fetchone()[0]
-        if not view_exists:
-            refresher = self.env["dashboard.stats.view.refresher"].sudo()
-            if not refresher.create_materialized_view_for_stat(self.id):
-                return None
-        try:
-            with self.env.registry.cursor() as cr:
-                cr.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
-                cr.execute(f"SELECT * FROM {view_name} LIMIT 1")
-                result = cr.fetchone()
-                if result is None:
-                    return "0"
-                if len(result) == 1:
-                    value = result[0]
-                else:
-                    value = 1
-                if isinstance(value, (int, float)):
-                    return "{:,}".format(value)
-                else:
-                    return str(value) if value is not None else "0"
-        except Exception as e:
-            _logger.error(
-                f"Error querying materialized view for statistic {self.id}: {e}"
-            )
-            return None
-
-    def refresh_materialized_view(self):
-        """Manually refresh the materialized view for this statistic.
-        Returns:
-            dict: Action dictionary to display the result notification.
-        """
-        self.ensure_one()
-        if not self.use_materialized_view:
-            return {
-                "type": "ir.actions.client",
-                "tag": "display_notification",
-                "params": {
-                    "title": "Error",
-                    "message": "Materialized view is not enabled for this statistic.",
-                    "type": "danger",
-                    "sticky": False,
-                },
-            }
-        refresher = self.env["dashboard.stats.view.refresher"].sudo()
-        success = refresher.refresh_stat_view(self.id)
-        if success:
-            return {
-                "type": "ir.actions.client",
-                "tag": "display_notification",
-                "params": {
-                    "title": "Success",
-                    "message": "Materialized view refreshed successfully.",
-                    "type": "success",
-                    "sticky": False,
-                },
-            }
-        else:
-            return {
-                "type": "ir.actions.client",
-                "tag": "display_notification",
-                "params": {
-                    "title": "Error",
-                    "message": "Failed to refresh materialized view.",
-                    "type": "danger",
-                    "sticky": False,
-                },
-            }
             
