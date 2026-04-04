@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
-    <t t-name="owl.ComplianceDashboard" owl="1">
+    <t t-name="owl.ComplianceDashboardV3" owl="1">
         <div class="cm-dashboard-shell">
             <div class="cm-dashboard-hero">
                 <div class="cm-dashboard-hero__copy">
@@ -61,16 +61,9 @@
                     </t>
                 </t>
                 <t t-else="">
-                    <t t-foreach="state.stats" t-as="stat" t-key="stat.id">
+                    <t t-foreach="state.stats" t-as="cardItem" t-key="cardItem.id">
                         <div class="cm-dashboard-cards__item">
-                            <Card 
-                                onClick="() => stat.query ? displayOdooView(stat.scope, stat.query, null, null, stat.name) : null"
-                                title="stat.name" 
-                                scope="stat.scope" 
-                                total="stat.val" 
-                                bgcolor="stat.scope_color"
-                                isClickable="stat.query and stat.name !== 'Avg. Customer Risk Score'" 
-                            />
+                            <Card t-props="getCardProps(cardItem)" />
                         </div>
                     </t>
                 </t>
@@ -99,7 +92,7 @@
                                 <div class="cm-dashboard-panel__header">
                                     <div>
                                         <h2 t-esc="chart.title" />
-                                        <p t-esc="chart.title === 'Top Transaction Exception' ? 'Most-triggered exception rules in the selected period.' : chart.title === 'Top 10 Customer Risk Rules' ? 'Risk analysis rules affecting the highest number of partners in the selected period.' : 'Click the chart to inspect underlying records.'" />
+                                        <p t-esc="chart.display_summary" />
                                     </div>
                                 </div>
                                 <t t-if="hasChartData(chart)">

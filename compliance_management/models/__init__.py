@@ -38,6 +38,7 @@ from . import blacklist
 from . import watchlist
 from . import greylist
 from . import statistic
+from . import resource_uri
 from . import risk_assessment_plan
 from . import settings
 from . import transaction

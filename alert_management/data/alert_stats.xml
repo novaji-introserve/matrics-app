@@ -4,6 +4,10 @@
         <record id="alert_stat_total_alerts_today" model="res.compliance.stat">
             <field name="name">Total Alerts Today</field>
             <field name="code">alert_total_today</field>
+            <field name="resource_id" ref="compliance_management.res_resource_uri_alert_history"/>
+            <field name="domain">[]</field>
+            <field name="display_order">1</field>
+            <field name="display_summary">Alerts generated so far within the current day.</field>
             <field name="scope">alert</field>
             <field name="state">active</field>
             <field name="scope_color">#2563eb</field>
@@ -13,6 +17,10 @@
         <record id="alert_stat_groups" model="res.compliance.stat">
             <field name="name">Number of Alert Groups</field>
             <field name="code">alert_groups_total</field>
+            <field name="resource_id" ref="compliance_management.res_resource_uri_alert_group"/>
+            <field name="domain">[]</field>
+            <field name="display_order">2</field>
+            <field name="display_summary">Configured alert groups available for operational routing.</field>
             <field name="scope">alert</field>
             <field name="state">active</field>
             <field name="scope_color">#0f766e</field>
@@ -22,6 +30,10 @@
         <record id="alert_stat_rules" model="res.compliance.stat">
             <field name="name">Number of Alert Rules</field>
             <field name="code">alert_rules_total</field>
+            <field name="resource_id" ref="compliance_management.res_resource_uri_alert_rules"/>
+            <field name="domain">[]</field>
+            <field name="display_order">3</field>
+            <field name="display_summary">Active alert rules currently driving detection coverage.</field>
             <field name="scope">alert</field>
             <field name="state">active</field>
             <field name="scope_color">#dc2626</field>
@@ -31,6 +43,10 @@
         <record id="alert_stat_sql_queries" model="res.compliance.stat">
             <field name="name">Number of SQL Queries</field>
             <field name="code">alert_sql_queries_total</field>
+            <field name="resource_id" ref="compliance_management.res_resource_uri_alert_sql_query"/>
+            <field name="domain">[]</field>
+            <field name="display_order">4</field>
+            <field name="display_summary">Stored SQL query definitions supporting alert execution.</field>
             <field name="scope">alert</field>
             <field name="state">active</field>
             <field name="scope_color">#f97316</field>

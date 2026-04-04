@@ -2,13 +2,6 @@ from datetime import timedelta
 
 from odoo import api, fields, models
 
-ALERT_DASHBOARD_ACTIONS = {
-    "alert_total_today": "alert_management.action_alert_history_status",
-    "alert_groups_total": "alert_management.action_alert_group",
-    "alert_rules_total": "alert_management.action_alert_rules",
-    "alert_sql_queries_total": "alert_management.action_process_sql",
-}
-
 
 class AlertHistoryDashboard(models.Model):
     _inherit = "alert.history"
@@ -26,8 +19,8 @@ class AlertHistoryDashboard(models.Model):
     @api.model
     def _get_alert_cards(self):
         stat_records = self.env["res.compliance.stat"].sudo().search(
-            [("state", "=", "active"), ("scope", "=", "alert")],
-            order="id",
+            [("state", "=", "active"), ("is_visible", "=", True), ("scope", "=", "alert")],
+            order="display_order asc, id asc",
         )
         self._refresh_alert_stat_values(stat_records)
         return [
@@ -35,7 +28,9 @@ class AlertHistoryDashboard(models.Model):
                 "id": stat.code,
                 "title": stat.name,
                 "value": stat.val or 0,
-                "action_xmlid": ALERT_DASHBOARD_ACTIONS.get(stat.code),
+                "display_summary": stat.display_summary,
+                "sql_query": stat.sql_query,
+                **stat._get_dashboard_action_metadata(),
             }
             for stat in stat_records
         ]

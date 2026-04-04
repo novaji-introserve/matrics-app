@@ -7,6 +7,7 @@
         <field name="arch" type="xml">
             <tree string="Customer Risk Analysis">
                 <field name="name" />
+                <field name="state" widget="badge" decoration-success="state == 'active'" decoration-warning="state == 'inactive'" />
                 <field name="priority" />
                  <field name="compute_score_from" />
                 <field name="risk_assessment" />
@@ -15,6 +16,23 @@
                 <field name="create_uid" />
                 <field name="create_date" />
             </tree>
+        </field>
+    </record>
+    <record id="compliance_risk_assessment_plan_search" model="ir.ui.view">
+        <field name="name">compliance_risk_assessment_plan_search</field>
+        <field name="model">res.compliance.risk.assessment.plan</field>
+        <field name="arch" type="xml">
+            <search string="Customer Risk Analysis">
+                <field name="name" />
+                <field name="code" />
+                <field name="risk_assessment" />
+                <filter string="Active" name="filter_state_active" domain="[('state', '=', 'active')]" />
+                <filter string="Inactive" name="filter_state_inactive" domain="[('state', '=', 'inactive')]" />
+                <separator />
+                <group expand="0" string="Group By">
+                    <filter string="State" name="group_state" context="{'group_by': 'state'}" />
+                </group>
+            </search>
         </field>
     </record>
     <!-- Risk Assessment Form -->

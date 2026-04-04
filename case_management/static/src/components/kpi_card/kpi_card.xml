@@ -4,6 +4,9 @@
         <div class="case-kpi-card" t-on-click="() => props.onClick(props.stat)">
             <div class="case-kpi-card__value"><span t-esc="props.value"/></div>
             <div class="case-kpi-card__label"><span t-esc="props.name"/></div>
+            <t t-if="props.summary">
+                <div class="case-kpi-card__summary"><span t-esc="props.summary"/></div>
+            </t>
             <div t-att-class="deltaClass">
                 <span t-esc="percentageLabel"/>
             </div>

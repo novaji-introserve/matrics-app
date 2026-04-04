@@ -31,7 +31,19 @@ const MODERN_PALETTES = {
     "#f87171",
     "#fdba74",
   ],
-  exceptions: {
+  exceptions: [
+    "#059669",
+    "#0ea5e9",
+    "#8b5cf6",
+    "#f97316",
+    "#ef4444",
+    "#eab308",
+    "#14b8a6",
+    "#6366f1",
+    "#ec4899",
+    "#84cc16",
+  ],
+  exceptionLine: {
     stroke: "#059669",
     fill: "rgba(5, 150, 105, 0.14)",
     points: "#10b981",
@@ -231,11 +243,11 @@ export class ChartRenderer extends Component {
       if (chartType === "line") {
         return {
           ...dataset,
-          borderColor: MODERN_PALETTES.exceptions.stroke,
-          backgroundColor: MODERN_PALETTES.exceptions.fill,
-          pointBackgroundColor: MODERN_PALETTES.exceptions.points,
+          borderColor: MODERN_PALETTES.exceptionLine.stroke,
+          backgroundColor: MODERN_PALETTES.exceptionLine.fill,
+          pointBackgroundColor: MODERN_PALETTES.exceptionLine.points,
           pointBorderColor: "#ffffff",
-          pointHoverBackgroundColor: MODERN_PALETTES.exceptions.stroke,
+          pointHoverBackgroundColor: MODERN_PALETTES.exceptionLine.stroke,
           pointHoverBorderColor: "#ffffff",
           pointRadius: 4,
           pointHoverRadius: 6,

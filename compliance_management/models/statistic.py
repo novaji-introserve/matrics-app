@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
+import ast
 import re
 import logging
 import sqlparse
@@ -30,8 +31,28 @@ class Statistic(models.Model):
         ),
     ]
     _inherit = ["mail.thread", "mail.activity.mixin"]
+
+    @api.model
+    def _default_resource_id(self):
+        resource = self.env.ref(
+            "compliance_management.res_resource_uri_customer",
+            raise_if_not_found=False,
+        )
+        return resource.id if resource else False
+
     name = fields.Char(string="Name", required=True)
     code = fields.Char(string="Code", required=True)
+    display_order = fields.Integer(string="Display Order", default=1, tracking=True)
+    is_visible = fields.Boolean(string="Is Visible", default=True, tracking=True)
+    resource_id = fields.Many2one(
+        "res.resource.uri",
+        string="Resource URI",
+        default=_default_resource_id,
+        ondelete="set null",
+        tracking=True,
+    )
+    domain = fields.Text(string="Domain", tracking=True)
+    display_summary = fields.Text(string="Display Summary")
     sql_query = fields.Text(string="SQL Query", required=True)
     scope = fields.Selection(
         string="Scope",
@@ -51,7 +72,7 @@ class Statistic(models.Model):
         selection=[("active", "Active"), ("inactive", "Inactive")],
         default="active",
     )
-    val = fields.Char(string="Value", compute="_compute_val", store=True, readonly=True)
+    val = fields.Char(string="Value", readonly=True, copy=False)
     narration = fields.Text(string="Narration")
     scope_color = fields.Char()
     last_execution_time = fields.Float(
@@ -67,6 +88,68 @@ class Statistic(models.Model):
     last_error_message = fields.Text(string="Last Error Message", readonly=True)
 
     active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+
+    def init(self):
+        super().init()
+        stat_resource_map = {
+            "avg_cust_risk_score": "res_resource_uri_customer",
+            "total_cust": "res_resource_uri_customer",
+            "customers_no_bvn": "res_resource_uri_customer",
+            "pep_customers": "res_resource_uri_customer",
+            "global_pep": "res_resource_uri_global_pep_list",
+            "watch_list": "res_resource_uri_watchlist",
+            "alert_total_today": "res_resource_uri_alert_history",
+            "alert_groups_total": "res_resource_uri_alert_group",
+            "alert_rules_total": "res_resource_uri_alert_rules",
+            "alert_sql_queries_total": "res_resource_uri_alert_sql_query",
+            "case_all_cases": "res_resource_uri_case_manager",
+            "case_draft_cases": "res_resource_uri_case_manager",
+            "case_open_cases": "res_resource_uri_case_manager",
+            "case_overdue_cases": "res_resource_uri_case_manager",
+            "case_closed_cases": "res_resource_uri_case_manager",
+            "case_archived_cases": "res_resource_uri_case_manager",
+        }
+        stat_domain_map = {
+            "avg_cust_risk_score": "[('internal_category', '=', 'customer'), ('active', '=', True)]",
+            "total_cust": "[('internal_category', '=', 'customer'), ('active', '=', True)]",
+            "customers_no_bvn": "[('internal_category', '=', 'customer'), ('active', '=', True), '|', ('bvn', '=', False), ('bvn', 'ilike', 'NOBVN%')]",
+            "pep_customers": "[('internal_category', '=', 'customer'), ('active', '=', True), ('is_pep', '=', True)]",
+            "branch_tot": "[]",
+            "risk_univ_cnt": "[]",
+            "global_pep": "[]",
+            "watch_list": "[]",
+            "alert_total_today": "[]",
+            "alert_groups_total": "[]",
+            "alert_rules_total": "[]",
+            "alert_sql_queries_total": "[]",
+            "case_all_cases": "[]",
+            "case_draft_cases": "[('case_status', '=', 'draft')]",
+            "case_open_cases": "[('case_status', '=', 'open')]",
+            "case_overdue_cases": "[('case_status', '=', 'overdue')]",
+            "case_closed_cases": "[('case_status', '=', 'closed')]",
+            "case_archived_cases": "[('case_status', '=', 'archived'), ('active', '=', False)]",
+        }
+        for stat_code, xml_id in stat_resource_map.items():
+            self.env.cr.execute(
+                """
+                UPDATE res_compliance_stat stat
+                SET resource_id = imd.res_id
+                FROM ir_model_data imd
+                WHERE imd.module = 'compliance_management'
+                  AND imd.name = %s
+                  AND stat.code = %s
+                """,
+                (xml_id, stat_code),
+            )
+        for stat_code, domain_value in stat_domain_map.items():
+            self.env.cr.execute(
+                """
+                UPDATE res_compliance_stat
+                SET domain = %s
+                WHERE code = %s
+                """,
+                (domain_value, stat_code),
+            )
 
 
     def _get_stat_refresh_config(self):
@@ -125,6 +208,39 @@ class Statistic(models.Model):
         execution_time_ms = (time.time() - start) * 1000
         return value, execution_time_ms
 
+    def _compute_current_value(self, record):
+        original_query, query = record._prepare_and_validate_query(record.sql_query)
+        return record._execute_query_and_get_value(original_query, query) if original_query else "0"
+
+    def _get_dashboard_action_metadata(self):
+        self.ensure_one()
+        model_uri = self.resource_id.model_uri if self.resource_id else False
+        search_view_xmlids = {
+            "res.transaction.screening.rule": "compliance_management.compliance_transaction_screening_rule_search",
+            "res.compliance.risk.assessment.plan": "compliance_management.compliance_risk_assessment_plan_search",
+            "res.partner.risk.plan.line": "compliance_management.view_partner_risk_plan_line_search",
+        }
+        search_view_id = False
+        if model_uri in search_view_xmlids:
+            view = self.env.ref(search_view_xmlids[model_uri], raise_if_not_found=False)
+            search_view_id = view.id if view else False
+        return {
+            "resource_model_uri": model_uri,
+            "search_view_id": search_view_id,
+            "domain": self._parse_domain(),
+        }
+
+    def _parse_domain(self):
+        self.ensure_one()
+        if not self.domain:
+            return False
+        try:
+            parsed_domain = ast.literal_eval(self.domain)
+        except (ValueError, SyntaxError):
+            _logger.warning("Invalid domain for statistic %s (%s): %s", self.name, self.code, self.domain)
+            return False
+        return parsed_domain if isinstance(parsed_domain, list) else False
+
     @api.model
     def update_stat(self, limit=None):
         if not self._acquire_stat_refresh_lock():
@@ -136,7 +252,7 @@ class Statistic(models.Model):
         if limit:
             search_kwargs["limit"] = int(limit)
         stats = self.sudo().search(
-            [("state", "=", "active"), ("active", "=", True)],
+            [("state", "=", "active"), ("active", "=", True), ("is_visible", "=", True)],
             **search_kwargs,
         )
 
@@ -346,33 +462,7 @@ class Statistic(models.Model):
                 _logger.warning(f"Dangerous Query: {sql_query}")
                 raise
             
-            # Additional validation for res_partner table access
             query_lower = original_query.lower()
-            pattern = r"\bres_partner\b"
-            
-            if re.search(pattern, query_lower, re.IGNORECASE):
-                # Apply origin filtering for res_partner queries
-                has_where = bool(re.search(r"\bwhere\b", query_lower))
-                condition = (
-                    " AND origin IN ('demo','test','prod')"
-                    if has_where
-                    else " WHERE origin IN ('demo','test','prod')"
-                )
-                
-                # Find the right place to insert the condition
-                for clause in ["group by", "order by", "limit", "offset", "having"]:
-                    clause_pos = query_lower.find(" " + clause + " ")
-                    if clause_pos > -1:
-                        original_query = (
-                            original_query[:clause_pos]
-                            + condition
-                            + original_query[clause_pos:]
-                        )
-                        break
-                else:
-                    original_query += condition
-                
-                _logger.info(f"Applied security filter for res_partner query - {user_info}")
             
             # Log successful validation
             _logger.info(f"SQL Query Validated Successfully - {user_info}")
@@ -424,12 +514,14 @@ class Statistic(models.Model):
             ValidationError: If the SQL query is invalid.
         """
         sql_query = vals.get("sql_query")
+        computed_value = "0"
         if sql_query:
             try:
                 original_query, query = self._prepare_and_validate_query(sql_query)
-                self._execute_query_and_get_value(original_query, query)
+                computed_value = self._execute_query_and_get_value(original_query, query)
             except Exception as e:
                 raise ValidationError(f"Invalid SQL query:\n{str(e)}")
+        vals = dict(vals, val=computed_value)
         return super(Statistic, self).create(vals)
 
     def write(self, vals):
@@ -443,33 +535,40 @@ class Statistic(models.Model):
         """
         if "sql_query" in vals:
             sql_query = vals["sql_query"]
-        if "sql_query" in vals:
             try:
                 original_query, query = self._prepare_and_validate_query(sql_query)
-                self._execute_query_and_get_value(original_query, query)
+                vals = dict(vals, val=self._execute_query_and_get_value(original_query, query))
             except Exception as e:
                 raise ValidationError(f"Invalid SQL query:\n{str(e)}")
         return super(Statistic, self).write(vals)
 
-    @api.depends("sql_query")
-    def _compute_val(self):
-        """Compute the value directly from the statistic SQL query."""
-        for record in self:
-            if not record.sql_query:
-                record.val = "0"
-                continue
-            try:
-                original_query, query = record._prepare_and_validate_query(record.sql_query)
-                if original_query:
-                    record.val = record._execute_query_and_get_value(
-                        original_query, query
-                    )
-            except Exception as e:
-                record.val = "Error"
-                _logger.error(f"Error computing value for stat {record.name}: {str(e)}")
+    def action_run_statistic(self):
+        """Execute the statistic query on demand and persist the latest value."""
+        self.ensure_one()
 
-    @api.onchange("sql_query")
-    def _onchange_sql_query(self):
-        """Trigger value computation when the SQL query is changed."""
-        self._compute_val()
+        start = time.time()
+        original_query, query = self._prepare_and_validate_query(self.sql_query)
+        value = self._execute_query_and_get_value(original_query, query)
+        execution_time_ms = (time.time() - start) * 1000
+
+        super(Statistic, self).write(
+            {
+                "val": value,
+                "last_execution_time": execution_time_ms,
+                "last_execution_status": "success",
+                "last_error_message": False,
+            }
+        )
+
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "title": "Success",
+                "message": "Statistic updated successfull",
+                "type": "success",
+                "sticky": False,
+                "next": {"type": "ir.actions.client", "tag": "reload"},
+            },
+        }
             

@@ -61,6 +61,9 @@
                         <div class="alert-kpi-card alert-kpi-card--clickable" t-on-click="() => openCard(card)">
                             <div class="alert-kpi-card__value" t-esc="card.value" />
                             <div class="alert-kpi-card__label" t-esc="card.title" />
+                            <t t-if="card.display_summary">
+                                <div class="alert-kpi-card__summary" t-esc="card.display_summary" />
+                            </t>
                         </div>
                     </t>
                 </div>

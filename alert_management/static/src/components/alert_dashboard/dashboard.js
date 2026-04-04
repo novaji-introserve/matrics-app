@@ -129,31 +129,25 @@ export class AlertDashboard extends Component {
         await this.loadDashboard();
     }
 
-    openCard(card) {
+    async openCard(card) {
         if (!card) {
             return;
         }
-        if (card.id === "alert_total_today") {
-            const today = new Date();
-            const start = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")} 00:00:00`;
-            const tomorrow = new Date(today);
-            tomorrow.setDate(today.getDate() + 1);
-            const end = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")} 00:00:00`;
+        if (card.resource_model_uri && Array.isArray(card.domain)) {
             this.action.doAction({
                 type: "ir.actions.act_window",
-                name: "Today's Alerts",
-                res_model: "alert.history",
+                name: card.title,
+                res_model: card.resource_model_uri,
                 view_mode: "tree,form",
-                domain: [
-                    ["create_date", ">=", start],
-                    ["create_date", "<", end],
-                ],
+                domain: card.domain,
+                search_view_id: card.search_view_id || undefined,
+                context: {
+                    search_default_active: 0,
+                    search_default_inactive: 0,
+                    search_default_state: 0,
+                },
                 target: "current",
             });
-            return;
-        }
-        if (card.action_xmlid) {
-            this.action.doAction(card.action_xmlid);
         }
     }
 

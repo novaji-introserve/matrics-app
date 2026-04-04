@@ -40,6 +40,13 @@ class Compliance(http.Controller):
         self.get_unique_client_identifier = get_unique_client_identifier
         self.normalize_cache_key_components = normalize_cache_key_components
 
+    def _chart_display_summary(self, chart_id, title):
+        summary_map = {
+            "top_transaction_exceptions": "Most-triggered exception rules in the selected period.",
+            "top_customer_risk_rules": "Risk analysis rules affecting the highest number of partners in the selected period.",
+        }
+        return summary_map.get(chart_id, "Click the chart to inspect underlying records.")
+
     @http.route("/dashboard/user", auth="public", type="json")
     def index(self, **kw):
         """
@@ -397,6 +404,9 @@ class Compliance(http.Controller):
             {
                 "id": "top_customer_risk_rules",
                 "title": "Top 10 Customer Risk Rules",
+                "display_summary": self._chart_display_summary(
+                    "top_customer_risk_rules", "Top 10 Customer Risk Rules"
+                ),
                 "type": "line",
                 "labels": [row[1] for row in top_risk_rules],
                 "ids": [row[0] for row in top_risk_rules],
@@ -411,6 +421,9 @@ class Compliance(http.Controller):
             {
                 "id": "top_accounts",
                 "title": "Top 10 Branch by Accounts Opened",
+                "display_summary": self._chart_display_summary(
+                    "top_accounts", "Top 10 Branch by Accounts Opened"
+                ),
                 "type": "bar",
                 "labels": [row[1] for row in top_accounts],
                 "ids": [row[0] for row in top_accounts],
@@ -425,6 +438,9 @@ class Compliance(http.Controller):
             {
                 "id": "top_high_risk_accounts",
                 "title": "Top 10 High Risk Branch by Accounts",
+                "display_summary": self._chart_display_summary(
+                    "top_high_risk_accounts", "Top 10 High Risk Branch by Accounts"
+                ),
                 "type": "bar",
                 "labels": [row[1] for row in top_high_risk],
                 "ids": [row[0] for row in top_high_risk],
@@ -439,6 +455,9 @@ class Compliance(http.Controller):
             {
                 "id": "top_transaction_exceptions",
                 "title": "Top Transaction Exception",
+                "display_summary": self._chart_display_summary(
+                    "top_transaction_exceptions", "Top Transaction Exception"
+                ),
                 "type": "line",
                 "labels": [row[1] for row in top_exceptions],
                 "ids": [row[0] for row in top_exceptions],
@@ -453,6 +472,9 @@ class Compliance(http.Controller):
             {
                 "id": "cases_by_status",
                 "title": "Cases by Status",
+                "display_summary": self._chart_display_summary(
+                    "cases_by_status", "Cases by Status"
+                ),
                 "type": "pie",
                 "labels": [row[1] for row in case_statuses],
                 "ids": [row[0] for row in case_statuses],
@@ -467,6 +489,9 @@ class Compliance(http.Controller):
             {
                 "id": "cases_by_exceptions",
                 "title": "Cases by Exceptions",
+                "display_summary": self._chart_display_summary(
+                    "cases_by_exceptions", "Cases by Exceptions"
+                ),
                 "type": "pie",
                 "labels": [row[1] for row in case_exceptions],
                 "ids": [row[0] for row in case_exceptions],
@@ -641,8 +666,8 @@ class Compliance(http.Controller):
         _logger.info(f"This is the stats cache key: {cache_key}")
 
         stat_records = request.env["res.compliance.stat"].sudo().search(
-            [("state", "=", "active"), ("scope", "in", self.DASHBOARD_SCOPES)],
-            order="id",
+            [("state", "=", "active"), ("is_visible", "=", True), ("scope", "in", self.DASHBOARD_SCOPES)],
+            order="display_order asc, id asc",
         )
 
         computed_results = [
@@ -653,6 +678,8 @@ class Compliance(http.Controller):
                 "id": stat.id,
                 "scope_color": stat.scope_color,
                 "query": stat.sql_query,
+                "display_summary": stat.display_summary,
+                **stat._get_dashboard_action_metadata(),
             }
             for stat in stat_records
         ]
@@ -713,10 +740,11 @@ class Compliance(http.Controller):
         results = request.env["res.compliance.stat"].sudo().search(
             [
                 ("state", "=", "active"),
+                ("is_visible", "=", True),
                 ("scope", "in", self.DASHBOARD_SCOPES),
                 ("scope", "=", category),
             ],
-            order="id",
+            order="display_order asc, id asc",
         )
 
         computed_results = [
@@ -727,6 +755,8 @@ class Compliance(http.Controller):
                 "id": result.id,
                 "scope_color": result.scope_color,
                 "query": result.sql_query,
+                "display_summary": result.display_summary,
+                **result._get_dashboard_action_metadata(),
             }
             for result in results
         ]

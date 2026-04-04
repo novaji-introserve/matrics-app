@@ -98,6 +98,7 @@
         'views/remove_partner_actions.xml',
         "views/customer.xml",
         "views/statistics.xml",
+        "views/resource_uri.xml",
         "views/dashboard.xml",
         "views/card_dashboard_template.xml",
         "views/risk_assessment_plan.xml",
@@ -114,6 +115,7 @@
         'data/demo_data/stat/compliance_stats.xml',
         'data/demo_data/chart/charts.xml',
         'data/settings.xml',
+        'data/resource_uri_data.xml',
         'data/demo_data/plan/risk_plan.xml',
         'data/demo_data/plan/jurisdiction_plan.xml',
        

@@ -4,6 +4,6 @@
     <!-- client to load the owl action created -->
     <record id="action_compliance_dashboard" model="ir.actions.client">
         <field name="name">Dashboard</field>
-        <field name="tag">owl.compliance_dashboard</field>
+        <field name="tag">owl.compliance_dashboard_v3</field>
     </record>
 </odoo>

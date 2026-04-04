@@ -328,18 +328,17 @@ class QueryService:
             
             and_parts = QueryService._split_by_operator(expr, "AND")
             if len(and_parts) > 1:
-                result = []
-                for part in and_parts[:-1]:
-                    result.append("&")
+                result = ["&"] * (len(and_parts) - 1)
+                for part in and_parts:
                     result.extend(parse_expression(part, depth + 1))
-                result.extend(parse_expression(and_parts[-1], depth + 1))
                 return result
             
             if expr.strip().startswith("(") and expr.strip().endswith(")"):
                 inner_expr = expr.strip()[1:-1].strip()
                 return parse_expression(inner_expr, depth + 1)
             
-            return [QueryService._parse_single_condition(expr)]
+            parsed_condition = QueryService._parse_single_condition(expr)
+            return [parsed_condition] if parsed_condition else []
 
         try:
             domain = parse_expression(condition_string)
@@ -407,6 +406,7 @@ class QueryService:
             tuple: A tuple representing the Odoo domain condition.
         """
         condition = condition.strip()
+        condition = re.sub(r"^\((.*)\)$", r"\1", condition).strip()
         is_true_match = re.search(r"(\w+)\s+is\s+true", condition.lower())
         if is_true_match:
             field = is_true_match.group(1).strip()
@@ -427,19 +427,19 @@ class QueryService:
             value = parts[1].strip().strip("'\"")
             return (field, "ilike", value.replace("%", ""))
         ops_map = {
-            "=": "=",
-            ">": ">",
             ">=": ">=",
-            "<": "<",
             "<=": "<=",
             "!=": "!=",
             "<>": "!=",
+            "=": "=",
+            ">": ">",
+            "<": "<",
         }
-        for op in ops_map.keys():
-            if f" {op} " in condition:
-                parts = condition.split(f" {op} ", 1)
-                field = parts[0].strip()
-                value = parts[1].strip().strip("'\"")
+        for op, mapped_op in ops_map.items():
+            match = re.match(rf"^\s*([a-zA-Z0-9_\.]+)\s*{re.escape(op)}\s*(.+?)\s*$", condition)
+            if match:
+                field = match.group(1).strip().split(".")[-1]
+                value = match.group(2).strip().strip("'\"")
                 if value.lower() == "true":
                     value = True
                 elif value.lower() == "false":
@@ -448,9 +448,9 @@ class QueryService:
                     value = int(value)
                 elif value.replace(".", "", 1).isdigit():
                     value = float(value)
-                return (field, ops_map[op], value)
+                return (field, mapped_op, value)
         _logger.warning(f"Could not parse condition: {condition}")
-        return (condition, "=", True)
+        return None
 
     @staticmethod
     def _extract_quoted_value(value_str):

@@ -194,12 +194,22 @@ export class CaseDashboard extends Component {
       return;
     }
 
-    if (stat.action_xmlid) {
-      this.actionService.doAction(stat.action_xmlid);
-      return;
+    if (stat.resource_model_uri && Array.isArray(stat.domain)) {
+      this.actionService.doAction({
+        type: "ir.actions.act_window",
+        name: stat.name,
+        res_model: stat.resource_model_uri,
+        view_mode: "tree,form",
+        domain: stat.domain,
+        search_view_id: stat.search_view_id || undefined,
+        context: {
+          search_default_active: 0,
+          search_default_inactive: 0,
+          search_default_state: 0,
+        },
+        target: "current",
+      });
     }
-
-    this.actionService.doAction("case_management.action_case_manager");
   }
 
   async getCaseStatusChart() {

@@ -19,6 +19,23 @@
             </tree>
         </field>
     </record>
+    <record id="compliance_transaction_screening_rule_search" model="ir.ui.view">
+        <field name="name">compliance_transaction_screening_rule_search</field>
+        <field name="model">res.transaction.screening.rule</field>
+        <field name="arch" type="xml">
+            <search string="Transaction Screening Rule">
+                <field name="name" />
+                <field name="code" />
+                <field name="risk_level" />
+                <filter string="Active" name="filter_state_active" domain="[('state', '=', 'active')]" />
+                <filter string="Inactive" name="filter_state_inactive" domain="[('state', '=', 'inactive')]" />
+                <group expand="0" string="Group By">
+                    <filter string="State" name="group_state" context="{'group_by': 'state'}" />
+                    <filter string="Risk Level" name="group_risk_level" context="{'group_by': 'risk_level'}" />
+                </group>
+            </search>
+        </field>
+    </record>
     <!-- Risk Assessment Form -->
     <record id="compliance_transaction_screening_rule_form" model="ir.ui.view">
         <field name="name">Transaction Screening Rule Form</field>

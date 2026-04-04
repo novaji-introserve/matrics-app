@@ -13,15 +13,17 @@ export class Card extends Component {
 
     handleClick() {
         if (this.props.isClickable && this.props.onClick) {
-            this.props.onClick();
+            this.props.onClick(this.props.itemId);
         }
     }
 }
 
 Card.template = "owl.card";
 Card.props = {
+    itemId: { optional: true },
     onClick: { type: Function, optional: true },
     title: { optional: true },
+    summary: { optional: true },
     scope: { optional: true },
     total: { optional: true },
     bgcolor: { optional: true },

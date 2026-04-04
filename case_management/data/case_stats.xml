@@ -4,6 +4,10 @@
         <record id="case_stat_all_cases" model="res.compliance.stat">
             <field name="name">All Cases</field>
             <field name="code">case_all_cases</field>
+            <field name="resource_id" ref="compliance_management.res_resource_uri_case_manager"/>
+            <field name="domain">[]</field>
+            <field name="display_order">1</field>
+            <field name="display_summary">All investigation cases currently available in the module.</field>
             <field name="scope">case</field>
             <field name="state">active</field>
             <field name="scope_color">#2563eb</field>
@@ -13,6 +17,10 @@
         <record id="case_stat_draft_cases" model="res.compliance.stat">
             <field name="name">Draft Cases</field>
             <field name="code">case_draft_cases</field>
+            <field name="resource_id" ref="compliance_management.res_resource_uri_case_manager"/>
+            <field name="domain">[('case_status', '=', 'draft')]</field>
+            <field name="display_order">2</field>
+            <field name="display_summary">Cases still in draft and not yet moved into active handling.</field>
             <field name="scope">case</field>
             <field name="state">active</field>
             <field name="scope_color">#64748b</field>
@@ -22,6 +30,10 @@
         <record id="case_stat_open_cases" model="res.compliance.stat">
             <field name="name">Open Cases</field>
             <field name="code">case_open_cases</field>
+            <field name="resource_id" ref="compliance_management.res_resource_uri_case_manager"/>
+            <field name="domain">[('case_status', '=', 'open')]</field>
+            <field name="display_order">3</field>
+            <field name="display_summary">Cases actively being worked on within the selected workload.</field>
             <field name="scope">case</field>
             <field name="state">active</field>
             <field name="scope_color">#0f766e</field>
@@ -31,6 +43,10 @@
         <record id="case_stat_overdue_cases" model="res.compliance.stat">
             <field name="name">Overdue Cases</field>
             <field name="code">case_overdue_cases</field>
+            <field name="resource_id" ref="compliance_management.res_resource_uri_case_manager"/>
+            <field name="domain">[('case_status', '=', 'overdue')]</field>
+            <field name="display_order">4</field>
+            <field name="display_summary">Cases that have exceeded expected handling timelines.</field>
             <field name="scope">case</field>
             <field name="state">active</field>
             <field name="scope_color">#dc2626</field>
@@ -40,6 +56,10 @@
         <record id="case_stat_closed_cases" model="res.compliance.stat">
             <field name="name">Closed Cases</field>
             <field name="code">case_closed_cases</field>
+            <field name="resource_id" ref="compliance_management.res_resource_uri_case_manager"/>
+            <field name="domain">[('case_status', '=', 'closed')]</field>
+            <field name="display_order">5</field>
+            <field name="display_summary">Cases resolved and formally closed out.</field>
             <field name="scope">case</field>
             <field name="state">active</field>
             <field name="scope_color">#16a34a</field>
@@ -49,6 +69,10 @@
         <record id="case_stat_archived_cases" model="res.compliance.stat">
             <field name="name">Archived Cases</field>
             <field name="code">case_archived_cases</field>
+            <field name="resource_id" ref="compliance_management.res_resource_uri_case_manager"/>
+            <field name="domain">[('case_status', '=', 'archived'), ('active', '=', False)]</field>
+            <field name="display_order">6</field>
+            <field name="display_summary">Closed cases moved out of the active workload into archive.</field>
             <field name="scope">case</field>
             <field name="state">active</field>
             <field name="scope_color">#f97316</field>

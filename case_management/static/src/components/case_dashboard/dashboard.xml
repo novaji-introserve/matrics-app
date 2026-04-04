@@ -62,6 +62,7 @@
                             onClick.bind="openCard"
                             stat="stat"
                             name="stat.name"
+                            summary="stat.display_summary"
                             value="stat.val"
                             percentage="stat.percentage"
                         />

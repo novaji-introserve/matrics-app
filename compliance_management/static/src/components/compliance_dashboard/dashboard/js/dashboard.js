@@ -424,6 +424,27 @@ export class ComplianceDashboard extends Component {
     return false;
   }
 
+  _normalizeStats(records) {
+    if (!Array.isArray(records)) {
+      return [];
+    }
+
+    return records
+      .filter(item => item && typeof item === "object")
+      .map(item => ({
+        id: item.id ?? null,
+        name: item.name ?? "",
+        scope: item.scope ?? "",
+        val: item.val ?? 0,
+        scope_color: item.scope_color ?? "#2563eb",
+        display_summary: item.display_summary ?? "",
+        resource_model_uri: item.resource_model_uri ?? false,
+        search_view_id: item.search_view_id ?? false,
+        domain: item.domain ?? false,
+      }))
+      .filter(item => item.id !== null);
+  }
+
   /**
    * Get all stats with proper caching and error handling
    */
@@ -441,11 +462,11 @@ export class ComplianceDashboard extends Component {
         logDebug('Got valid stats data:', result);
         
         if (Array.isArray(result.data)) {
-          this.state.stats = [...result.data];
-          this.state.totalstat = result.total || result.data.length;
+          this.state.stats = this._normalizeStats(result.data);
+          this.state.totalstat = result.total || this.state.stats.length;
         } else if (Array.isArray(result)) {
-          this.state.stats = [...result];
-          this.state.totalstat = result.length;
+          this.state.stats = this._normalizeStats(result);
+          this.state.totalstat = this.state.stats.length;
         }
       } else {
         logDebug('No valid stats data returned');
@@ -480,11 +501,11 @@ export class ComplianceDashboard extends Component {
       
       if (result && this._validateStatsData(result)) {
         if (result.data && Array.isArray(result.data)) {
-          this.state.stats = [...result.data];
-          this.state.totalstat = result.total || result.data.length;
+          this.state.stats = this._normalizeStats(result.data);
+          this.state.totalstat = result.total || this.state.stats.length;
         } else if (Array.isArray(result)) {
-          this.state.stats = [...result];
-          this.state.totalstat = result.length;
+          this.state.stats = this._normalizeStats(result);
+          this.state.totalstat = this.state.stats.length;
         } else {
           this.state.stats = [];
           this.state.totalstat = 0;
@@ -654,38 +675,21 @@ export class ComplianceDashboard extends Component {
   /**
    * Display Odoo view based on query results with caching
    */
-  async displayOdooView(category, query, branch_filter, branch_field, title) {
+  async displayOdooView(category, query, branch_filter, branch_field, title, modelUri = null, searchViewId = null, explicitDomain = null) {
     try {
-      if (!query) {
-            logDebug("No query provided for displayOdooView, skipping action");
+      if (!modelUri || !explicitDomain || !Array.isArray(explicitDomain)) {
+            logDebug("No explicit domain configured for displayOdooView, skipping action");
             return;
         }
 
-      const cacheKey = `dynamic_sql_${this.state.cco}_${JSON.stringify(this.state.branches_id)}_${encodeURIComponent(query)}_${this.state.uniqueId}`;
-      let response = await this.serverCache.getCache(cacheKey);
-      
-      if (!response) {
-        response = await this.rpc("/dashboard/dynamic_sql", { 
-          sql_query: query, 
-          branches_id: this.state.branches_id, 
-          cco: this.state.cco 
-        });
-        if (response && !response.error) {
-          await this.serverCache.setCache(cacheKey, response);
-        }
-      }
-      
-      if (!response || response.error) {
-        logDebug("Error in dynamic_sql response:", response?.error);
-        return;
-      }
+      let domainToUse = explicitDomain;
 
       const displayTitle = title || (category ? 
         category.charAt(0).toUpperCase() + category.slice(1).toLowerCase() : 
         "Card Results");
       
-      if (response.domain && Array.isArray(response.domain)) {
-        response.domain = response.domain.map(item => {
+      if (domainToUse && Array.isArray(domainToUse)) {
+        domainToUse = domainToUse.map(item => {
           if (Array.isArray(item) && item.length === 3) {
             const [field, operator, value] = item;
             
@@ -701,15 +705,21 @@ export class ComplianceDashboard extends Component {
           return item;
         });
       } else {
-            logDebug("No valid domain in response, skipping navigation");
+            logDebug("No valid domain configured, skipping navigation");
             return;
       }
 
       this.navigate.doAction({
         type: "ir.actions.act_window",
-        res_model: response.table.replace(/_/g, "."),
+        res_model: modelUri,
         name: displayTitle,
-        domain: response.domain,
+        domain: domainToUse,
+        search_view_id: searchViewId || undefined,
+        context: {
+          search_default_active: 0,
+          search_default_inactive: 0,
+          search_default_state: 0,
+        },
         views: [
           [false, "tree"],
           [false, "form"],
@@ -719,12 +729,58 @@ export class ComplianceDashboard extends Component {
       logDebug("Error in displayOdooView:", error);
     }
   }
+
+  openStatCard(stat) {
+    if (!stat) {
+      return;
+    }
+
+    if (stat.resource_model_uri && Array.isArray(stat.domain)) {
+      this.displayOdooView(
+        stat.scope,
+        null,
+        null,
+        null,
+        stat.name,
+        stat.resource_model_uri,
+        stat.search_view_id,
+        stat.domain
+      );
+    }
+  }
+
+  openStatCardById(statId) {
+    if (statId === undefined || statId === null || !Array.isArray(this.state.stats)) {
+      return;
+    }
+    const normalizedId = String(statId);
+    const stat = this.state.stats.find(item => String(item.id) === normalizedId);
+    if (stat) {
+      this.openStatCard(stat);
+    }
+  }
+
+  onStatCardClick(ev) {
+    const statId = ev?.currentTarget?.dataset?.statId;
+    this.openStatCardById(statId);
+  }
+
+  getCardProps(cardItem) {
+    return {
+      title: cardItem?.name ?? "",
+      summary: cardItem?.display_summary ?? "",
+      scope: cardItem?.scope ?? "",
+      total: cardItem?.val ?? 0,
+      bgcolor: cardItem?.scope_color ?? "#2563eb",
+      isClickable: false,
+    };
+  }
 }
 
-ComplianceDashboard.template = "owl.ComplianceDashboard";
+ComplianceDashboard.template = "owl.ComplianceDashboardV3";
 ComplianceDashboard.components = { Card, ChartRenderer };
 
-registry.category("actions").add("owl.compliance_dashboard", ComplianceDashboard);
+registry.category("actions").add("owl.compliance_dashboard_v3", ComplianceDashboard);
 
 
 
