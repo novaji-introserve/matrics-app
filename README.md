@@ -105,14 +105,38 @@ docker-compose down
 
 In [docker-compose.yml#L21](docker-compose.yml#L21), we exposed port **20016** for live-chat on host.
 
-Configuring **nginx** to activate live chat feature (in production):
+Configuring **nginx** to route the main HTTP app to `8069` and the gevent endpoints (`/longpolling/` and `/websocket`) to `8072`:
 
 ``` conf
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    '' close;
+}
+
 #...
 server {
     #...
+    location /websocket {
+        proxy_pass http://0.0.0.0:20016/websocket;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
     location /longpolling/ {
         proxy_pass http://0.0.0.0:20016/longpolling/;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location / {
+        proxy_pass http://0.0.0.0:10016;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
     #...
 }

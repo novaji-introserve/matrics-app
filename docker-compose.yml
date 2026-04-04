@@ -15,6 +15,19 @@ services:
     volumes:
         - /home/jonathan/storage/postgresql:/var/lib/postgresql/data
 
+  pgbouncer:
+    build:
+      context: .
+      dockerfile: .docker/pgbouncer/Dockerfile
+    container_name: pgbouncer
+    restart: unless-stopped
+    depends_on:
+      - db
+    networks:
+      - odoo-net
+    ports:
+      - "5433:5433"
+
   redis:
     image: redis:7-alpine
     container_name: redis
@@ -34,13 +47,15 @@ services:
       - odoo-net
     depends_on:
       - db
+      - pgbouncer
     ports:
       - "10016:8069"
-      - "20016:8072" # live chat
+      - "20016:8072" # gevent port for longpolling/websocket traffic
     tty: true
     command: --
     environment:
-      - HOST=db
+      - HOST=pgbouncer
+      - PORT=5433
       - USER=odoo
       - PASSWORD=odoo16@2022
     volumes:
@@ -73,6 +88,7 @@ services:
       - REDIS_PORT=6379
     depends_on:
       - db
+      - pgbouncer
       - redis
       - odoo16
     networks:
@@ -94,6 +110,7 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:
+      - pgbouncer
       - redis
       - odoo16
     networks:
@@ -116,6 +133,7 @@ services:
       - REDIS_PORT=6379
     depends_on:
       - db
+      - pgbouncer
       - redis
       - fastapi-rq-worker
     networks:
