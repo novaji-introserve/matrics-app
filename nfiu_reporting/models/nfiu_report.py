@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 
 THRESHOLD_AMT = 10000000
 REPORTING_DAYS_PAST = 1095
+REPORT_NAME_PREFIX = 'NFIU'
 
 class NFIUReport(models.Model):
     _name = 'nfiu.report'
@@ -27,7 +28,7 @@ class NFIUReport(models.Model):
     report_code = fields.Selection([
         ('AIF', 'Additional Information File'),
         ('CTR', 'Currency Transaction Report'),
-        ('EFT', 'Electronic/Express Funds Transfer'),
+        ('EFT', 'Electronic/Express Funds Transfer (EFT)'),
         ('IFT', 'International Funds Transfer'),
         ('LRFI', 'Local Request For Information'),
         ('M', 'Manual'),
@@ -53,11 +54,8 @@ class NFIUReport(models.Model):
 
     # Reporting person details
     reporting_person_id = fields.Many2one('nfiu.person', string='Reporting Person', required=True,tracking=True)
-    location_id = fields.Many2one('nfiu.address', string='Location',tracking=True)
-    
-    # Related transactions
-    #transaction_ids = fields.One2many('nfiu.transaction', 'report_id', string='Transactions')
-    
+    location_id = fields.Many2one('nfiu.address', string='Location',tracking=True,required=True)
+        
     # Report indicators
     indicator_ids = fields.Many2many('nfiu.indicator', string='Report Indicators',required=True,tracking=True)
     
@@ -92,6 +90,34 @@ class NFIUReport(models.Model):
     def set_generated(self):
         self.ensure_one()
         self.write({'state':'generated'})
+
+    def get_reporting_location(self):
+        """Determine the reporting location based on the entity's addresses"""
+        if self.location_id:
+            # For simplicity, we take the first address as the reporting location
+            return f"{self.location_id.address}, {self.location_id.town}, {self.location_id.city}"
+        return None
+
+    def _format_sql_datetime(self, value, field_label):
+        if not value:
+            raise ValidationError(_("%s is required for NFIU XML generation.") % field_label)
+        return fields.Datetime.to_string(value).replace(' ', 'T')
+
+    def _sanitize_text(self, value, max_length, field_label, required=False):
+        text = '' if value is None else str(value).strip()
+        if required and not text:
+            raise ValidationError(_("%s is required for NFIU XML generation.") % field_label)
+        return text[:max_length] if text else text
+
+    def _add_text_element(self, parent, tag, value, max_length, field_label, required=False):
+        text = self._sanitize_text(value, max_length, field_label, required=required)
+        if required or text:
+            ET.SubElement(parent, tag).text = text
+        return text
+
+    def _build_report_name(self):
+        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+        return f"{self.entity_id.name.strip().replace(' ', '_').upper()}_{self.report_code}_{self.name.strip().replace(' ', '_').upper()}_{timestamp}"
 
     def generate_xml(self):
         """Generate XML content according to goAML schema"""
@@ -133,8 +159,22 @@ class NFIUReport(models.Model):
         for c in currencies:
             currency_id = c.id
         # Add transactions
-        
-        transactions = self.env['res.customer.transaction'].search([('currency_id', '=', currency_id), ('report_nfiu', '=', True), ('date_created', '>=', self.date_from), ('date_created', '<=', self.date_to)])
+        # We need to add threshold transactions based on the report criteria (date range, currency, etc.) 
+        threshold = self.env['nfiu.currency.threshold'].search([('currency_id', '=', currency_id)], limit=1)
+        threshold_amount = threshold.threshold if threshold else THRESHOLD_AMT
+        # Debit transactions are reportable below threshold; credit transactions above threshold.
+        transactions = self.env['res.customer.transaction'].search([
+            ('currency_id', '=', currency_id),
+            ('date_created', '>=', self.date_from),
+            ('date_created', '<=', self.date_to),
+            '|',
+            '&',
+            ('transaction_type', '=', 'D'),
+            ('amount', '<', threshold_amount),
+            '&',
+            ('transaction_type', '=', 'C'),
+            ('amount', '>', threshold_amount),
+        ])
         for transaction in transactions:
             trans_elem = ET.SubElement(root, 'transaction')
             self._add_transaction_xml(trans_elem, transaction)
@@ -152,7 +192,7 @@ class NFIUReport(models.Model):
         # Update record
         self.xml_content = xml_string
         self.xml_file = base64.b64encode(xml_string.encode('utf-8'))
-        self.xml_filename = f"FIU_Report_{self.name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xml"
+        self.xml_filename = self._build_report_name() + '.xml'
         self.state = 'generated'
         
         return True
@@ -249,189 +289,198 @@ class NFIUReport(models.Model):
         if not person:
             return
         # Add basic person details   
-        ET.SubElement(parent, 'gender').text = person.gender or '-'
+        ET.SubElement(parent, 'gender').text = self._sanitize_text(person.gender or '-', 1, 'Reporting person gender')
         if person.title:
-            ET.SubElement(parent, 'title').text = person.title or ''
-        ET.SubElement(parent, 'first_name').text = person.first_name or ''
+            self._add_text_element(parent, 'title', person.title, 30, 'Reporting person title')
+        self._add_text_element(parent, 'first_name', person.first_name, 100, 'Reporting person first name', required=True)
         if person.middle_name:
-            ET.SubElement(parent, 'middle_name').text = person.middle_name
+            self._add_text_element(parent, 'middle_name', person.middle_name, 100, 'Reporting person middle name')
         # Add prefix if available
         if person.prefix:
-            ET.SubElement(parent, 'prefix').text = person.prefix
-        ET.SubElement(parent, 'last_name').text = person.last_name
+            self._add_text_element(parent, 'prefix', person.prefix, 100, 'Reporting person prefix')
+        self._add_text_element(parent, 'last_name', person.last_name, 100, 'Reporting person last name', required=True)
         
         if person.birthdate:
-            ET.SubElement(parent, 'birthdate').text = person.birthdate.strftime('%Y-%m-%dT%H:%M:%S')
+            ET.SubElement(parent, 'birthdate').text = self._format_sql_datetime(person.birthdate, 'Reporting person birthdate')
         # Add birth place if available
         if person.birth_place:
-            ET.SubElement(parent, 'birth_place').text = person.birth_place
+            self._add_text_element(parent, 'birth_place', person.birth_place, 255, 'Reporting person birth place')
         # Add mother's name if available
         if person.mothers_name:
-            ET.SubElement(parent, 'mothers_name').text = person.mothers_name
+            self._add_text_element(parent, 'mothers_name', person.mothers_name, 100, "Reporting person mother's name")
         # Add alias and SSN if available
         if person.alias:
-            ET.SubElement(parent, 'alias').text = person.alias
+            self._add_text_element(parent, 'alias', person.alias, 100, 'Reporting person alias')
         # Add SSN if available
         if person.ssn:
-            ET.SubElement(parent, 'ssn').text = person.ssn
+            self._add_text_element(parent, 'ssn', person.ssn, 25, 'Reporting person SSN')
             
         # Add passport info
         if person.passport_number:
-            ET.SubElement(parent, 'passport_number').text = person.passport_number
+            self._add_text_element(parent, 'passport_number', person.passport_number, 255, 'Reporting person passport number', required=True)
             if person.passport_country:
-                ET.SubElement(parent, 'passport_country').text = person.passport_country
+                self._add_text_element(parent, 'passport_country', person.passport_country, 2, 'Reporting person passport country')
         
         if person.id_number:
-            ET.SubElement(parent, 'id_number').text = person.id_number
+            self._add_text_element(parent, 'id_number', person.id_number, 255, 'Reporting person ID number')
             
         # Add nationalities and residence
         if person.nationality1:
-            ET.SubElement(parent, 'nationality1').text = person.nationality1
+            self._add_text_element(parent, 'nationality1', person.nationality1, 2, 'Reporting person nationality 1')
         if person.nationality2:
-            ET.SubElement(parent, 'nationality2').text = person.nationality2
+            self._add_text_element(parent, 'nationality2', person.nationality2, 2, 'Reporting person nationality 2')
         if person.nationality3:
-            ET.SubElement(parent, 'nationality3').text = person.nationality3
+            self._add_text_element(parent, 'nationality3', person.nationality3, 2, 'Reporting person nationality 3')
         if person.residence:
-            ET.SubElement(parent, 'residence').text = person.residence
+            self._add_text_element(parent, 'residence', person.residence, 2, 'Reporting person residence')
             
         # Add occupation and employer
         if person.occupation:
-            ET.SubElement(parent, 'occupation').text = person.occupation
+            self._add_text_element(parent, 'occupation', person.occupation, 255, 'Reporting person occupation')
         if person.employer_name:
-            ET.SubElement(parent, 'employer_name').text = person.employer_name
+            self._add_text_element(parent, 'employer_name', person.employer_name, 255, 'Reporting person employer name')
             
         # Add source of wealth
         if person.source_of_wealth:
-            ET.SubElement(parent, 'source_of_wealth').text = person.source_of_wealth
+            self._add_text_element(parent, 'source_of_wealth', person.source_of_wealth, 255, 'Reporting person source of wealth')
 
     def _add_person_xml(self, parent, person):
         """Add person XML elements"""
         if not person:
             return
         # Add basic person details   
-        ET.SubElement(parent, 'gender').text = person.gender or '-'
+        ET.SubElement(parent, 'gender').text = self._sanitize_text(person.gender or '-', 1, 'Transaction person gender')
         if person.title:
-            ET.SubElement(parent, 'title').text = person.title or ''
-        ET.SubElement(parent, 'first_name').text = person.firstname or ''
+            self._add_text_element(parent, 'title', person.title, 30, 'Transaction person title')
+        self._add_text_element(parent, 'first_name', person.firstname, 100, 'Transaction person first name', required=True)
         if person.middlename:
-            ET.SubElement(parent, 'middle_name').text = person.middlename
+            self._add_text_element(parent, 'middle_name', person.middlename, 100, 'Transaction person middle name')
         # Add prefix if available
         if person.prefix:
-            ET.SubElement(parent, 'prefix').text = person.prefix
-        ET.SubElement(parent, 'last_name').text = person.lastname
+            self._add_text_element(parent, 'prefix', person.prefix, 100, 'Transaction person prefix')
+        self._add_text_element(parent, 'last_name', person.lastname, 100, 'Transaction person last name', required=True)
         
         if person.dob:
-            ET.SubElement(parent, 'birthdate').text = person.dob.strftime('%Y-%m-%dT%H:%M:%S')
+            ET.SubElement(parent, 'birthdate').text = self._format_sql_datetime(person.dob, 'Transaction person birthdate')
         # Add birth place if available
         if person.birth_place:
-            ET.SubElement(parent, 'birth_place').text = person.birth_place
+            self._add_text_element(parent, 'birth_place', person.birth_place, 255, 'Transaction person birth place')
         # Add mother's name if available
         if person.mothers_name:
-            ET.SubElement(parent, 'mothers_name').text = person.mothers_name
+            self._add_text_element(parent, 'mothers_name', person.mothers_name, 100, "Transaction person mother's name")
         # Add alias and SSN if available
         if person.alias:
-            ET.SubElement(parent, 'alias').text = person.alias
+            self._add_text_element(parent, 'alias', person.alias, 100, 'Transaction person alias')
         # Add SSN if available
         if person.ssn:
-            ET.SubElement(parent, 'ssn').text = person.ssn
+            self._add_text_element(parent, 'ssn', person.ssn, 25, 'Transaction person SSN')
             
         # Add passport info
         if person.passport_number:
-            ET.SubElement(parent, 'passport_number').text = person.passport_number
+            self._add_text_element(parent, 'passport_number', person.passport_number, 255, 'Transaction person passport number', required=True)
             if person.passport_country:
-                ET.SubElement(parent, 'passport_country').text = person.passport_country
+                self._add_text_element(parent, 'passport_country', person.passport_country, 2, 'Transaction person passport country')
         
         if person.id_number:
-            ET.SubElement(parent, 'id_number').text = person.id_number
+            self._add_text_element(parent, 'id_number', person.id_number, 255, 'Transaction person ID number')
             
         # Add nationalities and residence
         if person.nationality1:
-            ET.SubElement(parent, 'nationality1').text = person.nationality1
+            self._add_text_element(parent, 'nationality1', person.nationality1, 2, 'Transaction person nationality 1')
         if person.nationality2:
-            ET.SubElement(parent, 'nationality2').text = person.nationality2
+            self._add_text_element(parent, 'nationality2', person.nationality2, 2, 'Transaction person nationality 2')
         if person.nationality3:
-            ET.SubElement(parent, 'nationality3').text = person.nationality3
+            self._add_text_element(parent, 'nationality3', person.nationality3, 2, 'Transaction person nationality 3')
         if person.residence:
-            ET.SubElement(parent, 'residence').text = person.residence
+            self._add_text_element(parent, 'residence', person.residence, 2, 'Transaction person residence')
             
         # Add occupation and employer
         if person.occupation:
-            ET.SubElement(parent, 'occupation').text = person.occupation
+            self._add_text_element(parent, 'occupation', person.occupation, 255, 'Transaction person occupation')
         if person.employer_name:
-            ET.SubElement(parent, 'employer_name').text = person.employer_name
+            self._add_text_element(parent, 'employer_name', person.employer_name, 255, 'Transaction person employer name')
             
         # Add source of wealth
         if person.source_of_wealth:
-            ET.SubElement(parent, 'source_of_wealth').text = person.source_of_wealth
+            self._add_text_element(parent, 'source_of_wealth', person.source_of_wealth, 255, 'Transaction person source of wealth')
 
     def _add_address_xml(self, parent, address):
         """Add address XML elements"""
         if not address:
             return
             
-        ET.SubElement(parent, 'address_type').text = address.address_type or 'P'
-        ET.SubElement(parent, 'address').text = address.address or ''
+        ET.SubElement(parent, 'address_type').text = self._sanitize_text(address.address_type or 'P', 1, 'Address type', required=True)
+        self._add_text_element(parent, 'address', address.address, 100, 'Address', required=True)
         if address.town:
-            ET.SubElement(parent, 'town').text = address.town
-        ET.SubElement(parent, 'city').text = address.city or ''
+            self._add_text_element(parent, 'town', address.town, 255, 'Town')
+        self._add_text_element(parent, 'city', address.city, 255, 'City', required=True)
         if address.zip:
-            ET.SubElement(parent, 'zip').text = address.zip
-        ET.SubElement(parent, 'country_code').text = address.country_code or 'NG'
+            self._add_text_element(parent, 'zip', address.zip, 10, 'ZIP')
+        self._add_text_element(parent, 'country_code', address.country_code or 'NG', 2, 'Country code', required=True)
         if address.state:
-            ET.SubElement(parent, 'state').text = address.state
+            self._add_text_element(parent, 'state', address.state, 255, 'State')
 
     def _add_transaction_xml(self, parent, transaction):
         """Add transaction XML elements"""
-        ET.SubElement(parent, 'transactionnumber').text = transaction.transaction_number
+        transaction_number = (
+            transaction.transaction_number
+            or transaction.name
+            or transaction.internal_ref_number
+            or str(transaction.id)
+        )
+        transaction_number = self._sanitize_text(transaction_number, 50, 'Transaction number', required=True)
+        ET.SubElement(parent, 'transactionnumber').text = transaction_number
         if transaction.internal_ref_number:
-            ET.SubElement(parent, 'internal_ref_number').text = transaction.internal_ref_number
-        ET.SubElement(parent, 'transaction_location').text = transaction.transaction_location or ''
-        ET.SubElement(parent, 'transaction_description').text = transaction.narration or ''
-        ET.SubElement(parent, 'date_transaction').text = transaction.date_created.strftime('%Y-%m-%dT%H:%M:%S')
+            self._add_text_element(parent, 'internal_ref_number', transaction.internal_ref_number, 50, 'Internal reference number')
+        self._add_text_element(parent, 'transaction_location', transaction.transaction_location or self.get_reporting_location(), 255, 'Transaction location', required=True)
+        self._add_text_element(parent, 'transaction_description', transaction.narration or '', 4000, 'Transaction description', required=True)
+        ET.SubElement(parent, 'date_transaction').text = self._format_sql_datetime(transaction.date_created, 'Transaction date')
         
         if transaction.teller:
-            ET.SubElement(parent, 'teller').text = transaction.teller
+            self._add_text_element(parent, 'teller', transaction.teller, 50, 'Teller')
         if transaction.authorized:
-            ET.SubElement(parent, 'authorized').text = transaction.authorized
+            self._add_text_element(parent, 'authorized', transaction.authorized, 50, 'Authorized by')
             
         if transaction.value_date:
-            ET.SubElement(parent, 'value_date').text = transaction.value_date.strftime('%Y-%m-%dT%H:%M:%S')
+            ET.SubElement(parent, 'value_date').text = self._format_sql_datetime(transaction.value_date, 'Value date')
             
-        ET.SubElement(parent, 'transmode_code').text = transaction.transmode_code or 'A'
+        ET.SubElement(parent, 'transmode_code').text = self._sanitize_text(transaction.transmode_code or 'A', 2, 'Transaction mode code', required=True)
         if transaction.transmode_comment:
-            ET.SubElement(parent, 'transmode_comment').text = transaction.transmode_comment
+            self._add_text_element(parent, 'transmode_comment', transaction.transmode_comment, 50, 'Transaction mode comment')
             
-        ET.SubElement(parent, 'amount_local').text = str(abs(transaction.amount_local))
-        default_entity = self.env.ref('nfiu_reporting.nfiu_entity_1')
+        amount_local = transaction.amount_local if transaction.amount_local is not None else transaction.amount
+        if amount_local is None:
+            raise ValidationError(_("Transaction amount is required for NFIU XML generation."))
+        ET.SubElement(parent, 'amount_local').text = str(abs(amount_local))
         # Add parties (from/to), we need to resolve the customer to person or entity
+        from_person = transaction.customer_id
+        to_person = transaction.customer_id
         if transaction.transaction_type == 'C':
-            transaction.from_person_id = transaction.customer_id
-            transaction.to_person_id = transaction.customer_id
-            transaction.to_entity_id = default_entity      
+            from_person = transaction.customer_id
+            to_person = transaction.customer_id
         else:
-            transaction.to_person_id = transaction.customer_id
-            transaction.from_person_id = transaction.customer_id
-            transaction.to_entity_id = default_entity
+            from_person = transaction.customer_id
+            to_person = transaction.customer_id
         
-        if transaction.from_person_id:
+        if from_person:
             from_elem = ET.SubElement(parent, 't_from')
-            ET.SubElement(from_elem, 'from_funds_code').text = transaction.from_funds_code or 'A'
+            ET.SubElement(from_elem, 'from_funds_code').text = self._sanitize_text(transaction.from_funds_code or 'A', 2, 'From funds code', required=True)
             if transaction.from_funds_comment:
-                ET.SubElement(from_elem, 'from_funds_comment').text = transaction.from_funds_comment
+                self._add_text_element(from_elem, 'from_funds_comment', transaction.from_funds_comment, 255, 'From funds comment')
             
             from_person = ET.SubElement(from_elem, 'from_person')
-            self._add_person_xml(from_person, transaction.from_person_id)
-            ET.SubElement(from_elem, 'from_country').text = transaction.from_country or 'NG'
+            self._add_person_xml(from_person, transaction.customer_id)
+            self._add_text_element(from_elem, 'from_country', transaction.from_country or 'NG', 2, 'From country', required=True)
             
-        if transaction.to_person_id:
+        if to_person:
             to_elem = ET.SubElement(parent, 't_to')
-            ET.SubElement(to_elem, 'to_funds_code').text = transaction.to_funds_code or 'A'
+            ET.SubElement(to_elem, 'to_funds_code').text = self._sanitize_text(transaction.to_funds_code or 'A', 2, 'To funds code', required=True)
             if transaction.to_funds_comment:
-                ET.SubElement(to_elem, 'to_funds_comment').text = transaction.to_funds_comment
+                self._add_text_element(to_elem, 'to_funds_comment', transaction.to_funds_comment, 255, 'To funds comment')
                 
             to_person = ET.SubElement(to_elem, 'to_person')
-            self._add_person_xml(to_person, transaction.to_person_id)
-            ET.SubElement(to_elem, 'to_country').text = transaction.to_country or 'NG'
+            self._add_person_xml(to_person, transaction.customer_id)
+            self._add_text_element(to_elem, 'to_country', transaction.to_country or 'NG', 2, 'To country', required=True)
 
     def validate_xml(self):
         """Validate generated XML against XSD schema"""
@@ -487,5 +536,3 @@ class NFIUReport(models.Model):
         
         self.state = 'submitted'
         return True
-
-

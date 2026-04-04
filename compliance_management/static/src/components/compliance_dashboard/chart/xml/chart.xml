@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
  <t t-name="owl.ChartRender" owl="1">
- <div class="chart-container position-relative" style="width: 100%; height: 44vh;">
+ <div class="chart-container position-relative" style="width: 100%; height: 18vh; min-height: 140px;">
    <!-- Library loading spinner overlay -->
    <div t-if="state.isLibraryLoading" class="position-absolute top-0 start-0 end-0 bottom-0 d-flex justify-content-center align-items-center bg-white bg-opacity-75" style="z-index: 10;">
      <div class="d-flex flex-column align-items-center">

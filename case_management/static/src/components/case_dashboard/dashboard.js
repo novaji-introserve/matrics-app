@@ -68,6 +68,32 @@ export class CaseDashboard extends Component {
     });
   }
 
+  get currentPeriodLabel() {
+    const period = Number(this.state.period);
+    if (period === 0) {
+      return "All time";
+    }
+    if (period === 1) {
+      return "Yesterday";
+    }
+    if (period === 7) {
+      return "Last 7 days";
+    }
+    if (period === 14) {
+      return "Last 14 days";
+    }
+    if (period === 30) {
+      return "Last 30 days";
+    }
+    if (period === 90) {
+      return "Last 90 days";
+    }
+    if (period === 365) {
+      return "Last 365 days";
+    }
+    return `${period} day window`;
+  }
+
   // Base domain to apply user access restrictions
   getBaseDomain() {
     return [
@@ -456,19 +482,19 @@ export class CaseDashboard extends Component {
       console.log("Status counts:", statusCounts);
 
       const backgroundColors = [
-        "rgba(142, 142, 142, 0.7)", //  - Yellow
-        "rgba(255,172,0,0.7)", //  - Yellow
-        "rgba(40,167,69,0.7)", //  - Green
-        "rgba(220,53,69,0.7)", //  - Red
-        "rgba(233,233,233,0.7)", //  - Blue
+        "rgba(100, 116, 139, 0.82)",
+        "rgba(37, 99, 235, 0.82)",
+        "rgba(16, 185, 129, 0.82)",
+        "rgba(239, 68, 68, 0.82)",
+        "rgba(249, 115, 22, 0.82)",
       ];
 
       const borderColors = [
-        "rgb(142, 142, 142)", //  - Yellow
-        "rgb(255,172,0)", //  - Yellow
-        "rgb(40,167,69)", //  - Green
-        "rgb(220,53,69)", //  - Red
-        "rgb(233,233,233)", //  - Blue
+        "rgb(71, 85, 105)",
+        "rgb(29, 78, 216)",
+        "rgb(5, 150, 105)",
+        "rgb(220, 38, 38)",
+        "rgb(234, 88, 12)",
       ];
 
       // For pie charts, we need to filter out zero values to avoid empty segments
@@ -524,16 +550,22 @@ export class CaseDashboard extends Component {
           },
           plugins: {
             legend: {
-              position: "top",
+              position: "right",
               labels: {
                 font: {
-                  size: 12,
+                  size: 11,
                 },
-                padding: 20,
+                padding: 16,
+                usePointStyle: true,
               },
             },
             tooltip: {
-              enabled: true, // Make sure tooltips are enabled
+              enabled: true,
+              backgroundColor: "rgba(15, 23, 42, 0.92)",
+              titleColor: "#ffffff",
+              bodyColor: "#e2e8f0",
+              padding: 12,
+              cornerRadius: 12,
               callbacks: {
                 label: function (context) {
                   return context.label + ": " + context.raw + " cases";
@@ -589,15 +621,15 @@ export class CaseDashboard extends Component {
       const counts = [ratingCounts.low, ratingCounts.medium, ratingCounts.high];
 
       const backgroundColors = [
-        "rgba(40,167,69,0.7)", // Closed - Green
-        "rgba(255,172,0,0.7)", // Archived - Yellow
-        "rgba(220,53,69,0.7)", // Overdue - Red
+        "rgba(14, 165, 233, 0.82)",
+        "rgba(245, 158, 11, 0.82)",
+        "rgba(244, 63, 94, 0.82)",
       ];
 
       const borderColors = [
-        "rgba(0, 128, 0)", // Low - Green
-        "rgba(255, 255, 0)", // Medium - Yellow
-        "rgba(255, 0, 0)", // High - Red
+        "rgb(2, 132, 199)",
+        "rgb(217, 119, 6)",
+        "rgb(225, 29, 72)",
       ];
 
       this.state.caseRatingChart = {
@@ -610,10 +642,11 @@ export class CaseDashboard extends Component {
               backgroundColor: backgroundColors,
               borderColor: borderColors,
               borderWidth: 1,
-              borderRadius: 4, // Rounded bars
-              maxBarThickness: 60, // Control max thickness
+              borderRadius: 3,
+              borderSkipped: false,
+              maxBarThickness: 56,
               hoverBackgroundColor: backgroundColors.map((color) =>
-                color.replace("0.7", "0.9")
+                color.replace("0.82", "0.96")
               ),
             },
           ],
@@ -634,6 +667,11 @@ export class CaseDashboard extends Component {
             },
             tooltip: {
               enabled: true,
+              backgroundColor: "rgba(15, 23, 42, 0.92)",
+              titleColor: "#ffffff",
+              bodyColor: "#e2e8f0",
+              padding: 12,
+              cornerRadius: 12,
               callbacks: {
                 label: function (context) {
                   return context.label + " Rating: " + context.raw + " cases";
@@ -654,7 +692,7 @@ export class CaseDashboard extends Component {
               },
               grid: {
                 display: true,
-                color: "rgba(0,0,0,0.05)",
+                color: "rgba(15, 23, 42, 0.08)",
               },
             },
             x: {
@@ -663,6 +701,7 @@ export class CaseDashboard extends Component {
                   size: 12,
                   weight: "bold",
                 },
+                color: "#334155",
               },
             },
           },

@@ -6,6 +6,42 @@ import { useService } from "@web/core/utils/hooks";
 const ANIMATION_DELAY = 50;
 const MAX_INITIAL_ITEMS = 10;
 
+const MODERN_PALETTES = {
+  accounts: [
+    "#2563eb",
+    "#3b82f6",
+    "#60a5fa",
+    "#93c5fd",
+    "#1d4ed8",
+    "#0ea5e9",
+    "#38bdf8",
+    "#0284c7",
+    "#6366f1",
+    "#8b5cf6",
+  ],
+  highRisk: [
+    "#f97316",
+    "#fb7185",
+    "#ef4444",
+    "#f59e0b",
+    "#ea580c",
+    "#dc2626",
+    "#f43f5e",
+    "#fb923c",
+    "#f87171",
+    "#fdba74",
+  ],
+  exceptions: {
+    stroke: "#059669",
+    fill: "rgba(5, 150, 105, 0.14)",
+    points: "#10b981",
+  },
+  neutralBorder: "rgba(15, 23, 42, 0.08)",
+  neutralGrid: "rgba(15, 23, 42, 0.08)",
+  text: "#334155",
+  title: "#0f172a",
+};
+
 /**
  * Chart renderer component with progressive loading animation
  */
@@ -14,6 +50,7 @@ export class ChartRenderer extends Component {
     this.navigate = useService("action");
     this.chartRef = useRef("compliance_chart");
     this.chartInstance = null;
+    this.normalizedData = null;
 
     this.animationTimeouts = [];
 
@@ -92,6 +129,7 @@ export class ChartRenderer extends Component {
 
     try {
       const chartType = this.props.data?.type || this.props.type || 'bar';
+      const options = this._buildChartOptions(chartType, this.props.data);
 
       this.chartInstance = new Chart(this.chartRef.el, {
         type: chartType,
@@ -104,37 +142,7 @@ export class ChartRenderer extends Component {
             borderWidth: 1
           }]
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: {
-                callback: function (value) {
-                  return value;
-                }
-              }
-            }
-          },
-          plugins: {
-            legend: {
-              display: false
-            },
-            title: {
-              display: true,
-              text: this.props.data?.title || this.props.title || '',
-              position: 'bottom'
-            },
-            subtitle: {
-              display: true,
-              text: 'No data available',
-              padding: {
-                bottom: 10
-              }
-            }
-          }
-        }
+        options
       });
     } catch (error) {
       console.error("Error creating empty chart:", error);
@@ -153,10 +161,12 @@ export class ChartRenderer extends Component {
     try {
       const chartType = this.props.data.type || this.props.type || 'bar';
       const sourceData = this.props.data;
+      const normalizedData = this._normalizeChartData(sourceData, chartType);
+      this.normalizedData = normalizedData;
 
-      const initialCount = Math.min(MAX_INITIAL_ITEMS, sourceData.labels.length);
+      const initialCount = Math.min(MAX_INITIAL_ITEMS, normalizedData.labels.length);
 
-      const initialDatasets = sourceData.datasets.map(dataset => {
+      const initialDatasets = normalizedData.datasets.map(dataset => {
         const initialData = dataset.data.slice(0, initialCount);
         const initialColors = Array.isArray(dataset.backgroundColor) ?
           dataset.backgroundColor.slice(0, initialCount) :
@@ -180,53 +190,15 @@ export class ChartRenderer extends Component {
         };
       });
 
+      const options = this._buildChartOptions(chartType, sourceData);
+
       this.chartInstance = new Chart(this.chartRef.el, {
         type: chartType,
         data: {
-          labels: sourceData.labels.slice(0, initialCount),
+          labels: normalizedData.labels.slice(0, initialCount),
           datasets: initialDatasets
         },
-        options: {
-          onClick: (event, elements) => this.handleChartClick(event, elements),
-          responsive: true,
-          maintainAspectRatio: true,
-          animation: {
-            duration: 400,
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: {
-                callback: function (value) {
-                  return value;
-                }
-              }
-            }
-          },
-          plugins: {
-            legend: {
-              display: chartType !== 'bar',
-              position: 'top'
-            },
-            title: {
-              display: false,
-              text: sourceData.title || this.props.title || '',
-              position: 'bottom'
-            },
-            tooltip: {
-              enabled: true
-            },
-            subtitle: {
-              display: false,
-              text: initialCount < sourceData.labels.length ?
-                `Loading chart elements...` :
-                `Loaded ${initialCount} items`,
-              padding: {
-                bottom: 10
-              }
-            }
-          }
-        }
+        options
       });
 
       this.state.loadedElements = initialCount;
@@ -235,6 +207,161 @@ export class ChartRenderer extends Component {
       console.error("Error creating progressive chart:", error);
       this.state.error = "Failed to create chart";
     }
+  }
+
+  _getPaletteKey(title) {
+    const lowerTitle = String(title || "").toLowerCase();
+    if (lowerTitle.includes("high risk")) {
+      return "highRisk";
+    }
+    if (lowerTitle.includes("exception") || lowerTitle.includes("screened")) {
+      return "exceptions";
+    }
+    return "accounts";
+  }
+
+  _buildBarColors(palette, count) {
+    return Array.from({ length: count }, (_, index) => palette[index % palette.length]);
+  }
+
+  _normalizeChartData(sourceData, chartType) {
+    const paletteKey = this._getPaletteKey(sourceData.title);
+    const labels = sourceData.labels || [];
+    const datasets = (sourceData.datasets || []).map((dataset) => {
+      if (chartType === "line") {
+        return {
+          ...dataset,
+          borderColor: MODERN_PALETTES.exceptions.stroke,
+          backgroundColor: MODERN_PALETTES.exceptions.fill,
+          pointBackgroundColor: MODERN_PALETTES.exceptions.points,
+          pointBorderColor: "#ffffff",
+          pointHoverBackgroundColor: MODERN_PALETTES.exceptions.stroke,
+          pointHoverBorderColor: "#ffffff",
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          borderWidth: 3,
+          tension: 0.35,
+          fill: true,
+        };
+      }
+
+      const palette = MODERN_PALETTES[paletteKey] || MODERN_PALETTES.accounts;
+      const colors = this._buildBarColors(palette, labels.length);
+      if (chartType === "pie" || chartType === "doughnut") {
+        return {
+          ...dataset,
+          backgroundColor: colors,
+          borderColor: colors.map(() => "#ffffff"),
+          borderWidth: 2,
+          hoverOffset: 10,
+        };
+      }
+      return {
+        ...dataset,
+        backgroundColor: colors,
+        borderColor: colors.map(() => MODERN_PALETTES.neutralBorder),
+        borderWidth: 1,
+        borderRadius: 4,
+        borderSkipped: false,
+        hoverBackgroundColor: colors,
+        maxBarThickness: 38,
+      };
+    });
+
+    return {
+      ...sourceData,
+      labels,
+      datasets,
+    };
+  }
+
+  _buildChartOptions(chartType, sourceData) {
+    const isCircularChart = chartType === "pie" || chartType === "doughnut";
+    const baseOptions = {
+      onClick: (event, elements) => this.handleChartClick(event, elements),
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: isCircularChart ? 'nearest' : 'nearest',
+        axis: isCircularChart ? undefined : 'x',
+        intersect: false,
+      },
+      hover: {
+        mode: 'nearest',
+        intersect: false,
+      },
+      animation: {
+        duration: 550,
+        easing: 'easeOutQuart',
+      },
+      plugins: {
+        legend: {
+          display: chartType !== 'bar',
+          position: isCircularChart ? 'right' : 'top',
+          labels: {
+            color: MODERN_PALETTES.text,
+            usePointStyle: true,
+            boxWidth: 10,
+          },
+        },
+        title: {
+          display: false,
+          text: sourceData?.title || this.props.title || '',
+          position: 'bottom'
+        },
+        tooltip: {
+          enabled: true,
+          backgroundColor: 'rgba(15, 23, 42, 0.92)',
+          titleColor: '#ffffff',
+          bodyColor: '#e2e8f0',
+          padding: 12,
+          cornerRadius: 12,
+          displayColors: chartType !== 'line',
+          callbacks: {
+            label: function (context) {
+              const value = context.parsed?.y ?? context.parsed;
+              return `${context.label}: ${value}`;
+            },
+          },
+        },
+        subtitle: {
+          display: false,
+          text: 'Loading chart elements...',
+          padding: {
+            bottom: 10
+          }
+        }
+      }
+    };
+
+    if (!isCircularChart) {
+      baseOptions.scales = {
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: MODERN_PALETTES.neutralGrid,
+          },
+          ticks: {
+            color: MODERN_PALETTES.text,
+            callback: function (value) {
+              return value;
+            }
+          }
+        },
+        x: {
+          grid: {
+            display: false,
+          },
+          ticks: {
+            color: MODERN_PALETTES.text,
+            maxRotation: chartType === 'line' ? 0 : 18,
+            minRotation: 0,
+          },
+        }
+      };
+    }
+
+    return baseOptions;
   }
 
   /**
@@ -250,7 +377,7 @@ export class ChartRenderer extends Component {
 
     this.clearAllAnimationTimeouts();
 
-    const sourceData = this.props.data;
+    const sourceData = this.normalizedData || this.props.data;
     const chartType = sourceData.type || 'bar';
 
     const startIndex = this.state.loadedElements;
@@ -325,36 +452,23 @@ export class ChartRenderer extends Component {
     const clickedIndex = elements[0].index;
     const chartData = this.props.data;
 
-    console.log("Chart click:", { chartData, clickedIndex });
-
     const modelName = chartData.model_name;
     const filterColumn = chartData.filter;
     const filterID = chartData.ids?.[clickedIndex];
 
     if (!modelName || !filterColumn || filterID === undefined) {
-      console.warn("Missing data for chart click action");
       return;
     }
 
     let domain = [[filterColumn, "=", filterID]];
 
     if (chartData.additional_domain && Array.isArray(chartData.additional_domain)) {
-      console.log("Adding conditions:", chartData.additional_domain);
-
       chartData.additional_domain.forEach(condition => {
         if (Array.isArray(condition) && condition.length >= 3) {
           domain.push(condition);
         }
       });
     }
-
-    console.log("Navigating with action:", {
-      type: "ir.actions.act_window",
-      name: `${chartData.title} - ${chartData.labels[clickedIndex] || "Unknown"}`,
-      res_model: modelName,
-      domain,
-      views: [[false, "tree"], [false, "form"]]
-    });
 
     this.navigate.doAction({
       type: "ir.actions.act_window",

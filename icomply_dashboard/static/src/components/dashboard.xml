@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="owl.Dashboard" owl="1">
+        <div class="icomply-dashboard">
+            <div class="icomply-dashboard__hero">
+                <div class="icomply-dashboard__hero-copy">
+                    <span class="icomply-dashboard__eyebrow">Compliance Intelligence</span>
+                    <h1 class="icomply-dashboard__title">Operational Risk Dashboard</h1>
+                    <p class="icomply-dashboard__subtitle">
+                        Branch concentration, high-risk exposure, and transaction exceptions in one view.
+                    </p>
+                </div>
+                <div class="icomply-dashboard__controls">
+                    <label class="icomply-dashboard__filter">
+                        <span>Period</span>
+                        <select class="form-select" t-att-value="state.datepicked" t-on-change="onDateChange">
+                            <option value="0">Today</option>
+                            <option value="7">Last 7 days</option>
+                            <option value="14">Last 14 days</option>
+                            <option value="30">Last 30 days</option>
+                            <option value="60">Last 60 days</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+
+            <div class="icomply-dashboard__summary">
+                <div class="icomply-dashboard__stat">
+                    <span class="icomply-dashboard__stat-label">Scope</span>
+                    <strong t-esc="state.cc ? 'All branches' : 'Assigned branches'" />
+                </div>
+                <div class="icomply-dashboard__stat">
+                    <span class="icomply-dashboard__stat-label">Window</span>
+                    <strong t-esc="currentPeriodLabel" />
+                </div>
+                <div class="icomply-dashboard__stat">
+                    <span class="icomply-dashboard__stat-label">Visible branches</span>
+                    <strong t-esc="state.cc ? 'All' : state.branches_id.length" />
+                </div>
+            </div>
+
+            <t t-if="state.loading">
+                <div class="icomply-dashboard__empty">Loading dashboard data...</div>
+            </t>
+            <t t-else="">
+                <div class="icomply-dashboard__grid">
+                    <section class="icomply-dashboard__panel">
+                        <div class="icomply-dashboard__panel-head">
+                            <div>
+                                <h2>Top 10 Branch by Accounts Opened</h2>
+                                <p>Click a bar to inspect branch accounts.</p>
+                            </div>
+                        </div>
+                        <div class="icomply-dashboard__canvas-wrap">
+                            <canvas t-ref="topBranchesChart" />
+                        </div>
+                    </section>
+
+                    <section class="icomply-dashboard__panel">
+                        <div class="icomply-dashboard__panel-head">
+                            <div>
+                                <h2>Top 10 High Risk Branch by Accounts</h2>
+                                <p>Click a bar to inspect high-risk accounts.</p>
+                            </div>
+                        </div>
+                        <div class="icomply-dashboard__canvas-wrap">
+                            <canvas t-ref="highRiskBranchesChart" />
+                        </div>
+                    </section>
+
+                    <section class="icomply-dashboard__panel icomply-dashboard__panel--wide">
+                        <div class="icomply-dashboard__panel-head">
+                            <div>
+                                <h2>Top Transaction Exception</h2>
+                                <p>Click a point to open transactions for the selected exception rule.</p>
+                            </div>
+                        </div>
+                        <div class="icomply-dashboard__canvas-wrap icomply-dashboard__canvas-wrap--line">
+                            <canvas t-ref="exceptionsChart" />
+                        </div>
+                    </section>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

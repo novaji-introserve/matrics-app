@@ -9,10 +9,18 @@
         groups="hr.group_hr_manager,hr.group_hr_user,base.group_user" 
         sequence="200"/>
     <!-- Main Menu -->
-    <menuitem web_icon="alert_management,static/description/icon-alert.png" id="menu_alert_management_main"  name="Alerts" sequence="-400"/>
+    <menuitem web_icon="alert_management,static/description/icon-alert.png" id="menu_alert_management_main"  name="Alerts" action="action_alert_dashboard" sequence="-400"/>
 
 
     <!-- Alert Monitoring -->
+
+    <menuitem
+        id="menu_alert_dashboard"
+        name="Alert Monitoring"
+        parent="menu_alert_management_main"
+        action="action_alert_dashboard"
+        sequence="0"
+    />
 
     <menuitem 
         id="menu_alert_history" name="Alert History" 

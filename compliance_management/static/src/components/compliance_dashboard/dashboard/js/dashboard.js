@@ -62,7 +62,9 @@ export class ComplianceDashboard extends Component {
       stats: [],
       totalstat: 0,
       datepicked: 20000,
+      refreshRate: 5,
       dynamic_chart: [],
+      chartError: null,
       scrollLeft: true,
       scrollRight: false,
       uniqueId: null,
@@ -74,6 +76,7 @@ export class ComplianceDashboard extends Component {
     
     // Models that should trigger a refresh
     this.refreshModels = ['res.partner', 'res.branch'];
+    this.refreshTimer = null;
 
     // Setup bus listener for refreshing the dashboard
     useBusListener('dashboard_refresh_channel', this.handleRefreshNotification.bind(this));
@@ -82,6 +85,7 @@ export class ComplianceDashboard extends Component {
     onWillStart(async () => {
       try {
         this._hideGlobalLoadingIndicator();
+        this._loadRefreshPreference();
         await this.getCurrentUser();
         this._loadDataProgressively();
       } catch (error) {
@@ -101,11 +105,84 @@ export class ComplianceDashboard extends Component {
         }
       };
     }, () => []);
+
+    onWillUnmount(() => {
+      if (this.refreshTimer) {
+        clearInterval(this.refreshTimer);
+        this.refreshTimer = null;
+      }
+    });
     
     this.displayOdooView = this.displayOdooView.bind(this);
     this.displaybycategory = this.displaybycategory.bind(this);
     this.filterByDate = this.filterByDate.bind(this);
     this._onHorizontalScroll = this._onHorizontalScroll.bind(this);
+    this.onDateChange = this.onDateChange.bind(this);
+    this.onRefreshRateChange = this.onRefreshRateChange.bind(this);
+  }
+
+  get currentPeriodLabel() {
+    const days = Number(this.state.datepicked);
+    if (days === 0) {
+      return "Today";
+    }
+    if (days === 7) {
+      return "Last 7 days";
+    }
+    if (days === 14) {
+      return "Last 14 days";
+    }
+    if (days === 30) {
+      return "Last 30 days";
+    }
+    if (days === 60) {
+      return "Last 60 days";
+    }
+    return "All time";
+  }
+
+  get selectedCharts() {
+    return (this.state.dynamic_chart || []).filter(
+      (chart) => chart && typeof chart === "object"
+    );
+  }
+
+  get primaryCharts() {
+    return this.selectedCharts.filter(
+      (chart) => !["cases_by_status", "cases_by_exceptions"].includes(chart.id)
+    );
+  }
+
+  get casePieCharts() {
+    return this.selectedCharts.filter((chart) =>
+      ["cases_by_status", "cases_by_exceptions"].includes(chart.id)
+    );
+  }
+
+  get debugChartSummary() {
+    if (!this.selectedCharts.length) {
+      return "No chart titles";
+    }
+    return this.selectedCharts
+      .map((chart) => {
+        const pointCount =
+          Array.isArray(chart.datasets) &&
+          chart.datasets[0] &&
+          Array.isArray(chart.datasets[0].data)
+            ? chart.datasets[0].data.length
+            : 0;
+        return `${chart.title || "Untitled"}(${pointCount})`;
+      })
+      .join(" | ");
+  }
+
+  hasChartData(chart) {
+    if (!chart || !Array.isArray(chart.datasets) || !chart.datasets.length) {
+      return false;
+    }
+    return chart.datasets.some((dataset) =>
+      Array.isArray(dataset.data) && dataset.data.some((value) => Number(value || 0) !== 0)
+    );
   }
 
   /**
@@ -114,6 +191,48 @@ export class ComplianceDashboard extends Component {
   _clearLoadingStates() {
     this.state.loadingStates.stats = false;
     this.state.loadingStates.charts = false;
+  }
+
+  _loadRefreshPreference() {
+    try {
+      const savedRate = Number(
+        window.localStorage.getItem("compliance_dashboard_refresh_rate")
+      );
+      if ([1, 5, 30, 60].includes(savedRate)) {
+        this.state.refreshRate = savedRate;
+      }
+    } catch (error) {
+      logDebug("Could not load refresh preference:", error);
+    }
+  }
+
+  _saveRefreshPreference() {
+    try {
+      window.localStorage.setItem(
+        "compliance_dashboard_refresh_rate",
+        String(this.state.refreshRate)
+      );
+    } catch (error) {
+      logDebug("Could not save refresh preference:", error);
+    }
+  }
+
+  _restartRefreshTimer() {
+    if (this.refreshTimer) {
+      clearInterval(this.refreshTimer);
+      this.refreshTimer = null;
+    }
+
+    const refreshRate = Number(this.state.refreshRate);
+    if (![1, 5, 30, 60].includes(refreshRate)) {
+      return;
+    }
+
+    this.refreshTimer = setInterval(() => {
+      this.fetchDashboardCharts({ silent: true }).catch((error) => {
+        logDebug("Background chart refresh failed:", error);
+      });
+    }, refreshRate * 60 * 1000);
   }
 
   /**
@@ -137,7 +256,7 @@ export class ComplianceDashboard extends Component {
     const datepicked = String(this.state.datepicked || 20000);
     const uniqueId = String(this.state.uniqueId || '');
     
-    return `charts_data_${cco}_${branches}_${datepicked}_${uniqueId}`;
+    return `charts_data_v6_${cco}_${branches}_${datepicked}_${uniqueId}`;
   }
 
   /**
@@ -451,22 +570,16 @@ export class ComplianceDashboard extends Component {
   /**
    * Fetch dashboard charts with proper caching
    */
-  async fetchDashboardCharts() {
+  async fetchDashboardCharts(options = {}) {
+    const { silent = false } = options;
     try {
-      this.state.loadingStates.charts = true;
-      
-      const cacheKey = this._generateChartsCacheKey();
-      logDebug(`Fetching charts with cache key: ${cacheKey}`);
-      const cachedData = await this.serverCache.getCache(cacheKey);
-      
-      if (cachedData && this._validateChartData(cachedData)) {
-        logDebug('Using cached chart data');
-        this.state.dynamic_chart = [...cachedData];
-        this.state.loadingStates.charts = false;
-        return cachedData;
+      if (!silent) {
+        this.state.loadingStates.charts = true;
       }
-      logDebug('Fetching charts from server');
-      const result = await this.rpc(`/dashboard/dynamic_charts/`, {
+      this.state.chartError = null;
+
+      logDebug('Fetching focused charts from server');
+      const result = await this.rpc(`/dashboard/focused_charts`, {
         cco: this.state.cco,
         branches_id: this.state.branches_id,
         datepicked: Number(this.state.datepicked),
@@ -475,19 +588,23 @@ export class ComplianceDashboard extends Component {
       if (result && this._validateChartData(result)) {
         logDebug('Got valid chart data:', result);
         this.state.dynamic_chart = [...result];
-        await this.serverCache.setCache(cacheKey, result);
       } else {
         logDebug('No valid chart data returned');
         this.state.dynamic_chart = [];
       }
-      
-      this.state.loadingStates.charts = false;
+
+      this._restartRefreshTimer();
+
       return result;
     } catch (error) {
       logDebug("Error fetching charts:", error);
-      this.state.loadingStates.charts = false;
       this.state.dynamic_chart = [];
+      this.state.chartError = error?.message || "Chart fetch failed";
       return null;
+    } finally {
+      if (!silent) {
+        this.state.loadingStates.charts = false;
+      }
     }
   }
 
@@ -522,6 +639,17 @@ export class ComplianceDashboard extends Component {
       this._clearLoadingStates();
       return false;
     }
+  }
+
+  async onDateChange(ev) {
+    this.state.datepicked = Number(ev.target.value);
+    await this.filterByDate(true);
+  }
+
+  async onRefreshRateChange(ev) {
+    this.state.refreshRate = Number(ev.target.value);
+    this._saveRefreshPreference();
+    this._restartRefreshTimer();
   }
 
   /**

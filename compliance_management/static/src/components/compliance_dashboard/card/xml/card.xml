@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="owl.card" owl="1">
-        <div 
-            t-on-click="props.onClick" 
-            t-att-class="'px-4 py-2 mb-3 box shadow bg-white position-relative' + (props.isClickable ? ' cursor-pointer' : ' cursor-default')"
-            t-att-style="props.bgcolor ? 'background-color: ' + props.bgcolor : ''"
+        <div
+            t-att-class="cardClassName"
+            t-att-style="'--cm-kpi-accent: ' + accentColor"
+            t-on-click="handleClick"
         >
-            <h2 class="my-3 fs-1">
-                <t t-out="props.total" />
-            </h2>
-
-            <p class="text-muted text-capitalize fs-3">
-                <t t-out="props.title" />
-            </p>
-
-            <div class="text-uppercase fw-bold text-center bg-dark text-white fs-6 position-absolute catbox">
-                <p><t t-out="props.scope ? props.scope.slice(0,2) : '--'" /></p>
+            <div class="cm-kpi-card__badge">
+                <t t-out="props.scope ? props.scope.slice(0,2) : '--'" />
             </div>
-            
+            <div class="cm-kpi-card__value">
+                <t t-out="props.total" />
+            </div>
+            <div class="cm-kpi-card__label">
+                <t t-out="props.title" />
+            </div>
+            <div class="cm-kpi-card__scope">
+                <t t-out="props.scope || 'Metric'" />
+            </div>
         </div>
     </t>
 </templates>

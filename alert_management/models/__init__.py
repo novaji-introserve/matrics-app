@@ -2,6 +2,7 @@
 
 from . import alert_group
 from . import alert_history
+from . import dashboard
 from . import alert_rules
 from . import exception_frequency
 from . import sql

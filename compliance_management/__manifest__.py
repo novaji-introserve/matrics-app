@@ -15,7 +15,7 @@
     # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     "category": "iComply",
-    "version": "0.3",
+    "version": "0.5",
     # any module necessary for this one to work correctly
     
     'depends': ['base', 'web', 'bus', 'hr', 'access_apps', 'web_field_slider', 'gamification', 'hide_powered_by_odoo','web_widget_numeric_step','legion_hide_odoo','base_automation', 'google_gmail', 'gamification','project',
@@ -111,6 +111,7 @@
         'data/gender.xml',
         'data/identification_type.xml',
         'data/demo_data/stat/compliance_stats.xml',
+        'data/demo_data/chart/charts.xml',
         'data/settings.xml',
         'data/demo_data/plan/risk_plan.xml',
         'data/demo_data/plan/jurisdiction_plan.xml',

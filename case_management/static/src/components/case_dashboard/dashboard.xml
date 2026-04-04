@@ -1,75 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="CaseDashboard" owl="1">
-        <div class="vh-100 overflow-auto bg-muted">
-            <div class="row mb-2 ms-2 me-2 mt-1">
-                <div class="col-lg-12">
-                    <div class="row">
-                        <div class="col m-0 p-0">
-                            <div class="shadow-sm border m-2 p-2 bg-white">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <h3 class="text-primary fw-bold">Case Management Dashboard</h3>
-                                    <div>
-                                        <select class="form-select" t-model="state.period" t-on-change="OnChangePeriod" t-att-disabled="state.isLoading">
-                                            <option value="0">All Time</option>
-                                            <option value="1">Yesterday</option>
-                                            <option value="7">Last 7 Days</option>
-                                            <option value="14">Last 14 Days</option>
-                                            <option value="30">Last 30 Days</option>
-                                            <option value="90">Last 90 Days</option>
-                                            <option value="365">Last 365 Days</option>
-                                        </select>
-                                    </div>
-                                </div>
+        <div class="case-dashboard-shell">
+            <div class="case-dashboard-hero">
+                <div class="case-dashboard-hero__copy">
+                    <span class="case-dashboard-hero__eyebrow">Case Management</span>
+                    <h1 class="case-dashboard-hero__title">Investigations Overview</h1>
+                    <p class="case-dashboard-hero__subtitle">
+                        Track case volume, status movement, and risk intensity across your assigned workload.
+                    </p>
+                </div>
+                <div class="case-dashboard-hero__controls">
+                    <label class="case-dashboard-filter">
+                        <span>Period</span>
+                        <select class="form-select" t-model="state.period" t-on-change="OnChangePeriod" t-att-disabled="state.isLoading">
+                            <option value="0">All Time</option>
+                            <option value="1">Yesterday</option>
+                            <option value="7">Last 7 Days</option>
+                            <option value="14">Last 14 Days</option>
+                            <option value="30">Last 30 Days</option>
+                            <option value="90">Last 90 Days</option>
+                            <option value="365">Last 365 Days</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+
+            <div class="case-dashboard-meta">
+                <div class="case-dashboard-meta__card">
+                    <span class="case-dashboard-meta__label">Scope</span>
+                    <strong>My Cases</strong>
+                </div>
+                <div class="case-dashboard-meta__card">
+                    <span class="case-dashboard-meta__label">Window</span>
+                    <strong t-esc="currentPeriodLabel" />
+                </div>
+                <div class="case-dashboard-meta__card">
+                    <span class="case-dashboard-meta__label">Charts</span>
+                    <strong>2</strong>
+                </div>
+            </div>
+
+            <div t-if="state.isLoading" class="case-dashboard-loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p>Loading dashboard data...</p>
+            </div>
+
+            <div t-else="">
+                <div class="case-dashboard-cards">
+                    <KpiCard onClick.bind="viewAllCases" name="'All Cases'" value="state.allCases.value" percentage="state.allCases.percentage" />
+                    <KpiCard onClick.bind="viewDraftCases" name="'Draft Cases'" value="state.draftCases.value" percentage="state.draftCases.percentage" />
+                    <KpiCard onClick.bind="viewOpenCases" name="'Open Cases'" value="state.openCases.value" percentage="state.openCases.percentage" />
+                    <KpiCard onClick.bind="viewOverdueCases" name="'Overdue Cases'" value="state.overdueCases.value" percentage="state.overdueCases.percentage" />
+                    <KpiCard onClick.bind="viewClosedCases" name="'Closed Cases'" value="state.closedCases.value" percentage="state.closedCases.percentage" />
+                    <KpiCard onClick.bind="viewArchivedCases" name="'Archived Cases'" value="state.archivedCases.value" percentage="state.archivedCases.percentage" />
+                </div>
+
+                <div class="case-dashboard-grid">
+                    <section class="case-dashboard-panel">
+                        <div class="case-dashboard-panel__header">
+                            <div>
+                                <h2>Case Status Distribution</h2>
+                                <p>How active cases are distributed across the lifecycle.</p>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Loading indicator -->
-                    <div t-if="state.isLoading" class="text-center my-5">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+                        <div class="case-dashboard-panel__body">
+                            <ChartRenderer type="'pie'" title="'Status Distribution'" config="state.caseStatusChart" onClick.bind="viewByStatus" />
                         </div>
-                        <p class="mt-2">Loading dashboard data...</p>
                     </div>
-
-                    <div t-else="">
-                        <!-- Cards row -->
-                        <div class="row">
-                            <KpiCard onClick.bind="viewAllCases" name="'All Cases'" value="state.allCases.value" percentage="state.allCases.percentage" />
-                            <KpiCard onClick.bind="viewDraftCases" name="'Draft Cases'" value="state.draftCases.value" percentage="state.draftCases.percentage" />
-                            <KpiCard onClick.bind="viewOpenCases" name="'Open Cases'" value="state.openCases.value" percentage="state.openCases.percentage" />
-                            <KpiCard onClick.bind="viewOverdueCases" name="'Overdue Cases'" value="state.overdueCases.value" percentage="state.overdueCases.percentage" />
-                            <KpiCard onClick.bind="viewClosedCases" name="'Closed Cases'" value="state.closedCases.value" percentage="state.closedCases.percentage" />
-                            <KpiCard onClick.bind="viewArchivedCases" name="'Archived Cases'" value="state.archivedCases.value" percentage="state.archivedCases.percentage" />
-                        </div>
-
-                        <!-- Charts row -->
-                        <div class="row">
-                            <div class="col-lg-6 m-0 p-0">
-                                <div class="shadow-sm border m-2 p-4 bg-white">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <h6 class="text-primary fw-bold">Case Status Distribution</h6>
-                                        
-                                    </div>
-                                    <div style="width:100%; height:210px; margin-top:10px; margin-bottom:10px;">
-                                        <ChartRenderer type="'pie'" title="'Status Distribution'" config="state.caseStatusChart" onClick.bind="viewByStatus" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 m-0 p-0">
-                                <div class="shadow-sm border m-2 p-4 bg-white">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <h6 class="text-primary fw-bold mb-2">Case Rating Distribution</h6>
-                                        
-                                    </div>
-                                    <div style="width:100%; height:210px; margin-top:10px; margin-bottom:10px;">
-                                        <ChartRenderer type="'bar'" title="'Priority Distribution'" config="state.caseRatingChart" onClick.bind="viewByRating" />
-                                    </div>
-                                </div>
+                    <section class="case-dashboard-panel">
+                        <div class="case-dashboard-panel__header">
+                            <div>
+                                <h2>Case Rating Distribution</h2>
+                                <p>Risk concentration across low, medium, and high priority cases.</p>
                             </div>
                         </div>
-                    </div>
+                        <div class="case-dashboard-panel__body">
+                            <ChartRenderer type="'bar'" title="'Priority Distribution'" config="state.caseRatingChart" onClick.bind="viewByRating" />
+                        </div>
+                    </section>
                 </div>
             </div>
         </div>

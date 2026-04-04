@@ -128,22 +128,26 @@ def create_transactions():
             name = generate_custom_id(prefix="TRN")
             amount = round(random.uniform(-1.5, 2.0), 2) if ac.currency == 'USD' else round(random.uniform(-50.0, 50.0), 2)
             narration = f"Transaction for {ac.name} with Tran ID: {name}"
-            date_created = get_random_date(1, 2).strftime('%Y-%m-%d')
+            date_created = datetime.now().strftime('%Y-%m-%d')
             transaction_type = get_transaction_type('DEP') if amount > 0 else get_transaction_type('WDR')
             inputter ='SYSTEM'
             officer = get_account_officer(ac.account_officer_id.id) if ac.account_officer_id else get_authorizer_id()
             authorizer = officer.code
             tran_code = f"{transaction_type.trancode}{date_created.replace('-','')}" if transaction_type else None
+            amt = amount * 1025 
             print(f"Account ID: {ac.id}, Amount: {amount}, Currency: {ac.currency}")
             tran_data = {
                 'customer_id': ac.customer_id.id,
                 'account_id': ac.id,
                 'currency_id': ac.currency_id.id if ac.currency_id else None,
                 'currency': ac.currency,
-                'amount': (amount * 1025),
+                'amount': amt,
+                'amount_local': amt,
                 'narration': narration,
                 'date_created': date_created,
                 'name': name,
+                'transaction_number': name,
+                'internal_ref_number': name,
                 'account_officer_id': ac.account_officer_id.id if ac.account_officer_id else None,
                 'tran_type': transaction_type.id if transaction_type else None,
                 'inputter': inputter,

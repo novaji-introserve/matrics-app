@@ -32,6 +32,7 @@
     'license': 'LGPL-3',
     'icon': 'case_management/static/description/icon.png',
     "assets": {"web.assets_backend": [
+        'case_management/static/src/css/style.css',
         'case_management/static/src/components/case_dashboard/dashboard.xml',
         'case_management/static/src/components/case_dashboard/dashboard.js',
         'case_management/static/src/components/chart_renderer/chart_renderer.js',

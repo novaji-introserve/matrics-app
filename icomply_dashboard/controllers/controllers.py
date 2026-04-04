@@ -5,6 +5,20 @@ from datetime import datetime, timedelta
 from odoo import fields
 
 class Mydashboard(http.Controller):
+    def _get_date_range(self, datepicked):
+        today = datetime.now().date()
+        prev_date = today - timedelta(days=datepicked)
+        start_of_prev_day = fields.Datetime.to_string(datetime.combine(prev_date, datetime.min.time()))
+        end_of_today = fields.Datetime.to_string(datetime.combine(today, datetime.max.time()))
+        return start_of_prev_day, end_of_today
+
+    def _execute_query(self, sql, params=None, keys=None):
+        request.env.cr.execute(sql, params) if params else request.env.cr.execute(sql)
+        results = request.env.cr.fetchall()
+        if not keys:
+            return results
+        return [dict(zip(keys, row)) for row in results]
+
     @http.route('/dashboard/user', auth='public', type='json')
     def index(self, **kw):
         user = request.env.user
@@ -114,6 +128,119 @@ class Mydashboard(http.Controller):
                     return _execute_query(sql, (branches_id,))
                 except Exception as e:
                     print(f"error occured {str(e)}")
+
+    @http.route('/dashboard/top_branches_by_accounts', auth='public', type='json')
+    def top_branches_by_accounts(self, cco, branches_id, datepicked, **kw):
+        start_of_prev_day, end_of_today = self._get_date_range(datepicked)
+        keys = ["id", "name", "account_count"]
+
+        if cco:
+            if datepicked > 0:
+                sql = """
+                    SELECT rb.id, rb.name, COUNT(rpa.id) AS account_count
+                    FROM res_branch rb
+                    JOIN res_partner_account rpa ON rb.id = rpa.branch_id
+                    WHERE rpa.date_created BETWEEN %s AND %s
+                    GROUP BY rb.id, rb.name
+                    ORDER BY account_count DESC
+                    LIMIT 10
+                """
+                return self._execute_query(sql, (start_of_prev_day, end_of_today), keys)
+
+            sql = """
+                SELECT rb.id, rb.name, COUNT(rpa.id) AS account_count
+                FROM res_branch rb
+                JOIN res_partner_account rpa ON rb.id = rpa.branch_id
+                GROUP BY rb.id, rb.name
+                ORDER BY account_count DESC
+                LIMIT 10
+            """
+            return self._execute_query(sql, keys=keys)
+
+        if not branches_id:
+            return []
+
+        if datepicked > 0:
+            sql = """
+                SELECT rb.id, rb.name, COUNT(rpa.id) AS account_count
+                FROM res_branch rb
+                JOIN res_partner_account rpa ON rb.id = rpa.branch_id
+                WHERE rb.id = ANY(%s) AND rpa.date_created BETWEEN %s AND %s
+                GROUP BY rb.id, rb.name
+                ORDER BY account_count DESC
+                LIMIT 10
+            """
+            return self._execute_query(sql, (branches_id, start_of_prev_day, end_of_today), keys)
+
+        sql = """
+            SELECT rb.id, rb.name, COUNT(rpa.id) AS account_count
+            FROM res_branch rb
+            JOIN res_partner_account rpa ON rb.id = rpa.branch_id
+            WHERE rb.id = ANY(%s)
+            GROUP BY rb.id, rb.name
+            ORDER BY account_count DESC
+            LIMIT 10
+        """
+        return self._execute_query(sql, (branches_id,), keys)
+
+    @http.route('/dashboard/top_high_risk_branches_by_accounts', auth='public', type='json')
+    def top_high_risk_branches_by_accounts(self, cco, branches_id, datepicked, **kw):
+        start_of_prev_day, end_of_today = self._get_date_range(datepicked)
+        keys = ["id", "name", "high_risk_accounts"]
+
+        if cco:
+            if datepicked > 0:
+                sql = """
+                    SELECT rb.id, rb.name, COUNT(rpa.id) AS high_risk_accounts
+                    FROM res_branch rb
+                    JOIN res_partner_account rpa ON rb.id = rpa.branch_id
+                    JOIN res_partner rp ON rpa.customer_id = rp.id
+                    WHERE rp.risk_level = 'high' AND rpa.date_created BETWEEN %s AND %s
+                    GROUP BY rb.id, rb.name
+                    ORDER BY high_risk_accounts DESC
+                    LIMIT 10
+                """
+                return self._execute_query(sql, (start_of_prev_day, end_of_today), keys)
+
+            sql = """
+                SELECT rb.id, rb.name, COUNT(rpa.id) AS high_risk_accounts
+                FROM res_branch rb
+                JOIN res_partner_account rpa ON rb.id = rpa.branch_id
+                JOIN res_partner rp ON rpa.customer_id = rp.id
+                WHERE rp.risk_level = 'high'
+                GROUP BY rb.id, rb.name
+                ORDER BY high_risk_accounts DESC
+                LIMIT 10
+            """
+            return self._execute_query(sql, keys=keys)
+
+        if not branches_id:
+            return []
+
+        if datepicked > 0:
+            sql = """
+                SELECT rb.id, rb.name, COUNT(rpa.id) AS high_risk_accounts
+                FROM res_branch rb
+                JOIN res_partner_account rpa ON rb.id = rpa.branch_id
+                JOIN res_partner rp ON rpa.customer_id = rp.id
+                WHERE rb.id = ANY(%s) AND rp.risk_level = 'high' AND rpa.date_created BETWEEN %s AND %s
+                GROUP BY rb.id, rb.name
+                ORDER BY high_risk_accounts DESC
+                LIMIT 10
+            """
+            return self._execute_query(sql, (branches_id, start_of_prev_day, end_of_today), keys)
+
+        sql = """
+            SELECT rb.id, rb.name, COUNT(rpa.id) AS high_risk_accounts
+            FROM res_branch rb
+            JOIN res_partner_account rpa ON rb.id = rpa.branch_id
+            JOIN res_partner rp ON rpa.customer_id = rp.id
+            WHERE rb.id = ANY(%s) AND rp.risk_level = 'high'
+            GROUP BY rb.id, rb.name
+            ORDER BY high_risk_accounts DESC
+            LIMIT 10
+        """
+        return self._execute_query(sql, (branches_id,), keys)
 
     @http.route('/dashboard/get_high_risk_customer_by_branch', auth='public', type='json')
     def get_high_risk(self, cco, branches_id, datepicked, **kw):

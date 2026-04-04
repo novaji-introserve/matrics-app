@@ -55,7 +55,7 @@
 
         <record id="dashboard_home" model="ir.actions.client">
           <field name="name">Dashboard</field>
-          <field name="tag">owl.icomply_dashboard</field>
+          <field name="tag">owl.dashboard</field>
         </record> 
 
     <!-- <menuitem id="icomply_dashboard_menu" name="iComply Dashboard" parent="base.menu_custom"

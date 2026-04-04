@@ -35,6 +35,7 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+        'views/dashboard.xml',
         'views/alert_group.xml',
         'views/alert_history.xml',
         'views/alert_rules_view.xml',
@@ -67,4 +68,13 @@
     'license': 'LGPL-3',
     "application": True,
     "auto_install": False,
+    "assets": {
+        "web.assets_backend": [
+            'alert_management/static/src/css/dashboard.css',
+            'alert_management/static/src/components/alert_dashboard/dashboard.xml',
+            'alert_management/static/src/components/alert_dashboard/dashboard.js',
+            'alert_management/static/src/components/alert_dashboard/line_chart.xml',
+            'alert_management/static/src/components/alert_dashboard/line_chart.js',
+        ],
+    },
 }
