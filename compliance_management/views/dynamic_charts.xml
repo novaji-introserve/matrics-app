@@ -6,9 +6,12 @@
             <field name="model">res.dashboard.charts</field>
             <field name="arch" type="xml">
                 <tree>
+                    <field name="display_order" optional="show"/>
                     <field name="name"/>
+                    <field name="code"/>
+                    <field name="scope"/>
                     <field name="chart_type"/>
-                    <field name="color_scheme"/>
+                    <field name="is_visible"/>
                     <field name="last_execution_status" optional="show" widget="badge" 
                            decoration-success="last_execution_status == 'success'" 
                            decoration-danger="last_execution_status == 'error'"/>
@@ -35,19 +38,26 @@
                         </div>
                         <group>
                             <group>
+                                <field name="code"/>
                                 <field name="chart_type"/>
+                                <field name="scope"/>
+                                <field name="display_order"/>
+                                <field name="is_visible"/>
                                 <field name="color_scheme"/>
-                                <field name="branch_filter"/>
-                                <field name="branch_field" attrs="{'invisible': [('branch_filter', '=', False)], 'required': [('branch_filter', '=', True)]}"/>
-                                <field name="column"/>
+                                <field name="display_summary"/>
+                                <field name="description"/>
                             </group>
                             <group>
+                                <field name="branch_filter"/>
+                                <field name="branch_field" attrs="{'invisible': [('branch_filter', '=', False)], 'required': [('branch_filter', '=', True)]}"/>
+                                <field name="date_filter"/>
+                                <field name="date_field" attrs="{'required': [('date_filter', '=', True)]}"/>
+                                <field name="column"/>
                                 <field name="x_axis_field"/>
                                 <field name="y_axis_field"/>
-                                <field name="date_field"/>
+                                <field name="navigation_value_field"/>
                                 <field name="target_model_id" options="{'no_create': True}"/>
-                                <field name="domain_field_id" options="{'no_create': True}" context="{'ir_model_id': target_model_id}"/>
-                                <!-- Add new performance fields -->
+                                <field name="navigation_filter_field"/>
                                 <field name="use_materialized_view"/>
                                 <field name="materialized_view_refresh_interval" 
                                        attrs="{'invisible': [('use_materialized_view', '=', False)]}"/>
@@ -74,12 +84,18 @@
                                     <field name="last_error_message" readonly="1"/>
                                 </div>
                             </page>
-                            <page string="Description">
-                                <field name="description" placeholder="Describe the purpose of this chart"/>
+                            <page string="Navigation">
+                                <group>
+                                    <field name="navigation_domain" placeholder="[('field', '=', value)]"/>
+                                    <field name="apply_dashboard_date_filter"/>
+                                    <field name="navigation_date_field" attrs="{'required': [('apply_dashboard_date_filter', '=', True)]}"/>
+                                    <field name="apply_dashboard_branch_filter"/>
+                                    <field name="navigation_branch_field" attrs="{'required': [('apply_dashboard_branch_filter', '=', True)]}"/>
+                                </group>
                             </page>
                             <page string="Advanced Settings" groups="base.group_system">
                                 <group>
-                                    <!-- <field name="is_complex_query" readonly="1"/> -->
+                                    <field name="domain_field_id" options="{'no_create': True}" context="{'ir_model_id': target_model_id}"/>
                                     <field name="domain_filter"/>
                                 </group>
                             </page>

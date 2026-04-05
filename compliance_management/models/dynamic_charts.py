@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api
 from odoo import exceptions
+import ast
 import psycopg2
 import re
 import logging
@@ -22,10 +23,33 @@ class ResCharts(models.Model):
             "unique(name)",
             "Chart name already exists. It must be unique!",
         ),
+        (
+            "uniq_chart_code",
+            "unique(code)",
+            "Chart code already exists. It must be unique!",
+        ),
     ]
     _inherit = ["mail.thread", "mail.activity.mixin"]
     name = fields.Char("Chart Name", required=True, tracking=True)
+    code = fields.Char("Code", tracking=True)
     description = fields.Text("Description")
+    display_summary = fields.Text("Display Summary")
+    display_order = fields.Integer("Display Order", default=1, tracking=True)
+    is_visible = fields.Boolean("Is Visible", default=False, tracking=True)
+    scope = fields.Selection(
+        [
+            ("alert", "Alert Management"),
+            ("bank", "Bank Wide"),
+            ("branch", "Branch"),
+            ("case", "Case Management"),
+            ("compliance", "Compliance"),
+            ("regulatory", "Regulatory"),
+            ("risk", "Risk Assessment"),
+        ],
+        string="Scope",
+        default="compliance",
+        tracking=True,
+    )
     chart_type = fields.Selection(
         [
             ("bar", "Bar Chart"),
@@ -116,6 +140,46 @@ class ResCharts(models.Model):
     domain_field = fields.Char(
         related="domain_field_id.name", string="Domain Field Name", store=True
     )
+    navigation_filter_field = fields.Char(
+        string="Navigation Filter Field",
+        help="Target model field used when a chart point is clicked.",
+        tracking=True,
+    )
+    navigation_value_field = fields.Char(
+        string="Navigation Value Field",
+        help="Query result column used as the clicked filter value.",
+        tracking=True,
+    )
+    navigation_domain = fields.Text(
+        string="Navigation Domain",
+        help="Static Odoo domain appended during chart drill-down.",
+        tracking=True,
+    )
+    apply_dashboard_date_filter = fields.Boolean(
+        string="Apply Dashboard Date Filter",
+        default=False,
+        tracking=True,
+    )
+    navigation_date_field = fields.Char(
+        string="Navigation Date Field",
+        help="Target model field used for dashboard period drill-down.",
+        tracking=True,
+    )
+    apply_dashboard_branch_filter = fields.Boolean(
+        string="Apply Dashboard Branch Filter",
+        default=False,
+        tracking=True,
+    )
+    navigation_branch_field = fields.Char(
+        string="Navigation Branch Field",
+        help="Target model field used for dashboard branch drill-down.",
+        tracking=True,
+    )
+    date_filter = fields.Boolean(
+        string="Apply Dashboard Date Filter To Query",
+        default=False,
+        tracking=True,
+    )
     domain_filter = fields.Char(
         string="Domain Filter", help="Domain filter for the action window"
     )
@@ -146,6 +210,158 @@ class ResCharts(models.Model):
         string="Last View Refresh", readonly=True
     )
     active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+
+    def init(self):
+        super().init()
+        chart_backfill = {
+            "demo_chart_top10_branch_by_customer": {
+                "code": "top_accounts",
+                "display_order": 1,
+                "is_visible": True,
+                "scope": "compliance",
+                "display_summary": "Branches with the highest account-opening volume in the selected period.",
+                "navigation_filter_field": "branch_id",
+                "navigation_value_field": "branch_id",
+                "navigation_domain": "[]",
+                "apply_dashboard_date_filter": True,
+                "navigation_date_field": "create_date",
+                "apply_dashboard_branch_filter": True,
+                "navigation_branch_field": "branch_id",
+                "date_filter": True,
+            },
+            "demo_chart_top10_high_risk_branch": {
+                "code": "top_high_risk_accounts",
+                "display_order": 2,
+                "is_visible": True,
+                "scope": "compliance",
+                "display_summary": "Branches with the highest concentration of high-risk accounts in the selected period.",
+                "navigation_filter_field": "branch_id",
+                "navigation_value_field": "branch_id",
+                "navigation_domain": "[('risk_level', '=', 'high')]",
+                "apply_dashboard_date_filter": True,
+                "navigation_date_field": "create_date",
+                "apply_dashboard_branch_filter": True,
+                "navigation_branch_field": "branch_id",
+                "date_filter": True,
+            },
+            "demo_chart_top10_screened_transaction": {
+                "code": "top_transaction_exceptions",
+                "display_order": 4,
+                "is_visible": True,
+                "scope": "compliance",
+                "display_summary": "Most-triggered exception rules in the selected period.",
+                "navigation_filter_field": "rule_id",
+                "navigation_value_field": "rule_id",
+                "navigation_domain": "[]",
+                "apply_dashboard_date_filter": True,
+                "navigation_date_field": "date_created",
+                "apply_dashboard_branch_filter": True,
+                "navigation_branch_field": "branch_id",
+                "date_filter": True,
+            },
+            "demo_chart_top_customer_risk_rules": {
+                "code": "top_customer_risk_rules",
+                "display_order": 3,
+                "is_visible": True,
+                "scope": "compliance",
+                "display_summary": "Risk analysis rules affecting the highest number of partners in the selected period.",
+                "navigation_filter_field": "plan_line_id",
+                "navigation_value_field": "risk_rule_id",
+                "navigation_domain": "[]",
+                "apply_dashboard_date_filter": True,
+                "navigation_date_field": "create_date",
+                "apply_dashboard_branch_filter": True,
+                "navigation_branch_field": "partner_id.branch_id",
+                "date_filter": True,
+            },
+            "demo_chart_cases_by_status": {
+                "code": "cases_by_status",
+                "display_order": 5,
+                "is_visible": True,
+                "scope": "compliance",
+                "display_summary": "Current case distribution by lifecycle stage for the selected period.",
+                "navigation_filter_field": "case_status",
+                "navigation_value_field": "case_status",
+                "navigation_domain": "[]",
+                "apply_dashboard_date_filter": True,
+                "navigation_date_field": "create_date",
+                "apply_dashboard_branch_filter": False,
+                "navigation_branch_field": False,
+                "date_filter": True,
+            },
+            "demo_chart_cases_by_exceptions": {
+                "code": "cases_by_exceptions",
+                "display_order": 6,
+                "is_visible": True,
+                "scope": "compliance",
+                "display_summary": "Cases grouped by linked exception process in the selected period.",
+                "navigation_filter_field": "process",
+                "navigation_value_field": "process_id",
+                "navigation_domain": "[]",
+                "apply_dashboard_date_filter": True,
+                "navigation_date_field": "create_date",
+                "apply_dashboard_branch_filter": False,
+                "navigation_branch_field": False,
+                "date_filter": True,
+            },
+        }
+        for xml_id, values in chart_backfill.items():
+            assignments = ", ".join(f"{field} = %s" for field in values)
+            params = list(values.values()) + [xml_id]
+            self.env.cr.execute(
+                f"""
+                UPDATE res_dashboard_charts chart
+                SET {assignments}
+                FROM ir_model_data imd
+                WHERE imd.module = 'compliance_management'
+                  AND imd.name = %s
+                  AND chart.id = imd.res_id
+                """,
+                params,
+            )
+
+    def _parse_navigation_domain(self):
+        self.ensure_one()
+        if not self.navigation_domain:
+            return []
+        try:
+            parsed_domain = ast.literal_eval(self.navigation_domain)
+        except (ValueError, SyntaxError):
+            _logger.warning(
+                "Invalid navigation domain for chart %s (%s): %s",
+                self.name,
+                self.code,
+                self.navigation_domain,
+            )
+            return []
+        return parsed_domain if isinstance(parsed_domain, list) else []
+
+    def _build_dashboard_navigation_domain(
+        self, *, cco=False, branches_id=None, datepicked=7, start_at=None, end_at=None
+    ):
+        self.ensure_one()
+        domain = list(self._parse_navigation_domain())
+        if (
+            self.apply_dashboard_date_filter
+            and self.navigation_date_field
+            and start_at
+            and end_at
+            and datepicked in (0, 1, 7, 30)
+        ):
+            domain.extend(
+                [
+                    [self.navigation_date_field, ">=", start_at],
+                    [self.navigation_date_field, "<=", end_at],
+                ]
+            )
+        if (
+            self.apply_dashboard_branch_filter
+            and self.navigation_branch_field
+            and not cco
+            and branches_id
+        ):
+            domain.append([self.navigation_branch_field, "in", branches_id])
+        return domain
 
     def _validate_sql_query_structure(self, parsed_query):
         """Validate the structure of a parsed SQL query to prevent injection attacks.

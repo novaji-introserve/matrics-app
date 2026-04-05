@@ -29,12 +29,39 @@ class ChartDataService:
         else:
             return f"dashboard_chart_view_{chart_id.id}"
 
-    def _extract_chart_data(self, chart, results, query):
+    @staticmethod
+    def _default_chart_title(chart):
+        code = getattr(chart, "code", False)
+        title_map = {
+            "top_accounts": "Top 10 Branch by Accounts Opened",
+            "top_high_risk_accounts": "Top 10 High Risk Branch by Accounts",
+            "top_customer_risk_rules": "Top 10 Customer Risk Rules",
+            "top_transaction_exceptions": "Top Transaction Exception",
+            "cases_by_status": "Cases by Status",
+            "cases_by_exceptions": "Cases by Exceptions",
+        }
+        return getattr(chart, "name", False) or title_map.get(code) or "Dashboard Chart"
+
+    def _extract_chart_data(
+        self,
+        chart,
+        results,
+        query,
+        *,
+        cco=False,
+        branches_id=None,
+        datepicked=7,
+        start_at=None,
+        end_at=None,
+    ):
         """Extract chart data from query results"""
+        chart_identifier = chart.code or chart.id
+        chart_title = self._default_chart_title(chart)
         if not results:
             return {
-                "id": chart.id,
-                "title": chart.name,
+                "id": chart_identifier,
+                "title": chart_title,
+                "display_summary": chart.display_summary or chart.description or "",
                 "type": chart.chart_type,
                 "labels": [],
                 "datasets": [{"data": [], "backgroundColor": []}],
@@ -59,7 +86,7 @@ class ChartDataService:
                     (k for k in results[0].keys() if k != x_field and k != "id"), None
                 )
 
-        id_field = "id"
+        id_field = chart.navigation_value_field or "id"
         if id_field not in results[0]:
             id_field = next((k for k in results[0].keys() if k.endswith("_id")), None)
             
@@ -72,8 +99,9 @@ class ChartDataService:
         if not y_field:
             _logger.error(f"Cannot determine Y-axis field for chart {chart.id}")
             return {
-                "id": chart.id,
-                "title": chart.name,
+                "id": chart_identifier,
+                "title": chart_title,
+                "display_summary": chart.display_summary or chart.description or "",
                 "type": chart.chart_type,
                 "error": "Cannot determine Y-axis field from query results",
                 "labels": [],
@@ -89,49 +117,24 @@ class ChartDataService:
             except (ValueError, TypeError):
                 values.append(0)
 
-        additional_domain = []
-        if chart.query:
-            original_query = chart.query.upper()
-            where_clause = ""
-            if "WHERE" in original_query:
-                where_start = original_query.find("WHERE") + 5
-                where_end = -1
-                for clause in ["GROUP BY", "ORDER BY", "LIMIT"]:
-                    clause_pos = original_query.find(clause, where_start)
-                    if clause_pos > -1 and (where_end == -1 or clause_pos < where_end):
-                        where_end = clause_pos
-                where_clause = original_query[
-                    where_start : where_end if where_end > -1 else None
-                ].strip()
-                if where_clause:
-                    conditions = where_clause.split("AND")
-                    for condition in conditions:
-                        condition = condition.strip()
-                        if "=" in condition and "." in condition:
-                            parts = condition.split("=")
-                            field_part = parts[0].strip()
-                            value_part = parts[1].strip()
-                            if "." in field_part:
-                                table, field = field_part.split(".")
-                                if "'" in value_part:
-                                    value = value_part.replace("'", "").lower()
-                                    additional_domain.append(
-                                        (field.lower(), "=", value)
-                                    )
-                                elif value_part.isdigit():
-                                    value = int(value_part)
-                                    additional_domain.append(
-                                        (field.lower(), "=", value)
-                                    )
+        additional_domain = chart._build_dashboard_navigation_domain(
+            cco=cco,
+            branches_id=branches_id or [],
+            datepicked=datepicked,
+            start_at=start_at,
+            end_at=end_at,
+        )
 
         colors = self.color_generator._generate_colors(chart.color_scheme, len(results))
         
         return {
-            "id": chart.id,
-            "title": chart.name,
+            "id": chart_identifier,
+            "record_id": chart.id,
+            "title": chart_title,
+            "display_summary": chart.display_summary or chart.description or "",
             "type": chart.chart_type,
             "model_name": chart.target_model,
-            "filter": chart.domain_field,
+            "filter": chart.navigation_filter_field or chart.domain_field,
             "column": chart.column,
             "labels": labels,
             "ids": ids,
@@ -139,6 +142,7 @@ class ChartDataService:
             "additional_domain": additional_domain,
             "datasets": [
                 {
+                    "label": chart_title,
                     "data": values,
                     "backgroundColor": colors,
                     "borderColor": (
@@ -148,6 +152,107 @@ class ChartDataService:
                 }
             ],
         }
+
+    def _apply_dashboard_date_filter_to_query(self, chart, query, datepicked, start_at, end_at):
+        if (
+            not chart.date_filter
+            or not chart.date_field
+            or datepicked not in (0, 1, 7, 30)
+            or not start_at
+            or not end_at
+        ):
+            return query
+        sanitized_query = (query or "").strip()
+        had_semicolon = sanitized_query.endswith(";")
+        if had_semicolon:
+            sanitized_query = sanitized_query[:-1]
+        date_condition = f"{chart.date_field} BETWEEN '{start_at}' AND '{end_at}'"
+        filtered_query = QueryService.add_condition_to_query(sanitized_query, date_condition)
+        if had_semicolon and not filtered_query.endswith(";"):
+            filtered_query += ";"
+        return filtered_query
+
+    def get_dashboard_chart_data(
+        self, chart, cco, branches_id, datepicked=7, start_at=None, end_at=None
+    ):
+        if not self.env:
+            return {
+                "id": chart.code or chart.id,
+                "title": self._default_chart_title(chart),
+                "display_summary": chart.display_summary or chart.description or "",
+                "type": chart.chart_type,
+                "error": "No environment provided",
+                "labels": [],
+                "datasets": [{"data": [], "backgroundColor": []}],
+            }
+
+        try:
+            security_service = SecurityService()
+            db_service = DatabaseService(self.env)
+
+            if security_service.is_co_user():
+                cco = True
+
+            secured_query = security_service.secure_chart_query(chart, cco, branches_id)
+            secured_query = self._apply_dashboard_date_filter_to_query(
+                chart, secured_query, datepicked, start_at, end_at
+            )
+
+            is_safe, error_msg = security_service.validate_sql_query(secured_query)
+            if not is_safe:
+                security_service.log_security_event(
+                    "DASHBOARD_CHART_SQL_INJECTION",
+                    f"Unsafe dashboard chart query: {error_msg} - Query: {secured_query[:200]}..."
+                )
+                return {
+                    "id": chart.code or chart.id,
+                    "title": self._default_chart_title(chart),
+                    "display_summary": chart.display_summary or chart.description or "",
+                    "type": chart.chart_type,
+                    "error": "Request validation failed",
+                    "labels": [],
+                    "datasets": [{"data": [], "backgroundColor": []}],
+                }
+
+            success, results, execution_time = db_service.execute_query_with_timeout(
+                secured_query, timeout=15000
+            )
+            if success and results:
+                chart_data = self._extract_chart_data(
+                    chart,
+                    results,
+                    secured_query,
+                    cco=cco,
+                    branches_id=branches_id,
+                    datepicked=datepicked,
+                    start_at=start_at,
+                    end_at=end_at,
+                )
+                chart_data["execution_time_ms"] = round(execution_time, 2)
+                db_service.record_execution_stats(chart.id, execution_time, "success")
+                return chart_data
+
+            db_service.record_execution_stats(chart.id, 0, "error", results)
+            return {
+                "id": chart.code or chart.id,
+                "title": self._default_chart_title(chart),
+                "display_summary": chart.display_summary or chart.description or "",
+                "type": chart.chart_type,
+                "error": "Request validation failed",
+                "labels": [],
+                "datasets": [{"data": [], "backgroundColor": []}],
+            }
+        except Exception as e:
+            _logger.error(f"Error executing dashboard chart query: {e}")
+            return {
+                "id": chart.code or chart.id,
+                "title": self._default_chart_title(chart),
+                "display_summary": chart.display_summary or chart.description or "",
+                "type": chart.chart_type,
+                "error": "Request validation failed",
+                "labels": [],
+                "datasets": [{"data": [], "backgroundColor": []}],
+            }
 
     def _is_safe_query(self, query):
         """Check if a query is safe to execute"""

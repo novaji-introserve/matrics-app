@@ -10,6 +10,7 @@ import logging
 from ..services.security_service import SecurityService
 from ..services.database_service import DatabaseService
 from ..services.cache_service import CacheService
+from ..services.chart_data_service import ChartDataService
 from ..services.materialized_view import MaterializedViewService
 from ..utils.cache_key_unique_identifier import get_unique_client_identifier, normalize_cache_key_components
 from ..services.query_service import QueryService
@@ -36,16 +37,10 @@ class Compliance(http.Controller):
         self.database_service = DatabaseService()
         self.cache_service = CacheService()
         self.query_service = QueryService()
+        self.chart_data_service = ChartDataService()
         self.materialized_view_service = MaterializedViewService()
         self.get_unique_client_identifier = get_unique_client_identifier
         self.normalize_cache_key_components = normalize_cache_key_components
-
-    def _chart_display_summary(self, chart_id, title):
-        summary_map = {
-            "top_transaction_exceptions": "Most-triggered exception rules in the selected period.",
-            "top_customer_risk_rules": "Risk analysis rules affecting the highest number of partners in the selected period.",
-        }
-        return summary_map.get(chart_id, "Click the chart to inspect underlying records.")
 
     @http.route("/dashboard/user", auth="public", type="json")
     def index(self, **kw):
@@ -173,336 +168,28 @@ class Compliance(http.Controller):
 
         branches_array = self.check_branches_id(branches_id) if branches_id else []
         start_at, end_at = self._dashboard_date_range(datepicked)
-
-        account_filters = []
-        account_params = []
-        tx_filters = []
-        tx_params = []
-        risk_rule_filters = []
-        risk_rule_params = []
-
-        if datepicked in (0, 1, 7, 30):
-            account_filters.append(
-                "((COALESCE(rpa.opening_date, rpa.date_created) BETWEEN %s AND %s) OR (rpa.create_date BETWEEN %s AND %s))"
-            )
-            account_params.extend([
-                start_at,
-                end_at,
-                start_at,
-                end_at,
-            ])
-            tx_filters.append("rct.date_created BETWEEN %s AND %s")
-            tx_params.extend([start_at, end_at])
-            risk_rule_filters.append("rppl.create_date BETWEEN %s AND %s")
-            risk_rule_params.extend([start_at, end_at])
-
-        if not cco:
-            if not branches_array:
-                return []
-            account_filters.append("rb.id = ANY(%s)")
-            account_params.append(branches_array)
-            tx_filters.append("rct.branch_id = ANY(%s)")
-            tx_params.append(branches_array)
-            risk_rule_filters.append("rp.branch_id = ANY(%s)")
-            risk_rule_params.append(branches_array)
-
-        account_where = f"WHERE {' AND '.join(account_filters)}" if account_filters else ""
-        tx_where = f"WHERE {' AND '.join(tx_filters)}" if tx_filters else ""
-        risk_rule_where = f"WHERE {' AND '.join(risk_rule_filters)}" if risk_rule_filters else ""
-
-        account_filters_fallback = []
-        account_params_fallback = []
-        if not cco:
-            account_filters_fallback.append("rb.id = ANY(%s)")
-            account_params_fallback.append(branches_array)
-        account_where_fallback = (
-            f"WHERE {' AND '.join(account_filters_fallback)}"
-            if account_filters_fallback else ""
+        if not cco and not branches_array:
+            return []
+        chart_service = ChartDataService(request.env)
+        chart_records = request.env["res.dashboard.charts"].sudo().search(
+            [
+                ("state", "=", "active"),
+                ("active", "=", True),
+                ("is_visible", "=", True),
+                ("scope", "=", "compliance"),
+            ],
+            order="display_order asc, id asc",
         )
-
-        top_accounts_sql = f"""
-            SELECT rb.id, rb.name, COUNT(rpa.id) AS account_count
-            FROM res_branch rb
-            JOIN res_partner_account rpa ON rb.id = rpa.branch_id
-            {account_where}
-            GROUP BY rb.id, rb.name
-            ORDER BY account_count DESC
-            LIMIT 10
-        """
-
-        high_risk_filters = list(account_filters)
-        high_risk_params = list(account_params)
-        high_risk_filters.append("rp.risk_level = 'high'")
-        high_risk_where = f"WHERE {' AND '.join(high_risk_filters)}" if high_risk_filters else ""
-
-        top_high_risk_sql = f"""
-            SELECT rb.id, rb.name, COUNT(rpa.id) AS high_risk_accounts
-            FROM res_branch rb
-            JOIN res_partner_account rpa ON rb.id = rpa.branch_id
-            JOIN res_partner rp ON rpa.customer_id = rp.id
-            {high_risk_where}
-            GROUP BY rb.id, rb.name
-            ORDER BY high_risk_accounts DESC
-            LIMIT 10
-        """
-
-        top_exceptions_sql = f"""
-            SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
-            FROM res_transaction_screening_rule rtsr
-            JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
-            {tx_where}
-            GROUP BY rtsr.id, rtsr.name
-            ORDER BY hit_count DESC
-            LIMIT 10
-        """
-
-        top_risk_rules_sql = f"""
-            SELECT rcap.id, rcap.name, COUNT(DISTINCT rppl.partner_id) AS partner_count
-            FROM res_compliance_risk_assessment_plan rcap
-            JOIN res_partner_risk_plan_line rppl ON rcap.id = rppl.plan_line_id
-            JOIN res_partner rp ON rp.id = rppl.partner_id
-            {risk_rule_where}
-            GROUP BY rcap.id, rcap.name
-            ORDER BY partner_count DESC, rcap.name ASC
-            LIMIT 10
-        """
-
-        top_accounts = self._execute_dashboard_query(top_accounts_sql, tuple(account_params))
-        top_high_risk = self._execute_dashboard_query(top_high_risk_sql, tuple(high_risk_params))
-        top_exceptions = self._execute_dashboard_query(top_exceptions_sql, tuple(tx_params))
-        top_risk_rules = self._execute_dashboard_query(top_risk_rules_sql, tuple(risk_rule_params))
-
-        account_domain = []
-        account_domain_fallback = []
-        if datepicked in (0, 1, 7, 30):
-            account_domain.extend([
-                ["create_date", ">=", start_at],
-                ["create_date", "<=", end_at],
-            ])
-        if not cco and branches_array:
-            account_domain.append(["branch_id", "in", branches_array])
-            account_domain_fallback.append(["branch_id", "in", branches_array])
-
-        if datepicked in (0, 1, 7, 30) and not top_accounts:
-            top_accounts_sql = f"""
-                SELECT rb.id, rb.name, COUNT(rpa.id) AS account_count
-                FROM res_branch rb
-                JOIN res_partner_account rpa ON rb.id = rpa.branch_id
-                {account_where_fallback}
-                GROUP BY rb.id, rb.name
-                ORDER BY account_count DESC
-                LIMIT 10
-            """
-            top_accounts = self._execute_dashboard_query(
-                top_accounts_sql, tuple(account_params_fallback)
-            )
-            account_domain = list(account_domain_fallback)
-
-        if datepicked in (0, 1, 7, 30) and not top_high_risk:
-            top_high_risk_sql = f"""
-                SELECT rb.id, rb.name, COUNT(rpa.id) AS high_risk_accounts
-                FROM res_branch rb
-                JOIN res_partner_account rpa ON rb.id = rpa.branch_id
-                JOIN res_partner rp ON rpa.customer_id = rp.id
-                {f"{account_where_fallback} {'AND' if account_where_fallback else 'WHERE'} rp.risk_level = 'high'"}
-                GROUP BY rb.id, rb.name
-                ORDER BY high_risk_accounts DESC
-                LIMIT 10
-            """
-            top_high_risk = self._execute_dashboard_query(
-                top_high_risk_sql, tuple(account_params_fallback)
-            )
-            account_domain = list(account_domain_fallback)
-
-        case_statuses = []
-        case_exceptions = []
-
-        if request.env.registry.get("case.manager"):
-            case_filters = []
-            case_params = []
-
-            if datepicked in (0, 1, 7, 30):
-                case_filters.append("cm.create_date BETWEEN %s AND %s")
-                case_params.extend([start_at, end_at])
-
-            if not cco:
-                if not branches_array:
-                    return []
-
-            case_where = f"WHERE {' AND '.join(case_filters)}" if case_filters else ""
-
-            case_status_rows = self._execute_dashboard_query(
-                f"""
-                    SELECT cm.case_status, COUNT(cm.id) AS case_count
-                    FROM case_manager cm
-                    {case_where}
-                    GROUP BY cm.case_status
-                    ORDER BY case_count DESC, cm.case_status ASC
-                """,
-                tuple(case_params),
-            )
-            status_labels = {
-                "draft": "Draft",
-                "open": "Open",
-                "closed": "Closed",
-                "overdue": "Overdue",
-                "archived": "Archived",
-            }
-            case_statuses = [
-                (row[0], status_labels.get(row[0], str(row[0]).title()), row[1])
-                for row in case_status_rows if row and row[0]
-            ]
-
-            case_exception_filters = list(case_filters)
-            case_exception_params = list(case_params)
-            case_exception_filters.append("cm.process IS NOT NULL")
-            case_exception_where = (
-                f"WHERE {' AND '.join(case_exception_filters)}"
-                if case_exception_filters else ""
-            )
-
-            case_exception_sql = f"""
-                SELECT
-                    ep.id,
-                    ep.name,
-                    COUNT(cm.id) AS case_count
-                FROM case_manager cm
-                JOIN exception_process_ ep ON ep.id = cm.process
-                {case_exception_where}
-                GROUP BY ep.id, ep.name
-                ORDER BY case_count DESC, ep.name ASC
-                LIMIT 10
-            """
-
-            case_exceptions = self._execute_dashboard_query(
-                case_exception_sql, tuple(case_exception_params)
-            )
-
-        tx_domain = []
-        if datepicked in (0, 1, 7, 30):
-            tx_domain.extend([
-                ["date_created", ">=", start_at],
-                ["date_created", "<=", end_at],
-            ])
-        if not cco and branches_array:
-            tx_domain.append(["branch_id", "in", branches_array])
-
-        risk_rule_domain = []
-        if datepicked in (0, 1, 7, 30):
-            risk_rule_domain.extend([
-                ["create_date", ">=", start_at],
-                ["create_date", "<=", end_at],
-            ])
-        if not cco and branches_array:
-            risk_rule_domain.append(["partner_id.branch_id", "in", branches_array])
-
-        case_domain = self._build_case_domain(
-            cco, branches_array, start_at, end_at, datepicked
-        )
-
         return [
-            {
-                "id": "top_customer_risk_rules",
-                "title": "Top 10 Customer Risk Rules",
-                "display_summary": self._chart_display_summary(
-                    "top_customer_risk_rules", "Top 10 Customer Risk Rules"
-                ),
-                "type": "line",
-                "labels": [row[1] for row in top_risk_rules],
-                "ids": [row[0] for row in top_risk_rules],
-                "filter": "plan_line_id",
-                "model_name": "res.partner.risk.plan.line",
-                "additional_domain": risk_rule_domain,
-                "datasets": [{
-                    "label": "Partners",
-                    "data": [row[2] for row in top_risk_rules],
-                }],
-            },
-            {
-                "id": "top_accounts",
-                "title": "Top 10 Branch by Accounts Opened",
-                "display_summary": self._chart_display_summary(
-                    "top_accounts", "Top 10 Branch by Accounts Opened"
-                ),
-                "type": "bar",
-                "labels": [row[1] for row in top_accounts],
-                "ids": [row[0] for row in top_accounts],
-                "filter": "branch_id",
-                "model_name": "res.partner.account",
-                "additional_domain": account_domain,
-                "datasets": [{
-                    "label": "Accounts",
-                    "data": [row[2] for row in top_accounts],
-                }],
-            },
-            {
-                "id": "top_high_risk_accounts",
-                "title": "Top 10 High Risk Branch by Accounts",
-                "display_summary": self._chart_display_summary(
-                    "top_high_risk_accounts", "Top 10 High Risk Branch by Accounts"
-                ),
-                "type": "bar",
-                "labels": [row[1] for row in top_high_risk],
-                "ids": [row[0] for row in top_high_risk],
-                "filter": "branch_id",
-                "model_name": "res.partner.account",
-                "additional_domain": account_domain + [["risk_level", "=", "high"]],
-                "datasets": [{
-                    "label": "High Risk Accounts",
-                    "data": [row[2] for row in top_high_risk],
-                }],
-            },
-            {
-                "id": "top_transaction_exceptions",
-                "title": "Top Transaction Exception",
-                "display_summary": self._chart_display_summary(
-                    "top_transaction_exceptions", "Top Transaction Exception"
-                ),
-                "type": "line",
-                "labels": [row[1] for row in top_exceptions],
-                "ids": [row[0] for row in top_exceptions],
-                "filter": "rule_id",
-                "model_name": "res.customer.transaction",
-                "additional_domain": tx_domain,
-                "datasets": [{
-                    "label": "Exceptions",
-                    "data": [row[2] for row in top_exceptions],
-                }],
-            },
-            {
-                "id": "cases_by_status",
-                "title": "Cases by Status",
-                "display_summary": self._chart_display_summary(
-                    "cases_by_status", "Cases by Status"
-                ),
-                "type": "pie",
-                "labels": [row[1] for row in case_statuses],
-                "ids": [row[0] for row in case_statuses],
-                "filter": "case_status",
-                "model_name": "case.manager",
-                "additional_domain": case_domain,
-                "datasets": [{
-                    "label": "Cases",
-                    "data": [row[2] for row in case_statuses],
-                }],
-            },
-            {
-                "id": "cases_by_exceptions",
-                "title": "Cases by Exceptions",
-                "display_summary": self._chart_display_summary(
-                    "cases_by_exceptions", "Cases by Exceptions"
-                ),
-                "type": "pie",
-                "labels": [row[1] for row in case_exceptions],
-                "ids": [row[0] for row in case_exceptions],
-                "filter": "process",
-                "model_name": "case.manager",
-                "additional_domain": case_domain,
-                "datasets": [{
-                    "label": "Cases",
-                    "data": [row[2] for row in case_exceptions],
-                }],
-            },
+            chart_service.get_dashboard_chart_data(
+                chart,
+                cco,
+                branches_array,
+                datepicked=datepicked,
+                start_at=start_at,
+                end_at=end_at,
+            )
+            for chart in chart_records
         ]
 
     @validate_sql_input
