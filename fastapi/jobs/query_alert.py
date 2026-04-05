@@ -1,8 +1,6 @@
 import html
 import logging
-
-import psycopg
-from psycopg.rows import dict_row
+from pathlib import Path
 
 from config.logger import setup_job_logging
 from config.settings import load_settings
@@ -12,6 +10,7 @@ from router.utils import get_postgres_dsn
 
 
 logger = logging.getLogger("app")
+DEFAULT_EMAIL_CSS_PATH = Path(__file__).with_name("styles") / "query_alert.css"
 
 
 def _validate_query(query: str) -> str:
@@ -23,37 +22,91 @@ def _validate_query(query: str) -> str:
     return normalized
 
 
-def _build_email_body(job_id: str,name:str, rows: list[dict], query: str) -> str:
-    row_count = len(rows)
+def _load_email_css_rules() -> str:
+    settings = load_settings(refresh=True)
+    css_path = (settings.alert_email_css_path or "").strip()
+    if css_path:
+        configured_path = Path(css_path)
+        if configured_path.is_file():
+            return configured_path.read_text(encoding="utf-8").strip()
+        logger.warning("Configured alert email CSS file was not found: %s", configured_path)
+
+    if settings.alert_email_css.strip():
+        return settings.alert_email_css.strip()
+
+    return DEFAULT_EMAIL_CSS_PATH.read_text(encoding="utf-8").strip()
+
+
+def _format_column_label(key: object) -> str:
+    return str(key).replace("_", " ").title()
+
+
+def _build_logo_markup() -> str:
+    settings = load_settings(refresh=True)
+    logo_url = (settings.alert_email_logo_url or "").strip()
+    if not logo_url:
+        return ""
+
+    escaped_logo_url = html.escape(logo_url, quote=True)
+    return (
+        "<div class='query-alert__logo-wrap'>"
+        f"<img class='query-alert__logo' src='{escaped_logo_url}' alt='Alert logo'>"
+        "</div>"
+    )
+
+
+def _build_table(rows: list[dict]) -> str:
     header_cells = "".join(
-        f"<th style='text-align:left;padding:5px;border:1px solid #d0d7de'>{html.escape(str(key).replace('_', ' ').title())}</th>"
+        f"<th class='query-alert__header'>{html.escape(_format_column_label(key))}</th>"
         for key in rows[0].keys()
     )
     body_rows = []
     for row in rows:
         cells = "".join(
-            f"<td style='padding:5px;border:1px solid #d0d7de'>{html.escape(str(value))}</td>"
+            f"<td class='query-alert__cell'>{html.escape(str(value))}</td>"
             for value in row.values()
         )
         body_rows.append(f"<tr>{cells}</tr>")
 
-    table = (
-        "<table style='border: 0px solid #ddd !important;font-family:Helvetica,sans-serif;font-size:12px'>"
+    return (
+        "<table class='query-alert__table'>"
         f"<thead><tr>{header_cells}</tr></thead>"
         f"<tbody>{''.join(body_rows)}</tbody>"
         "</table>"
     )
 
+
+def _build_email_body(job_id: str, name: str, rows: list[dict], query: str) -> str:
+    row_count = len(rows)
+    css_rules = _load_email_css_rules()
+    logo = _build_logo_markup()
+    table = _build_table(rows)
+
     return (
-        "<div style='font-family:Helvetica,sans-serif;font-size:12px'>"
-        f"<p><strong>Alert Rule</strong>: <code>{html.escape(name)}</code></p>"
-        f"<p>Alert manager alert query found <strong>{row_count}</strong> record(s).</p>"
+        "<!DOCTYPE html>"
+        "<html>"
+        "<head>"
+        "<meta charset='utf-8'>"
+        "<style>"
+        f"{css_rules}"
+        "</style>"
+        "</head>"
+        "<body>"
+        "<div class='query-alert'>"
+        f"{logo}"
+        f"<p class='query-alert__meta'><strong>Alert Rule</strong>: <code>{html.escape(name)}</code></p>"
+        f"<p class='query-alert__meta'>Alert manager alert query found <strong>{row_count}</strong> record(s).</p>"
         f"{table}"
         "</div>"
+        "</body>"
+        "</html>"
     )
 
 
 def run_database_alert_query(job_id: str) -> None:
+    import psycopg
+    from psycopg.rows import dict_row
+
     setup_job_logging()
     settings = load_settings(refresh=True)
     job = get_alert_job(job_id)

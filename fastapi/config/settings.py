@@ -46,6 +46,9 @@ class Settings(BaseSettings):
     stat_refresh_cron: str = "*/5 * * * *"
     stat_refresh_job_id: str = "compliance-stat-refresh"
     alert_email_subject: str = "Database alert records found"
+    alert_email_css: str = ""
+    alert_email_css_path: str = ""
+    alert_email_logo_url: str = ""
 
     mail_server: str = ""
     mail_port: int = 587
