@@ -1,5 +1,10 @@
 from odoo import models, fields, api
 
+TRANSACTION_TYPE_SELECTION = [
+    ('debit', 'Debit'),
+    ('credit', 'Credit'),
+]
+
 
 class BankTransaction(models.Model):
     _name = 'bank.transaction'
@@ -8,7 +13,7 @@ class BankTransaction(models.Model):
 
     # Transaction Details
     transaction_number = fields.Char(
-        string='Transaction Number', required=True)
+        string='Transaction Number', required=True, index=True)
     name = fields.Char(string='Transaction Name',
                        required=True, related='transaction_number')
     internal_ref_number = fields.Char(
@@ -24,6 +29,11 @@ class BankTransaction(models.Model):
     authorized = fields.Char(string='Authorized By')
     late_deposit = fields.Boolean(string='Late Deposit', default=False)
     transmode_code = fields.Char(string='Transaction Mode Code', index=True)
+    tran_type = fields.Selection(
+        TRANSACTION_TYPE_SELECTION,
+        string='Transaction Type',
+        index=True,
+    )
 
     # Amount
     amount_local = fields.Float(

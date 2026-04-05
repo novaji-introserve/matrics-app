@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="owl.InterbankDashboard" owl="1">
+        <div class="ib-dashboard-shell">
+            <section class="ib-dashboard-hero">
+                <div>
+                    <span class="ib-dashboard-hero__eyebrow">Inter-Bank Transactions</span>
+                    <h1 class="ib-dashboard-hero__title">Operations Dashboard</h1>
+                    <p class="ib-dashboard-hero__subtitle">
+                        Monitor transaction flow by account type and currency across the selected reporting window.
+                    </p>
+                </div>
+                <div class="ib-dashboard-controls">
+                    <label class="ib-dashboard-filter">
+                        <span>Period</span>
+                        <select class="form-select" t-att-value="state.datepicked" t-on-change="onDateChange">
+                            <option value="0">Today</option>
+                            <option value="1">Yesterday</option>
+                            <option value="7">Last 7 days</option>
+                            <option value="30">Last 1 month</option>
+                        </select>
+                    </label>
+                    <label class="ib-dashboard-filter">
+                        <span>Refresh</span>
+                        <select class="form-select" t-att-value="state.refreshRate" t-on-change="onRefreshRateChange">
+                            <option value="1">1 minute</option>
+                            <option value="5">5 minutes</option>
+                            <option value="30">30 minutes</option>
+                            <option value="60">60 minutes</option>
+                        </select>
+                    </label>
+                </div>
+            </section>
+
+            <section class="ib-dashboard-meta">
+                <div class="ib-dashboard-meta__card">
+                    <span class="ib-dashboard-meta__label">Window</span>
+                    <strong t-esc="currentPeriodLabel" />
+                </div>
+                <div class="ib-dashboard-meta__card">
+                    <span class="ib-dashboard-meta__label">Updated</span>
+                    <strong t-esc="formattedUpdatedAt" />
+                </div>
+                <div class="ib-dashboard-meta__card">
+                    <span class="ib-dashboard-meta__label">Charts</span>
+                    <strong t-esc="state.charts.length" />
+                </div>
+            </section>
+
+            <section class="ib-dashboard-stats">
+                <t t-foreach="state.stats" t-as="stat" t-key="stat.id">
+                    <article
+                        class="cm-kpi-card"
+                        t-att-style="'--cm-kpi-accent: ' + stat.accent"
+                    >
+                        <div class="cm-kpi-card__badge">
+                            <t t-out="stat.label.slice(0, 2).toUpperCase()" />
+                        </div>
+                        <div class="cm-kpi-card__value">
+                            <t t-out="formatStatValue(stat)" />
+                        </div>
+                        <div class="cm-kpi-card__label">
+                            <t t-out="stat.label" />
+                        </div>
+                        <div class="cm-kpi-card__summary">
+                            <t t-out="currentPeriodLabel" />
+                        </div>
+                        <div class="cm-kpi-card__scope">
+                            <t t-out="'Inter-Bank'" />
+                        </div>
+                    </article>
+                </t>
+            </section>
+
+            <section class="ib-dashboard-grid">
+                <t t-if="state.loading">
+                    <div class="ib-dashboard-panel ib-dashboard-panel--loading cm-dashboard-panel">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </t>
+                <t t-else="">
+                    <t t-foreach="state.charts" t-as="chart" t-key="chart.id">
+                        <article class="ib-dashboard-panel cm-dashboard-panel">
+                            <div class="ib-dashboard-panel__header">
+                                <div>
+                                    <h2 t-esc="chart.title" />
+                                    <p t-esc="chart.display_summary" />
+                                </div>
+                            </div>
+                            <div class="ib-dashboard-panel__body cm-dashboard-panel__body chart shadow-0 bg-transparent">
+                                <InterbankChart data="chart" />
+                            </div>
+                        </article>
+                    </t>
+                </t>
+            </section>
+        </div>
+    </t>
+</templates>

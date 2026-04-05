@@ -10,6 +10,8 @@ access_nfiu_currency_threshold_user,nfiu.currency.threshold,model_nfiu_currency_
 access_nfiu_suspicious_transaction_hist_user,nfiu.suspicious.transaction.hist,model_nfiu_suspicious_transaction_hist,regulatory_reports.group_regulatory_report,1,1,1,1
 access_nfiu_export_wizard,nfiu.export.wizard,model_nfiu_export_wizard,regulatory_reports.group_regulatory_report,1,1,1,1
 access_bank_transaction_user,bank.transaction.user,model_bank_transaction,regulatory_reports.group_regulatory_report,1,1,1,1
+access_bank_institution_user,bank.institution.user,model_bank_institution,regulatory_reports.group_regulatory_report,1,1,1,1
+access_bank_account_type_user,bank.account.type.user,model_bank_account_type,regulatory_reports.group_regulatory_report,1,1,1,1
 access_bank_account_user,bank.account.user,model_bank_account,regulatory_reports.group_regulatory_report,1,1,1,1
 access_bank_person_user,bank.person.user,model_bank_person,regulatory_reports.group_regulatory_report,1,1,1,1
 access_account_signatory_user,account.signatory.user,model_account_signatory,regulatory_reports.group_regulatory_report,1,1,1,1

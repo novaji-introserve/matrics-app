@@ -61,6 +61,12 @@
         sequence="10" />
 
     <!-- Sub Menus -->
+    <menuitem id="menu_bank_dashboard"
+        name="Dashboard"
+        parent="menu_bank_transactions_main"
+        action="action_interbank_dashboard"
+        sequence="5" />
+
     <menuitem id="menu_bank_transactions"
         name="Transactions"
         parent="menu_bank_transactions_main"
@@ -78,6 +84,23 @@
         parent="menu_bank_transactions_main"
         action="action_bank_person"
         sequence="30" />
+
+    <menuitem id="menu_bank_configuration"
+        name="Configuration"
+        parent="menu_bank_transactions_main"
+        sequence="40" />
+
+    <menuitem id="menu_bank_institutions"
+        name="Bank Institutions"
+        parent="menu_bank_configuration"
+        action="action_bank_institution"
+        sequence="10" />
+
+    <menuitem id="menu_bank_account_types"
+        name="Account Types"
+        parent="menu_bank_configuration"
+        action="action_bank_account_type"
+        sequence="20" />
 
     </data>
 </odoo>

@@ -7,9 +7,10 @@
         <field name="name">bank.transaction.tree</field>
         <field name="model">bank.transaction</field>
         <field name="arch" type="xml">
-            <tree string="Bank Transactions">
+            <tree string="Bank Transactions" create="false" edit="false" delete="false">
                 <field name="transaction_number" />
                 <field name="date_transaction" />
+                <field name="tran_type" />
                 <field name="amount_local" />
                 <field name="currency_code" />
                 <field name="from_account_id" />
@@ -24,7 +25,7 @@
         <field name="name">bank.transaction.form</field>
         <field name="model">bank.transaction</field>
         <field name="arch" type="xml">
-            <form string="Bank Transaction">
+            <form string="Bank Transaction" create="false" edit="false" delete="false">
                 <header>
                     <button name="action_view_from_account" string="View From Account" type="object"
                         class="btn-primary" />
@@ -32,27 +33,34 @@
                         class="btn-primary" />
                 </header>
                 <sheet>
-                    <group>
-                        <group name="transaction_info">
+                    <div class="oe_title">
+                        <label for="transaction_number" class="oe_edit_only" />
+                        <h1>
+                            <field name="transaction_number" readonly="1" />
+                        </h1>
+                    </div>
+                    <group string="Transaction Overview" col="4">
+                        <group>
                             <field name="transaction_number" />
                             <field name="internal_ref_number" />
                             <field name="transaction_location" />
                             <field name="date_transaction" />
                             <field name="value_date" />
                         </group>
-                        <group name="amount_info">
+                        <group>
                             <field name="amount_local" />
+                            <field name="tran_type" />
                             <field name="currency_code" />
                             <field name="transmode_code" />
                             <field name="late_deposit" />
                         </group>
                     </group>
-                    <group>
-                        <group name="system_info">
+                    <group string="Operational Details" col="4">
+                        <group>
                             <field name="teller" />
                             <field name="authorized" />
                         </group>
-                        <group name="location_info">
+                        <group>
                             <field name="from_country" />
                             <field name="to_country" />
                             <field name="from_funds_code" />
@@ -61,17 +69,20 @@
                     </group>
                     <notebook>
                         <page string="Account Information">
-                            <group>
-                                <group name="from_account">
+                            <group string="Account Routing" col="4">
+                                <group>
                                     <field name="from_account_id" />
                                 </group>
-                                <group name="to_account">
+                                <group>
                                     <field name="to_account_id" />
                                 </group>
                             </group>
                         </page>
                         <page string="Description">
-                            <field name="transaction_description" nolabel="1" />
+                            <group string="Transaction Narrative">
+                                <field name="transaction_description" nolabel="1"
+                                    style="max-width: 920px; width: 100%;" />
+                            </group>
                         </page>
                     </notebook>
                 </sheet>
@@ -79,19 +90,149 @@
         </field>
     </record>
 
+    <!-- Bank Transaction Search View -->
+    <record id="view_bank_transaction_search" model="ir.ui.view">
+        <field name="name">bank.transaction.search</field>
+        <field name="model">bank.transaction</field>
+        <field name="arch" type="xml">
+            <search string="Search Bank Transactions">
+                <field name="transaction_number" />
+                <field name="tran_type" />
+                <field name="currency_code" />
+                <filter
+                    name="filter_today"
+                    string="Today"
+                    domain="[
+                        ('date_transaction', '&gt;=', context_today().strftime('%%Y-%%m-%%d 00:00:00')),
+                        ('date_transaction', '&lt;=', context_today().strftime('%%Y-%%m-%%d 23:59:59'))
+                    ]"
+                />
+                <filter
+                    name="filter_last_7_days"
+                    string="Last 7 Days"
+                    domain="[
+                        ('date_transaction', '&gt;=', (context_today() - relativedelta(days=6)).strftime('%%Y-%%m-%%d 00:00:00')),
+                        ('date_transaction', '&lt;=', context_today().strftime('%%Y-%%m-%%d 23:59:59'))
+                    ]"
+                />
+                <filter
+                    name="filter_last_1_month"
+                    string="Last 1 Month"
+                    domain="[
+                        ('date_transaction', '&gt;=', (context_today() - relativedelta(months=1) + relativedelta(days=1)).strftime('%%Y-%%m-%%d 00:00:00')),
+                        ('date_transaction', '&lt;=', context_today().strftime('%%Y-%%m-%%d 23:59:59'))
+                    ]"
+                />
+                <filter
+                    name="filter_credit"
+                    string="Credit"
+                    domain="[('tran_type', '=', 'credit')]"
+                />
+                <filter
+                    name="filter_debit"
+                    string="Debit"
+                    domain="[('tran_type', '=', 'debit')]"
+                />
+                <group string="Group By">
+                    <filter
+                        name="group_by_currency_code"
+                        string="Currency"
+                        context="{'group_by': 'currency_code'}"
+                    />
+                    <filter
+                        name="group_by_tran_type"
+                        string="Transaction Type"
+                        context="{'group_by': 'tran_type'}"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
     <!-- BANK ACCOUNT VIEWS -->
+
+    <!-- Bank Institution Tree View -->
+    <record id="view_bank_institution_tree" model="ir.ui.view">
+        <field name="name">bank.institution.tree</field>
+        <field name="model">bank.institution</field>
+        <field name="arch" type="xml">
+            <tree string="Bank Institutions">
+                <field name="name" />
+                <field name="inst_code" />
+                <field name="swift_code" />
+                <field name="non_bank_institution" />
+            </tree>
+        </field>
+    </record>
+
+    <!-- Bank Institution Form View -->
+    <record id="view_bank_institution_form" model="ir.ui.view">
+        <field name="name">bank.institution.form</field>
+        <field name="model">bank.institution</field>
+        <field name="arch" type="xml">
+            <form string="Bank Institution">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" placeholder="Institution Name" />
+                        </h1>
+                    </div>
+                    <group string="Institution Details" col="4">
+                        <group>
+                            <field name="inst_code" />
+                            <field name="swift_code" />
+                        </group>
+                        <group>
+                            <field name="non_bank_institution" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Bank Account Type Tree View -->
+    <record id="view_bank_account_type_tree" model="ir.ui.view">
+        <field name="name">bank.account.type.tree</field>
+        <field name="model">bank.account.type</field>
+        <field name="arch" type="xml">
+            <tree string="Bank Account Types">
+                <field name="name" />
+            </tree>
+        </field>
+    </record>
+
+    <!-- Bank Account Type Form View -->
+    <record id="view_bank_account_type_form" model="ir.ui.view">
+        <field name="name">bank.account.type.form</field>
+        <field name="model">bank.account.type</field>
+        <field name="arch" type="xml">
+            <form string="Bank Account Type">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" placeholder="Account Type" />
+                        </h1>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
 
     <!-- Bank Account Tree View -->
     <record id="view_bank_account_tree" model="ir.ui.view">
         <field name="name">bank.account.tree</field>
         <field name="model">bank.account</field>
         <field name="arch" type="xml">
-            <tree string="Bank Accounts">
+            <tree string="Bank Accounts" create="false" edit="false" delete="false">
                 <field name="account_number" />
                 <field name="account_name" />
-                <field name="institution_name" />
+                <field name="institution_id" />
+                <field name="personal_account_type" />
+                <field name="currency_id" />
                 <field name="balance" />
-                <field name="currency_code" />
                 <field name="status_code" />
             </tree>
         </field>
@@ -102,36 +243,46 @@
         <field name="name">bank.account.form</field>
         <field name="model">bank.account</field>
         <field name="arch" type="xml">
-            <form string="Bank Account">
+            <form string="Bank Account" create="false" edit="false" delete="false">
                 <sheet>
-                    <group>
-                        <group name="account_info">
+                    <div class="oe_title">
+                        <label for="account_name" class="oe_edit_only" />
+                        <h1>
+                            <field name="account_name" readonly="1" />
+                        </h1>
+                    </div>
+                    <group string="Account Profile" col="4">
+                        <group>
                             <field name="account_number" />
                             <field name="account_name" />
                             <field name="beneficiary" />
                             <field name="client_number" />
                             <field name="personal_account_type" />
                         </group>
-                        <group name="financial_info">
+                        <group>
                             <field name="balance" />
-                            <field name="currency_code" />
+                            <field name="currency_id" />
+                            <field name="currency_code" readonly="1" />
                             <field name="opened" />
                             <field name="status_code" />
                         </group>
                     </group>
-                    <group>
-                        <group name="institution_info">
-                            <field name="institution_name" />
-                            <field name="institution_code" />
-                            <field name="swift_code" />
+                    <group string="Institution Details" col="4">
+                        <group>
+                            <field name="institution_id" />
+                            <field name="institution_name" readonly="1" />
+                            <field name="institution_code" readonly="1" />
+                            <field name="swift_code" readonly="1" />
+                        </group>
+                        <group>
                             <field name="branch" />
-                            <field name="non_bank_institution" />
+                            <field name="non_bank_institution" readonly="1" />
                         </group>
                     </group>
                     <notebook>
                         <page string="Signatories">
                             <field name="signatory_ids">
-                                <tree>
+                                <tree create="false" edit="false" delete="false">
                                     <field name="person_id" />
                                     <field name="is_primary" />
                                 </tree>
@@ -139,7 +290,7 @@
                         </page>
                         <page string="Incoming Transactions">
                             <field name="incoming_transactions">
-                                <tree>
+                                <tree create="false" edit="false" delete="false">
                                     <field name="transaction_number" />
                                     <field name="date_transaction" />
                                     <field name="amount_local" />
@@ -149,7 +300,7 @@
                         </page>
                         <page string="Outgoing Transactions">
                             <field name="outgoing_transactions">
-                                <tree>
+                                <tree create="false" edit="false" delete="false">
                                     <field name="transaction_number" />
                                     <field name="date_transaction" />
                                     <field name="amount_local" />
@@ -163,6 +314,43 @@
         </field>
     </record>
 
+    <!-- Bank Account Search View -->
+    <record id="view_bank_account_search" model="ir.ui.view">
+        <field name="name">bank.account.search</field>
+        <field name="model">bank.account</field>
+        <field name="arch" type="xml">
+            <search string="Search Bank Accounts">
+                <field name="account_number" />
+                <field name="institution_id" />
+                <field name="personal_account_type" />
+                <field name="currency_id" />
+                <field name="status_code" />
+                <group string="Group By">
+                    <filter
+                        name="group_by_institution_id"
+                        string="Institution"
+                        context="{'group_by': 'institution_id'}"
+                    />
+                    <filter
+                        name="group_by_personal_account_type"
+                        string="Account Type"
+                        context="{'group_by': 'personal_account_type'}"
+                    />
+                    <filter
+                        name="group_by_currency_id"
+                        string="Currency"
+                        context="{'group_by': 'currency_id'}"
+                    />
+                    <filter
+                        name="group_by_status_code"
+                        string="Status"
+                        context="{'group_by': 'status_code'}"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
     <!-- BANK PERSON VIEWS -->
 
     <!-- Bank Person Tree View -->
@@ -170,7 +358,7 @@
         <field name="name">bank.person.tree</field>
         <field name="model">bank.person</field>
         <field name="arch" type="xml">
-            <tree string="Bank Persons">
+            <tree string="Bank Persons" create="false" edit="false" delete="false">
                 <field name="full_name" />
                 <field name="title" />
                 <field name="gender" />
@@ -186,10 +374,16 @@
         <field name="name">bank.person.form</field>
         <field name="model">bank.person</field>
         <field name="arch" type="xml">
-            <form string="Bank Person">
+            <form string="Bank Person" create="false" edit="false" delete="false">
                 <sheet>
-                    <group>
-                        <group name="personal_info">
+                    <div class="oe_title">
+                        <label for="full_name" class="oe_edit_only" />
+                        <h1>
+                            <field name="full_name" readonly="1" />
+                        </h1>
+                    </div>
+                    <group string="Personal Profile" col="4">
+                        <group>
                             <field name="title" />
                             <field name="first_name" />
                             <field name="last_name" />
@@ -197,52 +391,67 @@
                             <field name="gender" />
                             <field name="birthdate" />
                         </group>
-                        <group name="nationality_info">
+                        <group>
                             <field name="nationality1" />
                             <field name="nationality2" />
                             <field name="residence" />
                         </group>
                     </group>
-                    <group>
-                        <group name="professional_info">
+                    <group string="Professional and Tax Details" col="4">
+                        <group>
                             <field name="occupation" />
                             <field name="source_of_wealth" />
                         </group>
-                        <group name="tax_info">
+                        <group>
                             <field name="tax_number" />
                             <field name="tax_reg_number" />
                         </group>
                     </group>
                     <notebook>
                         <page string="Contact Information">
-                            <group>
-                                <group name="phones">
+                            <group col="1">
                                     <field name="phone_ids" nolabel="1">
-                                        <tree editable="bottom">
+                                        <tree create="false" edit="false" delete="false">
+                                            <field name="full_number" optional="hide" />
+                                            <field name="phone_number" string="Phone Number" />
+                                            <field name="country_prefix" string="Prefix" />
                                             <field name="contact_type" />
-                                            <field name="communication_type" />
-                                            <field name="country_prefix" />
-                                            <field name="phone_number" />
-                                            <field name="full_number" />
                                         </tree>
                                     </field>
-                                </group>
-                                <group name="addresses">
-                                    <field name="address_ids" nolabel="1">
-                                        <tree>
-                                            <field name="address_type" />
-                                            <field name="address" />
+                                    <field name="address_ids" nolabel="1" mode="tree,form">
+                                        <tree create="false" edit="false" delete="false">
                                             <field name="city" />
-                                            <field name="state" />
-                                            <field name="country_code" />
+                                            <field name="state" string="State / Province" />
+                                            <field name="country_code" optional="hide" />
                                         </tree>
+                                        <form string="Person Address" create="false" edit="false" delete="false">
+                                            <sheet>
+                                                <group col="4">
+                                                    <group>
+                                                        <field name="country_code" />
+                                                        <field name="postal_code" />
+                                                    </group>
+                                                </group>
+                                                <group col="1">
+                                                    <field name="address" nolabel="1"
+                                                        style="max-width: 960px; width: 100%;" />
+                                                </group>
+                                                <group col="4">
+                                                    <group>
+                                                        <field name="city" />
+                                                    </group>
+                                                    <group>
+                                                        <field name="state" />
+                                                    </group>
+                                                </group>
+                                            </sheet>
+                                        </form>
                                     </field>
-                                </group>
                             </group>
                         </page>
                         <page string="Identification">
                             <field name="identification_ids">
-                                <tree editable="bottom">
+                                <tree create="false" edit="false" delete="false">
                                     <field name="identification_type" />
                                     <field name="number" />
                                     <field name="issue_date" />
@@ -254,7 +463,7 @@
                         </page>
                         <page string="Account Signatories">
                             <field name="signatory_ids">
-                                <tree>
+                                <tree create="false" edit="false" delete="false">
                                     <field name="account_id" />
                                     <field name="is_primary" />
                                 </tree>
@@ -274,6 +483,8 @@
         <field name="res_model">bank.transaction</field>
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="view_bank_transaction_tree" />
+        <field name="search_view_id" ref="view_bank_transaction_search" />
+        <field name="context">{'search_default_filter_today': 1, 'search_default_group_by_currency_code': 1, 'group_by': 'currency_code'}</field>
     </record>
 
     <!-- Bank Account Action -->
@@ -282,8 +493,25 @@
         <field name="res_model">bank.account</field>
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="view_bank_account_tree" />
-        <field name="context">{}</field>
+        <field name="search_view_id" ref="view_bank_account_search" />
+        <field name="context">{'search_default_group_by_personal_account_type': 1, 'group_by': 'personal_account_type'}</field>
         <field name="domain">[]</field>
+    </record>
+
+    <!-- Bank Institution Action -->
+    <record id="action_bank_institution" model="ir.actions.act_window">
+        <field name="name">Bank Institutions</field>
+        <field name="res_model">bank.institution</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_bank_institution_tree" />
+    </record>
+
+    <!-- Bank Account Type Action -->
+    <record id="action_bank_account_type" model="ir.actions.act_window">
+        <field name="name">Bank Account Types</field>
+        <field name="res_model">bank.account.type</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_bank_account_type_tree" />
     </record>
 
     <!-- Bank Person Action -->

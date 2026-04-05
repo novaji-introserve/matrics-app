@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="res_resource_uri_bank_transaction" model="res.resource.uri">
+            <field name="name">Bank Transaction</field>
+            <field name="model_uri">bank.transaction</field>
+        </record>
+
+        <record id="res_resource_uri_bank_account" model="res.resource.uri">
+            <field name="name">Bank Account</field>
+            <field name="model_uri">bank.account</field>
+        </record>
+
+        <record id="interbank_stat_total_transactions" model="res.compliance.stat">
+            <field name="name">Transactions</field>
+            <field name="code">interbank_total_transactions</field>
+            <field name="display_order">1</field>
+            <field name="is_visible" eval="True"/>
+            <field name="resource_id" ref="nfiu_reporting.res_resource_uri_bank_transaction"/>
+            <field name="domain">[]</field>
+            <field name="scope">interbank</field>
+            <field name="scope_color">#0f766e</field>
+            <field name="display_summary">Total inter-bank transactions currently loaded.</field>
+            <field name="sql_query">SELECT COUNT(id) FROM bank_transaction</field>
+        </record>
+
+        <record id="interbank_stat_total_value" model="res.compliance.stat">
+            <field name="name">Total Value</field>
+            <field name="code">interbank_total_value</field>
+            <field name="display_order">2</field>
+            <field name="is_visible" eval="True"/>
+            <field name="resource_id" ref="nfiu_reporting.res_resource_uri_bank_transaction"/>
+            <field name="domain">[]</field>
+            <field name="scope">interbank</field>
+            <field name="scope_color">#1d4ed8</field>
+            <field name="display_summary">Absolute monetary value across all inter-bank transactions.</field>
+            <field name="sql_query">SELECT COALESCE(ROUND(SUM(ABS(amount_local))::numeric, 2), 0) FROM bank_transaction</field>
+        </record>
+
+        <record id="interbank_stat_source_accounts" model="res.compliance.stat">
+            <field name="name">Source Accounts</field>
+            <field name="code">interbank_source_accounts</field>
+            <field name="display_order">3</field>
+            <field name="is_visible" eval="True"/>
+            <field name="resource_id" ref="nfiu_reporting.res_resource_uri_bank_account"/>
+            <field name="domain">[]</field>
+            <field name="scope">interbank</field>
+            <field name="scope_color">#c2410c</field>
+            <field name="display_summary">Distinct source accounts represented in transaction history.</field>
+            <field name="sql_query">SELECT COUNT(DISTINCT from_account_id) FROM bank_transaction WHERE from_account_id IS NOT NULL</field>
+        </record>
+
+        <record id="interbank_stat_institutions" model="res.compliance.stat">
+            <field name="name">Institutions</field>
+            <field name="code">interbank_institutions</field>
+            <field name="display_order">4</field>
+            <field name="is_visible" eval="True"/>
+            <field name="resource_id" ref="nfiu_reporting.res_resource_uri_bank_account"/>
+            <field name="domain">[]</field>
+            <field name="scope">interbank</field>
+            <field name="scope_color">#7c3aed</field>
+            <field name="display_summary">Distinct institutions linked to originator accounts.</field>
+            <field name="sql_query">SELECT COUNT(DISTINCT ba.institution_id) FROM bank_transaction bt JOIN bank_account ba ON ba.id = bt.from_account_id WHERE ba.institution_id IS NOT NULL</field>
+        </record>
+
+        <record id="interbank_stat_currencies" model="res.compliance.stat">
+            <field name="name">Currencies</field>
+            <field name="code">interbank_currencies</field>
+            <field name="display_order">5</field>
+            <field name="is_visible" eval="True"/>
+            <field name="resource_id" ref="nfiu_reporting.res_resource_uri_bank_transaction"/>
+            <field name="domain">[]</field>
+            <field name="scope">interbank</field>
+            <field name="scope_color">#be123c</field>
+            <field name="display_summary">Currencies present in the loaded inter-bank transactions.</field>
+            <field name="sql_query">SELECT COUNT(DISTINCT currency_code) FROM bank_transaction WHERE currency_code IS NOT NULL</field>
+        </record>
+
+        <record id="interbank_chart_transactions_by_account_type" model="res.dashboard.charts">
+            <field name="name">Transactions by Account Type</field>
+            <field name="code">interbank_transactions_by_account_type</field>
+            <field name="description">Inter-bank transactions grouped by source account type.</field>
+            <field name="display_summary">Source account types with the highest transaction volume in the selected period.</field>
+            <field name="display_order">1</field>
+            <field name="scope">interbank</field>
+            <field name="is_visible" eval="True"/>
+            <field name="refresh_mode">live</field>
+            <field name="chart_type">bar</field>
+            <field name="query">
+                SELECT
+                    COALESCE(bat.name, 'Unspecified') AS account_type,
+                    COUNT(bt.id) AS transaction_count
+                FROM bank_transaction bt
+                LEFT JOIN bank_account ba ON ba.id = bt.from_account_id
+                LEFT JOIN bank_account_type bat ON bat.id = ba.personal_account_type
+                GROUP BY COALESCE(bat.name, 'Unspecified')
+                ORDER BY transaction_count DESC, account_type ASC
+                LIMIT 10
+            </field>
+            <field name="color_scheme">brown</field>
+            <field name="x_axis_field">account_type</field>
+            <field name="y_axis_field">transaction_count</field>
+            <field name="branch_filter" eval="False"/>
+            <field name="date_filter" eval="True"/>
+            <field name="date_field">bt.date_transaction</field>
+            <field name="column">6</field>
+            <field name="state">active</field>
+            <field name="navigation_domain">[]</field>
+            <field name="apply_dashboard_date_filter" eval="True"/>
+            <field name="navigation_date_field">date_transaction</field>
+            <field name="target_model_id" ref="model_bank_transaction"/>
+        </record>
+
+        <record id="interbank_chart_transactions_by_currency" model="res.dashboard.charts">
+            <field name="name">Transactions by Currency</field>
+            <field name="code">interbank_transactions_by_currency</field>
+            <field name="description">Inter-bank transactions grouped by transaction currency.</field>
+            <field name="display_summary">Transaction currency distribution for the selected period.</field>
+            <field name="display_order">2</field>
+            <field name="scope">interbank</field>
+            <field name="is_visible" eval="True"/>
+            <field name="refresh_mode">live</field>
+            <field name="chart_type">bar</field>
+            <field name="query">
+                SELECT
+                    COALESCE(bt.currency_code, 'Unspecified') AS currency_code,
+                    COUNT(bt.id) AS transaction_count
+                FROM bank_transaction bt
+                GROUP BY COALESCE(bt.currency_code, 'Unspecified')
+                ORDER BY transaction_count DESC, currency_code ASC
+                LIMIT 10
+            </field>
+            <field name="color_scheme">cool</field>
+            <field name="x_axis_field">currency_code</field>
+            <field name="y_axis_field">transaction_count</field>
+            <field name="navigation_value_field">currency_code</field>
+            <field name="branch_filter" eval="False"/>
+            <field name="date_filter" eval="True"/>
+            <field name="date_field">bt.date_transaction</field>
+            <field name="column">6</field>
+            <field name="state">active</field>
+            <field name="navigation_filter_field">currency_code</field>
+            <field name="navigation_domain">[]</field>
+            <field name="apply_dashboard_date_filter" eval="True"/>
+            <field name="navigation_date_field">date_transaction</field>
+            <field name="target_model_id" ref="model_bank_transaction"/>
+        </record>
+    </data>
+</odoo>

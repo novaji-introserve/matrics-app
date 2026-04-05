@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="owl.InterbankChart" owl="1">
+        <div class="chart-container position-relative" style="width: 100%; height: 15vh; min-height: 120px;">
+            <t t-if="state.error">
+                <div class="ib-chart__empty" t-esc="state.error" />
+            </t>
+            <t t-elif="!props.data or !props.data.labels or !props.data.labels.length">
+                <div class="ib-chart__empty">No data available for the selected period.</div>
+            </t>
+            <t t-else="">
+                <canvas t-ref="chart" class="ib-chart__canvas" />
+            </t>
+        </div>
+    </t>
+</templates>

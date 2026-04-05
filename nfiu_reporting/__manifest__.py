@@ -21,7 +21,7 @@
     # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'Uncategorized',
-    'version': '0.1',
+    'version': '0.2',
 
     # any module necessary for this one to work correctly
     'depends': ['base','compliance_management','regulatory_reports','hr','case_management'],
@@ -29,6 +29,9 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+        'data/bank_account_type_data.xml',
+        'data/interbank_dashboard_data.xml',
+        'views/interbank_dashboard.xml',
         'views/nfiu_person_views.xml',
         'views/nfiu_entity_views.xml',
         'views/nfiu_entity_director_views.xml',
@@ -46,5 +49,14 @@
     'demo': [
         'demo/demo.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'nfiu_reporting/static/src/components/interbank_dashboard/chart/js/chart.js',
+            'nfiu_reporting/static/src/components/interbank_dashboard/chart/xml/chart.xml',
+            'nfiu_reporting/static/src/components/interbank_dashboard/dashboard/js/dashboard.js',
+            'nfiu_reporting/static/src/components/interbank_dashboard/dashboard/xml/dashboard.xml',
+            'nfiu_reporting/static/src/components/interbank_dashboard/dashboard/css/dashboard.css',
+        ],
+    },
     'license': 'LGPL-3',
 }

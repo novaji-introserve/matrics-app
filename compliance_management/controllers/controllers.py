@@ -91,6 +91,21 @@ class Compliance(http.Controller):
             datepicked = 7
         return datepicked if datepicked in (0, 1, 7, 30) else 7
 
+    def _normalize_dashboard_scope(self, dashboard_scope, default=None):
+        allowed_scopes = {
+            "alert",
+            "bank",
+            "branch",
+            "case",
+            "compliance",
+            "interbank",
+            "regulatory",
+            "risk",
+        }
+        if dashboard_scope in allowed_scopes:
+            return dashboard_scope
+        return default
+
     def _dashboard_date_range(self, datepicked):
         today = datetime.now().date()
         if datepicked == 0:
@@ -157,18 +172,23 @@ class Compliance(http.Controller):
         return charts.sorted(lambda chart: (chart.display_order, chart.id))
 
     @http.route("/dashboard/focused_charts", auth="user", type="json")
-    def focused_charts(self, cco=False, branches_id=None, datepicked=7, **kw):
+    def focused_charts(self, cco=False, branches_id=None, datepicked=7, dashboard_scope=None, **kw):
         try:
             sanitized_data = self.security_service.validate_and_sanitize_request_data({
                 'cco': cco,
                 'branches_id': branches_id,
                 'datepicked': datepicked,
+                'dashboard_scope': dashboard_scope,
                 **kw
             })
             cco = sanitized_data.get('cco', cco)
             branches_id = sanitized_data.get('branches_id', branches_id)
             datepicked = self._normalize_dashboard_period(
                 sanitized_data.get('datepicked', datepicked)
+            )
+            dashboard_scope = self._normalize_dashboard_scope(
+                sanitized_data.get('dashboard_scope', dashboard_scope),
+                default="compliance",
             )
         except Exception as e:
             self.security_service.log_security_event(
@@ -190,16 +210,16 @@ class Compliance(http.Controller):
                 ("state", "=", "active"),
                 ("active", "=", True),
                 ("is_visible", "=", True),
-                ("scope", "=", "compliance"),
+                ("scope", "=", dashboard_scope),
             ],
             order="display_order asc, id asc",
         )
-        if not chart_records:
+        if not chart_records and dashboard_scope == "compliance":
             chart_records = request.env["res.dashboard.charts"].sudo().search(
                 [("state", "=", "active")],
                 order="display_order asc, id asc",
             )
-        if not chart_records:
+        if not chart_records and dashboard_scope == "compliance":
             chart_records = self._get_default_compliance_chart_records()
         results = [
             chart._get_dashboard_chart_payload(
@@ -332,7 +352,7 @@ class Compliance(http.Controller):
 
     @log_access
     @http.route("/dashboard/stats", auth="public", type="json")
-    def getAllstats(self, cco, branches_id, datepicked, **kw):
+    def getAllstats(self, cco, branches_id, datepicked, dashboard_scope=None, **kw):
         # Validate all input parameters
         try:
             # Sanitize and validate input parameters
@@ -340,12 +360,16 @@ class Compliance(http.Controller):
                 'cco': cco,
                 'branches_id': branches_id,
                 'datepicked': datepicked,
+                'dashboard_scope': dashboard_scope,
                 **kw
             })
             cco = sanitized_data.get('cco', cco)
             branches_id = sanitized_data.get('branches_id', branches_id)
             datepicked = self._normalize_dashboard_period(
                 sanitized_data.get('datepicked', datepicked)
+            )
+            dashboard_scope = self._normalize_dashboard_scope(
+                sanitized_data.get('dashboard_scope', dashboard_scope)
             )
         except Exception as e:
             self.security_service.log_security_event(
@@ -384,8 +408,13 @@ class Compliance(http.Controller):
         cache_key = f"all_stats_v2_{cco_str}_{branches_str}_{datepicked_str}_{unique_id}"
         _logger.info(f"This is the stats cache key: {cache_key}")
 
+        stat_domain = [("state", "=", "active"), ("is_visible", "=", True)]
+        if dashboard_scope:
+            stat_domain.append(("scope", "=", dashboard_scope))
+        else:
+            stat_domain.append(("scope", "in", self.DASHBOARD_SCOPES))
         stat_records = request.env["res.compliance.stat"].sudo().search(
-            [("state", "=", "active"), ("is_visible", "=", True), ("scope", "in", self.DASHBOARD_SCOPES)],
+            stat_domain,
             order="display_order asc, id asc",
         )
 
@@ -393,7 +422,11 @@ class Compliance(http.Controller):
             {
                 "name": stat.name,
                 "scope": stat.scope,
-                "val": stat.val or 0,
+                "val": (
+                    stat.val
+                    if stat.val not in (False, None, "")
+                    else stat._compute_current_value(stat)
+                ) or 0,
                 "id": stat.id,
                 "scope_color": stat.scope_color,
                 "query": stat.sql_query,
