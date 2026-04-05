@@ -193,3 +193,4 @@ pymysql
 oracledb
 scikit-learn
 setuptools==80.9.0
+redis

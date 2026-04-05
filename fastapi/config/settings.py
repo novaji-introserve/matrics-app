@@ -43,6 +43,8 @@ class Settings(BaseSettings):
     rq_queue_name: str = "alerts"
     rq_scheduler_poll_interval_seconds: int = 5
     alert_jobs_sync_interval_seconds: int = 10
+    stat_refresh_cron: str = "*/5 * * * *"
+    stat_refresh_job_id: str = "compliance-stat-refresh"
     alert_email_subject: str = "Database alert records found"
 
     mail_server: str = ""

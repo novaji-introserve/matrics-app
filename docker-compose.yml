@@ -47,6 +47,7 @@ services:
       - odoo-net
     depends_on:
       - db
+      - redis
       - pgbouncer
     ports:
       - "10016:8069"
