@@ -73,6 +73,22 @@ def group_accounts_by_currency(accounts):
 
 
 def choose_accounts(accounts_by_currency):
+    weighted_currency_pool = []
+    if accounts_by_currency.get("NGN") and len(accounts_by_currency["NGN"]) >= 2:
+        weighted_currency_pool.extend(["NGN"] * 65)
+
+    for currency_code, accounts in accounts_by_currency.items():
+        if currency_code == "NGN" or len(accounts) < 2:
+            continue
+        weighted_currency_pool.extend([currency_code] * 12)
+
+    if weighted_currency_pool:
+        currency_code = random.choice(weighted_currency_pool)
+        source_account, destination_account = random.sample(
+            accounts_by_currency[currency_code], 2
+        )
+        return source_account, destination_account, currency_code
+
     eligible_currencies = [
         currency_code
         for currency_code, accounts in accounts_by_currency.items()
