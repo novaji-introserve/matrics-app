@@ -28,6 +28,8 @@
                 <form string="Dynamic Chart">
                     <header>
                         <button name="action_test_query" string="Test Query" type="object" class="btn-primary"/>
+                        <button name="action_refresh_dashboard_cache" string="Refresh Cache" type="object" class="btn-secondary"
+                                attrs="{'invisible': [('refresh_mode', '=', 'live')]}"/>
                         <button name="action_refresh_materialized_view" string="Refresh View" type="object" 
                                 class="btn-secondary" attrs="{'invisible': [('use_materialized_view', '=', False)]}"/>
                         <field name="state" widget="statusbar" options="{'clickable':'1'}" />
@@ -43,6 +45,8 @@
                                 <field name="scope"/>
                                 <field name="display_order"/>
                                 <field name="is_visible"/>
+                                <field name="refresh_mode"/>
+                                <field name="cache_ttl_minutes" attrs="{'invisible': [('refresh_mode', '=', 'live')]}"/>
                                 <field name="color_scheme"/>
                                 <field name="display_summary"/>
                                 <field name="description"/>
@@ -91,6 +95,13 @@
                                     <field name="navigation_date_field" attrs="{'required': [('apply_dashboard_date_filter', '=', True)]}"/>
                                     <field name="apply_dashboard_branch_filter"/>
                                     <field name="navigation_branch_field" attrs="{'required': [('apply_dashboard_branch_filter', '=', True)]}"/>
+                                </group>
+                            </page>
+                            <page string="Cache">
+                                <group>
+                                    <field name="cache_computed_at" readonly="1"/>
+                                    <field name="cache_expires_at" readonly="1"/>
+                                    <field name="cached_payload" readonly="1" widget="text"/>
                                 </group>
                             </page>
                             <page string="Advanced Settings" groups="base.group_system">

@@ -3,7 +3,7 @@ from odoo.exceptions import ValidationError
 import xml.etree.ElementTree as ET
 from lxml import etree
 import base64
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 
 
 THRESHOLD_AMT = 10000000
@@ -37,6 +37,19 @@ class NFIUReport(models.Model):
         ('UTR', 'Unusual Transaction Report'),
     ], string='Report Code', required=True,tracking=True)
     
+    report_type = fields.Selection([
+        ('CTR', 'CTR - Currency Transaction Report'),
+        ('FTR', 'FTR - Foreign Currency Transaction Report'),
+        ('STR','STR - Suspicious Transaction Report'),
+        ('UTR', 'UTR - Unusual Transaction Report'),
+        ('AIF', 'Additional Information File'),
+        ('EFT', 'Electronic/Express Funds Transfer (EFT)'),
+        ('IFT', 'International Funds Transfer'),
+        ('LRFI', 'Local Request For Information'),
+        ('M', 'Manual'),
+        ('SAR', 'Suspicious Activity Report'),
+    ], string='Report Type', required=True, tracking=True, compute='_compute_report_type', store=True, precompute=True)
+    
     entity_reference = fields.Char(string='Entity Reference',related='entity_id.entity_reference', size=255,tracking=True)
     fiu_ref_number = fields.Char(string='FIU Reference Number',related='entity_id.fiu_reference', size=255,tracking=True)
     submission_date = fields.Datetime(string='Submission Date', required=True, default=fields.Datetime.now)
@@ -55,7 +68,7 @@ class NFIUReport(models.Model):
     # Reporting person details
     reporting_person_id = fields.Many2one('nfiu.person', string='Reporting Person', required=True,tracking=True)
     location_id = fields.Many2one('nfiu.address', string='Location',tracking=True,required=True)
-        
+    transaction_cnt = fields.Integer(string='Transaction Count', compute='_compute_transaction_count', store=True)
     # Report indicators
     indicator_ids = fields.Many2many('nfiu.indicator', string='Report Indicators',required=True,tracking=True)
     
@@ -83,6 +96,41 @@ class NFIUReport(models.Model):
             vals['name'] = self.env['ir.sequence'].next_by_code('nfiu.report') or '/'
         return super(NFIUReport, self).create(vals)
     
+    @api.depends('report_code', 'currency_code_local', 'entity_id.local_currency.currency_id.name')
+    def _compute_report_type(self):
+        for report in self:
+            if not report.report_code:
+                report.report_type = False
+            elif report.report_code == 'CTR':
+                entity_currency_name = report.entity_id.local_currency.currency_id.name
+                report.report_type = report.report_code
+                if (
+                    report.currency_code_local
+                    and entity_currency_name
+                    and report.currency_code_local.upper() != entity_currency_name.upper()
+                ):
+                    report.report_type = "FTR"
+            else:
+                report.report_type = report.report_code
+                    
+
+    @api.depends('currency_code_local', 'date_from', 'date_to')
+    def _compute_transaction_count(self):
+        transaction_model = self.env['res.customer.transaction']
+
+        for report in self:
+            report.transaction_cnt = 0
+            if not report.currency_code_local or not report.date_from or not report.date_to:
+                continue
+
+            filters = report.get_report_filters()
+            if not filters:
+                continue
+
+            report.transaction_cnt = transaction_model.search_count(
+                filters
+            )
+    
     def set_draft(self):
         self.ensure_one()
         self.write({'state':'draft'})
@@ -90,6 +138,18 @@ class NFIUReport(models.Model):
     def set_generated(self):
         self.ensure_one()
         self.write({'state':'generated'})
+
+    def action_download_report(self):
+        self.ensure_one()
+        if not self.xml_file:
+            raise ValidationError(_("No XML file is available for download."))
+
+        filename = self.xml_filename or f"{self.name or 'nfiu_report'}.xml"
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{self._name}/{self.id}/xml_file/{filename}?download=true',
+            'target': 'self',
+        }
 
     def get_reporting_location(self):
         """Determine the reporting location based on the entity's addresses"""
@@ -117,7 +177,19 @@ class NFIUReport(models.Model):
 
     def _build_report_name(self):
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-        return f"{self.entity_id.name.strip().replace(' ', '_').upper()}_{self.report_code}_{self.name.strip().replace(' ', '_').upper()}_{timestamp}"
+        return f"{self.entity_id.commercial_name.strip().replace(' ', '_').upper()}_{self.report_type}_{self.name.strip().replace(' ', '_').upper()}_{timestamp}"
+
+    def _get_transaction_date_domain(self):
+        self.ensure_one()
+        if not self.date_from or not self.date_to:
+            return []
+
+        start_dt = datetime.combine(self.date_from, time.min)
+        end_dt = datetime.combine(self.date_to, time.max)
+        return [
+            ('date_created', '>=', fields.Datetime.to_string(start_dt)),
+            ('date_created', '<=', fields.Datetime.to_string(end_dt)),
+        ]
 
     def generate_xml(self):
         """Generate XML content according to goAML schema"""
@@ -155,26 +227,9 @@ class NFIUReport(models.Model):
             ET.SubElement(root, 'reason').text = self.reason
         if self.action:
             ET.SubElement(root, 'action').text = self.action
-        currencies= self.env['res.currency'].search([('name', '=', self.currency_code_local)], limit=1)
-        for c in currencies:
-            currency_id = c.id
-        # Add transactions
-        # We need to add threshold transactions based on the report criteria (date range, currency, etc.) 
-        threshold = self.env['nfiu.currency.threshold'].search([('currency_id', '=', currency_id)], limit=1)
-        threshold_amount = threshold.threshold if threshold else THRESHOLD_AMT
-        # Debit transactions are reportable below threshold; credit transactions above threshold.
-        transactions = self.env['res.customer.transaction'].search([
-            ('currency_id', '=', currency_id),
-            ('date_created', '>=', self.date_from),
-            ('date_created', '<=', self.date_to),
-            '|',
-            '&',
-            ('transaction_type', '=', 'D'),
-            ('amount', '<', threshold_amount),
-            '&',
-            ('transaction_type', '=', 'C'),
-            ('amount', '>', threshold_amount),
-        ])
+        filters = self.get_report_filters()
+        transactions = self.env['res.customer.transaction'].search(filters)
+        self.transaction_cnt = len(transactions)
         for transaction in transactions:
             trans_elem = ET.SubElement(root, 'transaction')
             self._add_transaction_xml(trans_elem, transaction)
@@ -197,7 +252,42 @@ class NFIUReport(models.Model):
         
         return True
 
+    def get_report_filters(self):
+        """
+        Build the transaction search domain for this report.
 
+        The base domain always includes the selected date range and currency.
+        CTR/FTR add threshold rules for signed amounts:
+        - debit transactions must be below -threshold_amount
+        - credit transactions must be above threshold_amount
+        STR adds the suspicious transaction flags and does not use threshold rules.
+        All other report types use only the base date-range and currency filters.
+        """
+        self.ensure_one()
+
+        currency = self.env['res.currency'].search([('name', '=', self.currency_code_local)], limit=1)
+        if not currency:
+            return []
+        filters = self._get_transaction_date_domain() + [('currency_id', '=', currency.id)]
+        threshold = self.env['nfiu.currency.threshold'].search([('currency_id', '=', currency.id)], limit=1)
+        threshold_amount = threshold.threshold if threshold else THRESHOLD_AMT
+        report_kind = self.report_type
+        if report_kind in ('CTR', 'FTR'):
+            filters += [
+                '|',
+                '&',
+                ('transaction_type', '=', 'D'),
+                ('amount', '<', threshold_amount * -1),
+                '&',
+                ('transaction_type', '=', 'C'),
+                ('amount', '>', threshold_amount),
+            ]
+        elif report_kind == 'STR':
+            filters += [
+                ('report_nfiu', '=', True),
+                ('suspicious_transaction', '=', True),
+            ]
+        return filters
 # Additional methods for automatic report generation
     def action_create_from_transactions(self):
         """Create NFIU report from existing res.customer.transaction transactions"""
@@ -289,7 +379,8 @@ class NFIUReport(models.Model):
         if not person:
             return
         # Add basic person details   
-        ET.SubElement(parent, 'gender').text = self._sanitize_text(person.gender or '-', 1, 'Reporting person gender')
+        reporting_gender = person.gender or getattr(self.entity_id, 'gender', False) or '-'
+        ET.SubElement(parent, 'gender').text = self._sanitize_text(reporting_gender, 1, 'Reporting person gender')
         if person.title:
             self._add_text_element(parent, 'title', person.title, 30, 'Reporting person title')
         self._add_text_element(parent, 'first_name', person.first_name, 100, 'Reporting person first name', required=True)

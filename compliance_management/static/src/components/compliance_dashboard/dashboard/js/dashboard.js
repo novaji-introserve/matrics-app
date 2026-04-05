@@ -86,6 +86,7 @@ export class ComplianceDashboard extends Component {
     onWillStart(async () => {
       try {
         this._hideGlobalLoadingIndicator();
+        this._loadPeriodPreference();
         this._loadRefreshPreference();
         await this.getCurrentUser();
         this._loadDataProgressively();
@@ -208,6 +209,19 @@ export class ComplianceDashboard extends Component {
     }
   }
 
+  _loadPeriodPreference() {
+    try {
+      const savedPeriod = Number(
+        window.localStorage.getItem("compliance_dashboard_period")
+      );
+      if ([0, 1, 7, 30].includes(savedPeriod)) {
+        this.state.datepicked = savedPeriod;
+      }
+    } catch (error) {
+      logDebug("Could not load period preference:", error);
+    }
+  }
+
   _saveRefreshPreference() {
     try {
       window.localStorage.setItem(
@@ -216,6 +230,17 @@ export class ComplianceDashboard extends Component {
       );
     } catch (error) {
       logDebug("Could not save refresh preference:", error);
+    }
+  }
+
+  _savePeriodPreference() {
+    try {
+      window.localStorage.setItem(
+        "compliance_dashboard_period",
+        String(this.state.datepicked)
+      );
+    } catch (error) {
+      logDebug("Could not save period preference:", error);
     }
   }
 
@@ -553,11 +578,20 @@ export class ComplianceDashboard extends Component {
       this.state.chartError = null;
 
       logDebug('Fetching focused charts from server');
-      const result = await this.rpc(`/dashboard/focused_charts`, {
+      let result = await this.rpc(`/dashboard/focused_charts`, {
         cco: this.state.cco,
         branches_id: this.state.branches_id,
         datepicked: Number(this.state.datepicked),
       });
+
+      if (!Array.isArray(result) || result.length === 0) {
+        logDebug('Focused charts returned no data, falling back to legacy charts endpoint');
+        result = await this.rpc(`/dashboard/dynamic_charts/`, {
+          cco: this.state.cco,
+          branches_id: this.state.branches_id,
+          datepicked: Number(this.state.datepicked),
+        });
+      }
       
       if (result && this._validateChartData(result)) {
         logDebug('Got valid chart data:', result);
@@ -631,6 +665,7 @@ export class ComplianceDashboard extends Component {
 
   async onDateChange(ev) {
     this.state.datepicked = Number(ev.target.value);
+    this._savePeriodPreference();
     await this.filterByDate(true);
   }
 

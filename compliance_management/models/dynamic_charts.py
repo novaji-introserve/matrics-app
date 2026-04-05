@@ -3,6 +3,7 @@
 from odoo import models, fields, api
 from odoo import exceptions
 import ast
+import json
 import psycopg2
 import re
 import logging
@@ -36,6 +37,25 @@ class ResCharts(models.Model):
     display_summary = fields.Text("Display Summary")
     display_order = fields.Integer("Display Order", default=1, tracking=True)
     is_visible = fields.Boolean("Is Visible", default=False, tracking=True)
+    refresh_mode = fields.Selection(
+        [
+            ("live", "Live"),
+            ("scheduled", "Scheduled Cache"),
+            ("manual", "Manual Cache"),
+        ],
+        string="Refresh Mode",
+        default="live",
+        tracking=True,
+    )
+    cache_ttl_minutes = fields.Integer(
+        string="Cache TTL (Minutes)",
+        default=60,
+        tracking=True,
+        help="How long the cached chart payload is considered fresh.",
+    )
+    cached_payload = fields.Text(string="Cached Payload", readonly=True, copy=False)
+    cache_computed_at = fields.Datetime(string="Cache Computed At", readonly=True, copy=False)
+    cache_expires_at = fields.Datetime(string="Cache Expires At", readonly=True, copy=False)
     scope = fields.Selection(
         [
             ("alert", "Alert Management"),
@@ -213,112 +233,8 @@ class ResCharts(models.Model):
 
     def init(self):
         super().init()
-        chart_backfill = {
-            "demo_chart_top10_branch_by_customer": {
-                "code": "top_accounts",
-                "display_order": 1,
-                "is_visible": True,
-                "scope": "compliance",
-                "display_summary": "Branches with the highest account-opening volume in the selected period.",
-                "navigation_filter_field": "branch_id",
-                "navigation_value_field": "branch_id",
-                "navigation_domain": "[]",
-                "apply_dashboard_date_filter": True,
-                "navigation_date_field": "create_date",
-                "apply_dashboard_branch_filter": True,
-                "navigation_branch_field": "branch_id",
-                "date_filter": True,
-            },
-            "demo_chart_top10_high_risk_branch": {
-                "code": "top_high_risk_accounts",
-                "display_order": 2,
-                "is_visible": True,
-                "scope": "compliance",
-                "display_summary": "Branches with the highest concentration of high-risk accounts in the selected period.",
-                "navigation_filter_field": "branch_id",
-                "navigation_value_field": "branch_id",
-                "navigation_domain": "[('risk_level', '=', 'high')]",
-                "apply_dashboard_date_filter": True,
-                "navigation_date_field": "create_date",
-                "apply_dashboard_branch_filter": True,
-                "navigation_branch_field": "branch_id",
-                "date_filter": True,
-            },
-            "demo_chart_top10_screened_transaction": {
-                "code": "top_transaction_exceptions",
-                "display_order": 4,
-                "is_visible": True,
-                "scope": "compliance",
-                "display_summary": "Most-triggered exception rules in the selected period.",
-                "navigation_filter_field": "rule_id",
-                "navigation_value_field": "rule_id",
-                "navigation_domain": "[]",
-                "apply_dashboard_date_filter": True,
-                "navigation_date_field": "date_created",
-                "apply_dashboard_branch_filter": True,
-                "navigation_branch_field": "branch_id",
-                "date_filter": True,
-            },
-            "demo_chart_top_customer_risk_rules": {
-                "code": "top_customer_risk_rules",
-                "display_order": 3,
-                "is_visible": True,
-                "scope": "compliance",
-                "display_summary": "Risk analysis rules affecting the highest number of partners in the selected period.",
-                "navigation_filter_field": "plan_line_id",
-                "navigation_value_field": "risk_rule_id",
-                "navigation_domain": "[]",
-                "apply_dashboard_date_filter": True,
-                "navigation_date_field": "create_date",
-                "apply_dashboard_branch_filter": True,
-                "navigation_branch_field": "partner_id.branch_id",
-                "date_filter": True,
-            },
-            "demo_chart_cases_by_status": {
-                "code": "cases_by_status",
-                "display_order": 5,
-                "is_visible": True,
-                "scope": "compliance",
-                "display_summary": "Current case distribution by lifecycle stage for the selected period.",
-                "navigation_filter_field": "case_status",
-                "navigation_value_field": "case_status",
-                "navigation_domain": "[]",
-                "apply_dashboard_date_filter": True,
-                "navigation_date_field": "create_date",
-                "apply_dashboard_branch_filter": False,
-                "navigation_branch_field": False,
-                "date_filter": True,
-            },
-            "demo_chart_cases_by_exceptions": {
-                "code": "cases_by_exceptions",
-                "display_order": 6,
-                "is_visible": True,
-                "scope": "compliance",
-                "display_summary": "Cases grouped by linked exception process in the selected period.",
-                "navigation_filter_field": "process",
-                "navigation_value_field": "process_id",
-                "navigation_domain": "[]",
-                "apply_dashboard_date_filter": True,
-                "navigation_date_field": "create_date",
-                "apply_dashboard_branch_filter": False,
-                "navigation_branch_field": False,
-                "date_filter": True,
-            },
-        }
-        for xml_id, values in chart_backfill.items():
-            assignments = ", ".join(f"{field} = %s" for field in values)
-            params = list(values.values()) + [xml_id]
-            self.env.cr.execute(
-                f"""
-                UPDATE res_dashboard_charts chart
-                SET {assignments}
-                FROM ir_model_data imd
-                WHERE imd.module = 'compliance_management'
-                  AND imd.name = %s
-                  AND chart.id = imd.res_id
-                """,
-                params,
-            )
+        # Do not rewrite dashboard chart records on registry init or module upgrade.
+        # Chart configuration should remain user-editable after installation.
 
     def _parse_navigation_domain(self):
         self.ensure_one()
@@ -362,6 +278,165 @@ class ResCharts(models.Model):
         ):
             domain.append([self.navigation_branch_field, "in", branches_id])
         return domain
+
+    def _cache_payload_key(self, *, cco=False, branches_id=None, datepicked=7):
+        normalized_branches = ",".join(
+            str(branch_id) for branch_id in sorted(set(branches_id or []))
+        )
+        return f"cco={int(bool(cco))}|period={int(datepicked)}|branches={normalized_branches}"
+
+    def _read_cached_payload(self, *, cco=False, branches_id=None, datepicked=7):
+        self.ensure_one()
+        if not self.cached_payload:
+            return None
+        try:
+            cached_payloads = json.loads(self.cached_payload)
+        except (TypeError, ValueError):
+            _logger.warning("Invalid cached payload for chart %s (%s)", self.name, self.code)
+            return None
+        if not isinstance(cached_payloads, dict):
+            return None
+        cache_key = self._cache_payload_key(
+            cco=cco, branches_id=branches_id, datepicked=datepicked
+        )
+        cache_entry = cached_payloads.get(cache_key)
+        if not isinstance(cache_entry, dict):
+            return None
+        return cache_entry.get("payload")
+
+    def _store_cached_payload(self, payload, *, cco=False, branches_id=None, datepicked=7):
+        self.ensure_one()
+        now = fields.Datetime.now()
+        ttl_minutes = max(int(self.cache_ttl_minutes or 60), 1)
+        try:
+            cached_payloads = json.loads(self.cached_payload) if self.cached_payload else {}
+        except (TypeError, ValueError):
+            cached_payloads = {}
+        if not isinstance(cached_payloads, dict):
+            cached_payloads = {}
+        cache_key = self._cache_payload_key(
+            cco=cco, branches_id=branches_id, datepicked=datepicked
+        )
+        cached_payloads[cache_key] = {
+            "payload": payload,
+            "computed_at": fields.Datetime.to_string(now),
+            "expires_at": fields.Datetime.to_string(
+                fields.Datetime.add(now, minutes=ttl_minutes)
+            ),
+        }
+        self.write(
+            {
+                "cached_payload": json.dumps(cached_payloads),
+                "cache_computed_at": now,
+                "cache_expires_at": fields.Datetime.add(now, minutes=ttl_minutes),
+            }
+        )
+
+    def _get_dashboard_chart_payload(
+        self, chart_service, *, cco=False, branches_id=None, datepicked=7, start_at=None, end_at=None
+    ):
+        self.ensure_one()
+        branches_id = branches_id or []
+        if self.refresh_mode == "live":
+            return chart_service.get_dashboard_chart_data(
+                self,
+                cco,
+                branches_id,
+                datepicked=datepicked,
+                start_at=start_at,
+                end_at=end_at,
+            )
+
+        cached_payload = self._read_cached_payload(
+            cco=cco, branches_id=branches_id, datepicked=datepicked
+        )
+        if cached_payload:
+            return cached_payload
+
+        payload = chart_service.get_dashboard_chart_data(
+            self,
+            cco,
+            branches_id,
+            datepicked=datepicked,
+            start_at=start_at,
+            end_at=end_at,
+        )
+        self._store_cached_payload(
+            payload, cco=cco, branches_id=branches_id, datepicked=datepicked
+        )
+        return payload
+
+    @api.model
+    def refresh_dashboard_chart_payloads(self, limit=None):
+        search_kwargs = {"order": "display_order asc, id asc"}
+        if limit:
+            search_kwargs["limit"] = int(limit)
+        charts = self.sudo().search(
+            [
+                ("state", "=", "active"),
+                ("active", "=", True),
+                ("is_visible", "=", True),
+                ("scope", "=", "compliance"),
+                ("refresh_mode", "in", ["scheduled", "manual"]),
+            ],
+            **search_kwargs,
+        )
+        if not charts:
+            return True
+
+        from ..services.chart_data_service import ChartDataService
+
+        payload_service = ChartDataService(self.env)
+        for chart in charts:
+            for period in (0, 1, 7, 30):
+                try:
+                    payload = payload_service.get_dashboard_chart_data(
+                        chart,
+                        cco=True,
+                        branches_id=[],
+                        datepicked=period,
+                        start_at=None,
+                        end_at=None,
+                    )
+                    chart._store_cached_payload(
+                        payload, cco=True, branches_id=[], datepicked=period
+                    )
+                except Exception as exc:
+                    _logger.warning(
+                        "Failed to refresh cached payload for chart %s (%s) period=%s: %s",
+                        chart.name,
+                        chart.code,
+                        period,
+                        exc,
+                    )
+        return True
+
+    def action_refresh_dashboard_cache(self):
+        from ..services.chart_data_service import ChartDataService
+
+        payload_service = ChartDataService(self.env)
+        for chart in self:
+            payload = payload_service.get_dashboard_chart_data(
+                chart,
+                cco=True,
+                branches_id=[],
+                datepicked=30,
+                start_at=None,
+                end_at=None,
+            )
+            chart._store_cached_payload(
+                payload, cco=True, branches_id=[], datepicked=30
+            )
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "title": "Success",
+                "message": "Chart cache refreshed successfully.",
+                "type": "success",
+                "sticky": False,
+            },
+        }
 
     def _validate_sql_query_structure(self, parsed_query):
         """Validate the structure of a parsed SQL query to prevent injection attacks.

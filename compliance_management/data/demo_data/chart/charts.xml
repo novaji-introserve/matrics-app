@@ -8,6 +8,8 @@
             <field name="display_order">1</field>
             <field name="scope">compliance</field>
             <field name="is_visible" eval="True"/>
+            <field name="refresh_mode">scheduled</field>
+            <field name="cache_ttl_minutes">60</field>
             <field name="chart_type">bar</field>
             <field name="query">
                 SELECT rb.id AS branch_id, rb.name, COUNT(rpa.id) AS account_count
@@ -46,6 +48,8 @@
             <field name="display_order">2</field>
             <field name="scope">compliance</field>
             <field name="is_visible" eval="True"/>
+            <field name="refresh_mode">scheduled</field>
+            <field name="cache_ttl_minutes">60</field>
             <field name="chart_type">bar</field>
             <field name="query">
                 SELECT rb.id AS branch_id, rb.name AS name, COUNT(rpa.id) AS high_risk_accounts
@@ -86,6 +90,8 @@
             <field name="display_order">3</field>
             <field name="scope">compliance</field>
             <field name="is_visible" eval="True"/>
+            <field name="refresh_mode">scheduled</field>
+            <field name="cache_ttl_minutes">60</field>
             <field name="chart_type">line</field>
             <field name="query">
                 SELECT rcap.id AS risk_rule_id, rcap.name AS name, COUNT(DISTINCT rppl.partner_id) AS partner_count
@@ -123,6 +129,8 @@
             <field name="display_order">4</field>
             <field name="scope">compliance</field>
             <field name="is_visible" eval="True"/>
+            <field name="refresh_mode">scheduled</field>
+            <field name="cache_ttl_minutes">60</field>
             <field name="chart_type">line</field>
             <field name="query">
                 SELECT rtsr.id AS rule_id, rtsr.name AS name, COUNT(rct.id) AS hit_count
@@ -159,6 +167,8 @@
             <field name="display_order">5</field>
             <field name="scope">compliance</field>
             <field name="is_visible" eval="True"/>
+            <field name="refresh_mode">scheduled</field>
+            <field name="cache_ttl_minutes">60</field>
             <field name="chart_type">pie</field>
             <field name="query">
                 SELECT cm.case_status, COUNT(cm.id) AS case_count
@@ -190,6 +200,8 @@
             <field name="display_order">6</field>
             <field name="scope">compliance</field>
             <field name="is_visible" eval="True"/>
+            <field name="refresh_mode">scheduled</field>
+            <field name="cache_ttl_minutes">60</field>
             <field name="chart_type">pie</field>
             <field name="query">
                 SELECT ep.id AS process_id, ep.name AS name, COUNT(cm.id) AS case_count

@@ -37,6 +37,22 @@ class DynamicChartController(http.Controller):
         self.normalize_cache_key_components = normalize_cache_key_components
         self.debug_mode = True
 
+    def _get_default_compliance_chart_records(self):
+        chart_xmlids = [
+            "compliance_management.demo_chart_top10_branch_by_customer",
+            "compliance_management.demo_chart_top10_high_risk_branch",
+            "compliance_management.demo_chart_top_customer_risk_rules",
+            "compliance_management.demo_chart_top10_screened_transaction",
+            "compliance_management.demo_chart_cases_by_status",
+            "compliance_management.demo_chart_cases_by_exceptions",
+        ]
+        charts = request.env["res.dashboard.charts"].sudo().browse()
+        for xmlid in chart_xmlids:
+            chart = request.env.ref(xmlid, raise_if_not_found=False)
+            if chart:
+                charts |= chart
+        return charts.sorted(lambda chart: (chart.display_order, chart.id))
+
     @http.route("/web/dynamic_charts/preview", type="json", auth="user")
     def preview_chart(
         self,
@@ -593,6 +609,8 @@ class DynamicChartController(http.Controller):
                 return cache_data
                 
             charts = request.env["res.dashboard.charts"].search([("state", "=", "active")])
+            if not charts:
+                charts = self._get_default_compliance_chart_records()
             results = []
             
             chart_data_service = ChartDataService(request.env)

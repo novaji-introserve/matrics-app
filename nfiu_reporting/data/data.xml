@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <odoo>
-    <data noupdate="0">
+    <data noupdate="1">
         <!-- XSD Schema Attachment -->
         <record id="nfiu_schema_attachment" model="ir.attachment">
             <field name="name">NFIU XSD Schema</field>

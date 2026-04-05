@@ -57,7 +57,7 @@
              <!-- Main Menu -->
     <menuitem id="menu_bank_transactions_main"
         name="Inter-Bank Transactions"
-        web_icon="nfiu_reporting,static/description/naira.png"
+        web_icon="nfiu_reporting,static/description/transfer.png"
         sequence="10" />
 
     <!-- Sub Menus -->

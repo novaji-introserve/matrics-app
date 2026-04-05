@@ -140,6 +140,22 @@ class Compliance(http.Controller):
         )
         return [row[0] for row in rows if row and row[0]]
 
+    def _get_default_compliance_chart_records(self):
+        chart_xmlids = [
+            "compliance_management.demo_chart_top10_branch_by_customer",
+            "compliance_management.demo_chart_top10_high_risk_branch",
+            "compliance_management.demo_chart_top_customer_risk_rules",
+            "compliance_management.demo_chart_top10_screened_transaction",
+            "compliance_management.demo_chart_cases_by_status",
+            "compliance_management.demo_chart_cases_by_exceptions",
+        ]
+        charts = request.env["res.dashboard.charts"].sudo().browse()
+        for xmlid in chart_xmlids:
+            chart = request.env.ref(xmlid, raise_if_not_found=False)
+            if chart:
+                charts |= chart
+        return charts.sorted(lambda chart: (chart.display_order, chart.id))
+
     @http.route("/dashboard/focused_charts", auth="user", type="json")
     def focused_charts(self, cco=False, branches_id=None, datepicked=7, **kw):
         try:
@@ -168,8 +184,6 @@ class Compliance(http.Controller):
 
         branches_array = self.check_branches_id(branches_id) if branches_id else []
         start_at, end_at = self._dashboard_date_range(datepicked)
-        if not cco and not branches_array:
-            return []
         chart_service = ChartDataService(request.env)
         chart_records = request.env["res.dashboard.charts"].sudo().search(
             [
@@ -180,17 +194,35 @@ class Compliance(http.Controller):
             ],
             order="display_order asc, id asc",
         )
-        return [
-            chart_service.get_dashboard_chart_data(
-                chart,
-                cco,
-                branches_array,
+        if not chart_records:
+            chart_records = request.env["res.dashboard.charts"].sudo().search(
+                [("state", "=", "active")],
+                order="display_order asc, id asc",
+            )
+        if not chart_records:
+            chart_records = self._get_default_compliance_chart_records()
+        results = [
+            chart._get_dashboard_chart_payload(
+                chart_service,
+                cco=cco,
+                branches_id=branches_array,
                 datepicked=datepicked,
                 start_at=start_at,
                 end_at=end_at,
             )
             for chart in chart_records
         ]
+        if results:
+            return results
+
+        from .charts import DynamicChartController
+
+        return DynamicChartController().get_chart_data(
+            cco=cco,
+            branches_id=branches_array,
+            datepicked=datepicked,
+            **kw,
+        )
 
     @validate_sql_input
     @log_access

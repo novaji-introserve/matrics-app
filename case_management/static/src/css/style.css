@@ -151,7 +151,7 @@
 }
 
 .case-kpi-card__value {
-    font-size: 30px;
+    font-size: 24px;
     font-weight: 700;
     line-height: 1;
     color: var(--case-text);
@@ -159,7 +159,7 @@
 
 .case-kpi-card__label {
     margin-top: 10px;
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 600;
     color: #334155;
 }

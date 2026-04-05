@@ -17,6 +17,20 @@
             <field name="nextcall" eval="(datetime.now() + timedelta(minutes=10)).strftime('%Y-%m-%d %H:%M:%S')"/>
         </record>
 
+        <record id="ir_cron_refresh_dashboard_chart_payload_cache" model="ir.cron">
+            <field name="name">Refresh Dashboard Chart Payload Cache</field>
+            <field name="model_id" ref="model_res_dashboard_charts"/>
+            <field name="state">code</field>
+            <field name="code">model.refresh_dashboard_chart_payloads()</field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">30</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="active" eval="False"/>
+            <field name="nextcall" eval="(datetime.now() + timedelta(minutes=15)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        </record>
+
 
         <record id="ir_cron_refresh_digital_mat_view" model="ir.cron">
             <field name="name">Refresh Digital Products Materialized View</field>

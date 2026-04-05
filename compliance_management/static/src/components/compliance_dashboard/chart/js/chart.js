@@ -82,7 +82,19 @@ export class ChartRenderer extends Component {
 
     useEffect(
       () => {
-        if (!this.state.isLibraryLoading && this.props.data && !this.chartInstance) {
+        if (this.state.isLibraryLoading || !this.props.data) {
+          return;
+        }
+
+        this.clearAllAnimationTimeouts();
+        this.destroyChart();
+        this.state.error = null;
+        this.state.emptyChart = false;
+        this.state.loadedElements = 0;
+        this.state.totalElements = 0;
+        this.state.isAnimating = false;
+
+        if (this.chartRef.el) {
           this.initializeChart();
         }
       },
