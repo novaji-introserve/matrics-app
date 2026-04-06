@@ -744,6 +744,8 @@
 
     <!-- Sub menu for Accounts under Configuration -->
     <menuitem id="menu_accounts" name="Accounts" parent="menu_compliance_configuration" sequence="80" />
+    <menuitem id="menu_ledgers" name="Ledgers" parent="menu_accounts" action="action_res_ledger" sequence="5" />
+    <menuitem id="menu_ledger_types" name="Ledger Types" parent="menu_accounts" action="action_res_ledger_type" sequence="10" />
 
     <!-- Sub menu for Risk Management under Configuration -->
     <menuitem id="menu_risk_assessment" name="Risk Management" parent="menu_compliance_configuration" sequence="100" />

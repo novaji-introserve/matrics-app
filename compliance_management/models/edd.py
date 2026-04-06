@@ -550,7 +550,7 @@ class CustomerEDD(models.Model):
 
             # Create alert history record
             alert_history = self.env['alert.history'].sudo().create({
-                "ref_id": f"{self._name},{self.id}",
+                "ref_id": self._name,
                 'html_body': rendered_html,
                 'attachment_data': None,
                 'attachment_link': None,

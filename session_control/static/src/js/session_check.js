@@ -56,7 +56,7 @@ odoo.define("session_control.SessionCheck", function (require) {
       if (activeTabId !== myTabId) {
         showLogoutDialog(
           "Session Terminated",
-          "You have opened iComply in a new tab or window. This session will be closed."
+          "You have opened MATRICS in a new tab or window. This session will be closed."
         );
         return;
       }

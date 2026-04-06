@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'iComply ETL Manager',
+    'name': 'MATRICS ETL Manager',
     'version': '2.0',
-    'category': 'icomply',
+    'category': 'MATRICS',
     'summary': 'Enterprise-grade ETL solution for seamless data integration across databases',
     'description': """
-iComply ETL Manager
+ MATRICS ETL Manager
 ==================
 A powerful Extract, Transform, Load (ETL) solution for Odoo that enables seamless data integration across multiple database systems.
 

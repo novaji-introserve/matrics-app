@@ -17,7 +17,7 @@ odoo.define('compliance_management/static/src/js/custom_title_service', function
                 let currentTitle = document.title;
                 
                 // Skip if already has our prefix
-                if (currentTitle.startsWith('iComply - ')) {
+                if (currentTitle.startsWith('MATRICS - ')) {
                     return;
                 }
                 
@@ -27,7 +27,7 @@ odoo.define('compliance_management/static/src/js/custom_title_service', function
                 }
                 
                 // Set our custom title
-                const newTitle = "iComply - " + currentTitle;
+                const newTitle = "MATRICS - " + currentTitle;
                 document.title = newTitle;
                 // console.log("Title updated to:", newTitle);
             }

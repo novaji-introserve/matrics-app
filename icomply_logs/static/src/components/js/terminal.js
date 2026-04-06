@@ -2,7 +2,7 @@
 import { registry } from "@web/core/registry";
 
 /**
- * IComply Terminal Service - Multi-profile log viewer
+ * MATRICS Terminal Service - Multi-profile log viewer
  */
 export const icomplyTerminalService = {
     dependencies: ['bus_service', 'rpc'],

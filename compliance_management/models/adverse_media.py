@@ -328,7 +328,7 @@ class AdverseMedia(models.Model):
                 if mail.state == 'sent':
                     # insert into alert history table
                     self.env['alert.history'].sudo(flag=True).create({
-                        "ref_id": f"{self._name},{self.id}",
+                        "ref_id": self._name,
                         'html_body': rendered_html,
                         'attachment_data':  None,
                         'attachment_link':  None,

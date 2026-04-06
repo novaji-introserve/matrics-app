@@ -636,7 +636,7 @@ class CustomerScreeningResult(models.Model):
                                 f"Could not determine risk thresholds: {e}")
 
                         self.env['alert.history'].sudo().create({
-                            "ref_id": f"res.partner.screening.result,{partner.id}",
+                            "ref_id": "res.partner.screening.result",
                             'html_body': mail_values['body_html'],
                             'attachment_data': None,
                             'attachment_link': None,

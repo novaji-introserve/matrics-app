@@ -84,6 +84,11 @@ def get_customer_tier(name):
     customer_tier = explore(env['res.partner.tier'])
     return customer_tier.search([('code', '=', name)], limit=1)
 
+def get_ledger_by_code(code):
+    """Get ledger by code."""
+    ledger = explore(env['res.ledger'])
+    return ledger.search([('ledger_code', '=', code)], limit=1)
+
 def get_account_counts(customer_id):
     if not customer_id:
         return 0
@@ -123,9 +128,10 @@ def create_accounts():
                 name = f"{customer.name} - {curr.name}"
                 cur_id = str(curr.id).zfill(3)
                 account_name = f"{cur_id}{customer.customer_id}"
-                account_date = get_random_date(1,3).strftime('%Y-%m-%d')
+                account_date = datetime.now().strftime('%Y-%m-%d')
                 bal = round(random.uniform(10.0, 1000.0), 2) if curr.name == 'USD' else round(random.uniform(1000.0, 10000000.0), 2)
                 account_product = get_account_product('regular_individual_account') if curr.name == 'NGN' else get_account_product('dom_saving')
+                ledger = get_ledger_by_code('100202') if curr.name == 'NGN' else get_ledger_by_code('100220') if curr.name == 'USD' else None
                 account_data = {
                     'customer_id': customer.id,
                     'account_officer_id':random.choice(account_officer_ids) if account_officer_ids else None,
@@ -142,6 +148,7 @@ def create_accounts():
                     'account_status': 'active',
                     'balance': bal,
                     'product_id': account_product.id if account_product else None,
+                    'ledger_id': ledger.id if ledger else None,
                 }
                 try:
                     tot_created += 1

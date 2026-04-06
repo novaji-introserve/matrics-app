@@ -56,7 +56,7 @@ class Theme(models.TransientModel):
         # ensure the menus have no parent items
         menu_item = self.env['ir.ui.menu'].sudo().search([('parent_id', '=', False)])
         for menu in menu_item:
-            if menu.name == 'iComply Utility':
+            if menu.name == 'MATRICS Utility':
                 img_path = get_module_resource(
                     'custom_backend_theme', 'static', 'src', 'img',
                     'icons_green',
@@ -75,7 +75,7 @@ class Theme(models.TransientModel):
                     'alert.png')
                 menu.write({'web_icon_data': base64.b64encode(
                     open(img_path, "rb").read())})
-            if menu.name == 'iComply Utility':
+            if menu.name == 'MATRICS Utility':
                 img_path = get_module_resource(
                     'custom_backend_theme', 'static', 'src', 'img', 'icons',
                     'utility.png')
@@ -307,7 +307,7 @@ class Theme(models.TransientModel):
     def icon_change_theme_green(self):
         menu_item = self.env['ir.ui.menu'].sudo().search([('parent_id', '=', False)])
         for menu in menu_item:
-            if menu.name == 'iComply Utility':
+            if menu.name == 'MATRICS Utility':
                 img_path = get_module_resource(
                     'custom_backend_theme', 'static', 'src', 'img',
                     'icons_green',

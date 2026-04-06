@@ -2,16 +2,16 @@
 
     <!-- 1️⃣ Category under Technical -->
     <record id="module_category_icomply_logs" model="ir.module.category">
-        <field name="name">Icomply Logs</field>
+        <field name="name">MATRICS Logs</field>
         <field name="sequence">10</field>
         <field name="parent_id" ref="base.module_category_technical"/>
     </record>
 
     <!-- 2️⃣ Technical Access Group -->
     <record id="group_icomply_logs_technical" model="res.groups">
-        <field name="name">Icomply Logs Technical</field>
+        <field name="name">MATRICS Logs Technical</field>
         <field name="category_id" ref="module_category_icomply_logs"/>
-        <field name="comment">Technical users with access to Icomply Logs module</field>
+        <field name="comment">Technical users with access to MATRICS Logs module</field>
         <field name="users" eval="[(4, ref('base.user_admin'))]"/>  
     </record>
 

@@ -12,7 +12,7 @@
                                 <t t-esc="state.profileInfo.name"/> - System Logs
                             </t>
                             <t t-else="">
-                                IComply System Logs
+                                MATRICS System Logs
                             </t>
                         </h5>
                         

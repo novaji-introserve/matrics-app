@@ -8,19 +8,21 @@
             <tree string="Account" create="false">
                 <field name="name" string="Account Number" />
                 <field name="account_name" optional="show"/>
+                <field name="ledger_id" readonly="1" optional="show"/>
+                <field name="ledger_type_id" readonly="1" optional="show"/>
                 <field name="branch_id" optional="show"/>
                 <!-- <field name="currency_id" optional="show"/> -->
                 <!-- <field name="account_type_id" optional="show"/> -->
                 <!-- <field name="product_id" optional="show"/> -->
                 <field name="currency" readonly="1" />
-                <field name="account_type" readonly="1" />
-                <field name="account_position" readonly="1" />
+                <field name="account_type" readonly="1" optional="hide" />
+                <field name="account_position" readonly="1" optional="hide"/>
 
                 <field name="risk_score" optional="show"/>
                 <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('low')" optional="show"/>
                 <!-- <field name="account_tier" optional="show"/> -->
-                <field name="tier_name"/>
-                <field name="tier_level" invisible="1"/>
+                <field name="tier_name" optional="hide"/>
+                <field name="tier_level" invisible="1" optional="hide"/>
 
 
                 <field name="state" widget="badge" decoration-success="state == 'Active'" decoration-warning="state in ('Dormant', 'Flagged')" decoration-danger="state in ('Inactive', 'Closed')" optional="show"/>
@@ -73,6 +75,8 @@
                                 <group>
                                     <field name="customer_id" readonly="1" />
                                     <field name="account_type" readonly="1" />
+                                    <field name="ledger_id" readonly="1" />
+                                    <field name="ledger_type_id" readonly="1" />
                                     <field name="account_position" readonly="1" />
                                     <field name="account_officer_id" readonly="1" />
                                   <field name="tier_name"/>
@@ -140,6 +144,8 @@
             <search string="Search Account">
                 <field name="name" />
                 <field name="customer_id" string="Customer Id"/>
+                <field name="ledger_id"/>
+                <field name="ledger_type_id"/>
                 <field name="category"/>
              
 
@@ -156,6 +162,8 @@
                     <filter name="group_currency" string="Currency" context="{'group_by': 'currency_id'}" />
                     <filter name="group_product" string="Product" context="{'group_by': 'product_id'}" />
                     <filter name="group_account_type" string="Account Type" context="{'group_by': 'account_type_id'}" />
+                    <filter name="group_ledger" string="Ledger" context="{'group_by': 'ledger_id'}" />
+                    <filter name="group_ledger_type" string="Ledger Type" context="{'group_by': 'ledger_type_id'}" />
                     <filter name="group_state" string="Status" context="{'group_by': 'state'}" />
                     <filter string="Category" name="group_by_category" context="{'group_by': 'category'}"/>
 

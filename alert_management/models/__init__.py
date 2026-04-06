@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from . import reference_selections
+from . import change_data_capture
 from . import alert_group
 from . import alert_history
 from . import dashboard

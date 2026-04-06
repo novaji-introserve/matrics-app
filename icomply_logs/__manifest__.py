@@ -1,7 +1,7 @@
 {
-    'name': 'iComply Logs',
+    'name': 'MATRICS Logs',
     'version': '1.0.0',
-    'category': 'iComply',
+    'category': 'MATRICS',
     'summary': 'View system logs',
     'description': """
         This module allows administrators to view system logs.

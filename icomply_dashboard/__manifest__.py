@@ -8,7 +8,7 @@
         Long description of module's purpose
     """,
     
-    'category': 'iComply',
+    'category': 'MATRICS',
     'version': '0.4',
 
     'author': "Novaji Introserve Ltd",

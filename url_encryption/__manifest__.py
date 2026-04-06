@@ -2,7 +2,7 @@
 {
     'name': 'URL Encryption',
     'version': '1.0.0',
-    'category': 'icomply',
+    'category': 'MATRICS',
     'summary': 'Encrypt sensitive URL parameters to prevent manipulation',
     'description': '''
         This module encrypts sensitive URL parameters like action IDs, menu IDs, etc.

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "iComply Utility",
+    'name': "MATRICS Utility",
 
     'summary': """
         Utility module for Icompliance management.
@@ -14,7 +14,7 @@
     'author': "Novaji Introserve",
     'website': "https://novajii.com",
 
-    'category': 'iComply',
+    'category': 'MATRICS',
     'version': '0.1',
 
     'depends': ['base'],

@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from odoo import api, fields, models
+from odoo.addons.compliance_management.services.chart_data_service import ChartDataService
 
 
 class AlertHistoryDashboard(models.Model):
@@ -13,7 +14,7 @@ class AlertHistoryDashboard(models.Model):
         return {
             "period": period,
             "cards": self._get_alert_cards(),
-            "trend": self._get_alert_trend(period),
+            "charts": self._get_alert_charts(period),
         }
 
     @api.model
@@ -22,12 +23,11 @@ class AlertHistoryDashboard(models.Model):
             [("state", "=", "active"), ("is_visible", "=", True), ("scope", "=", "alert")],
             order="display_order asc, id asc",
         )
-        self._refresh_alert_stat_values(stat_records)
         return [
             {
                 "id": stat.code,
                 "title": stat.name,
-                "value": stat.val or 0,
+                "value": self._get_alert_stat_value(stat),
                 "display_summary": stat.display_summary,
                 **stat._get_dashboard_action_metadata(),
             }
@@ -35,30 +35,11 @@ class AlertHistoryDashboard(models.Model):
         ]
 
     @api.model
-    def _refresh_alert_stat_values(self, stat_records):
-        for stat in stat_records:
-            try:
-                original_query, query = stat._prepare_and_validate_query(
-                    stat.sql_query, code=stat.code
-                )
-                current_value = stat._execute_query_and_get_value(original_query, query) if original_query else "0"
-            except Exception:
-                current_value = "0"
-
-            if (stat.val or "0") != current_value:
-                self.env.cr.execute(
-                    """
-                    UPDATE res_compliance_stat
-                    SET val = %s,
-                        write_date = NOW(),
-                        write_uid = %s
-                    WHERE id = %s
-                    """,
-                    (current_value, self.env.user.id, stat.id),
-                )
-
-        if stat_records:
-            stat_records.invalidate_recordset(["val", "write_date", "write_uid"])
+    def _get_alert_stat_value(self, stat):
+        try:
+            return stat._compute_current_value(stat)
+        except Exception:
+            return stat.val or "0"
 
     def _normalize_period(self, period):
         try:
@@ -85,34 +66,28 @@ class AlertHistoryDashboard(models.Model):
         return start_date, range_end
 
     @api.model
-    def _get_alert_trend(self, period):
+    def _get_alert_charts(self, period):
         start_date, end_date = self._get_period_bounds(period)
-
-        self.env.cr.execute(
-            """
-            SELECT DATE(create_date) AS day, COUNT(*)
-            FROM alert_history
-            WHERE create_date IS NOT NULL
-              AND DATE(create_date) BETWEEN %s AND %s
-            GROUP BY DATE(create_date)
-            ORDER BY DATE(create_date)
-            """,
-            [start_date, end_date],
+        start_at = f"{start_date.isoformat()} 00:00:00"
+        end_at = f"{(end_date + timedelta(days=1)).isoformat()} 00:00:00"
+        chart_service = ChartDataService(self.env)
+        chart_records = self.env["res.dashboard.charts"].sudo().search(
+            [
+                ("state", "=", "active"),
+                ("active", "=", True),
+                ("is_visible", "=", True),
+                ("scope", "=", "alert"),
+            ],
+            order="display_order asc, id asc",
         )
-        counts_by_day = {row[0]: row[1] for row in self.env.cr.fetchall()}
-
-        labels = []
-        dates = []
-        values = []
-        cursor = start_date
-        while cursor <= end_date:
-            labels.append(cursor.strftime("%b %d"))
-            dates.append(cursor.isoformat())
-            values.append(counts_by_day.get(cursor, 0))
-            cursor += timedelta(days=1)
-
-        return {
-            "dates": dates,
-            "labels": labels,
-            "values": values,
-        }
+        return [
+            chart._get_dashboard_chart_payload(
+                chart_service,
+                cco=True,
+                branches_id=[],
+                datepicked=period,
+                start_at=start_at,
+                end_at=end_at,
+            )
+            for chart in chart_records
+        ]

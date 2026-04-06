@@ -4,7 +4,7 @@ import { useService } from "@web/core/utils/hooks";
 import { registry } from "@web/core/registry";
 
 /**
- * IComply Terminal Component - Profile-based multi-terminal
+ * MATRICS Terminal Component - Profile-based multi-terminal
  */
 export class IComplyTerminalComponent extends Component {
     setup() {
@@ -44,7 +44,7 @@ export class IComplyTerminalComponent extends Component {
             this.terminal = useService("icomply_terminal");
             this.hasTerminalService = true;
         } catch (e) {
-            console.warn("IComply terminal service not available:", e);
+            console.warn("MATRICS terminal service not available:", e);
             this.hasTerminalService = false;
         }
 

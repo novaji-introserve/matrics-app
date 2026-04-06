@@ -27,7 +27,7 @@
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
-    'category': 'icomply',
+    'category': 'MATRICS',
     'version': '0.1',
 
     # any module necessary for this one to work correctly
@@ -36,10 +36,12 @@
     'data': [
         'security/ir.model.access.csv',
         'data/alert_stats.xml',
+        'data/alert_charts.xml',
         'views/dashboard.xml',
         'views/alert_group.xml',
         'views/alert_history.xml',
         'views/alert_rules_view.xml',
+        'views/change_data_capture_views.xml',
         'views/control_officer.xml',
         'views/frequency_view.xml',
         'views/mail_template.xml',

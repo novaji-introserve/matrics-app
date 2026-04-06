@@ -2,9 +2,12 @@ from odoo import models, fields, api
 from datetime import datetime
 import time
 import uuid
+
+from .reference_selections import ALERT_SOURCE_SELECTION
+
 class alert_history(models.Model):
     _name = 'alert.history'
-    _description = "alert history"
+    _description = "Alert History"
     _rec_name = "alert_id"
     _order = 'id desc'
     
@@ -12,20 +15,13 @@ class alert_history(models.Model):
     alert_id = fields.Char(string="alert_id", required=True, index=True, default=lambda self: self._generate_alert_id())
     attachment_data = fields.Char()
     attachment_link = fields.Char()
-    html_body = fields.Html(string="html body")
-    ref_id = fields.Reference(selection=[
-        ('alert.rules', 'Alert Rules'),
-        ('adverse.media', 'Adverse Media'),
-        ('res.partner.edd', 'EDD'),
-        ('case.management', 'Case'),
-        ('case.manager', 'Case'),
-        ('res.partner.screening.result', 'Sanction Screening'),
-        ],
+    html_body = fields.Html(string="html body", sanitize=False)
+    ref_id = fields.Selection(selection=ALERT_SOURCE_SELECTION,
         string='Alert Source'
     )
 
     last_checked = fields.Char()
-    risk_rating = fields.Char()
+    risk_rating = fields.Char(index=True)
     process_id = fields.Char()
     case_ref = fields.Char()
     case_ref_display = fields.Html('Case Reference', compute='_compute_case_ref_display', sanitize=False)

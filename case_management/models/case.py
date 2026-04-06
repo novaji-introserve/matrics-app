@@ -675,7 +675,7 @@ class CaseManager(models.Model):
                 # Create alert history record
                 self.env['alert.history'].sudo().create({
                     'html_body': rendered_html,
-                    'ref_id': f"{self._name},{self.id}",
+                    'ref_id': self._name,
                     'risk_rating': self.case_rating if self.case_rating else "Low",
                     'process_id': process_id,
                     'date_created': fields.Datetime.now(),

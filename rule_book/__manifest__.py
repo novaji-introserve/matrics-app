@@ -13,7 +13,7 @@
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
-    "category": "icomply",
+    "category": "MATRICS",
     "version": "0.1",
     # any module necessary for this one to work correctly
     "depends": ["base", "web", "mail", "calendar", 'hide_powered_by_odoo', 'legion_hide_odoo', 'hr', 'muk_web_theme',

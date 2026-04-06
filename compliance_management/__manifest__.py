@@ -14,7 +14,7 @@
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
-    "category": "iComply",
+    "category": "MATRICS",
     "version": "0.5.1",
     # any module necessary for this one to work correctly
     
@@ -41,6 +41,8 @@
         "security/security.xml",
         "views/adverse_media.xml",
         "views/configuration.xml",
+        "views/ledger.xml",
+        "views/ledger_type.xml",
         "data/demo_data/keyword/media_keywords.xml",
         "data/schedules/adverse_media_cron.xml",
         'data/schedules/run_risk_assessment_cron.xml',
@@ -85,6 +87,8 @@
         "data/demo_data/risk_assessment/transaction_behavior.xml",
        
         "data/demo_data/account/account_type.xml",
+        "data/demo_data/account/ledger_type.xml",
+        "data/demo_data/account/ledger.xml",
         "data/demo_data/education/educational_level.xml",
         "data/demo_data/tier/customer_tier.xml",
         "data/demo_data/customer/sector.xml",
@@ -146,12 +150,18 @@
 
             # Load templates first
             'compliance_management/static/src/components/file_upload/xml/csv_import.xml',
+            'compliance_management/static/src/components/compliance_dashboard/card/xml/card.xml',
+            'compliance_management/static/src/components/compliance_dashboard/chart/xml/chart.xml',
+            'compliance_management/static/src/components/compliance_dashboard/dashboard/xml/dashboard.xml',
             
             # Then load base files
             'compliance_management/static/src/components/file_upload/js/terminal.js',
             'compliance_management/static/src/components/file_upload/js/chunked_uploader.js',
             'compliance_management/static/src/components/file_upload/js/terminal_component.js',
             'compliance_management/static/src/components/file_upload/js/import_form_component.js',
+            'compliance_management/static/src/components/compliance_dashboard/card/js/card.js',
+            'compliance_management/static/src/components/compliance_dashboard/chart/js/chart.js',
+            'compliance_management/static/src/components/compliance_dashboard/dashboard/js/dashboard.js',
             
             # Finally load action registrations
             'compliance_management/static/src/components/file_upload/js/main.js',

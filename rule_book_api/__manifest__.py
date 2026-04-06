@@ -16,7 +16,7 @@
     'author': "Novaji",
     'website': "https://www.novajii.com",
 
-    "category": "icomply",
+    "category": "MATRICS",
     "version": "0.1",
 
     'depends': ["base", "web", 'hide_powered_by_odoo', 'legion_hide_odoo', 'muk_web_theme'],

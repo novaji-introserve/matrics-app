@@ -1,7 +1,7 @@
 {
-    'name': 'iComply ETL Manager',
+    'name': 'MATRICS ETL Manager',
     'version': '1.0',
-    'category': 'iComply',
+    'category': 'MATRICS',
     'summary': 'Manage ETL configurations and processes',
     'sequence': 1,
     'author': 'Novaji Introserve Ltd',

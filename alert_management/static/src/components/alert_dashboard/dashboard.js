@@ -10,12 +10,14 @@ export class AlertDashboard extends Component {
     setup() {
         this.orm = useService("orm");
         this.action = useService("action");
+        this.isUnmounted = false;
+        this.loadRequestId = 0;
         this.state = useState({
             isLoading: true,
             period: 7,
             refreshRate: 5,
             cards: [],
-            trend: { dates: [], labels: [], values: [] },
+            charts: [],
         });
         this.refreshTimer = null;
 
@@ -24,7 +26,7 @@ export class AlertDashboard extends Component {
         this.openCard = this.openCard.bind(this);
         this.openCardById = this.openCardById.bind(this);
         this.onCardClick = this.onCardClick.bind(this);
-        this.openTrendDay = this.openTrendDay.bind(this);
+        this.openChartPoint = this.openChartPoint.bind(this);
         this.handleVisibilityRefresh = this.handleVisibilityRefresh.bind(this);
 
         onWillStart(async () => {
@@ -37,6 +39,7 @@ export class AlertDashboard extends Component {
         document.addEventListener("visibilitychange", this.handleVisibilityRefresh);
 
         onWillUnmount(() => {
+            this.isUnmounted = true;
             this.stopAutoRefresh();
             window.removeEventListener("focus", this.handleVisibilityRefresh);
             document.removeEventListener("visibilitychange", this.handleVisibilityRefresh);
@@ -57,15 +60,41 @@ export class AlertDashboard extends Component {
     }
 
     async loadDashboard() {
+        if (this.isUnmounted) {
+            return;
+        }
+        const requestId = ++this.loadRequestId;
         this.state.isLoading = true;
         try {
-            const data = await this.orm.call("alert.history", "get_alert_dashboard_data", [], {
-                period: this.state.period,
-            });
+            const [data, chartDefinitions] = await Promise.all([
+                this.orm.call("alert.history", "get_alert_dashboard_data", [], {
+                    period: this.state.period,
+                }),
+                this.orm.searchRead(
+                    "res.dashboard.charts",
+                    [
+                        ["scope", "=", "alert"],
+                        ["state", "=", "active"],
+                        ["active", "=", true],
+                        ["is_visible", "=", true],
+                    ],
+                    ["name", "code", "display_summary", "chart_type", "display_order"],
+                    { order: "display_order asc, id asc" }
+                ),
+            ]);
+            if (this.isUnmounted || requestId !== this.loadRequestId) {
+                return;
+            }
             this.state.cards = this.normalizeCards(data.cards);
-            this.state.trend = data.trend || { dates: [], labels: [], values: [] };
+            this.state.charts = this.normalizeCharts(chartDefinitions, data.charts);
+        } catch (error) {
+            if (!this.isUnmounted && error?.message !== "Component is destroyed") {
+                throw error;
+            }
         } finally {
-            this.state.isLoading = false;
+            if (!this.isUnmounted && requestId === this.loadRequestId) {
+                this.state.isLoading = false;
+            }
         }
     }
 
@@ -84,6 +113,37 @@ export class AlertDashboard extends Component {
                 search_view_id: card.search_view_id || false,
                 domain: Array.isArray(card.domain) ? card.domain : false,
             }));
+    }
+
+    normalizeCharts(definitions, payloads) {
+        const payloadList = Array.isArray(payloads) ? payloads : [];
+        const payloadByCode = new Map(
+            payloadList
+                .filter((chart) => chart && typeof chart === "object")
+                .map((chart) => [String(chart.id), chart])
+        );
+        const definitionList = Array.isArray(definitions) ? definitions : [];
+
+        return definitionList.map((definition) => {
+            const payload = payloadByCode.get(String(definition.code)) || {};
+            return {
+                id: payload.id || definition.code,
+                title: payload.title || definition.name || "",
+                display_summary:
+                    payload.display_summary || definition.display_summary || "",
+                type: payload.type || definition.chart_type || "bar",
+                model_name: payload.model_name || "alert.history",
+                filter: payload.filter || false,
+                labels: Array.isArray(payload.labels) ? payload.labels : [],
+                ids: Array.isArray(payload.ids) ? payload.ids : [],
+                additional_domain: Array.isArray(payload.additional_domain)
+                    ? payload.additional_domain
+                    : [],
+                datasets: Array.isArray(payload.datasets)
+                    ? payload.datasets
+                    : [{ data: [], backgroundColor: [] }],
+            };
+        });
     }
 
     loadRefreshPreference() {
@@ -117,8 +177,13 @@ export class AlertDashboard extends Component {
             return;
         }
         this.refreshTimer = setInterval(() => {
+            if (this.isUnmounted) {
+                return;
+            }
             this.loadDashboard().catch((error) => {
-                console.error("Error refreshing alert dashboard:", error);
+                if (error?.message !== "Component is destroyed") {
+                    console.error("Error refreshing alert dashboard:", error);
+                }
             });
         }, refreshRate * 60 * 1000);
     }
@@ -142,7 +207,7 @@ export class AlertDashboard extends Component {
     }
 
     async handleVisibilityRefresh() {
-        if (document.visibilityState === "hidden") {
+        if (this.isUnmounted || document.visibilityState === "hidden") {
             return;
         }
         await this.loadDashboard();
@@ -194,27 +259,46 @@ export class AlertDashboard extends Component {
         return `alert-kpi-card${isClickable ? " alert-kpi-card--clickable" : ""}`;
     }
 
-    openTrendDay(payload) {
-        if (!payload || !payload.date) {
+    openDashboardChartPoint(chart, payload) {
+        if (!chart || !payload) {
+            return;
+        }
+        const filterField = chart.filter;
+        const filterValue = payload.id ?? payload.label;
+        if (!chart.model_name || !filterField || filterValue === undefined || filterValue === null) {
             return;
         }
 
-        const start = `${payload.date} 00:00:00`;
-        const selectedDate = new Date(`${payload.date}T00:00:00`);
-        selectedDate.setDate(selectedDate.getDate() + 1);
-        const end = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")} 00:00:00`;
+        const domain = Array.isArray(chart.additional_domain) ? [...chart.additional_domain] : [];
+        if (filterField === "create_date") {
+            const start = `${filterValue} 00:00:00`;
+            const selectedDate = new Date(`${filterValue}T00:00:00`);
+            selectedDate.setDate(selectedDate.getDate() + 1);
+            const end = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")} 00:00:00`;
+            domain.push([filterField, ">=", start]);
+            domain.push([filterField, "<", end]);
+        } else {
+            domain.push([filterField, "=", filterValue]);
+        }
 
         this.action.doAction({
             type: "ir.actions.act_window",
-            name: `Alerts on ${payload.label || payload.date}`,
-            res_model: "alert.history",
-            view_mode: "tree,form",
-            domain: [
-                ["create_date", ">=", start],
-                ["create_date", "<", end],
+            name: chart.title || "Alert Chart",
+            res_model: chart.model_name,
+            domain,
+            views: [
+                [false, "tree"],
+                [false, "form"],
             ],
             target: "current",
         });
+    }
+
+    openChartPoint(payload) {
+        const chart = this.state.charts.find(
+            (record) => String(record.id) === String(payload?.chartId)
+        );
+        this.openDashboardChartPoint(chart, payload);
     }
 }
 

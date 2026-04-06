@@ -248,6 +248,13 @@ class Customer(models.Model):
     customer_status = fields.Many2one(
         'customer.status',
         string='Customer Status', readonly=True)
+    identity_verification = fields.Selection(
+        [('pending', 'Pending'), ('done', 'Verified')],
+        string='Identity Verification',
+        default='pending',
+        index=True,
+        tracking=True,
+    )
 
     @api.depends('customer_id')
     def _compute_is_case_manager_installed(self):
@@ -305,6 +312,20 @@ class Customer(models.Model):
 
         action['context'] = context
         return action
+
+    def run_identity_verification(self):
+        self.ensure_one()
+        self.write({'identity_verification': 'done'})
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Success'),
+                'message': _('Identity Verification successful'),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
 
     def action_view_screening_results(self):
         """View screening results for this customer"""

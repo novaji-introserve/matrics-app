@@ -6,14 +6,13 @@
         <field name="model">alert.history</field>
         <field name="arch" type="xml">
             <tree string="Alert History List" create="false" delete="False">
-                <field name="alert_id" string="Alert Reference" />
-                <field name="risk_rating" />
-                <!-- <field name="narration" /> -->
-                <field name="email" />
+                <field name="alert_id" string="Alert ID" />
+                <field name="ref_id" string="Reference Resource" />
+                <field name="risk_rating" widget="badge" decoration-success="risk_rating == 'low'" decoration-warning="risk_rating == 'medium'" decoration-danger="risk_rating == 'high'" />
                 <field name="source" />
                 <field name="last_checked" string="Date"   />
                 <field name="time" string="Time"/>
-
+                <field name="create_date" string="Date Created"/>
             </tree>
         </field>
     </record>
@@ -23,7 +22,7 @@
         <field name="name">alert.history.form</field>
         <field name="model">alert.history</field>
         <field name="arch" type="xml" >
-            <form string="Alert History List" edit="false" delete="false">
+            <form string="Alert History List" create="false" edit="false" delete="false" duplicate="false">
                 <!-- <header>
                     Add the button to generate and download CSV
                     <button name="generate_csv" type="object" string="Download CSV" style="background-color: #007046;" />
@@ -39,7 +38,7 @@
                         <div attrs="{'invisible': [('case_ref', '!=', False)]}">
                             <label for="ref_id" string="Alert Reference" />
                             <h1>
-                                <field name="ref_id" string="Alert Reference" widget="reference" />
+                                <field name="ref_id" string="Alert Reference" />
                             </h1>
                         </div>
                         
@@ -53,38 +52,102 @@
                     </div>
                 
         
-                <group string="RELATED INFORMATION">
-                
-                    <group>
-                        <field name="risk_rating" string="Rating" />
+                <group string="Alert Summary" col="4">
+                    <group string="Classification">
+                        <field name="ref_id" string="Related Resource" readonly="1"/>
+                        <field name="source" string="Source / Rule" readonly="1"/>
+                        <field name="risk_rating" string="Rating" widget="badge" decoration-success="risk_rating == 'low'" decoration-warning="risk_rating == 'medium'" decoration-danger="risk_rating == 'high'" readonly="1"/>
                     </group>
-                    <group>
-                        <field name="source" string="Source" />
-                    </group>
-                    
-                    <group attrs="{'invisible': [('process_id', '=', False)]}">
-                        <field name="process_id" string="Process"/>
-                    </group>
-                    <group>
-                        <field name="email" string="Email"/>
-                        <field name="email_cc" string="Email CC"/>
-                    </group>
-                    
-                </group>
-
-
-                <group string="DATE INFORMATION">
-                    <group>
-                        <field name="last_checked" string="Last Checked" />
-                    </group>
-                    <group>
-                        <field name="date_created" string="Date Created" />
+                    <group string="Timestamps">
+                        <field name="create_date" string="Created On" readonly="1"/>
+                        <field name="date_created" string="Date Created" readonly="1"/>
+                        <field name="last_checked" string="Last Checked" readonly="1"/>
                     </group>
                 </group>
-                <notebook>
-                    <page string="Record">
-                        <div style="overflow-x: auto; max-width: 100%;">
-                            <field name="html_body" widget="html" style="max-height: 800px; overflow-y: auto;" />
+
+	                <group string="Alert Details" col="4">
+	                    <group attrs="{'invisible': [('process_id', '=', False)]}" string="Process">
+	                        <field name="process_id" string="Process" readonly="1"/>
+	                    </group>
+	                </group>
+	                <notebook>
+	                    <page string="Recipients">
+	                        <group col="1">
+	                            <field name="email" string="Email" readonly="1" style="width: 100%;"/>
+	                            <field name="email_cc" string="Email CC" readonly="1" style="width: 100%;"/>
+	                        </group>
+	                    </page>
+	                    <page string="Alert Content">
+	                        <style>
+                            .o_alert_email_preview {
+                                display: flex;
+                                justify-content: center;
+                                padding: 16px;
+                                background: #f5f6f8;
+                                overflow-x: auto;
+                            }
+                            .o_alert_email_preview_card {
+                                width: 100%;
+                                max-width: 760px;
+                                background: #ffffff;
+                                border: 1px solid #d9dee3;
+                                border-radius: 8px;
+                                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+                                overflow: hidden;
+                            }
+                            .o_alert_email_preview_body {
+                                max-height: 720px;
+                                overflow-y: auto;
+                                padding: 20px 24px;
+                                color: #243447;
+                                font-family: Arial, Helvetica, sans-serif;
+                                font-size: 13px;
+                                line-height: 1.5;
+                            }
+                            .o_alert_email_preview_body table {
+                                width: 100% !important;
+                                max-width: 100%;
+                                border-collapse: collapse;
+                                table-layout: fixed;
+                                margin: 12px 0;
+                                font-size: 12px;
+                            }
+                            .o_alert_email_preview_body th,
+                            .o_alert_email_preview_body td {
+                                padding: 8px 10px !important;
+                                border: 1px solid #d9dee3 !important;
+                                vertical-align: top;
+                                word-break: break-word;
+                                overflow-wrap: anywhere;
+                            }
+                            .o_alert_email_preview_body img {
+                                max-width: 100% !important;
+                                height: auto !important;
+                            }
+                            .o_alert_email_preview_body p,
+                            .o_alert_email_preview_body ul,
+                            .o_alert_email_preview_body ol {
+                                margin: 0 0 10px 0;
+                            }
+                            .o_alert_email_preview_body h1,
+                            .o_alert_email_preview_body h2,
+                            .o_alert_email_preview_body h3,
+                            .o_alert_email_preview_body h4 {
+                                margin: 0 0 10px 0;
+                                line-height: 1.3;
+                            }
+                            .o_alert_email_preview_body pre,
+                            .o_alert_email_preview_body code {
+                                white-space: pre-wrap;
+                                word-break: break-word;
+                            }
+                        </style>
+                        <div class="o_alert_email_preview">
+                            <div class="o_alert_email_preview_card">
+                                <div class="o_alert_email_preview_body">
+                                    <field name="html_body" widget="html" nolabel="1"/>
+                                </div>
+                            </div>
                         </div>
                     </page>
                 </notebook>
@@ -93,21 +156,61 @@
         </field>
     </record>
 
-    
+    <record id="view_alert_history_search" model="ir.ui.view">
+        <field name="name">alert.history.search</field>
+        <field name="model">alert.history</field>
+        <field name="arch" type="xml">
+            <search string="Search Alert History">
+                <field name="alert_id" string="Alert Reference" />
+                <field name="ref_id" string="Alert Source" />
+                <field name="risk_rating" />
+                <field name="email" />
+                <field name="source" />
+                <filter
+                    string="Today"
+                    name="today"
+                    domain="[('create_date', '&gt;=', context_today().strftime('%Y-%m-%d 00:00:00')), ('create_date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d 00:00:00'))]"
+                />
+                <filter
+                    string="Last 1 Week"
+                    name="last_1_week"
+                    domain="[('create_date', '&gt;=', (context_today() - relativedelta(days=6)).strftime('%Y-%m-%d 00:00:00')), ('create_date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d 00:00:00'))]"
+                />
+                <filter
+                    string="Last 1 Month"
+                    name="last_1_month"
+                    domain="[('create_date', '&gt;=', (context_today() - relativedelta(months=1)).strftime('%Y-%m-%d 00:00:00')), ('create_date', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d 00:00:00'))]"
+                />
+                <separator/>
+                <filter string="High Risk" name="high_risk" domain="[('risk_rating', '=', 'high')]" />
+                <filter string="Medium Risk" name="medium_risk" domain="[('risk_rating', '=', 'medium')]" />
+                <filter string="Low Risk" name="low_risk" domain="[('risk_rating', '=', 'low')]" />
+                <group expand="0" string="Group By">
+                    <filter string="Risk Rating" name="group_by_risk_rating" context="{'group_by': 'risk_rating'}" />
+                    <filter string="Source" name="group_by_source" context="{'group_by': 'source'}" />
+                    <filter string="Alert Source" name="group_by_ref_id" context="{'group_by': 'ref_id'}" />
+                </group>
+            </search>
+        </field>
+    </record>
 
     <!-- Action to open the tree view -->
     <record id="action_alert_history_status" model="ir.actions.act_window">
         <field name="name">Alert History </field>
         <field name="res_model">alert.history</field>
         <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_alert_history_search" />
         <field name="domain">[('user_in_emails', '=', True)]</field>
+        <field name="context">{'search_default_today': 1}</field>
     </record>
     
     <record id="action_alert_history_individual" model="ir.actions.act_window">
         <field name="name">User Alert</field>
         <field name="res_model">alert.history</field>
         <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_alert_history_search" />
         <field name="domain">[('user_in_emails', '=', True)]</field>
+        <field name="context">{'search_default_today': 1}</field>
     </record>
 
 

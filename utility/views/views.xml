@@ -3,7 +3,7 @@
 <!-- views/menu_views.xml -->
 <odoo>
     <!-- Parent Menu -->
-    <menuitem id="menu_process_management" name="iComply Utility" sequence="6" />
+    <menuitem id="menu_process_management" name="MATRICS Utility" sequence="6" />
 
     <!-- Action for
     Process Category -->

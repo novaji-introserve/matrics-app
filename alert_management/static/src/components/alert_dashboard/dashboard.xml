@@ -73,17 +73,27 @@
                 </div>
 
                 <div class="alert-dashboard-grid">
-                    <section class="alert-dashboard-panel">
+                    <t t-foreach="state.charts" t-as="chart" t-key="chart.id">
+                        <section class="alert-dashboard-panel">
+                            <div class="alert-dashboard-panel__header">
+                                <div>
+                                    <h2 t-esc="chart.title"/>
+                                    <p t-esc="chart.display_summary"/>
+                                </div>
+                            </div>
+                            <div class="alert-dashboard-panel__body">
+                                <AlertDashboardChart data="chart" onPointClick.bind="openChartPoint" />
+                            </div>
+                        </section>
+                    </t>
+                    <div t-if="!state.charts.length" class="alert-dashboard-panel">
                         <div class="alert-dashboard-panel__header">
                             <div>
-                                <h2>Alerts Per Day</h2>
-                                <p>Daily alert generation trend for the selected period.</p>
+                                <h2>Dashboard Charts</h2>
+                                <p>No alert dashboard charts are currently available from <code>res.dashboard.charts</code>.</p>
                             </div>
                         </div>
-                        <div class="alert-dashboard-panel__body">
-                            <AlertDashboardChart labels="state.trend.labels" dates="state.trend.dates" values="state.trend.values" onPointClick.bind="openTrendDay" />
-                        </div>
-                    </section>
+                    </div>
                 </div>
             </div>
         </div>

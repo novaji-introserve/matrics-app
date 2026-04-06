@@ -196,7 +196,17 @@
 }
 
 .alert-dashboard-panel__body {
-    height: 320px;
+    height: auto;
+    overflow: auto;
+    padding-bottom: 8px;
+}
+
+.alert-dashboard-chart-shell {
+    position: relative;
+    width: 100%;
+    min-width: 720px;
+    height: 28vh;
+    min-height: 260px;
 }
 
 .alert-dashboard-chart {

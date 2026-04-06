@@ -16,6 +16,8 @@ from . import customer_sector
 from . import region
 from . import branch
 from . import account_ledger
+from . import ledger_type
+from . import ledger
 from . import account_product
 from . import gender
 from . import risk_level

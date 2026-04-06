@@ -4,7 +4,7 @@
     <record id="customer_inherit_res_partner" model="ir.ui.view">
       <field name="name">FIU Customer View</field>
       <field name="model">res.partner</field>
-      <field name="inherit_id" ref="base.view_partner_form" />
+      <field name="inherit_id" ref="compliance_management.customer_actions_inherit_res_partner" />
       <field name="priority">4600</field>
       <field name="arch" type="xml">
         <xpath expr="//field[@name='employment_status']" position="after">
@@ -18,13 +18,15 @@
           <field name="prefix" readonly="True" />
           <field name="alias" readonly="True" />
         </xpath>
-        <xpath expr="//field[@name='dob']" position="after">
+        <xpath expr="//field[@name='lastname']" position="after">
+          <field name="dob" readonly="True" />
           <field name="birth_place" readonly="True" />
           <field name="mothers_name" readonly="True" />
           <field name="residence" readonly="True" />
           <field name="nationality2" readonly="True" />
         </xpath>
-        <xpath expr="//field[@name='nin']" position="after">
+        <xpath expr="//field[@name='customer_id']" position="after">
+          <field name="nin" readonly="True" />
           <field name="ssn" readonly="True" />
           <field name="passport_number" readonly="True" />
           <field name="passport_country" readonly="True" />

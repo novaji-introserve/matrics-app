@@ -55,7 +55,14 @@ class CustomerAccount(models.Model):
     date_created = fields.Date(
         string='Date Created', index=True)  # date_created
     ledger_id = fields.Many2one(
-        comodel_name='res.partner.account.ledger', string='Ledger', index=True)
+        comodel_name='res.ledger', string='Ledger', index=True)
+    ledger_type_id = fields.Many2one(
+        comodel_name='res.ledger.type',
+        string='Ledger Type',
+        related='ledger_id.ledger_type_id',
+        store=True,
+        readonly=True,
+    )
     closure_status = fields.Selection(string='Closure Status', selection=[
                                       ('N', 'No'), ('Y', 'Yes')])
     branch_id = fields.Many2one(

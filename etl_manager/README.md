@@ -1,4 +1,4 @@
-# iComply ETL Manager
+# MATRICS ETL Manager
 
 **Version:** 2.0  
 **Author:** Olumide Awodeji (Synth corp)  
@@ -6,7 +6,7 @@
 
 ## Overview
 
-iComply ETL Manager is an enterprise-grade Extract, Transform, Load (ETL) solution for Odoo that enables seamless data integration across multiple database systems. It provides a robust framework for synchronizing data between different systems with high performance, reliability, and ease of use.
+MATRICS ETL Manager is an enterprise-grade Extract, Transform, Load (ETL) solution for Odoo that enables seamless data integration across multiple database systems. It provides a robust framework for synchronizing data between different systems with high performance, reliability, and ease of use.
 
 ## Key Features
 
@@ -204,7 +204,7 @@ IBM DB2 may require additional IBM CLI/ODBC drivers, which are platform-dependen
    ```
 
 3. Restart your Odoo server
-4. Go to Apps and install "iComply ETL Manager"
+4. Go to Apps and install "MATRICS ETL Manager"
 
 ## Configuration
 
@@ -393,4 +393,4 @@ For additional support, contact:
 
 ## License
 
-iComply ETL Manager is licensed under LGPL-3.
+MATRICS ETL Manager is licensed under LGPL-3.

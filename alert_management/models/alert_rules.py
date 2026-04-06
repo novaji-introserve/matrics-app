@@ -18,6 +18,8 @@ import re
 import hashlib
 import json
 
+from .reference_selections import ALERT_SOURCE_SELECTION
+
 _logger = logging.getLogger(__name__)
 
 
@@ -55,6 +57,11 @@ class alert_rules(models.Model):
     first_owner = fields.Many2one("res.users", string="First Line Owner")
     second_owner = fields.Many2one("res.users", string="Second Line Owner")
     process_id = fields.Char(string="Process", tracking=True)
+    model_id = fields.Selection(
+        selection=ALERT_SOURCE_SELECTION,
+        string="Model",
+        tracking=True,
+    )
     risk_rating = fields.Selection(
         selection=[("low", "Low"), ("medium", "Medium"), ("high", "High")],
         default="low",  # The default value is the first risk rating
@@ -558,6 +565,9 @@ class alert_rules(models.Model):
         template = self.env.ref("alert_management.alert_rules_mail_template")
 
         if template:
+            source_label = dict(ALERT_SOURCE_SELECTION).get(
+                rule.model_id, rule.model_id or "Alert Rules"
+            )
 
             # generate random string attached for each alert to be send
             alert_id = f"Alert{int(time.time() * 1000)}_{uuid.uuid4().hex[:8]}"
@@ -579,6 +589,7 @@ class alert_rules(models.Model):
                     "attachment_link": f"/web/content/{attachment_id.id}?download=true",
                     "html_body": table_html,
                     "alert_rule_id": rule.id,
+                    "ref_id": rule.model_id or "alert.rules",
                     "process_id": rule.process_id,
                     "risk_rating": rule.risk_rating,
                     "last_checked": rule.last_checked,
@@ -591,6 +602,7 @@ class alert_rules(models.Model):
                     "email_cc": ",".join([str(e) for e in emailcc]) if emailcc else "",
                     "narration": rule.narration,
                     "name": rule.name,
+                    "source": source_label,
                 }
             )
 

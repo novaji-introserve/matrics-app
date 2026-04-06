@@ -7,6 +7,7 @@
             <tree string="Alert Rules">
                 <field name="name" />
                 <field name="alert_id" />
+                <field name="model_id" />
                 <field name="frequency_id" />
                 <field name="first_owner" />
                 <field name="second_owner" />
@@ -38,6 +39,7 @@
                     <group string="PROCESS DETAILS">
                         <group>
                             <field name="process_id" string="Process" />
+                            <field name="model_id" />
                         </group>
                         <group >
                             <field name="risk_rating" string="Risk Rating" />
@@ -105,11 +107,35 @@
             </form>
         </field>
     </record>
+    <record id="view_alert_rules_search" model="ir.ui.view">
+        <field name="name">alert.rules.search</field>
+        <field name="model">alert.rules</field>
+        <field name="arch" type="xml">
+            <search string="Search Alert Rules">
+                <field name="name" />
+                <field name="alert_id" />
+                <field name="model_id" />
+                <field name="frequency_id" />
+                <field name="first_owner" />
+                <field name="second_owner" />
+                <field name="process_id" />
+                <field name="status" />
+                <field name="risk_rating" />
+                <group expand="0" string="Group By">
+                    <filter string="Model" name="group_by_model_id" context="{'group_by': 'model_id'}" />
+                    <filter string="Alert Group" name="group_by_alert_id" context="{'group_by': 'alert_id'}" />
+                    <filter string="Status" name="group_by_status" context="{'group_by': 'status'}" />
+                    <filter string="Risk Rating" name="group_by_risk_rating" context="{'group_by': 'risk_rating'}" />
+                </group>
+            </search>
+        </field>
+    </record>
     <!-- Action -->
     <record id="action_alert_rules" model="ir.actions.act_window">
         <field name="name">Alert Rules</field>
         <field name="res_model">alert.rules</field>
         <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_alert_rules_search" />
         <field name="context">{}</field>
     </record>
 </odoo>

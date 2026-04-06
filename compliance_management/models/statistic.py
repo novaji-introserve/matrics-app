@@ -61,9 +61,9 @@ class Statistic(models.Model):
             ("bank", "Bank Wide"),
             ("branch", "Branch"),
             ("case", "Case Management"),
-            ("compliance", "Compliance"),
+            ("compliance", "Compliance / AML"),
             ("regulatory", "Regulatory"),
-            ("risk", "Risk Assessment"),
+            ("risk", "Risk"),
         ],
         default="bank",
     )
@@ -215,17 +215,21 @@ class Statistic(models.Model):
     def _get_dashboard_action_metadata(self):
         self.ensure_one()
         model_uri = self.resource_id.model_uri if self.resource_id else False
+        model_exists = bool(
+            model_uri
+            and self.env["ir.model"].sudo().search_count([("model", "=", model_uri)])
+        )
         search_view_xmlids = {
             "res.transaction.screening.rule": "compliance_management.compliance_transaction_screening_rule_search",
             "res.compliance.risk.assessment.plan": "compliance_management.compliance_risk_assessment_plan_search",
             "res.partner.risk.plan.line": "compliance_management.view_partner_risk_plan_line_search",
         }
         search_view_id = False
-        if model_uri in search_view_xmlids:
+        if model_exists and model_uri in search_view_xmlids:
             view = self.env.ref(search_view_xmlids[model_uri], raise_if_not_found=False)
             search_view_id = view.id if view else False
         return {
-            "resource_model_uri": model_uri,
+            "resource_model_uri": model_uri if model_exists else False,
             "search_view_id": search_view_id,
             "domain": self._parse_domain(),
         }

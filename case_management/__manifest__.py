@@ -6,7 +6,7 @@
     'description': """This module helps in managing cases.""",
     'author': 'Novaji',
     'website': 'https://novajii.com',
-    "category": "iComply",
+    "category": "MATRICS",
     # any module necessary for this one to work correctly
     'depends': ['base','web', 'mail', 'alert_management', 'compliance_management'],
 

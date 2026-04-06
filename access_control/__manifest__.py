@@ -5,7 +5,7 @@
     'description': 'Control View Access',
     'author': 'Novaji',
     'website': 'https://novajii.com',
-    "category": "iComply",
+    "category": "MATRICS",
     'depends': ['base', 'web','session_control'],
     'data': [
         'security/security.xml',

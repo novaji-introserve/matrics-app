@@ -5,7 +5,7 @@
     'description': 'Control user sessions',
     'author': 'Novaji',
     'website': 'https://novajii.com',
-    "category": "iComply",
+    "category": "MATRICS",
     'depends': ['base', 'web'],
     'data': [
         "data/schedules/cron.xml",

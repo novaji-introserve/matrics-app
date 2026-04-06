@@ -6,11 +6,11 @@
         <field name="arch" type="xml">
             <tree string="Change Data Capture Logs" create="false" edit="false" delete="false">
                 <field name="name"/>
-                <field name="model"/>
+                <field name="resource_id"/>
                 <field name="field_name"/>
-                 <field name="res_name"/>
-                <field name="old_val"/>
-                <field name="new_val"/>
+                <field name="old_val" width="360"/>
+                <field name="new_val" width="360"/>
+                <field name="res_name"/>
                 <field name="updated_at"/>
             </tree>
         </field>
@@ -28,18 +28,22 @@
                             <field name="name" readonly="1"/>
                         </h1>
                     </div>
-                    <group>
+                    <group string="Audit Summary" col="4">
                         <group>
-                            <field name="model" readonly="1"/>
+                            <field name="resource_id" readonly="1"/>
+                            <field name="model_id" readonly="1"/>
+                            <field name="res_id" readonly="1"/>
+                        </group>
+                        <group>
                             <field name="res_name" readonly="1"/>
                             <field name="field_name" readonly="1"/>
                             <field name="updated_at" readonly="1"/>
                         </group>
                     </group>
-                    <group>
-                        <field name="old_val" widget="text" readonly="1"/>
-                        <field name="new_val" widget="text" readonly="1"/>
-                    </group>
+                    <separator string="Previous Value"/>
+                    <field name="old_val" widget="text" readonly="1" nolabel="1" placeholder="No previous value" colspan="4" style="width: 100%; min-height: 120px;"/>
+                    <separator string="Updated Value"/>
+                    <field name="new_val" widget="text" readonly="1" nolabel="1" placeholder="No updated value" colspan="4" style="width: 100%; min-height: 120px;"/>
                 </sheet>
             </form>
         </field>
@@ -50,6 +54,10 @@
         <field name="model">change.data.capture</field>
         <field name="arch" type="xml">
             <search string="Search Change Data Capture">
+                <field name="name"/>
+                <field name="resource_id"/>
+                <field name="field_name"/>
+                <field name="res_name"/>
                 <filter
                     string="Updated Today"
                     name="updated_today"
@@ -66,7 +74,7 @@
                     domain="[('updated_at', '&gt;=', (context_today() - relativedelta(months=1)).strftime('%Y-%m-%d 00:00:00')), ('updated_at', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d 00:00:00'))]"
                 />
                 <group expand="0" string="Group By">
-                    <filter string="Model" name="group_by_model" context="{'group_by': 'model'}"/>
+                    <filter string="Resource URI" name="group_by_resource_id" context="{'group_by': 'resource_id'}"/>
                     <filter string="Updated At" name="group_by_updated_at" context="{'group_by': 'updated_at'}"/>
                 </group>
             </search>
@@ -78,6 +86,6 @@
         <field name="res_model">change.data.capture</field>
         <field name="view_mode">tree,form</field>
         <field name="search_view_id" ref="view_change_data_capture_search"/>
-        <field name="context">{'search_default_updated_today': 1, 'search_default_group_by_model': 1}</field>
+        <field name="context">{'search_default_updated_today': 1, 'search_default_group_by_resource_id': 1}</field>
     </record>
 </odoo>

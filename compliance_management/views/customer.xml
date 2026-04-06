@@ -19,6 +19,7 @@
                 <field name="customer_id" optional="show" />
                 <field name="firstname" optional="show" />
                 <field name="lastname" optional="show" />
+                <field name="identity_verification" optional="show" widget="badge" decoration-warning="identity_verification == 'pending'" decoration-success="identity_verification == 'done'" />
                 <field name="risk_score" widget="badge" decoration-info="1" on_change="1" type="measure" />
                 <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level == 'medium'" decoration-success="risk_level =='low'" />
                 <field name="branch_id" optional="hide" />
@@ -67,6 +68,12 @@
         <field name="inherit_id" ref="base.view_partner_form" />
         <field name="priority">1600</field>
         <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="create">false</attribute>
+                <attribute name="edit">false</attribute>
+                <attribute name="delete">false</attribute>
+                <attribute name="duplicate">false</attribute>
+            </xpath>
             <xpath expr="//sheet" position="before">
                 <header>
                     <field name="show_create_case_button" invisible="1"/>
@@ -103,6 +110,7 @@
                     <button name="action_conduct_risk_assessment" class="oe_highlight" type="object" string="Conduct Risk Assessment" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Conduct Risk Assessment. Are you sure?" />
 
                     <button name="action_compute_risk_score_with_plan" class="oe_highlight" type="object" string="Run Risk Analysis" confirm="Compute Risk Score: Using your defined Risk Analysis, the Customer risk score and level will be recomputed. This process cannot be reversed. Are you sure to proceed?" />
+                    <button name="run_identity_verification" class="oe_highlight" type="object" string="Run Identity Verification" />
 
                     <!-- groups="compliance_management.group_compliance_branch_compliance_officer" -->
                     <button name="scan_news_articles" class="oe_highlight" type="object" string="Run Media Screening" groups="compliance_management.group_compliance_compliance_officer" confirm="Run Media Screening: Are you sure?" />
@@ -253,6 +261,10 @@
                 <attribute name="readonly">1</attribute>
             </xpath>
 
+            <xpath expr="//field[@name='customer_id']" position="after">
+                <field name="identity_verification" readonly="1" widget="badge" decoration-warning="identity_verification == 'pending'" decoration-success="identity_verification == 'done'"/>
+            </xpath>
+
             <!--  -->
 
             <xpath expr="//field[@name='vat']" position="attributes">
@@ -296,6 +308,7 @@
 
         </field>
     </record>
+
     <record id="view_customer_search" model="ir.ui.view">
         <field name="name">Customer Search Custom</field>
         <field name="model">res.partner</field>
@@ -310,10 +323,13 @@
                     <field name="phone" filter_domain="['|', ('phone', 'ilike', self), ('mobile', 'ilike', self)]"/>
                     <field name="category_id" string="Tag" operator="child_of"/>
                     <field name="customer_id" filter_domain="[('customer_id', 'ilike', self)]"/>
+                    <field name="identity_verification"/>
                     <separator/>
                     <filter string="Customers" name="type_customer" domain="[('internal_category', '=', 'customer')]"/>
                     <filter string="Without BVN" name="bvn" domain="['|', ('bvn', '=', False), ('bvn', 'ilike', 'NOBVN%')]"/>
                     <filter string="Without Phone No." name="customer_phone" domain="[('customer_phone', '=', False)]"/>
+                    <filter string="Pending Verification" name="pending_verification" domain="[('identity_verification', '=', 'pending')]"/>
+                    <filter string="Verified" name="verified_identity" domain="[('identity_verification', '=', 'done')]"/>
 
                     <!-- <filter string="Vendors" name="type_vendor" domain="[('internal_category', '=', 'vendor')]"/>
                     <filter string="Partners" name="type_partner" domain="[('internal_category', '=', 'partner')]"/>
@@ -326,6 +342,7 @@
                         <!-- <filter name="group_branch" string="Branch" domain="[]" context="{'group_by' : 'branch_id'}" /> -->
                         <filter name="group_tier" string="Tier" context="{'group_by': 'tier_id'}"/>
                         <filter name="group_risk_level" string="Risk Level" context="{'group_by': 'risk_level'}"/>
+                        <filter name="group_identity_verification" string="Identity Verification" context="{'group_by': 'identity_verification'}"/>
                         <filter name="group_internal_category" string="Category" context="{'group_by': 'internal_category'}"/>
                     </group>
                 </search>

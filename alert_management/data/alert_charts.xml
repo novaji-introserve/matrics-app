@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="alert_chart_alerts_per_day" model="res.dashboard.charts">
+            <field name="name">Alerts Per Day</field>
+            <field name="code">alert_alerts_per_day</field>
+            <field name="description">Daily alert generation trend.</field>
+            <field name="display_summary">Daily alert generation trend for the selected period.</field>
+            <field name="display_order">1</field>
+            <field name="scope">alert</field>
+            <field name="is_visible" eval="True"/>
+            <field name="refresh_mode">live</field>
+            <field name="cache_ttl_minutes">60</field>
+            <field name="chart_type">line</field>
+            <field name="query">
+                SELECT
+                    DATE(ah."create_date") AS day_date,
+                    COUNT(ah.id) AS alert_count
+                FROM alert_history ah
+                GROUP BY day_date
+                ORDER BY day_date
+            </field>
+            <field name="color_scheme">brown</field>
+            <field name="x_axis_field">day_date</field>
+            <field name="y_axis_field">alert_count</field>
+            <field name="navigation_value_field">day_date</field>
+            <field name="branch_filter" eval="False"/>
+            <field name="date_filter" eval="True"/>
+            <field name="date_field">ah."create_date"</field>
+            <field name="column">12</field>
+            <field name="state">active</field>
+            <field name="navigation_filter_field">create_date</field>
+            <field name="navigation_domain">[]</field>
+            <field name="apply_dashboard_date_filter" eval="False"/>
+            <field name="navigation_date_field">create_date</field>
+            <field name="apply_dashboard_branch_filter" eval="False"/>
+            <field name="target_model_id" ref="alert_management.model_alert_history"/>
+        </record>
+
+        <record id="alert_chart_risk_rating_distribution" model="res.dashboard.charts">
+            <field name="name">Alerts by Risk Rating</field>
+            <field name="code">alert_risk_rating_distribution</field>
+            <field name="description">Alert volume grouped by risk rating.</field>
+            <field name="display_summary">Distribution of alert history records by risk rating for the selected period.</field>
+            <field name="display_order">2</field>
+            <field name="scope">alert</field>
+            <field name="is_visible" eval="True"/>
+            <field name="refresh_mode">live</field>
+            <field name="cache_ttl_minutes">60</field>
+            <field name="chart_type">bar</field>
+            <field name="query">
+                SELECT
+                    ah.risk_rating AS risk_rating,
+                    COUNT(ah.id) AS alert_count
+                FROM alert_history ah
+                GROUP BY ah.risk_rating
+                ORDER BY ah.risk_rating
+            </field>
+            <field name="color_scheme">brown</field>
+            <field name="x_axis_field">risk_rating</field>
+            <field name="y_axis_field">alert_count</field>
+            <field name="navigation_value_field">risk_rating</field>
+            <field name="branch_filter" eval="False"/>
+            <field name="date_filter" eval="True"/>
+            <field name="date_field">ah."create_date"</field>
+            <field name="column">12</field>
+            <field name="state">active</field>
+            <field name="navigation_filter_field">risk_rating</field>
+            <field name="navigation_domain">[]</field>
+            <field name="apply_dashboard_date_filter" eval="True"/>
+            <field name="navigation_date_field">create_date</field>
+            <field name="apply_dashboard_branch_filter" eval="False"/>
+            <field name="target_model_id" ref="alert_management.model_alert_history"/>
+        </record>
+    </data>
+</odoo>
