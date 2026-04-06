@@ -7,6 +7,7 @@
 }
 
 .alert-dashboard-shell {
+    height: 100vh;
     min-height: 100vh;
     padding: 24px;
     overflow-y: auto;
@@ -197,8 +198,9 @@
 
 .alert-dashboard-panel__body {
     height: auto;
-    overflow: auto;
-    padding-bottom: 8px;
+    overflow: visible;
+    min-height: 63px;
+    padding-bottom: 16px;
 }
 
 .alert-dashboard-chart-shell {
@@ -212,6 +214,7 @@
 .alert-dashboard-chart {
     width: 100%;
     height: 100%;
+    display: block;
 }
 
 @media (max-width: 992px) {

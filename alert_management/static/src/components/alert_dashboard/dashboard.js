@@ -136,6 +136,9 @@ export class AlertDashboard extends Component {
                 filter: payload.filter || false,
                 labels: Array.isArray(payload.labels) ? payload.labels : [],
                 ids: Array.isArray(payload.ids) ? payload.ids : [],
+                point_domains: Array.isArray(payload.point_domains)
+                    ? payload.point_domains
+                    : [],
                 additional_domain: Array.isArray(payload.additional_domain)
                     ? payload.additional_domain
                     : [],
@@ -270,7 +273,9 @@ export class AlertDashboard extends Component {
         }
 
         const domain = Array.isArray(chart.additional_domain) ? [...chart.additional_domain] : [];
-        if (filterField === "create_date") {
+        if (Array.isArray(payload.domain) && payload.domain.length) {
+            domain.push(...payload.domain);
+        } else if (filterField === "create_date") {
             const start = `${filterValue} 00:00:00`;
             const selectedDate = new Date(`${filterValue}T00:00:00`);
             selectedDate.setDate(selectedDate.getDate() + 1);
@@ -298,6 +303,12 @@ export class AlertDashboard extends Component {
         const chart = this.state.charts.find(
             (record) => String(record.id) === String(payload?.chartId)
         );
+        if (chart && payload && payload.id !== undefined) {
+            const pointIndex = chart.ids.findIndex((value) => String(value) === String(payload.id));
+            if (pointIndex >= 0 && Array.isArray(chart.point_domains)) {
+                payload.domain = chart.point_domains[pointIndex] || [];
+            }
+        }
         this.openDashboardChartPoint(chart, payload);
     }
 }

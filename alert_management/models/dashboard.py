@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from odoo import api, fields, models
 from odoo.addons.compliance_management.services.chart_data_service import ChartDataService
@@ -80,14 +80,139 @@ class AlertHistoryDashboard(models.Model):
             ],
             order="display_order asc, id asc",
         )
-        return [
-            chart._get_dashboard_chart_payload(
-                chart_service,
-                cco=True,
-                branches_id=[],
-                datepicked=period,
-                start_at=start_at,
-                end_at=end_at,
+        payloads = []
+        for chart in chart_records:
+            if chart.code == "alert_alerts_per_day":
+                payloads.append(
+                    self._build_alerts_per_day_payload(
+                        chart, period, start_date, end_date, start_at, end_at
+                    )
+                )
+                continue
+            payloads.append(
+                chart._get_dashboard_chart_payload(
+                    chart_service,
+                    cco=True,
+                    branches_id=[],
+                    datepicked=period,
+                    start_at=start_at,
+                    end_at=end_at,
+                )
             )
-            for chart in chart_records
+        return payloads
+
+    def _build_alerts_per_day_payload(self, chart, period, start_date, end_date, start_at, end_at):
+        domain = [
+            ("create_date", ">=", start_at),
+            ("create_date", "<", end_at),
+        ]
+        grouped = self.env["alert.history"].sudo().read_group(
+            domain,
+            ["create_date"],
+            ["create_date:day"],
+            lazy=False,
+        )
+        counts_by_day = {}
+        domains_by_day = {}
+        for row in grouped:
+            day_key = self._extract_grouped_day_key(row, "create_date:day")
+            if not day_key:
+                continue
+            counts_by_day[day_key] = row.get("create_date_count", row.get("__count", 0))
+            domains_by_day[day_key] = self._build_grouped_day_domain(row, "create_date:day")
+
+        labels = []
+        values = []
+        point_domains = []
+        current_day = start_date
+        while current_day <= end_date:
+            label = current_day.isoformat()
+            labels.append(label)
+            values.append(counts_by_day.get(label, 0))
+            point_domains.append(domains_by_day.get(label, self._build_fallback_day_domain(label)))
+            current_day += timedelta(days=1)
+
+        colors = ChartDataService(self.env).color_generator._generate_colors(
+            chart.color_scheme, max(len(labels), 1)
+        )
+        additional_domain = chart._build_dashboard_navigation_domain(
+            cco=True,
+            branches_id=[],
+            datepicked=period,
+            start_at=start_at,
+            end_at=end_at,
+        )
+        return {
+            "id": chart.code,
+            "record_id": chart.id,
+            "title": chart.name,
+            "display_summary": chart.display_summary or chart.description or "",
+            "type": chart.chart_type,
+            "model_name": chart.target_model,
+            "filter": chart.navigation_filter_field or chart.domain_field,
+            "column": chart.column,
+            "labels": labels,
+            "ids": labels,
+            "point_domains": point_domains,
+            "datefield": chart.date_field,
+            "additional_domain": additional_domain,
+            "datasets": [
+                {
+                    "label": chart.name,
+                    "data": values,
+                    "backgroundColor": colors,
+                    "borderColor": colors,
+                    "borderWidth": 1,
+                }
+            ],
+        }
+
+    def _coerce_grouped_day(self, value):
+        value = (value or "").strip()
+        for fmt in ("%Y-%m-%d", "%d %b %Y", "%d %B %Y", "%Y-%m-%d %H:%M:%S"):
+            try:
+                return datetime.strptime(value, fmt).date().isoformat()
+            except ValueError:
+                continue
+        return None
+
+    def _extract_grouped_day_key(self, row, field_key):
+        range_values = row.get("__range", {}).get(field_key, {})
+        range_start = range_values.get("from")
+        if range_start:
+            day_key = self._coerce_grouped_day(range_start)
+            if day_key:
+                return day_key
+
+        grouped_day = row.get(field_key)
+        if not grouped_day:
+            return None
+        if isinstance(grouped_day, str):
+            return self._coerce_grouped_day(grouped_day)
+        if hasattr(grouped_day, "date"):
+            return grouped_day.date().isoformat()
+        if hasattr(grouped_day, "isoformat"):
+            return grouped_day.isoformat()
+        return None
+
+    def _build_grouped_day_domain(self, row, field_key):
+        range_values = row.get("__range", {}).get(field_key, {})
+        range_start = range_values.get("from")
+        range_end = range_values.get("to")
+        if range_start and range_end:
+            return [
+                ["create_date", ">=", range_start],
+                ["create_date", "<", range_end],
+            ]
+        day_key = self._extract_grouped_day_key(row, field_key)
+        return self._build_fallback_day_domain(day_key) if day_key else []
+
+    def _build_fallback_day_domain(self, day_key):
+        if not day_key:
+            return []
+        day_start = f"{day_key} 00:00:00"
+        day_end = f"{(fields.Date.to_date(day_key) + timedelta(days=1)).isoformat()} 00:00:00"
+        return [
+            ["create_date", ">=", day_start],
+            ["create_date", "<", day_end],
         ]
