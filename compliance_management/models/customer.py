@@ -15,6 +15,7 @@ from odoo.exceptions import UserError, AccessError
 from psycopg2.extras import execute_values
 import time
 from datetime import datetime, timedelta
+import threading
 
 
 load_dotenv()
@@ -249,7 +250,7 @@ class Customer(models.Model):
         'customer.status',
         string='Customer Status', readonly=True)
     identity_verification = fields.Selection(
-        [('pending', 'Pending'), ('done', 'Verified')],
+        [('pending', 'Pending'), ('processing', 'Processing'), ('done', 'Verified')],
         string='Identity Verification',
         default='pending',
         index=True,
@@ -315,17 +316,62 @@ class Customer(models.Model):
 
     def run_identity_verification(self):
         self.ensure_one()
-        self.write({'identity_verification': 'done'})
+        self.write({'identity_verification': 'processing'})
+        self.env.cr.commit()
+        thread = threading.Thread(
+            target=self._run_identity_verification_thread,
+            args=(self.id, self.env.uid, dict(self.env.context)),
+        )
+        thread.daemon = True
+        thread.start()
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': _('Success'),
-                'message': _('Identity Verification successful'),
-                'type': 'success',
+                'title': _('Identity Verification'),
+                'message': _('Identity verification has started in the background.'),
+                'type': 'info',
                 'sticky': False,
             }
         }
+
+    def _run_identity_verification_thread(self, partner_id, uid, context=None):
+        context = context or {}
+        try:
+            with api.Environment.manage():
+                new_cr = self.pool.cursor()
+                try:
+                    env = api.Environment(new_cr, uid, context)
+                    partner = env['res.partner'].browse(partner_id)
+                    if not partner.exists():
+                        return
+                    partner.sudo().write({'identity_verification': 'done'})
+                    new_cr.commit()
+                finally:
+                    new_cr.close()
+        except Exception:
+            _logger.exception(
+                "Failed background identity verification for partner %s",
+                partner_id,
+            )
+            try:
+                with api.Environment.manage():
+                    new_cr = self.pool.cursor()
+                    try:
+                        env = api.Environment(new_cr, uid, context)
+                        partner = env['res.partner'].browse(partner_id)
+                        if partner.exists():
+                            partner.sudo().write({'identity_verification': 'pending'})
+                            new_cr.commit()
+                    finally:
+                        new_cr.close()
+            except Exception:
+                _logger.exception(
+                    "Failed resetting identity verification state for partner %s",
+                    partner_id,
+                )
+    
+    
 
     def action_view_screening_results(self):
         """View screening results for this customer"""

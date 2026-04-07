@@ -19,7 +19,7 @@
                 <field name="customer_id" optional="show" />
                 <field name="firstname" optional="show" />
                 <field name="lastname" optional="show" />
-                <field name="identity_verification" optional="show" widget="badge" decoration-warning="identity_verification == 'pending'" decoration-success="identity_verification == 'done'" />
+                <field name="identity_verification" optional="show" widget="badge" decoration-warning="identity_verification == 'pending'" decoration-info="identity_verification == 'processing'" decoration-success="identity_verification == 'done'" />
                 <field name="risk_score" widget="badge" decoration-info="1" on_change="1" type="measure" />
                 <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level == 'medium'" decoration-success="risk_level =='low'" />
                 <field name="branch_id" optional="hide" />
@@ -262,7 +262,7 @@
             </xpath>
 
             <xpath expr="//field[@name='customer_id']" position="after">
-                <field name="identity_verification" readonly="1" widget="badge" decoration-warning="identity_verification == 'pending'" decoration-success="identity_verification == 'done'"/>
+                <field name="identity_verification" readonly="1" widget="badge" decoration-warning="identity_verification == 'pending'" decoration-info="identity_verification == 'processing'" decoration-success="identity_verification == 'done'"/>
             </xpath>
 
             <!--  -->
@@ -329,6 +329,7 @@
                     <filter string="Without BVN" name="bvn" domain="['|', ('bvn', '=', False), ('bvn', 'ilike', 'NOBVN%')]"/>
                     <filter string="Without Phone No." name="customer_phone" domain="[('customer_phone', '=', False)]"/>
                     <filter string="Pending Verification" name="pending_verification" domain="[('identity_verification', '=', 'pending')]"/>
+                    <filter string="Verification In Progress" name="processing_identity" domain="[('identity_verification', '=', 'processing')]"/>
                     <filter string="Verified" name="verified_identity" domain="[('identity_verification', '=', 'done')]"/>
 
                     <!-- <filter string="Vendors" name="type_vendor" domain="[('internal_category', '=', 'vendor')]"/>
