@@ -275,9 +275,9 @@ class Customer(models.Model):
         self.ensure_one()
         # Prepare action to open case form
         action = self.env.ref(
-            'case_management_v2.action_case_manager').read()[0]
+            'case_management.action_case_manager').read()[0]
         
-        form_view = self.env.ref('case_management_v2.view_case_manager_form')
+        form_view = self.env.ref('case_management.view_case_manager_form')
         action['views'] = [(form_view.id, 'form')]
         action['target'] = 'current'
         action['flags'] = {'initial_mode': 'edit'}
@@ -285,7 +285,7 @@ class Customer(models.Model):
         # Prepare default values from customer
         context = {
             'default_customer_id': self.id,
-            'default_case_status': 'draft',
+            'default_case_status': 'open',
             'from_customer_form': True,
 
         }
@@ -1046,24 +1046,22 @@ class Customer(models.Model):
         """
         Opens the case management form with the customer pre-filled
         """
+        self.ensure_one()
+
         # Create the context with required values
         context = {
-            'default_status_id': self.env.ref('case_management.case_status_open').id,
+            'default_case_status': 'open',
             'case_created': True,
             'show_creation_notification': True,
+            'default_customer_id': self.id,
         }
-
-        # Since customer_id in the case model is a Many2one field referencing res.partner,
-        # and this model (Customer) inherits from res.partner,
-        # we need to pass the ID of the current record
-        context['default_customer_id'] = self.id
 
         return {
             'type': 'ir.actions.act_window',
             'name': 'New Case',
-            'res_model': 'case',
+            'res_model': 'case.manager',
             'view_mode': 'form',
-            'view_id': self.env.ref('case_management.case_form_view').id,
+            'view_id': self.env.ref('case_management.view_case_manager_form').id,
             'target': 'current',
             'context': context
         }
@@ -1084,7 +1082,10 @@ class Customer(models.Model):
 
         # Create action to open case form
         action = self.env.ref(
-            'case_management_v2.action_create_case').read()[0]
+            'case_management.action_case_manager').read()[0]
+        form_view = self.env.ref('case_management.view_case_manager_form')
+        action['views'] = [(form_view.id, 'form')]
+        action['target'] = 'current'
         action['context'] = {
             'default_customer_id': self.id,
             'default_case_status': 'open',

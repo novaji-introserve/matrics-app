@@ -117,11 +117,7 @@
 
                     <button name="action_screen_customer" string="Run Sanction Screening" type="object" class="btn-primary" groups="compliance_management.group_compliance_compliance_officer" confirm="Run Media Screening: Are you sure?"/>
 
-
-
-                
-<button name="action_create_case" class="oe_highlight" string="Create Case" type="object" attrs="{'invisible': [('show_create_case_button', '=', False)]}"/>
-
+                    <button name="action_create_case" class="oe_highlight" string="Create Case" type="object" attrs="{'invisible': [('show_create_case_button', '=', False)]}"/>
 
                     <button 
                             name="action_create_customer_case" 
@@ -485,6 +481,55 @@
         <field name="type">ir.actions.server</field>
         <field name="state">code</field>
         <field name="code">action = model.action_view_likely_sanction_customer()</field>
+    </record>
+
+    <record id="action_customer_form_initiate_edd" model="ir.actions.server">
+        <field name="name">Initiate EDD</field>
+        <field name="model_id" ref="model_res_partner"/>
+        <field name="binding_model_id" ref="model_res_partner"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="groups_id" eval="[(4, ref('compliance_management.group_compliance_branch_compliance_officer'))]"/>
+        <field name="code">action = records.action_initiate_edd()</field>
+    </record>
+
+    <record id="action_customer_form_conduct_risk_assessment" model="ir.actions.server">
+        <field name="name">Conduct Risk Assessment</field>
+        <field name="model_id" ref="model_res_partner"/>
+        <field name="binding_model_id" ref="model_res_partner"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="groups_id" eval="[(4, ref('compliance_management.group_compliance_branch_compliance_officer'))]"/>
+        <field name="code">action = records.action_conduct_risk_assessment()</field>
+    </record>
+
+    <record id="action_customer_form_run_identity_verification" model="ir.actions.server">
+        <field name="name">Run Identity Verification</field>
+        <field name="model_id" ref="model_res_partner"/>
+        <field name="binding_model_id" ref="model_res_partner"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="code">action = records.run_identity_verification()</field>
+    </record>
+
+    <record id="action_customer_form_run_media_screening" model="ir.actions.server">
+        <field name="name">Run Media Screening</field>
+        <field name="model_id" ref="model_res_partner"/>
+        <field name="binding_model_id" ref="model_res_partner"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="groups_id" eval="[(4, ref('compliance_management.group_compliance_compliance_officer'))]"/>
+        <field name="code">action = records.scan_news_articles()</field>
+    </record>
+
+    <record id="action_customer_form_run_sanction_screening" model="ir.actions.server">
+        <field name="name">Run Sanction Screening</field>
+        <field name="model_id" ref="model_res_partner"/>
+        <field name="binding_model_id" ref="model_res_partner"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="groups_id" eval="[(4, ref('compliance_management.group_compliance_compliance_officer'))]"/>
+        <field name="code">action = records.action_screen_customer()</field>
     </record>
 
 

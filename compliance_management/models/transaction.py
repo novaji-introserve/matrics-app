@@ -107,9 +107,9 @@ class Transaction(models.Model):
         self.ensure_one()
         # Prepare action to open case form
         action = self.env.ref(
-            'case_management_v2.action_case_manager').read()[0]
+            'case_management.action_case_manager').read()[0]
 
-        form_view = self.env.ref('case_management_v2.view_case_manager_form')
+        form_view = self.env.ref('case_management.view_case_manager_form')
         action['views'] = [(form_view.id, 'form')]
         action['target'] = 'current'
         action['flags'] = {'initial_mode': 'edit'}
@@ -117,7 +117,7 @@ class Transaction(models.Model):
         # Prepare default values from customer
         context = {
             'default_customer_id': self.customer_id.id if self.customer_id else False,
-            'default_case_status': 'draft',
+            'default_case_status': 'open',
             'default_transaction_id': self.id,
         }
 
@@ -186,25 +186,24 @@ class Transaction(models.Model):
         """
         Opens the case management form with the transaction reference pre-filled
         """
+        self.ensure_one()
+
         # Create the context with required values
         context = {
-            'default_status_id': self.env.ref('case_management.case_status_open').id,
+            'default_case_status': 'open',
             'case_created': True,
             'show_creation_notification': True,
+            'default_transaction_id': self.id,
+            'default_transaction_reference': self.name,
+            'default_customer_id': self.customer_id.id if self.customer_id else False,
         }
-        
-        # Pre-fill the transaction reference
-        context['default_transaction_reference'] = self.name
-        
-        # Pre-fill the transaction_id field if it exists in the case model
-        context['default_transaction_id'] = self.id
         
         return {
             'type': 'ir.actions.act_window',
             'name': 'New Case',
-            'res_model': 'case',
+            'res_model': 'case.manager',
             'view_mode': 'form',
-            'view_id': self.env.ref('case_management.case_form_view').id,
+            'view_id': self.env.ref('case_management.view_case_manager_form').id,
             'target': 'current',
             'context': context
         }
