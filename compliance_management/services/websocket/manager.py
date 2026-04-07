@@ -72,7 +72,7 @@ def start_websocket_server():
             return False
         
         # Get WebSocket configuration
-        port = config.get('websocket_port', '8072')
+        port = config.get('websocket_port', '8073')
         
         # Start the process
         try:
@@ -164,7 +164,7 @@ def get_server_status():
     status = {
         'is_running': False,
         'pid': None,
-        'port': config.get('websocket_port', '8072'),
+        'port': config.get('websocket_port', '8073'),
         'log_file': WS_LOG_FILE,
         'uptime': None,
         'connection_count': 0

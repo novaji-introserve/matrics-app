@@ -15,7 +15,6 @@ from odoo.exceptions import UserError, AccessError
 from psycopg2.extras import execute_values
 import time
 from datetime import datetime, timedelta
-import threading
 
 
 load_dotenv()
@@ -316,60 +315,60 @@ class Customer(models.Model):
 
     def run_identity_verification(self):
         self.ensure_one()
+        if self.identity_verification == 'processing':
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Identity Verification'),
+                    'message': _('Identity verification is already in progress.'),
+                    'type': 'warning',
+                    'sticky': False,
+                }
+            }
+
         self.write({'identity_verification': 'processing'})
-        self.env.cr.commit()
-        thread = threading.Thread(
-            target=self._run_identity_verification_thread,
-            args=(self.id, self.env.uid, dict(self.env.context)),
-        )
-        thread.daemon = True
-        thread.start()
+        self.with_delay(
+            priority=20,
+            description=_('Identity verification for %s') % (self.display_name,),
+            identity_key='identity_verification_%s' % self.id,
+        ).job_run_identity_verification()
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
                 'title': _('Identity Verification'),
-                'message': _('Identity verification has started in the background.'),
+                'message': _('Identity verification has been queued and will run in the background.'),
                 'type': 'info',
                 'sticky': False,
             }
         }
 
-    def _run_identity_verification_thread(self, partner_id, uid, context=None):
-        context = context or {}
+    def _job_run_identity_verification(self):
+        """Backward-compatible alias for older queued jobs."""
+        return self.job_run_identity_verification()
+
+    def job_run_identity_verification(self):
+        self.ensure_one()
         try:
-            with api.Environment.manage():
-                new_cr = self.pool.cursor()
-                try:
-                    env = api.Environment(new_cr, uid, context)
-                    partner = env['res.partner'].browse(partner_id)
-                    if not partner.exists():
-                        return
-                    partner.sudo().write({'identity_verification': 'done'})
-                    new_cr.commit()
-                finally:
-                    new_cr.close()
+            if not self.exists():
+                return
+
+            self.sudo().write({'identity_verification': 'done'})
         except Exception:
             _logger.exception(
-                "Failed background identity verification for partner %s",
-                partner_id,
+                "Failed queued identity verification for partner %s",
+                self.id,
             )
             try:
-                with api.Environment.manage():
-                    new_cr = self.pool.cursor()
-                    try:
-                        env = api.Environment(new_cr, uid, context)
-                        partner = env['res.partner'].browse(partner_id)
-                        if partner.exists():
-                            partner.sudo().write({'identity_verification': 'pending'})
-                            new_cr.commit()
-                    finally:
-                        new_cr.close()
+                if self.exists():
+                    self.sudo().write({'identity_verification': 'pending'})
             except Exception:
                 _logger.exception(
                     "Failed resetting identity verification state for partner %s",
-                    partner_id,
+                    self.id,
                 )
+            raise
     
     
 

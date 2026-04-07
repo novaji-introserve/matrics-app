@@ -426,7 +426,7 @@
 #     </html>
 #     """.encode('utf-8')]
 
-# def start_server(host='0.0.0.0', port=8072):
+# def start_server(host='0.0.0.0', port=8073):
 #     """
 #     Start the WebSocket server.
     
@@ -481,7 +481,7 @@
 
 # if __name__ == "__main__":
 #     # Parse command-line arguments
-#     port = 8072
+#     port = 8073
 #     if len(sys.argv) > 1:
 #         try:
 #             port = int(sys.argv[1])
@@ -913,7 +913,7 @@ def websocket_app(environ, start_response):
     </html>
     """.encode('utf-8')]
 
-def start_server(host='0.0.0.0', port=8072):
+def start_server(host='0.0.0.0', port=8073):
     """
     Start the WebSocket server.
     
@@ -970,7 +970,7 @@ def start_server(host='0.0.0.0', port=8072):
 # NOT when it's imported by another module
 if __name__ == "__main__":
     # Parse command-line arguments
-    port = 8072
+    port = 8073
     if len(sys.argv) > 1:
         try:
             port = int(sys.argv[1])

@@ -41,7 +41,7 @@ class WebSocketController(http.Controller):
         """
         # Get the host from the request or config
         host = request.httprequest.host.split(':')[0]  # Use current hostname
-        port = int(config.get("websocket_port", 8072))
+        port = int(config.get("websocket_port", 8073))
         
         # Return configuration compatible with existing client code
         return {
@@ -131,7 +131,7 @@ class WebSocketController(http.Controller):
                     // Get current hostname and protocol
                     const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
                     const wsHost = window.location.hostname;
-                    const wsPort = {status.get('port', 8072)};
+                    const wsPort = {status.get('port', 8073)};
                     const wsUrl = `${{wsProtocol}}//${{wsHost}}:${{wsPort}}/csv_import/ws`;
                     
                     try {{

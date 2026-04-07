@@ -52,7 +52,7 @@ class DebugWebSocketController(http.Controller):
     
     <div>
         <label for="wsUrl">WebSocket URL:</label>
-        <input type="text" id="wsUrl" size="40" value="ws://localhost:8072/websocket" />
+        <input type="text" id="wsUrl" size="40" value="ws://localhost:8073/websocket" />
         <button id="connect">Connect</button>
         <button id="disconnect">Disconnect</button>
     </div>
@@ -156,7 +156,7 @@ class DebugWebSocketController(http.Controller):
             'timestamp': datetime.now().isoformat(),
             'odoo_version': tools.config.get('version', 'Unknown'),
             'server_port': tools.config.get('http_port', 8069),
-            'longpolling_port': tools.config.get('longpolling_port', 8072),
+            'longpolling_port': tools.config.get('longpolling_port', 8073),
             'nginx_info': self._get_nginx_info(),
             'environment': {
                 'python_version': os.sys.version,
@@ -211,7 +211,7 @@ class DebugWebSocketController(http.Controller):
             
             try {
                 // Try to connect to different WebSocket endpoints
-                testWebSocket('ws://' + window.location.hostname + ':8072/websocket', 'Native Odoo WebSocket (8072)');
+                testWebSocket('ws://' + window.location.hostname + ':8073/websocket', 'Custom WebSocket (8073)');
                 testWebSocket('ws://' + window.location.hostname + '/websocket', 'Proxied WebSocket');
                 testWebSocket('ws://' + window.location.hostname + '/csv_import/ws', 'Custom WebSocket');
             } catch (err) {
