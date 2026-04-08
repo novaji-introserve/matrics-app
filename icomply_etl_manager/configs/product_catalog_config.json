@@ -8,5 +8,11 @@
   "batch_size": 500,
   "incremental_date_column": null,
   "dependencies": [],
-  "mappings": []
+  "mappings": [
+    {
+      "source_column": "product_id",
+      "target_column": "default_code",
+      "mapping_type": "direct"
+    }
+  ]
 }
