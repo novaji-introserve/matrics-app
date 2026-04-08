@@ -14,11 +14,15 @@
     "data": [
         "security/groups.xml",
         "security/ir.model.access.csv",
+        "data/escalation_cron.xml",
         "views/alert_stat_views.xml",
         "views/alert_dashboard.xml",
         "views/alert_chart.xml",
         "views/escalation_period_views.xml",
+        "views/escalation_matrix_views.xml",
+        "views/res_users_subsidiaries.xml",
         "views/menus.xml",
+        "views/mail_template_escalation.xml",
         # Example data removed to avoid duplicate 'total_alerts' code on re-install
         # "data/alert_stat_example.xml",
     ],
@@ -34,6 +38,6 @@
         ],
     },
     "installable": True,
-    "application": False,
+    "application": True,
     "license": "LGPL-3",
 }

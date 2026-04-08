@@ -9,6 +9,7 @@ class EscalationPeriod(models.Model):
 
     name = fields.Selection(
         [
+            ("hours", "Hours"),
             ("days", "Days"),
             ("weeks", "Weeks"),
             ("months", "Months"),
@@ -36,6 +37,9 @@ class EscalationPeriod(models.Model):
                 
                 elif record.name == "weeks" and record.escalation_cycle > 52:
                     raise ValidationError("Escalation Period Cycle for weeks must be between 1 and 52.")
+                
+                elif record.name == "hours" and record.escalation_cycle > 24:
+                    raise ValidationError("Escalation Period Cycle for hours must be between 1 and 24.")
                 
                 elif record.name == "months" and record.escalation_cycle > 12:
                     raise ValidationError("Escalation Period Cycle for months must be between 1 and 12.")
