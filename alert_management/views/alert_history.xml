@@ -10,10 +10,11 @@
                 <field name="risk_rating" />
                 <!-- <field name="narration" /> -->
                 <field name="status" widget="badge"
-                    decoration-warning="status == 'pending review'"
-                    decoration-success="status == 'reviewed'"
-                    decoration-danger="status == 'fraud'"
-                    decoration-info="status == 'not fraud'" />
+                    decoration-muted="status == 'draft'"
+                    decoration-warning="status in ('pending review', 'archived')"
+                    decoration-success="status in ('reviewed', 'closed')"
+                    decoration-danger="status in ('fraud', 'overdue')"
+                    decoration-info="status in ('not fraud', 'open')" />
                 <field name="source" />
                 <field name="last_checked" string="Date" />
                 <field name="time" string="Time"/>
@@ -29,7 +30,7 @@
         <field name="arch" type="xml">
             <form string="Alert History List" edit="false" delete="false">
                 <header>
-                    <field name="status" widget="statusbar" statusbar_visible="pending review,reviewed,fraud,not fraud" />
+                    <field name="status" widget="statusbar" statusbar_visible="pending review,reviewed,fraud,not fraud,draft,open,closed,overdue,archived" />
                 </header>
                 <!-- <button name="open_reference_record" string="View Source Record" type="object" class="oe_highlight float-right" attrs="{'invisible': [('ref_id', '=', False)]}"/> -->
                 <sheet>
