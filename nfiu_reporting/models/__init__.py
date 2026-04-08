@@ -10,6 +10,7 @@ from . import nfiu_entity_director
 from . import nfiu_indicator
 from . import nfiu_currency_threshold
 from . import dashboard_scope_extension
+from . import res_config_settings
 
 # wizard/__init__.py
 from . import nfiu_export_wizard

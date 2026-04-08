@@ -1,5 +1,6 @@
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
+from odoo.modules.module import get_module_resource
 import xml.etree.ElementTree as ET
 from lxml import etree
 import base64
@@ -9,6 +10,7 @@ from datetime import datetime, timedelta, time
 THRESHOLD_AMT = 10000000
 REPORTING_DAYS_PAST = 1095
 REPORT_NAME_PREFIX = 'NFIU'
+SCHEMA_NOT_FOUND_MESSAGE = _('Validation schema not found. Please upload a schema to be used for validation.')
 
 class NFIUReport(models.Model):
     _name = 'nfiu.report'
@@ -602,6 +604,10 @@ class NFIUReport(models.Model):
                     errors.append(f"Line {error.line}: {error.message}")
                 self.validation_message = "\n".join(errors)
                 
+        except ValidationError as e:
+            self.state = 'error'
+            self.validation_message = str(e)
+            raise
         except Exception as e:
             self.state = 'error'
             self.validation_message = f"Validation error: {str(e)}"
@@ -610,10 +616,38 @@ class NFIUReport(models.Model):
 
     def _get_xsd_schema(self):
         """Get XSD schema content"""
-        # Look for the XSD schema file in the module's data folder
-        schema_path = self.env.ref('nfiu_reporting.nfiu_schema_attachment').datas
-        if schema_path:
-            return base64.b64decode(schema_path)
+        params = self.env['ir.config_parameter'].sudo()
+
+        module_xsd_path = params.get_param('nfiu_reporting.xsd_module_path')
+        if module_xsd_path:
+            path_parts = [part for part in module_xsd_path.split('/') if part]
+            schema_file_path = get_module_resource('nfiu_reporting', *path_parts)
+            if schema_file_path:
+                with open(schema_file_path, 'rb') as schema_file:
+                    return schema_file.read()
+
+        attachment_id = params.get_param('nfiu_reporting.xsd_attachment_id')
+        if attachment_id:
+            attachment = self.env['ir.attachment'].sudo().browse(int(attachment_id)).exists()
+            if attachment:
+                try:
+                    if not attachment.datas:
+                        raise ValidationError(_("Configured NFIU XSD attachment is empty."))
+                    return base64.b64decode(attachment.datas)
+                except FileNotFoundError:
+                    pass
+
+        # Backward-compatible fallback for databases that still use the legacy attachment xmlid.
+        attachment = self.env.ref('nfiu_reporting.nfiu_schema_attachment', raise_if_not_found=False)
+        if attachment:
+            try:
+                if not attachment.datas:
+                    raise ValidationError(_("NFIU XSD schema attachment is empty."))
+                return base64.b64decode(attachment.datas)
+            except FileNotFoundError:
+                pass
+
+        raise ValidationError(SCHEMA_NOT_FOUND_MESSAGE)
 
     def action_submit(self):
         """Submit the report (placeholder for actual submission logic)"""

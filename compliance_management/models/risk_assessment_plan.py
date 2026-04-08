@@ -30,6 +30,26 @@ class RiskAssessmentPlan(models.Model):
     risk_assessment = fields.Many2one(comodel_name='res.risk.assessment', string='Risk Assessment', index=True, required=False,
                                       help="Risk Assessment to which this plan is associated")
     risk_assessment_score = fields.Float(string='Risk Assessment Score',digits=(10, 2),related="risk_assessment.risk_rating")
+    internal_category = fields.Selection(
+        related='risk_assessment.internal_category',
+        string='Internal Category',
+        store=True,
+        index=True,
+    )
+    subject_id = fields.Many2one(
+        comodel_name='res.risk.subject',
+        related='risk_assessment.subject_id',
+        string='Risk Subject',
+        store=True,
+        index=True,
+    )
+    type_id = fields.Many2one(
+        comodel_name='res.risk.type',
+        related='risk_assessment.type_id',
+        string='Risk Type',
+        store=True,
+        index=True,
+    )
     
     use_composite_calculation = fields.Boolean(string='Use Composite Calculation', default=False,
                                                help="If checked, composite risk calculation will be used")

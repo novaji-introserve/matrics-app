@@ -84,7 +84,7 @@
                     <notebook colspan="4">
                         <page name='rule_query' string="Rule SQL Query" autofocus="autofocus">
                             <field name="sql_query"
-                                placeholder="SQL Query returning a single value..." />
+                                placeholder="SQL Query returning a single value..."  widget="ace"/>
                             <div class="alert alert-info" role="alert" name="test_warning"> 
                                 You can use the following placeholders in the SQL query: <ul>
                                     <li><code>#TRANSACTION_ID#</code> - (Internal) Transaction ID</li>
@@ -98,7 +98,7 @@
                             </div>
                         </page>
                         <page name='condition_python' string="Rule Python Code">
-                            <field name="condition_python" />
+                            <field name="condition_python" widget="ace" />
                             <div class="alert alert-info" role="alert" name="test_warning"> 
                                 You can use the following variables in the Python code:<br/>
                                 

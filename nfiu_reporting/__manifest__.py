@@ -37,6 +37,7 @@
         'views/nfiu_entity_director_views.xml',
         'views/nfiu_indicators_views.xml',
         'views/nfiu_currency_threshold_views.xml',
+        'views/res_config_settings_views.xml',
         'views/nfiu_report_views.xml',
         'views/nfiu_export_wizard_views.xml',
         'views/nfiu_transaction_views.xml',

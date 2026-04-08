@@ -54,6 +54,20 @@
             parent="menu_nfiu_config"
             action="action_nfiu_currency_threshold"
             sequence="40" />
+        <record id="action_nfiu_settings" model="ir.actions.act_window">
+            <field name="name">NFIU Settings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module': 'nfiu_reporting', 'bin_size': False}</field>
+        </record>
+        <menuitem id="menu_nfiu_settings"
+            name="Regulatory"
+            parent="base.menu_administration"
+            action="action_nfiu_settings"
+            sequence="60"
+            groups="compliance_management.group_compliance_chief_compliance_officer" />
              <!-- Main Menu -->
     <menuitem id="menu_bank_transactions_main"
         name="Inter-Bank Transactions"

@@ -49,6 +49,14 @@ class Transaction(models.Model):
         for transaction in self:
             transaction.write({'blocked': False})
 
+    def action_block(self):
+        """
+        Block the transaction by setting the blocked field to True.
+        """
+        self.ensure_one()
+        for transaction in self:
+            transaction.write({'blocked': True})
+
     def action_screen(self):
         result = super().action_screen()
         exceptions = self.env['res.transaction.screening.history'].search([
