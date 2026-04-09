@@ -2,6 +2,8 @@
 
 set -e
 
+ODOO_RC="${ODOO_RC:-/etc/odoo/odoo.conf}"
+
 # set the postgres database host, port, user and password according to the environment
 # and pass them as arguments to the odoo process if not present in the config file
 : ${HOST:=${DB_PORT_5432_TCP_ADDR:='db'}}
@@ -10,8 +12,8 @@ set -e
 : ${PASSWORD:=${DB_ENV_POSTGRES_PASSWORD:=${POSTGRES_PASSWORD:='odoo16@2022'}}}
 
 # install python packages
-pip install pip --upgrade
-pip install -r /etc/odoo/requirements.txt
+python3 -m pip install --upgrade pip
+python3 -m pip install -r /etc/odoo/requirements.txt
 
 # sed -i 's|raise werkzeug.exceptions.BadRequest(msg)|self.jsonrequest = {}|g' /usr/lib/python3/dist-packages/odoo/http.py
 
@@ -34,15 +36,15 @@ case "$1" in
     -- | odoo)
         shift
         if [[ "$1" == "scaffold" ]] ; then
-            exec odoo "$@"
+            exec odoo -c "$ODOO_RC" "$@"
         else
             wait-for-psql.py ${DB_ARGS[@]} --timeout=30
-            exec odoo "$@" "${DB_ARGS[@]}"
+            exec odoo -c "$ODOO_RC" "$@" "${DB_ARGS[@]}"
         fi
         ;;
     -*)
         wait-for-psql.py ${DB_ARGS[@]} --timeout=30
-        exec odoo "$@" "${DB_ARGS[@]}"
+        exec odoo -c "$ODOO_RC" "$@" "${DB_ARGS[@]}"
         ;;
     *)
         exec "$@"

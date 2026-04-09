@@ -1,11 +1,12 @@
 import html
 import logging
 from pathlib import Path
+from uuid import uuid4
 
 from config.logger import setup_job_logging
 from config.settings import load_settings
 from jobs.emailer import send_email
-from repo.alert_jobs import get_alert_job
+from repo.alert_jobs import create_alert_history, get_alert_job
 from router.utils import get_postgres_dsn
 
 
@@ -76,7 +77,13 @@ def _build_table(rows: list[dict]) -> str:
     )
 
 
-def _build_email_body(job_id: str, name: str, rows: list[dict], query: str) -> str:
+def _build_email_body(
+    job_id: str,
+    alert_id: str,
+    name: str,
+    rows: list[dict],
+    query: str,
+) -> str:
     row_count = len(rows)
     css_rules = _load_email_css_rules()
     logo = _build_logo_markup()
@@ -95,6 +102,7 @@ def _build_email_body(job_id: str, name: str, rows: list[dict], query: str) -> s
         "<div class='query-alert'>"
         f"{logo}"
         f"<p class='query-alert__meta'><strong>Alert Rule</strong>: <code>{html.escape(name)}</code></p>"
+        f"<p class='query-alert__meta'><strong>Alert ID</strong>: <code>{html.escape(alert_id)}</code></p>"
         f"<p class='query-alert__meta'>Alert manager alert query found <strong>{row_count}</strong> record(s).</p>"
         f"{table}"
         "</div>"
@@ -129,16 +137,41 @@ def run_database_alert_query(job_id: str) -> None:
         logger.info("Scheduled database alert query returned no rows for job=%s", job_id)
         return
 
+    alert_id = uuid4().hex
     final_subject = f"{job.subject} ({len(rows)})"
-    body = _build_email_body(job_id, job.subject, rows, query)
+    body = _build_email_body(job_id, alert_id, job.subject, rows, query)
     send_email(
         subject=final_subject,
         body=body,
         recipients=job.recipients,
         mail_from_name=job.mail_from_name,
     )
+    history_email = ", ".join(job.recipients)
+    history_source = job.name
     logger.info(
-        "Scheduled database alert email sent for job=%s to %s",
+        "Creating alert.history for job=%s alert_id=%s ref_id=%s source=%s email=%s",
         job_id,
+        alert_id,
+        job.model_id,
+        history_source,
+        history_email,
+    )
+    create_alert_history(
+        alert_id=alert_id,
+        ref_id=job.model_id,
+        risk_rating=job.risk_rating,
+        html_body=body,
+        email=history_email,
+        source=history_source,
+    )
+    logger.info(
+        "Created alert.history for job=%s alert_id=%s",
+        job_id,
+        alert_id,
+    )
+    logger.info(
+        "Scheduled database alert email sent for job=%s alert_id=%s to %s",
+        job_id,
+        alert_id,
         ", ".join(job.recipients),
     )

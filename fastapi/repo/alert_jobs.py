@@ -43,6 +43,12 @@ def _normalize_recipients(value: Any) -> list[str]:
     return []
 
 
+def _normalize_optional_text(value: Any) -> str | None:
+    if value in (None, False, ""):
+        return None
+    return str(value).strip() or None
+
+
 def _build_alert_job(record: dict[str, Any]) -> AlertJobConfig:
     settings = load_settings(refresh=True)
     name = str(record.get("name") or "").strip()
@@ -50,8 +56,11 @@ def _build_alert_job(record: dict[str, Any]) -> AlertJobConfig:
         job_id=_slugify_job_id(name),
         cron=str(record.get("cron_string") or "").strip(),
         query=str(record.get("alert_query") or "").strip(),
+        name=name,
         subject=name or settings.alert_email_subject,
         recipients=_normalize_recipients(record.get("recipients")),
+        model_id=_normalize_optional_text(record.get("model_id")),
+        risk_rating=record.get("risk_rating"),
         mail_from_name=None,
         enabled=True,
     )
@@ -64,7 +73,10 @@ def list_alert_jobs() -> list[AlertJobConfig]:
     if not record_ids:
         return []
 
-    records = model.read(record_ids, ["name", "alert_query", "cron_string", "recipients"])
+    records = model.read(
+        record_ids,
+        ["name", "alert_query", "cron_string", "recipients", "model_id", "risk_rating"],
+    )
     jobs: list[AlertJobConfig] = []
     for record in records:
         job = _build_alert_job(record)
@@ -72,6 +84,29 @@ def list_alert_jobs() -> list[AlertJobConfig]:
             continue
         jobs.append(job)
     return jobs
+
+
+def create_alert_history(
+    *,
+    alert_id: str,
+    ref_id: str | None,
+    risk_rating: int | str | None,
+    html_body: str,
+    email: str,
+    source: str,
+) -> Any:
+    env = _get_env()
+    history_model = env["alert.history"]
+    return history_model.create(
+        {
+            "alert_id": alert_id,
+            "ref_id": ref_id,
+            "risk_rating": risk_rating,
+            "html_body": html_body,
+            "email": email,
+            "source": source,
+        }
+    )
 
 
 def get_alert_job(job_id: str) -> AlertJobConfig:

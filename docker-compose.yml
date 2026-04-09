@@ -52,6 +52,7 @@ services:
     ports:
       - "10016:8069"
       - "20016:8072" # gevent port for longpolling/websocket traffic
+      - "8073:8073" # custom compliance_management websocket server
     tty: true
     command: --
     environment:
@@ -66,6 +67,7 @@ services:
       - ./addons:/mnt/extra-addons
       - /home/jonathan/projects/icomply_odoo:/mnt/icomply_odoo
       - /home/jonathan/storage/odoo16/lib:/usr/local/lib
+      - /home/jonathan/storage/odoo16/data:/root/.local/share/Odoo
       - ./etc:/etc/odoo
     restart: always
 

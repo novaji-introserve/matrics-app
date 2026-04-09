@@ -41,6 +41,20 @@ def capture_changes(change: dict) -> Any:
     return change_id
 
 
+def get_resource_uri_id(model_uri: str, name: str) -> int:
+    env = get_env()
+    resource_model = env["res.resource.uri"]
+    resource_ids = resource_model.search([("model_uri", "=", model_uri)], limit=1)
+    if resource_ids:
+        return resource_ids[0]
+    return resource_model.create(
+        {
+            "model_uri": model_uri,
+            "name": name,
+        }
+    )
+
+
 def get_tracked_partner_fields() -> list[dict[str, Any]]:
     env = get_env()
     field_model = env["ir.model.fields"]
@@ -93,9 +107,10 @@ def capture_tracked_partner_changes(
 
         change = {
             "name": f"Change in {field_name}",
-            "model": "res.partner",
+            "model_id": "res.partner",
             "res_id": partner_id,
             "res_name": new_record.get("name", ""),
+            "resource_id": get_resource_uri_id("res.partner", "Customer"),
             "field_name": field_name,
             "old_val": stringify_change_value(old_record.get(field_name)),
             "new_val": stringify_change_value(new_record.get(field_name)),

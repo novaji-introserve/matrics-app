@@ -14,6 +14,7 @@ def test_build_email_body_uses_dynamic_css_from_settings(monkeypatch, tmp_path):
 
     body = _build_email_body(
         job_id="aml-alert",
+        alert_id="alert-123",
         name="AML Alert",
         rows=[{"customer_name": "John", "amount": 10}],
         query="select 1",
@@ -25,6 +26,7 @@ def test_build_email_body_uses_dynamic_css_from_settings(monkeypatch, tmp_path):
     assert "class='query-alert__logo'" in body
     assert "src='https://example.com/logo.png'" in body
     assert "class='query-alert__table'" in body
+    assert "alert-123" in body
     assert "Customer Name" in body
     assert "style=" not in body
 

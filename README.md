@@ -98,14 +98,18 @@ docker-compose restart
 **Stop Odoo**:
 
 ``` bash
-docker-compose down
+docker compose down
 ```
 
 ## Live chat
 
-In [docker-compose.yml#L21](docker-compose.yml#L21), we exposed port **20016** for live-chat on host.
+In [docker-compose.yml](/home/jonathan/projects/odoo/16/odoo-16/docker-compose.yml), the host ports are:
 
-Configuring **nginx** to route the main HTTP app to `8069` and the gevent endpoints (`/longpolling/` and `/websocket`) to `8072`:
+- `10016` for the main Odoo HTTP app
+- `20016` for Odoo evented traffic (`/longpolling/` and Odoo `/websocket`)
+- `8073` for the custom `compliance_management` websocket server
+
+Configuring **nginx** to route the main HTTP app to `8069`, the Odoo evented endpoints to `20016`, and the custom compliance websocket to `8073`:
 
 ``` conf
 map $http_upgrade $connection_upgrade {
@@ -127,6 +131,15 @@ server {
 
     location /longpolling/ {
         proxy_pass http://0.0.0.0:20016/longpolling/;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /csv_import/ws {
+        proxy_pass http://0.0.0.0:8073/websocket;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
         proxy_set_header X-Forwarded-Host $host;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;

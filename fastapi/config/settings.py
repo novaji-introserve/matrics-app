@@ -16,8 +16,11 @@ class AlertJobConfig(BaseModel):
     job_id: str
     cron: str
     query: str
+    name: str
     subject: str = "Alert records found"
     recipients: list[str]
+    model_id: str | None = None
+    risk_rating: int | str | None = None
     mail_from_name: str | None = None
     enabled: bool = True
 
