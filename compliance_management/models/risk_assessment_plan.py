@@ -25,6 +25,14 @@ class RiskAssessmentPlan(models.Model):
         'active', 'Active'), ('inactive', 'Inactive')], default='draft', index=True)
     narration = fields.Text(string='Narration')
     risk_score = fields.Integer(string='Risk Score', default=1)
+    risk_score_slider_max = fields.Float(
+        string='Risk Score Slider Max',
+        compute='_compute_risk_score_slider_bounds',
+    )
+    risk_score_slider_min = fields.Float(
+        string='Risk Score Slider Min',
+        compute='_compute_risk_score_slider_bounds',
+    )
     compute_score_from = fields.Selection(string='Compute Risk Score From', selection=[(
         'dynamic', 'SQL Query Return Single Value'), ('static', 'From Risk Rating'),('risk_assessment','Related Risk Assessment'),('python','Python Expression')], default='risk_assessment', index=True,required=True)
     risk_assessment = fields.Many2one(comodel_name='res.risk.assessment', string='Risk Assessment', index=True, required=False,
@@ -57,6 +65,22 @@ class RiskAssessmentPlan(models.Model):
                                   help="Risk Universe associated with this plan")
     active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     condition_python = fields.Text(string='Python Expression',help='Applied this rule for calculation if condition is true. You can specify condition like result = 10 if customer.is_pep == True else 1')
+    
+    @api.depends('risk_assessment')
+    def _compute_risk_score_slider_bounds(self):
+        min_score, max_score = self._get_risk_score_slider_bounds()
+        for record in self:
+            record.risk_score_slider_min = min_score
+            record.risk_score_slider_max = max_score
+
+    @api.model
+    def _get_risk_score_slider_bounds(self):
+        score_record = self.env['res.fcra.score'].search([], limit=1)
+        min_score = float(score_record.min_score or 0)
+        max_score = float(score_record.max_score or 10)
+        if max_score < min_score:
+            max_score = min_score
+        return min_score, max_score
     
     
     

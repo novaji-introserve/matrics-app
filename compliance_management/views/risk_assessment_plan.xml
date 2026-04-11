@@ -66,10 +66,13 @@
                             <field name="name" />
                         </h1>
                     </div>
+                    <field name="risk_score_slider_min" invisible="1" />
+                    <field name="risk_score_slider_max" invisible="1" />
                     <group>
                         <group>
                             <field name="risk_assessment" nocreate="True" noedit="True" />
-                            <field name="risk_score" widget="slider" step="1" min="1" max="eval()" />
+                            <field name="risk_score" widget="risk_slider"
+                                options="{'step': 1, 'show_value': true, 'min_field': 'risk_score_slider_min', 'max_field': 'risk_score_slider_max'}" />
                         </group>
                         <group>
                             <field name="compute_score_from" />

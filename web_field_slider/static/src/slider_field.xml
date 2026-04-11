@@ -1,23 +1,190 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<template xml:space="preserve">
-
+<templates xml:space="preserve">
     <t t-name="web_field_slider.SliderField" owl="1">
-        <div class="d-flex">
-            <input
-                    t-ref="input"
-                    type="range"
-                    class="w-100"
-                    t-att-name="props.name"
-                    t-att-min="eval(props.min)"
-                    t-att-max="eval(props.max)"
-                    t-att-step="eval(props.step)"
-                    t-att="{disabled: props.readonly}"
-                    t-model="state.value"
-            />
-            <span t-esc="state.value"
-                  class="mb-0 ms-3 text-nowrap"
-            />
-        </div>
-    </t>
+        <div class="o_risk_slider d-flex align-items-center gap-3">
+            <span class="o_risk_badge o_risk_badge--bound d-flex align-items-center justify-content-center"
+                  t-att-title="'Minimum slider value: ' + state.minValue">
+                <t t-esc="state.minValue"/>
+            </span>
 
-</template>
+            <div class="o_slider_container position-relative flex-grow-1" t-att-style="sliderStyle">
+                <input type="range"
+                       class="o_risk_range form-range"
+                       t-att-class="state.isDragging ? 'dragging' : ''"
+                       t-att-name="props.name"
+                       t-att-min="state.minValue"
+                       t-att-max="state.maxValue"
+                       t-att-step="sliderStep"
+                       t-att-value="state.value"
+                       t-on-input="onInput"
+                       t-on-change="onChange"
+                       t-on-mousedown="onDragStart"
+                       t-on-touchstart="onDragStart"
+                       t-on-mouseup="onDragEnd"
+                       t-on-touchend="onDragEnd"
+                       t-on-keydown="onKeyDown"
+                       t-on-keyup="onDragEnd"
+                       t-att-aria-label="'Slider input'"
+                       t-att-aria-valuemin="state.minValue"
+                       t-att-aria-valuemax="state.maxValue"
+                       t-att-aria-valuenow="state.value"
+                       t-att-disabled="props.readonly"/>
+                <div class="o_slider_track_backdrop"/>
+                <div class="o_slider_progress"/>
+                <span class="o_value_tooltip position-absolute"
+                      t-att-class="badgeClass"
+                      t-att-style="tooltipStyle"
+                      t-esc="formattedValue"/>
+            </div>
+
+            <span class="o_risk_badge o_risk_badge--bound d-flex align-items-center justify-content-center"
+                  t-att-title="'Maximum slider value: ' + state.maxValue">
+                <t t-esc="state.maxValue"/>
+            </span>
+
+            <span class="o_current_value d-flex align-items-center justify-content-center"
+                  t-att-class="badgeClass">
+                <t t-esc="formattedValue"/>
+            </span>
+        </div>
+
+        <style>
+            .o_risk_slider {
+                padding: 10px 0;
+                align-items: center;
+            }
+            .o_risk_badge {
+                font-weight: 600;
+                line-height: 1;
+                letter-spacing: 0.01em;
+            }
+            .o_risk_badge--bound,
+            .o_current_value {
+                min-width: 52px;
+                height: 32px;
+                padding: 0 12px;
+                border-radius: 999px;
+                font-size: 0.85rem;
+            }
+            .o_risk_badge--bound {
+                background: #f3f4f6;
+                color: #344054;
+                border: 1px solid #d0d5dd;
+            }
+            .o_slider_container {
+                position: relative;
+                min-width: 100px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+            }
+            .o_risk_range {
+                position: relative;
+                z-index: 3;
+                margin: 0;
+                height: 40px;
+                background: transparent;
+                -webkit-appearance: none;
+                appearance: none;
+            }
+            .o_risk_range.dragging {
+                cursor: grabbing;
+            }
+            .o_risk_range:disabled {
+                opacity: 0.75;
+                cursor: not-allowed;
+            }
+            .o_risk_range:focus {
+                outline: none;
+            }
+            .o_slider_track_backdrop,
+            .o_slider_progress {
+                position: absolute;
+                left: 0;
+                right: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                height: 8px;
+                border-radius: 999px;
+                pointer-events: none;
+            }
+            .o_slider_track_backdrop {
+                background: linear-gradient(90deg, #e5e7eb 0%, #f3f4f6 100%);
+                box-shadow: inset 0 1px 2px rgba(16, 24, 40, 0.08);
+            }
+            .o_slider_progress {
+                right: auto;
+                width: var(--slider-progress);
+                background: linear-gradient(90deg, var(--slider-accent) 0%, var(--slider-accent-soft) 100%);
+                box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.04);
+                transition: width 90ms linear;
+            }
+            .o_value_tooltip {
+                top: -2px;
+                transform: translate(-50%, -100%);
+                font-size: 0.75rem;
+                font-weight: 700;
+                padding: 4px 10px;
+                border-radius: 999px;
+                z-index: 10;
+                white-space: nowrap;
+                min-width: 42px;
+                text-align: center;
+                color: #fff;
+                box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18);
+                transition: left 90ms linear, transform 120ms ease, opacity 120ms ease;
+                opacity: 0.92;
+            }
+            .o_risk_slider:not(:hover) .o_value_tooltip,
+            .o_risk_range:not(.dragging) ~ .o_value_tooltip {
+                transform: translate(-50%, -92%);
+            }
+            .o_risk_range::-webkit-slider-thumb {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background: #ffffff;
+                border: 2px solid var(--slider-accent, #2563eb);
+                -webkit-appearance: none;
+                margin-top: -6px;
+                box-shadow: 0 2px 10px rgba(15, 23, 42, 0.18);
+                cursor: grab;
+                transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+            }
+            .o_risk_range::-moz-range-thumb {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background: #ffffff;
+                border: 2px solid var(--slider-accent, #2563eb);
+                box-shadow: 0 2px 10px rgba(15, 23, 42, 0.18);
+                cursor: grab;
+                transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+            }
+            .o_risk_range::-webkit-slider-runnable-track {
+                height: 8px;
+                border-radius: 999px;
+                background: transparent;
+            }
+            .o_risk_range::-moz-range-track {
+                height: 8px;
+                border-radius: 999px;
+                background: transparent;
+            }
+            .o_risk_range:hover::-webkit-slider-thumb,
+            .o_risk_range:focus::-webkit-slider-thumb,
+            .o_risk_range.dragging::-webkit-slider-thumb,
+            .o_risk_range:hover::-moz-range-thumb,
+            .o_risk_range:focus::-moz-range-thumb,
+            .o_risk_range.dragging::-moz-range-thumb {
+                transform: scale(1.08);
+                box-shadow: 0 4px 14px rgba(15, 23, 42, 0.22);
+            }
+            .o_current_value {
+                color: #fff;
+                font-weight: 700;
+                box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+            }
+        </style>
+    </t>
+</templates>

@@ -88,6 +88,7 @@
         'rule_book/static/src/components/*/*.xml',
         'rule_book/static/src/components/*/*.scss',
         'rule_book/static/src/slider_field.xml',
+        'rule_book/static/src/slider_field.js',
         # Add JavaScript files
         'rule_book/static/src/components/**/*.js',
         # Add CSS files
