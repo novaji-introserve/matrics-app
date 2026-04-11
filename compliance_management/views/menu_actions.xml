@@ -258,24 +258,16 @@
         <field name="name">Customers on PEP List</field>
         <field name="res_model">res.partner</field>
         <field name="view_mode">kanban,tree,form</field>
-        <field name="domain">[('is_pep', '=', True)]</field>
-    </record>
-
-
-    <record model="ir.actions.act_window" id="res_charts_action">
-        <field name="name">Dashboard Charts</field>
-        <field name="res_model">res.dashboard.charts</field>
-        <field name="view_mode">tree,form</field>
+        <field name="domain">[('customer_type', '=', 'corporate')]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Create your first dynamic chart
+                Conduct EDD for a corporate customer
             </p>
             <p>
-                Configure SQL queries to generate dynamic charts for your Odoo data.
+                Corporate customer enhanced due diligence is conducted here
             </p>
         </field>
     </record>
-
 
     <record id="action_res_partner_edd" model="ir.actions.act_window">
         <field name="name">Enhanced Due Diligence</field>
@@ -842,6 +834,16 @@ action = {
 
     <menuitem id="menu_compliance_transaction_screening_rule" action="action_list_transaction_screening_rule" parent="menu_compliance_transaction_screening" name="Rules" groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer" sequence="100" />
 
+    <record id="action_open_internal_transactions" model="ir.actions.act_window">
+        <field name="name">Internal Transactions</field>
+        <field name="res_model">res.customer.transaction</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="compliance_transaction_tree" />
+        <field name="search_view_id" ref="view_customer_trans_search" />
+        <field name="domain">['|', ('account_id.ledger_type_id.name', '=', 'Internal'), ('account_id.account_type', '=', 'Internal')]</field>
+        <field name="context">{'search_default_internal_transactions': 1, 'search_default_group_branch': 1}</field>
+    </record>
+
 
     <!-- Menu -->
     <menuitem id="menu_compliance_stat" action="action_list_compliance_stat" parent="menu_compliance_risk_settings" name="Statistics" groups="group_compliance_compliance_risk_manager,group_compliance_compliance_officer" sequence="1000" />
@@ -970,10 +972,30 @@ action = {
         groups="base.group_user" />
     <menuitem id="mail.menu_root_discuss" name="Messaging" web_icon="compliance_management,static/description/icon-chat.png" groups="group_tech_support" sequence="1" />
 
+    <record id="action_res_partner_edd_corporate" model="ir.actions.act_window">
+        <field name="name">Corporate Enhanced Due Diligence</field>
+        <field name="res_model">res.partner.edd</field>
+        <field name="view_id" ref="edd_tree_view" />
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="edd_search_view"/>
+        <field name="domain">[("customer_type", "=", "corporate")]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Conduct EDD for a corporate customer
+            </p>
+            <p>
+                Corporate customer enhanced due diligence is conducted here
+            </p>
+        </field>
+    </record>
+
     <menuitem id="menu_compliance_customer_heading" action="open_customers" parent="menu_compliance_kyc" name="Customers" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="10" />
     <menuitem id="menu_compliance_high_risk_customers" action="open_high_risk_customers" parent="menu_compliance_kyc" name="High-Risk Customers" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="20" />
     <menuitem id="menu_compliance_customers_without_bvn" action="open_customers_without_bvn" parent="menu_compliance_kyc" name="Customers /wo BVN" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="25" />
     <menuitem id="menu_compliance_customer" action="open_customers" parent="menu_compliance_customer_heading" name="Customers" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="10" />
+    <menuitem id="menu_compliance_customer_corporate" action="open_corporate_customers" parent="menu_compliance_customer_heading" name="Corporate" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="15" />
+    <menuitem id="menu_compliance_customer_dd_corporate" action="open_corporate_customers" parent="menu_compliance_dd" name="Corporate" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer,group_compliance_transaction_monitoring_team" sequence="15" />
+    <menuitem id="menu_compliance_edd_corporate" action="action_res_partner_edd_corporate" parent="menu_compliance_dd" name="Corporate EDD" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer,group_compliance_relationship_manager" sequence="105" />
     <menuitem id="menu_compliance_customer_dd" action="open_customers" parent="menu_compliance_dd" name="Customers" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer,group_compliance_transaction_monitoring_team" sequence="10" />
     <menuitem id="menu_compliance_vendor_dd" action="open_vendors" parent="menu_compliance_dd" name="Vendors" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="20" />
     <menuitem id="menu_compliance_paerner_dd" action="open_partners" parent="menu_compliance_dd" name="Partners" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer" sequence="30" />
@@ -993,7 +1015,8 @@ action = {
     <menuitem id="menu_compliance_transactions" action="open_transactions" parent="menu_compliance_transaction_monitoring" name="Transactions To Review" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer,group_compliance_transaction_monitoring_team" sequence="10" />
     <menuitem id="menu_compliance_transactions_done" action="open_transactions_done" parent="menu_compliance_transaction_monitoring" name="Transactions Reviewed" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer,group_compliance_transaction_monitoring_team" sequence="20" />
     <menuitem id="menu_compliance_transactions_all" action="open_transactions_all" parent="menu_compliance_transaction_monitoring" name="All Transactions" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer,group_compliance_transaction_monitoring_team" sequence="30" />
-    <menuitem id="menu_change_data_capture" action="action_change_data_capture" parent="menu_compliance_transaction_monitoring" name="Change Data Capture" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer,group_compliance_transaction_monitoring_team" sequence="40" />
+    <menuitem id="menu_compliance_internal_transactions" action="action_open_internal_transactions" parent="menu_compliance_transaction_monitoring" name="Internal Transactions" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer,group_compliance_transaction_monitoring_team" sequence="40" />
+    <menuitem id="menu_change_data_capture" action="action_change_data_capture" parent="menu_compliance_transaction_monitoring" name="Change Data Capture" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer,group_compliance_transaction_monitoring_team" sequence="50" />
     <menuitem id="menu_compliance_kyc_transaction_screening"  parent="menu_compliance_transactions_root" name="Transaction Screening" groups="group_compliance_compliance_officer,group_compliance_transaction_monitoring_team" sequence="20" />
     <menuitem id="menu_compliance_transaction_screening_history" action="open_transaction_screening_history" parent="menu_compliance_kyc_transaction_screening" name="History" groups="group_compliance_compliance_officer,group_compliance_transaction_monitoring_team" sequence="40" />
     <menuitem

@@ -62,17 +62,6 @@ class RiskAssessmentLine(models.Model):
             """)
         super().init()
 
-    @api.model
-    def create(self, vals):
-        record = super(RiskAssessmentLine, self).create(vals)
-        record.update_aggregate_risk_score()
-        return record
-
-    def write(self, vals):
-        record = super(RiskAssessmentLine, self).write(vals)
-        self.update_aggregate_risk_score()
-        return record
-
     @api.depends('inherent_risk_score', 'control_effectiveness_score', 'residual_risk_impact','residual_risk_score','residual_risk_probability','residual_risk_score')
     def _compute_risk_score(self):
         max_score = self.get_control_effectiveness_max_score()
@@ -123,9 +112,3 @@ class RiskAssessmentLine(models.Model):
 
     def _compute_residual_risk_score(self, probability, impact):
         return (probability/100) * impact
-
-    def update_aggregate_risk_score(self):
-        risk_assessment_id = self.risk_assessment_id.id
-        self.env.cr.execute('update res_risk_assessment set risk_rating = (SELECT avg(residual_risk_score) FROM res_risk_assessment_line WHERE risk_assessment_id = %s) where id =%s',
-                            (risk_assessment_id, risk_assessment_id))
-        

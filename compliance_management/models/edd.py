@@ -223,6 +223,16 @@ class CustomerEDD(models.Model):
         string='Signatories Details (Names)', help='List the names of authorized signatories', tracking=True)
     beneficial_owner_details = fields.Text(
         string='Beneficial Owner Details', help='List the names of the Directors/Shareholders/Person of Significant Control')
+    structured_ubo_summary = fields.Text(
+        string='Structured UBO Summary',
+        related='customer_id.ubo_summary',
+        readonly=True,
+    )
+    structured_ubo_count = fields.Integer(
+        string='Structured UBO Count',
+        related='customer_id.ubo_count',
+        readonly=True,
+    )
     high_risk_industries = fields.Text(
         string="Does the customer have any direct or indirect link to high-risk industries (e.g. Crypto, Financial Services, DNFBPs)?", tracking=True)
     pep_association = fields.Boolean(
@@ -258,6 +268,12 @@ class CustomerEDD(models.Model):
                                       default=lambda self: self._default_is_editable_user(), store=False)
     is_officer_notified = fields.Boolean(
         string="Officer Notified", default=False)
+
+    def action_load_customer_ubo_details(self):
+        for rec in self:
+            if not rec.customer_id:
+                raise UserError(_('A customer is required before loading UBO details.'))
+            rec.beneficial_owner_details = rec.customer_id.ubo_summary
     is_relationship_manager = fields.Boolean(
         compute='_compute_is_relationship_manager', default=lambda self: self._default_is_relationship_manager(), store=False)
     is_diligence_officer = fields.Boolean(default=lambda self: (self.env.user.has_group('compliance_management.group_compliance_compliance_officer') or

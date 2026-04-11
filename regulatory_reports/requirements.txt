@@ -1,4 +1,1 @@
-openpyexcel
-pandas
-xlwt
 sqlparse

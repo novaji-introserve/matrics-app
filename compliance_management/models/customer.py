@@ -24,15 +24,89 @@ _logger = logging.getLogger(__name__)
 class Shareholders(models.Model):
     _name = 'res.partner.shareholders'
     _description = 'Shareholders and Directors'
+    _order = 'is_ubo desc, pct_equity desc, name'
 
     name = fields.Char(string='Name', required=True, tracking=True)
-    role = fields.Selection(string='Role', selection=[(
-        'director', 'Director'), ('shareholder', 'shareholder')])
+    owner_type = fields.Selection(
+        string='Owner Type',
+        selection=[
+            ('individual', 'Individual'),
+            ('corporate', 'Corporate'),
+            ('trust', 'Trust'),
+            ('nominee', 'Nominee'),
+        ],
+        default='individual',
+        required=True,
+        tracking=True,
+    )
+    role = fields.Selection(
+        string='Role',
+        selection=[
+            ('director', 'Director'),
+            ('shareholder', 'Shareholder'),
+            ('signatory', 'Signatory'),
+            ('psc', 'Person of Significant Control'),
+            ('ubo', 'Ultimate Beneficial Owner'),
+        ],
+        default='shareholder',
+        tracking=True,
+    )
+    ownership_type = fields.Selection(
+        string='Ownership Type',
+        selection=[('direct', 'Direct'), ('indirect', 'Indirect')],
+        default='direct',
+        required=True,
+        tracking=True,
+    )
     pct_equity = fields.Float(
         string='Equity (%)', digits=(10, 2), tracking=True)
+    voting_rights_pct = fields.Float(
+        string='Voting Rights (%)', digits=(10, 2), tracking=True)
+    effective_ownership_pct = fields.Float(
+        string='Effective Ownership (%)', digits=(10, 2), tracking=True,
+        help='Use this for indirect ownership where the effective ownership differs from direct equity.'
+    )
+    is_control_person = fields.Boolean(
+        string='Exercises Significant Control', tracking=True)
+    is_ubo = fields.Boolean(
+        string='UBO', compute='_compute_is_ubo', store=True)
+    verification_status = fields.Selection(
+        string='Verification Status',
+        selection=[
+            ('draft', 'Draft'),
+            ('pending', 'Pending Verification'),
+            ('verified', 'Verified'),
+            ('rejected', 'Rejected'),
+        ],
+        default='draft',
+        tracking=True,
+    )
+    source_of_wealth = fields.Text(string='Source of Wealth', tracking=True)
+    country_id = fields.Many2one('res.country', string='Country', tracking=True)
     bvn = fields.Char(string='BVN', tracking=True)
+    identification_number = fields.Char(
+        string='Identification / Registration No.', tracking=True)
+    relationship_to_customer = fields.Char(
+        string='Relationship to Customer', tracking=True)
+    is_pep = fields.Boolean(string='PEP', tracking=True)
+    is_sanctioned = fields.Boolean(string='Sanction Match', tracking=True)
+    notes = fields.Text(string='Notes', tracking=True)
+    active = fields.Boolean(default=True, tracking=True)
     customer_id = fields.Many2one(
-        comodel_name='res.partner', string='Partner', ondelete="cascade")
+        comodel_name='res.partner', string='Partner', ondelete="cascade", required=True)
+
+    @api.depends('role', 'pct_equity', 'effective_ownership_pct', 'voting_rights_pct', 'is_control_person', 'customer_id')
+    def _compute_is_ubo(self):
+        for rec in self:
+            threshold = rec.customer_id._get_ubo_threshold()
+            ownership_pct = rec.effective_ownership_pct or rec.pct_equity or 0.0
+            voting_pct = rec.voting_rights_pct or 0.0
+            rec.is_ubo = bool(
+                rec.role == 'ubo'
+                or rec.is_control_person
+                or ownership_pct >= threshold
+                or voting_pct >= threshold
+            )
 
 
 class PartnerRiskPlanLines(models.Model):
@@ -128,6 +202,16 @@ class Customer(models.Model):
         comodel_name='res.partner.edd', index=True, inverse_name='customer_id', string='EDD Lines', tracking=True)
     shareholder_ids = fields.One2many(
         comodel_name='res.partner.shareholders', inverse_name='customer_id', string='Shareholder', tracking=True)
+    ubo_count = fields.Integer(
+        string='UBO Count', compute='_compute_ubo_metrics')
+    ownership_total_pct = fields.Float(
+        string='Ownership Total (%)', digits=(10, 2), compute='_compute_ubo_metrics')
+    has_unverified_ubo = fields.Boolean(
+        string='Has Unverified UBO', compute='_compute_ubo_metrics')
+    has_high_risk_ubo = fields.Boolean(
+        string='Has High Risk UBO', compute='_compute_ubo_metrics')
+    ubo_summary = fields.Text(
+        string='UBO Summary', compute='_compute_ubo_metrics')
     risk_plan_line_ids = fields.One2many(
         comodel_name='res.partner.risk.plan.line', inverse_name='partner_id', string='Risk Analysis Lines', tracking=True)
     risk_assessment_ids = fields.One2many(
@@ -255,6 +339,74 @@ class Customer(models.Model):
         index=True,
         tracking=True,
     )
+
+    def _get_ubo_threshold(self):
+        self.ensure_one()
+        threshold_val = self.env['res.compliance.settings'].get_setting('ubo_threshold_pct')
+        try:
+            return float(threshold_val) if threshold_val is not None else 25.0
+        except (TypeError, ValueError):
+            return 25.0
+
+    @api.depends(
+        'shareholder_ids',
+        'shareholder_ids.is_ubo',
+        'shareholder_ids.pct_equity',
+        'shareholder_ids.effective_ownership_pct',
+        'shareholder_ids.verification_status',
+        'shareholder_ids.is_pep',
+        'shareholder_ids.is_sanctioned',
+        'shareholder_ids.name',
+        'shareholder_ids.role',
+        'shareholder_ids.owner_type',
+        'shareholder_ids.country_id',
+    )
+    def _compute_ubo_metrics(self):
+        for rec in self:
+            lines = rec.shareholder_ids.filtered(lambda line: line.active)
+            ubo_lines = lines.filtered(lambda line: line.is_ubo)
+            rec.ubo_count = len(ubo_lines)
+            rec.ownership_total_pct = round(sum(lines.mapped('pct_equity')), 2)
+            rec.has_unverified_ubo = any(
+                line.verification_status != 'verified' for line in ubo_lines
+            )
+            rec.has_high_risk_ubo = any(
+                line.is_pep or line.is_sanctioned for line in ubo_lines
+            )
+
+            summary_lines = []
+            for line in ubo_lines:
+                ownership_pct = line.effective_ownership_pct or line.pct_equity or 0.0
+                owner_type = dict(line._fields['owner_type'].selection).get(line.owner_type, '')
+                country = line.country_id.name if line.country_id else 'N/A'
+                status = dict(line._fields['verification_status'].selection).get(
+                    line.verification_status, line.verification_status or ''
+                )
+                risk_flags = []
+                if line.is_pep:
+                    risk_flags.append('PEP')
+                if line.is_sanctioned:
+                    risk_flags.append('Sanction')
+                risk_text = f" [{' / '.join(risk_flags)}]" if risk_flags else ''
+                summary_lines.append(
+                    f"{line.name} ({owner_type}) - {ownership_pct:.2f}% - {status} - {country}{risk_text}"
+                )
+
+            rec.ubo_summary = "\n".join(summary_lines) if summary_lines else "No UBO identified."
+
+    def action_view_ownership_lines(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Ownership / UBO Records'),
+            'res_model': 'res.partner.shareholders',
+            'view_mode': 'tree,form',
+            'domain': [('customer_id', '=', self.id)],
+            'context': {
+                'default_customer_id': self.id,
+            },
+            'target': 'current',
+        }
 
     @api.depends('customer_id')
     def _compute_is_case_manager_installed(self):

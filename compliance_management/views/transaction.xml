@@ -119,6 +119,7 @@
                 <filter string="Today's Transactions" name="today_records" domain="[('date_created', '=', context_today().strftime('%Y-%m-%d'))]" />
                 <filter string="Yesterday's Transactions" name="yesterday_records" domain="[('date_created', '&gt;=', (context_today() - relativedelta(days=1)).strftime('%Y-%m-%d')), ('date_created', '&lt;=', (context_today() - relativedelta(days=1)).strftime('%Y-%m-%d'))]" />
                 <filter string="This Week's Transactions" name="this_week_records" domain="[('date_created', '&gt;=', context_today().strftime('%Y-%m-01')), ('date_created', '&lt;=', context_today().strftime('%Y-%m-%d'))]" />
+                <filter string="Internal Transactions" name="internal_transactions" domain="['|', ('account_id.ledger_type_id.name', '=', 'Internal'), ('account_id.account_type', '=', 'Internal')]" />
 
 
                 <filter string="High Risk/ To Review" name="state_new" domain="[('state', '=', 'new'),('risk_level','=','high')]" />

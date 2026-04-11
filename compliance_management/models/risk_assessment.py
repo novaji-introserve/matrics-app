@@ -19,7 +19,7 @@ class RiskAssessment(models.Model):
     user_id = fields.Many2one(comodel_name='res.users', string='User',
                               required=True, index=True, default=lambda self: self.env.user.id)
     risk_rating = fields.Float(
-        string='Risk Rating', digits=(10, 2), default=0.0)
+        string='Risk Rating', digits=(10, 2), compute='_compute_risk_rating', store=True)
     narration = fields.Html(string='Narration')
     subject_id = fields.Many2one(
         comodel_name='res.risk.subject', string='Risk Subject', index=True)
@@ -39,56 +39,36 @@ class RiskAssessment(models.Model):
 
     active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     
-    @api.model
-    def create(self, vals):
-        record = super(RiskAssessment, self).create(vals)
-        for e in record:
-            e.action_update_risk_score()
-        for e in record:
-            e.action_update_risk_score()
-        return record
-
     def _compute_total_risk_lines(self):
         self.total_risk_lines = len(self.line_ids)
 
-    def write(self, vals):
-        for e in self:
-            score = e.compute_risk_score_from_lines()
-            vals['risk_rating'] = score
-        for e in self:
-            score = e.compute_risk_score_from_lines()
-            vals['risk_rating'] = score
-        record = super(RiskAssessment, self).write(vals)
-        return record
-
     def action_update_risk_score(self):
+        self.compute_risk_score()
+
+    def compute_risk_score(self):
         for rec in self:
-            score = self.compute_risk_score_from_lines()
-            rec.write({"risk_rating": score})     
+            rec.risk_rating = rec.compute_risk_score_from_lines()
 
     def compute_risk_score_from_lines(self):
+        self.ensure_one()
         setting  = self.env['res.compliance.settings'].search([('code','=','risk_assessment_computation')],limit = 1)
+        plan_setting = 'max'
         for e in setting:
-            plan_setting = e.val.strip().lower()
-        if plan_setting == 'avg':
-            self.env.cr.execute("SELECT avg(residual_risk_score) FROM res_risk_assessment_line WHERE risk_assessment_id = %s", (self.id,))
-        else:
-            self.env.cr.execute("SELECT max(residual_risk_score) FROM res_risk_assessment_line WHERE risk_assessment_id = %s", (self.id,))
-        rec = self.env.cr.fetchone()
-        result = 0.00
-        try:
-            result = f"{rec[0]:.2f}" if rec is not None else 0.0
-        except:
-            result = 0.0
-        return result
+            plan_setting = (e.val or '').strip().lower() or 'max'
+        line_scores = self.line_ids.mapped('residual_risk_score')
+        if not line_scores:
+            return 0.0
 
-    @api.depends('line_ids')
-    def _compute_risk_score(self):
-        score = self.compute_risk_score_from_lines()
-        for rec in self:
-             rec.write({"risk_rating": score}) 
-    
-             rec.write({"risk_rating": score}) 
+        if plan_setting == 'avg':
+            score = sum(line_scores) / len(line_scores)
+        else:
+            score = max(line_scores)
+
+        return round(score, 2)
+
+    @api.depends('line_ids', 'line_ids.residual_risk_score')
+    def _compute_risk_rating(self):
+        self.compute_risk_score()
     
     @api.onchange('line_ids')
     def _onchange_line_ids(self):

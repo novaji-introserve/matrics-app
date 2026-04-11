@@ -1,270 +1,403 @@
-from odoo import _, api, fields, models
-import logging
 import base64
+import html
 import io
-from openpyxl import load_workbook
-from odoo.exceptions import UserError
-from copy import copy
-from openpyxl.utils.cell import coordinate_from_string
+import logging
+
+import sqlparse
+import xlsxwriter
+
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError, ValidationError
+from sqlparse import sql
+from sqlparse.tokens import DML, Keyword
 
 _logger = logging.getLogger(__name__)
 
 
-class ReportRuns(models.Model):
-    _name = 'res.regulatory.report.run'
-    _description = 'Regulatory Report Runs'
-    _order = 'create_date desc'
-    name = fields.Char(string='Name')
-    report_id = fields.Many2one(
-        comodel_name='res.regulatory.report', string='Report',index=True)
-    # Result fields
-    processed_file = fields.Binary(string="Report File", tracking=True)
-    processed_filename = fields.Char(
-        string="Report Filename", tracking=True)
-    changes_count = fields.Integer(
-        string="Number of Changes Made", readonly=True)
+class RegulatoryReportRun(models.Model):
+    _name = "res.regulatory.report.run"
+    _description = "Regulatory Report Run"
+    _order = "create_date desc, id desc"
 
-    def action_submit_report(self):
+    name = fields.Char(required=True)
+    report_id = fields.Many2one(
+        "res.regulatory.report",
+        string="Report",
+        required=True,
+        ondelete="cascade",
+        index=True,
+    )
+    query_text = fields.Text(string="Query", required=True, readonly=True)
+    state = fields.Selection(
+        [
+            ("queued", "Queued"),
+            ("running", "Running"),
+            ("done", "Done"),
+            ("failed", "Failed"),
+        ],
+        string="Status",
+        default="queued",
+        index=True,
+    )
+    row_count = fields.Integer(string="Rows Exported", readonly=True)
+    file_name = fields.Char(string="File Name", readonly=True)
+    attachment_id = fields.Many2one(
+        "ir.attachment",
+        string="Download File",
+        readonly=True,
+        ondelete="set null",
+    )
+    download_url = fields.Char(
+        string="Download URL",
+        compute="_compute_download_url",
+        readonly=True,
+    )
+    error_message = fields.Text(string="Error", readonly=True)
+    requested_by = fields.Many2one(
+        "res.users",
+        string="Requested By",
+        default=lambda self: self.env.user,
+        readonly=True,
+    )
+    download_ready = fields.Boolean(
+        string="Download Ready",
+        compute="_compute_download_ready",
+    )
+
+    @api.depends("attachment_id")
+    def _compute_download_url(self):
+        for rec in self:
+            rec.download_url = (
+                f"/web/content/{rec.attachment_id.id}?download=true"
+                if rec.attachment_id
+                else False
+            )
+
+    @api.depends("state", "attachment_id")
+    def _compute_download_ready(self):
+        for rec in self:
+            rec.download_ready = rec.state == "done" and bool(rec.attachment_id)
+
+    def action_download_file(self):
+        self.ensure_one()
+        if not self.download_ready:
+            raise UserError(_("The file is not ready for download yet."))
         return {
-            "type": "ir.actions.client",
-                    "tag": "display_notification",
-                    "params": {
-                        "title": "Operation successful",
-                        "message": 'Report submitted successfully',
-                        "type": "success",
-                        "sticky": True,
-                    }
+            "type": "ir.actions.act_url",
+            "url": self.download_url,
+            "target": "self",
         }
 
-
-class Report(models.Model):
-    _name = 'res.regulatory.report'
-    _description = 'Regulatory Report'
-    _order = 'name, create_date desc'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
-    name = fields.Char(string='Name', required=True, tracking=True)
-    template_id = fields.Many2one(
-        comodel_name='res.regulatory.report.template', string='Report Template', required=True, tracking=True,index=True)
-    date_from = fields.Date(string='Period Start',
-                            required=True, index=True, tracking=True)
-    date_to = fields.Date(string='Period End',
-                          required=True, index=True, tracking=True)
-    run_mode = fields.Selection(string='Run Mode', selection=[('auto', 'Automated'), ('manual', 'Manual')],default='auto',index=True)
-    run_frequency = fields.Selection(string='Run Frequency', selection=[('daily', 'Daily'), ('weekly', 'Weekly'),('monthly','Monthly')],default='monthly')
-    # Result fields
-    processed_file = fields.Binary(string="Processed File", tracking=True)
-    processed_filename = fields.Char(
-        string="Processed Filename", tracking=True)
-    changes_count = fields.Integer(
-        string="Number of Changes Made", readonly=True)
-    run_ids = fields.One2many(
-        'res.regulatory.report.run', 'report_id', string='Report Runs')
-
-    def action_process_report(self):
-        """
-        Main method to process Excel file and perform find/replace operations
-        """
-        if not self.template_id.template_file:
-            raise UserError("Please upload a template file first.")
-
-        try:
-            # Decode binary data
-
-            file_data = base64.b64decode(self.template_id.template_file)
-
-            # Create Excel workbook object from binary data
-            workbook = load_workbook(io.BytesIO(file_data))
-            changes_count = 0
-            # Perform find and replace
-            item_ids = self.template_id.item_ids
-            if item_ids:
-                for i in item_ids:
-                    changes_count = self._find_replace_in_workbook(
-                        workbook,
-                        i.worksheet_id.name,
-                        i.name.strip().upper(),
-                        i.item_id.get_value(),
-                    )
-            # Convert back to binary
-            processed_binary = self._workbook_to_binary(workbook)
-            run = self.env['res.regulatory.report.run'].create({
-                'name': self.name,
-                'processed_file': processed_binary,
-                'processed_filename': f"{self.template_id.entity_id.code}_{self.template_id.code}",
-                'changes_count': 1,
-                'report_id': self.id
-            })
-
-            return {
-                'type': 'ir.actions.act_window',
-                'name': 'Report Processing Complete',
-                'view_mode': 'form',
-                'res_model': 'res.regulatory.report',
-                'res_id': self.id,
-                'target': 'current',
-            }
-
-        except Exception as e:
-            raise UserError(f"Error processing file: {str(e)}")
-
-    def _find_replace_in_workbook(self, workbook,worksheet_name,find_val, replace_val):
-        """
-        Find and replace values in all worksheets of the workbook
-
-        Args:
-            workbook: openpyxl Workbook object
-            find_val: Value to find
-            replace_val: Value to replace with
-
-        Returns:
-            int: Number of replacements made
-        """
-        changes_count = 0
-
-        # Iterate through all worksheets
-        #for worksheet in workbook.worksheets:
-        worksheet = workbook[worksheet_name]
-        if worksheet:
-            if isinstance(replace_val, dict):
-                pass
-            if isinstance(replace_val, list):
-                cell = worksheet[find_val]
-                col_letter, row_num = coordinate_from_string(find_val)
-                # Get all cells in that row so we can apply styles per cell
-                row_cells = []
-                for col in range(1, worksheet.max_column + 1):
-                    cell = worksheet.cell(row=row_num, column=col)
-                    row_cells.append(cell)
-                start_row = cell.row
-                new_data = replace_val
-                worksheet.insert_rows(start_row, len(new_data))
-                for i, row in enumerate(new_data):
-                    list_row = list(row)
-                    for j, value in enumerate(list_row):
-                        current_col = j+1
-                        new_cell = worksheet.cell(
-                            row=start_row+i, column=current_col, value=value)
-                        copy_cell = row_cells[j]
-                        if copy_cell.has_style:
-                            new_cell.font = copy(copy_cell.font)
-                            new_cell.border = copy(copy_cell.border)
-                            new_cell.fill = copy(copy_cell.fill)
-            else:
-                self._find_replace_in_cell(
-                    worksheet, find_val, replace_val
-                )
-            changes_count = changes_count+1
-            return changes_count
-
-    def _find_replace_in_cell(self, worksheet, find_val, replace_val):
-        worksheet[f"{find_val.upper()}"] = replace_val
-
-    def _find_replace_in_worksheet(self, worksheet, find_val, replace_val):
-        """
-        Find and replace values in a specific worksheet
-
-        Args:
-            worksheet: openpyxl Worksheet object
-            find_val: Value to find
-            replace_val: Value to replace with
-
-        Returns:
-            int: Number of replacements made in this worksheet
-        """
-        changes_count = 0
-
-        # Iterate through all cells in the worksheet
-        for row in worksheet.iter_rows():
-            for cell in row:
-                if cell.value is not None:
-                    # Handle different data types
-                    cell_value = str(cell.value)
-
-                    # Exact match replacement
-                    if cell_value == find_val:
-                        cell.value = replace_val
-                        changes_count += 1
-
-                    # Partial match replacement (if find_val is substring)
-                    elif find_val in cell_value:
-                        cell.value = cell_value.replace(find_val, replace_val)
-                        changes_count += 1
-
-        return changes_count
-
-    def _workbook_to_binary(self, workbook):
-        """
-        Convert openpyxl workbook back to binary data
-
-        Args:
-            workbook: openpyxl Workbook object
-
-        Returns:
-            str: Base64 encoded binary data
-        """
-        output = io.BytesIO()
-        workbook.save(output)
-        output.seek(0)
-        return base64.b64encode(output.read()).decode('utf-8')
-
-    @api.model
-    def get_excel_from_record(self, model_name, record_id, field_name):
-        """
-        Utility method to get Excel binary data from any Odoo record
-
-        Args:
-            model_name: Name of the model (e.g., 'res.partner')
-            record_id: ID of the record
-            field_name: Name of the binary field containing Excel data
-
-        Returns:
-            openpyxl Workbook object
-        """
-        record = self.env[model_name].browse(record_id)
-        if not record.exists():
-            raise UserError(
-                f"Record with ID {record_id} not found in {model_name}")
-
-        binary_data = getattr(record, field_name, None)
-        if not binary_data:
-            raise UserError(f"No data found in field {field_name}")
-
-        file_data = base64.b64decode(binary_data)
-        return load_workbook(io.BytesIO(file_data))
-
-    @api.model
-    def batch_find_replace(self, model_name, field_name, find_replace_pairs):
-        """
-        Batch process multiple records for find/replace operations
-
-        Args:
-            model_name: Name of the model containing Excel files
-            field_name: Name of the binary field
-            find_replace_pairs: List of tuples [(find1, replace1), (find2, replace2), ...]
-        """
-        records = self.env[model_name].search([(field_name, '!=', False)])
-
-        for record in records:
+    def generate_download_file(self):
+        for rec in self:
             try:
-                # Get workbook from record
-                binary_data = getattr(record, field_name)
-                file_data = base64.b64decode(binary_data)
-                workbook = load_workbook(io.BytesIO(file_data))
+                rec.write({"state": "running", "error_message": False})
+                columns, row_count, file_content = rec.report_id._generate_excel_content(
+                    rec.query_text
+                )
+                file_name = rec.report_id._build_export_filename()
+                attachment = self.env["ir.attachment"].create(
+                    {
+                        "name": file_name,
+                        "type": "binary",
+                        "datas": base64.b64encode(file_content).decode("ascii"),
+                        "mimetype": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        "res_model": rec._name,
+                        "res_id": rec.id,
+                    }
+                )
+                rec.write(
+                    {
+                        "state": "done",
+                        "row_count": row_count,
+                        "file_name": file_name,
+                        "attachment_id": attachment.id,
+                    }
+                )
+            except Exception as exc:
+                _logger.exception("Failed to generate regulatory report download")
+                rec.write(
+                    {
+                        "state": "failed",
+                        "error_message": str(exc),
+                    }
+                )
 
-                total_changes = 0
 
-                # Apply all find/replace pairs
-                for find_val, replace_val in find_replace_pairs:
-                    changes = self._find_replace_in_workbook(
-                        workbook, find_val, replace_val)
-                    total_changes += changes
+class RegulatoryReport(models.Model):
+    _name = "res.regulatory.report"
+    _description = "Regulatory Report"
+    _order = "name, create_date desc"
+    _inherit = ["mail.thread", "mail.activity.mixin"]
 
-                # Save back to record if changes were made
-                if total_changes > 0:
-                    processed_binary = self._workbook_to_binary(workbook)
-                    setattr(record, field_name, processed_binary)
+    name = fields.Char(string="Name", required=True, tracking=True)
+    query_text = fields.Text(
+        string="SQL Query",
+        required=True,
+        default="SELECT 1",
+        tracking=True,
+    )
+    preview_html = fields.Html(
+        string="Preview",
+        readonly=True,
+        sanitize=False,
+    )
+    preview_row_count = fields.Integer(string="Preview Rows", readonly=True)
+    preview_truncated = fields.Boolean(string="Preview Truncated", readonly=True)
+    last_preview_at = fields.Datetime(string="Last Preview At", readonly=True)
+    latest_run_id = fields.Many2one(
+        "res.regulatory.report.run",
+        string="Latest Download",
+        readonly=True,
+        ondelete="set null",
+    )
+    latest_run_state = fields.Selection(
+        related="latest_run_id.state",
+        string="Latest Download Status",
+        readonly=True,
+    )
+    latest_download_ready = fields.Boolean(
+        string="Latest Download Ready",
+        compute="_compute_latest_download_ready",
+    )
+    run_ids = fields.One2many(
+        "res.regulatory.report.run",
+        "report_id",
+        string="Downloads",
+        readonly=True,
+    )
 
-            except Exception as e:
-                # Log error but continue with other records
-                _logger.error(f"Error processing record {record.id}: {str(e)}")
-                continue
+    @api.depends("latest_run_id.state", "latest_run_id.attachment_id")
+    def _compute_latest_download_ready(self):
+        for rec in self:
+            rec.latest_download_ready = bool(
+                rec.latest_run_id
+                and rec.latest_run_id.state == "done"
+                and rec.latest_run_id.attachment_id
+            )
+
+    @api.constrains("query_text")
+    def _check_query_text(self):
+        for rec in self:
+            rec._validate_select_query(rec.query_text)
+
+    def write(self, vals):
+        if "query_text" in vals:
+            vals.update(
+                {
+                    "preview_html": False,
+                    "preview_row_count": 0,
+                    "preview_truncated": False,
+                    "last_preview_at": False,
+                    "latest_run_id": False,
+                }
+            )
+        return super().write(vals)
+
+    def action_validate_query(self):
+        self.ensure_one()
+        self._validate_select_query(self.query_text)
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "title": _("SQL Validation"),
+                "message": _("The query is a valid SELECT statement."),
+                "type": "success",
+                "sticky": False,
+            },
+        }
+
+    def action_preview_report(self):
+        self.ensure_one()
+        columns, rows, truncated = self._execute_preview_query(self.query_text)
+        self.write(
+            {
+                "preview_html": self._build_preview_html(columns, rows, truncated),
+                "preview_row_count": len(rows),
+                "preview_truncated": truncated,
+                "last_preview_at": fields.Datetime.now(),
+            }
+        )
+        return {
+            "type": "ir.actions.client",
+            "tag": "reload",
+        }
+
+    def action_queue_download(self):
+        self.ensure_one()
+        self._validate_select_query(self.query_text)
+        run = self.env["res.regulatory.report.run"].create(
+            {
+                "name": f"{self.name} - {fields.Datetime.now()}",
+                "report_id": self.id,
+                "query_text": self.query_text,
+                "requested_by": self.env.user.id,
+                "state": "queued",
+            }
+        )
+        self.write({"latest_run_id": run.id})
+        run.with_delay(
+            description=f"Generate regulatory report download: {self.name}",
+            priority=20,
+        ).generate_download_file()
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "title": _("Download Queued"),
+                "message": _("The export has been queued. Refresh when the file is ready."),
+                "type": "success",
+                "sticky": False,
+            },
+        }
+
+    def action_download_latest(self):
+        self.ensure_one()
+        if not self.latest_run_id:
+            raise UserError(_("No download has been queued for this report yet."))
+        return self.latest_run_id.action_download_file()
+
+    def _build_export_filename(self):
+        self.ensure_one()
+        slug = "_".join((self.name or "regulatory_report").strip().split())
+        slug = slug.lower() or "regulatory_report"
+        return f"{slug}.xlsx"
+
+    def _execute_preview_query(self, query_text):
+        self._validate_select_query(query_text)
+        self.env.cr.execute(query_text)
+        columns = [col[0] for col in (self.env.cr.description or [])]
+        preview_rows = self.env.cr.fetchmany(31)
+        truncated = len(preview_rows) > 30
+        rows = preview_rows[:30]
+        return columns, rows, truncated
+
+    def _generate_excel_content(self, query_text):
+        self.ensure_one()
+        self._validate_select_query(query_text)
+        self.env.cr.execute(query_text)
+        columns = [col[0] for col in (self.env.cr.description or [])]
+
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {"in_memory": True})
+        worksheet = workbook.add_worksheet("Report")
+        header_format = workbook.add_format({"bold": True, "bg_color": "#D9EAF7"})
+
+        total_rows = 0
+        if columns:
+            for col_idx, column_name in enumerate(columns):
+                worksheet.write(0, col_idx, column_name, header_format)
+
+        while True:
+            chunk = self.env.cr.fetchmany(1000)
+            if not chunk:
+                break
+            for row_offset, row in enumerate(chunk, start=total_rows + 1):
+                for col_idx, value in enumerate(row):
+                    worksheet.write(row_offset, col_idx, "" if value is None else value)
+            total_rows += len(chunk)
+
+        workbook.close()
+        output.seek(0)
+        return columns, total_rows, output.read()
+
+    def _build_preview_html(self, columns, rows, truncated):
+        if not columns:
+            return "<div class='alert alert-info'>The query returned no columns.</div>"
+
+        header_html = "".join(
+            f"<th style='padding:8px;border:1px solid #d9d9d9;background:#f5f5f5;text-align:left;'>{html.escape(str(col))}</th>"
+            for col in columns
+        )
+        body_rows = []
+        for row in rows:
+            row_html = "".join(
+                f"<td style='padding:8px;border:1px solid #e5e5e5;vertical-align:top;'>{html.escape('' if value is None else str(value))}</td>"
+                for value in row
+            )
+            body_rows.append(f"<tr>{row_html}</tr>")
+
+        if not body_rows:
+            colspan = max(len(columns), 1)
+            body_rows.append(
+                f"<tr><td colspan='{colspan}' style='padding:12px;border:1px solid #e5e5e5;'>No rows returned.</td></tr>"
+            )
+
+        note = ""
+        if truncated:
+            note = (
+                "<p style='margin:0 0 12px 0;color:#666;'>"
+                "Preview limited to the first 30 rows."
+                "</p>"
+            )
+
+        return (
+            "<div>"
+            f"{note}"
+            "<div style='overflow:auto;border:1px solid #d9d9d9;border-radius:6px;'>"
+            "<table style='width:100%;border-collapse:collapse;font-size:13px;'>"
+            f"<thead><tr>{header_html}</tr></thead>"
+            f"<tbody>{''.join(body_rows)}</tbody>"
+            "</table>"
+            "</div>"
+            "</div>"
+        )
+
+    def _validate_select_query(self, query_text):
+        query = (query_text or "").strip()
+        if not query:
+            raise ValidationError(_("SQL query is required."))
+
+        statements = [stmt for stmt in sqlparse.parse(query) if stmt.tokens and stmt.value.strip()]
+        if len(statements) != 1:
+            raise ValidationError(_("Only a single SQL statement is allowed."))
+
+        statement = statements[0]
+        if not self._is_select_statement(statement):
+            raise ValidationError(_("Only SELECT statements are allowed."))
+
+        forbidden_keywords = {
+            "INSERT",
+            "UPDATE",
+            "DELETE",
+            "DROP",
+            "ALTER",
+            "CREATE",
+            "TRUNCATE",
+            "MERGE",
+            "GRANT",
+            "REVOKE",
+            "COPY",
+            "VACUUM",
+            "CALL",
+            "EXEC",
+            "EXECUTE",
+        }
+        for token in statement.flatten():
+            if token.ttype in Keyword and token.normalized in forbidden_keywords:
+                raise ValidationError(
+                    _("Only read-only SELECT statements are allowed.")
+                )
+
+        return True
+
+    def _is_select_statement(self, statement):
+        first_token = statement.token_first(skip_ws=True, skip_cm=True)
+        if not first_token:
+            return False
+
+        if first_token.ttype is DML and first_token.normalized == "SELECT":
+            return True
+
+        if first_token.normalized == "WITH":
+            return any(
+                token.ttype is DML and token.normalized == "SELECT"
+                for token in statement.flatten()
+            )
+
+        if isinstance(statement, sql.Statement):
+            statement_type = statement.get_type()
+            return statement_type == "SELECT"
+
+        return False

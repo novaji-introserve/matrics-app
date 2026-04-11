@@ -144,6 +144,10 @@
                 <button class="oe_stat_button" type="object" name="get_risk_score" icon="fa-star">
                     <field string="Risk Score" name="risk_score" widget="statinfo"/>
                 </button>
+
+                <button class="oe_stat_button" type="object" name="action_view_ownership_lines" icon="fa-sitemap">
+                    <field string="UBOs" name="ubo_count" widget="statinfo"/>
+                </button>
             </xpath>
 
             <xpath expr="//field[@name='website']" position="replace">
@@ -261,6 +265,20 @@
                 <field name="identity_verification" readonly="1" widget="badge" decoration-warning="identity_verification == 'pending'" decoration-info="identity_verification == 'processing'" decoration-success="identity_verification == 'done'"/>
             </xpath>
 
+            <xpath expr="//sheet" position="inside">
+                <group string="Ownership / UBO Overview" attrs="{'invisible': [('is_company', '=', False)]}">
+                    <group>
+                        <field name="ubo_count" readonly="1"/>
+                        <field name="ownership_total_pct" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="has_unverified_ubo" readonly="1"/>
+                        <field name="has_high_risk_ubo" readonly="1"/>
+                    </group>
+                    <field name="ubo_summary" nolabel="1" readonly="1"/>
+                </group>
+            </xpath>
+
             <!--  -->
 
             <xpath expr="//field[@name='vat']" position="attributes">
@@ -305,6 +323,71 @@
         </field>
     </record>
 
+    <record id="view_res_partner_shareholders_tree" model="ir.ui.view">
+        <field name="name">res.partner.shareholders.tree</field>
+        <field name="model">res.partner.shareholders</field>
+        <field name="arch" type="xml">
+            <tree string="Ownership / UBO Records">
+                <field name="name"/>
+                <field name="owner_type"/>
+                <field name="role"/>
+                <field name="ownership_type"/>
+                <field name="pct_equity"/>
+                <field name="effective_ownership_pct"/>
+                <field name="is_control_person"/>
+                <field name="is_ubo"/>
+                <field name="verification_status"/>
+                <field name="is_pep"/>
+                <field name="is_sanctioned"/>
+                <field name="country_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_res_partner_shareholders_form" model="ir.ui.view">
+        <field name="name">res.partner.shareholders.form</field>
+        <field name="model">res.partner.shareholders</field>
+        <field name="arch" type="xml">
+            <form string="Ownership / UBO Record">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="customer_id"/>
+                            <field name="name"/>
+                            <field name="owner_type"/>
+                            <field name="role"/>
+                            <field name="ownership_type"/>
+                            <field name="relationship_to_customer"/>
+                        </group>
+                        <group>
+                            <field name="pct_equity"/>
+                            <field name="voting_rights_pct"/>
+                            <field name="effective_ownership_pct"/>
+                            <field name="is_control_person"/>
+                            <field name="is_ubo" readonly="1"/>
+                            <field name="verification_status"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="country_id"/>
+                            <field name="bvn"/>
+                            <field name="identification_number"/>
+                        </group>
+                        <group>
+                            <field name="is_pep"/>
+                            <field name="is_sanctioned"/>
+                            <field name="source_of_wealth"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
     <record id="view_customer_search" model="ir.ui.view">
         <field name="name">Customer Search Custom</field>
         <field name="model">res.partner</field>
@@ -322,6 +405,7 @@
                     <field name="identity_verification"/>
                     <separator/>
                     <filter string="Customers" name="type_customer" domain="[('internal_category', '=', 'customer')]"/>
+                    <filter string="Corporate" name="corporate_customer" domain="[('is_company', '=', True)]"/>
                     <filter string="Without BVN" name="bvn" domain="['|', ('bvn', '=', False), ('bvn', 'ilike', 'NOBVN%')]"/>
                     <filter string="Without Phone No." name="customer_phone" domain="[('customer_phone', '=', False)]"/>
                     <filter string="Pending Verification" name="pending_verification" domain="[('identity_verification', '=', 'pending')]"/>
