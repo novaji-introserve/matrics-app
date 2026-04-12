@@ -282,20 +282,58 @@ class RegulatoryReport(models.Model):
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {"in_memory": True})
         worksheet = workbook.add_worksheet("Report")
-        header_format = workbook.add_format({"bold": True, "bg_color": "#D9EAF7"})
+        header_format = workbook.add_format(
+            {
+                "bold": True,
+                "font_size": 10,
+                "font_color": "#0F172A",
+                "bg_color": "#EAF1F8",
+                "border": 1,
+                "border_color": "#CBD5E1",
+                "align": "left",
+                "valign": "vcenter",
+                "text_wrap": False,
+            }
+        )
+        body_format_even = workbook.add_format(
+            {
+                "font_size": 10,
+                "font_color": "#334155",
+                "bg_color": "#FFFFFF",
+                "border": 1,
+                "border_color": "#E2E8F0",
+                "align": "left",
+                "valign": "top",
+            }
+        )
+        body_format_odd = workbook.add_format(
+            {
+                "font_size": 10,
+                "font_color": "#334155",
+                "bg_color": "#F8FAFC",
+                "border": 1,
+                "border_color": "#E2E8F0",
+                "align": "left",
+                "valign": "top",
+            }
+        )
 
         total_rows = 0
         if columns:
             for col_idx, column_name in enumerate(columns):
                 worksheet.write(0, col_idx, column_name, header_format)
+                worksheet.set_column(col_idx, col_idx, min(max(len(str(column_name)) + 4, 14), 28))
+
+        worksheet.freeze_panes(1, 0)
 
         while True:
             chunk = self.env.cr.fetchmany(1000)
             if not chunk:
                 break
             for row_offset, row in enumerate(chunk, start=total_rows + 1):
+                row_format = body_format_even if row_offset % 2 else body_format_odd
                 for col_idx, value in enumerate(row):
-                    worksheet.write(row_offset, col_idx, "" if value is None else value)
+                    worksheet.write(row_offset, col_idx, "" if value is None else value, row_format)
             total_rows += len(chunk)
 
         workbook.close()
@@ -307,36 +345,37 @@ class RegulatoryReport(models.Model):
             return "<div class='alert alert-info'>The query returned no columns.</div>"
 
         header_html = "".join(
-            f"<th style='padding:8px;border:1px solid #d9d9d9;background:#f5f5f5;text-align:left;'>{html.escape(str(col))}</th>"
+            f"<th style='padding:9px 10px;border-bottom:1px solid #cbd5e1;border-right:1px solid #e2e8f0;background:#eaf1f8;color:#0f172a;text-align:left;font-size:11px;font-weight:700;white-space:nowrap;text-transform:uppercase;letter-spacing:0.04em;'>{html.escape(str(col))}</th>"
             for col in columns
         )
         body_rows = []
-        for row in rows:
+        for index, row in enumerate(rows):
+            row_background = "#ffffff" if index % 2 == 0 else "#f8fafc"
             row_html = "".join(
-                f"<td style='padding:8px;border:1px solid #e5e5e5;vertical-align:top;'>{html.escape('' if value is None else str(value))}</td>"
+                f"<td style='padding:8px 10px;border-bottom:1px solid #e2e8f0;border-right:1px solid #eef2f7;vertical-align:top;font-size:11px;line-height:1.35;color:#334155;background:{row_background};'>{html.escape('' if value is None else str(value))}</td>"
                 for value in row
             )
-            body_rows.append(f"<tr>{row_html}</tr>")
+            body_rows.append(f"<tr style='background:{row_background};'>{row_html}</tr>")
 
         if not body_rows:
             colspan = max(len(columns), 1)
             body_rows.append(
-                f"<tr><td colspan='{colspan}' style='padding:12px;border:1px solid #e5e5e5;'>No rows returned.</td></tr>"
+                f"<tr><td colspan='{colspan}' style='padding:14px 10px;border-bottom:1px solid #e2e8f0;background:#ffffff;font-size:11px;color:#64748b;'>No rows returned.</td></tr>"
             )
 
         note = ""
         if truncated:
             note = (
-                "<p style='margin:0 0 12px 0;color:#666;'>"
+                "<p style='margin:0 0 10px 0;color:#64748b;font-size:11px;font-weight:600;'>"
                 "Preview limited to the first 30 rows."
                 "</p>"
             )
 
         return (
-            "<div>"
+            "<div style='font-family:Inter, Segoe UI, Arial, sans-serif;'>"
             f"{note}"
-            "<div style='overflow:auto;border:1px solid #d9d9d9;border-radius:6px;'>"
-            "<table style='width:100%;border-collapse:collapse;font-size:13px;'>"
+            "<div style='overflow:auto;border:1px solid #d8e1eb;border-radius:10px;background:#ffffff;box-shadow:0 10px 30px rgba(15, 23, 42, 0.05);'>"
+            "<table style='width:100%;border-collapse:separate;border-spacing:0;font-size:11px;'>"
             f"<thead><tr>{header_html}</tr></thead>"
             f"<tbody>{''.join(body_rows)}</tbody>"
             "</table>"
