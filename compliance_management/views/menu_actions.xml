@@ -934,7 +934,7 @@ action = {
 
     <menuitem id="menu_queue_job_root" name="Job Queue" web_icon="queue_job,static/description/icon.png" groups="group_tech_support" />
 
-    <menuitem id="menu_board_root" name="Dashboards" web_icon="base,static/description/board.png" groups="group_tech_support" />
+    <menuitem id="menu_board_root" name="Dashboards" web_icon="base,static/description/board.png" groups="base.group_no_one" />
     
     <menuitem name="Settings" id="base.menu_administration" web_icon="compliance_management,static/description/icon-settings.png" sequence="550" groups="compliance_management.group_compliance_chief_compliance_officer" />
 
@@ -969,7 +969,7 @@ action = {
 
     <menuitem id="base.menu_board_root" name="Dashboards" sequence="260"
         web_icon="compliance_management,static/description/icon-dashboard.png"
-        groups="base.group_user" />
+        groups="base.group_no_one" />
     <menuitem id="mail.menu_root_discuss" name="Messaging" web_icon="compliance_management,static/description/icon-chat.png" groups="group_tech_support" sequence="1" />
 
     <record id="action_res_partner_edd_corporate" model="ir.actions.act_window">
