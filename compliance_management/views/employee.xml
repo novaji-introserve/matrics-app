@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="action_compliance_employee" model="ir.actions.act_window">
+            <field name="name">Employee</field>
+            <field name="res_model">hr.employee</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="view_employee_form_compliance" model="ir.ui.view">
+            <field name="name">hr.employee.form.compliance</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form" position="attributes">
+                    <attribute name="create">false</attribute>
+                    <attribute name="edit">false</attribute>
+                    <attribute name="delete">false</attribute>
+                </xpath>
+
+                <xpath expr="//header/button[@type='action']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button class="oe_stat_button" type="object" name="get_risk_level" icon="fa-thermometer-0">
+                        <div class="o_stat_info">
+                            <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level == 'medium'" decoration-success="risk_level == 'low'"/>
+                            <span class="o_stat_text">Risk Level</span>
+                        </div>
+                    </button>
+
+                    <button class="oe_stat_button" type="object" name="get_risk_score" icon="fa-star">
+                        <field string="Risk Score" name="risk_score" widget="statinfo"/>
+                    </button>
+                </xpath>
+
+                <xpath expr="//notebook" position="inside">
+                    <page string="Compliance" name="employee_compliance">
+                        <group>
+                            <group string="Risk">
+                                <field name="compliance_partner_id" readonly="1"/>
+                                <field name="risk_level" readonly="1" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level == 'medium'" decoration-success="risk_level == 'low'"/>
+                                <field name="risk_score" readonly="1"/>
+                            </group>
+                            <group string="Verification">
+                                <field name="identity_verification" readonly="1" widget="badge" decoration-warning="identity_verification == 'pending'" decoration-info="identity_verification == 'processing'" decoration-success="identity_verification == 'done'"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_employee_tree_compliance" model="ir.ui.view">
+            <field name="name">hr.employee.tree.compliance</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='work_phone']" position="after">
+                    <field name="risk_score" optional="show"/>
+                    <field name="risk_level" optional="show" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level == 'medium'" decoration-success="risk_level == 'low'"/>
+                    <field name="identity_verification" optional="hide" widget="badge" decoration-warning="identity_verification == 'pending'" decoration-info="identity_verification == 'processing'" decoration-success="identity_verification == 'done'"/>
+                </xpath>
+            </field>
+        </record>
+
+        <menuitem
+            id="menu_compliance_employee"
+            name="Employees"
+            parent="menu_compliance_root"
+            action="action_compliance_employee"
+            groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer,group_compliance_chief_compliance_officer,base.group_system"
+            sequence="20"
+        />
+    </data>
+</odoo>
