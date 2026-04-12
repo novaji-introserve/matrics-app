@@ -74,7 +74,7 @@
 
             <section class="ib-dashboard-grid">
                 <t t-if="state.loading">
-                    <div class="ib-dashboard-panel ib-dashboard-panel--loading cm-dashboard-panel">
+                    <div class="ib-dashboard-panel ib-dashboard-panel--loading cm-dashboard-panel cm-dashboard-panel--wide">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
@@ -82,14 +82,14 @@
                 </t>
                 <t t-else="">
                     <t t-foreach="state.charts" t-as="chart" t-key="chart.id">
-                        <article class="ib-dashboard-panel cm-dashboard-panel">
+                        <article class="ib-dashboard-panel cm-dashboard-panel cm-dashboard-panel--wide">
                             <div class="ib-dashboard-panel__header">
                                 <div>
                                     <h2 t-esc="chart.title" />
                                     <p t-esc="chart.display_summary" />
                                 </div>
                             </div>
-                            <div class="ib-dashboard-panel__body cm-dashboard-panel__body chart shadow-0 bg-transparent">
+                            <div class="ib-dashboard-panel__body cm-dashboard-panel__body shadow-0 bg-transparent">
                                 <InterbankChart data="chart" />
                             </div>
                         </article>
