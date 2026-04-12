@@ -111,11 +111,28 @@
             </xpath>
 
             <xpath expr="//page[@name='contact_addresses']" position="before">
+                <page name="identity_verification_details" string="Identity Verification">
+                    <group>
+                        <group string="Verification Status">
+                            <field name="bvn_verified" readonly="1" widget="boolean_toggle"/>
+                            <field name="nin_verified" readonly="1" widget="boolean_toggle"/>
+                            <field name="address_verified" readonly="1" widget="boolean_toggle"/>
+                            <field name="phone_verified" readonly="1" widget="boolean_toggle"/>
+                            <field name="age_verified" readonly="1" widget="boolean_toggle"/>
+                        </group>
+                        <group string="Verification Audit">
+                            <field name="identity_verification" readonly="1" widget="badge" decoration-warning="identity_verification == 'pending'" decoration-info="identity_verification == 'processing'" decoration-success="identity_verification == 'done'"/>
+                            <field name="verification_date" readonly="1"/>
+                            <field name="verification_reference_id" readonly="1"/>
+                        </group>
+                    </group>
+                </page>
+
                 <page name='accounts' string="Accounts">
                     <field name="account_ids" context="{'default_customer_id': active_id}" />
                 </page>
 
-                <page name="digital_products" string="Customer Channels">
+                <page name="digital_products" string="Channels">
                     <!-- Simplified view without problematic fields -->
 
                     <field name="channel_subscription_ids"
@@ -162,7 +179,7 @@
                 </page>
 
 
-                <page name='plans' string="Plan-based Risk Analysis">
+                <page name='plans' string="Risk Analysis">
                     <div class="alert alert-info" role="alert" name="plan_tips">
                         Plan-based risk analysis is used to calculate the risk score based on
                         predefined plans and their computed risk score. The resulting risk score is
@@ -228,7 +245,7 @@
 
 
                 <!-- <notebook position="inside"> -->
-                <page string="Enhanced Due Diligence" name="edd_record">
+                <page string="EDD" name="edd_record">
                     <field name="edd_ids" nolabel="1"
                         context="{'form_view_ref': 'compliance_management.edd_form_view'}">
                         <tree string="EDD Record" create="False" edit="False" delete="False">
