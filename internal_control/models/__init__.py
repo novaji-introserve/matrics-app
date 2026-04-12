@@ -5,10 +5,12 @@ from . import fraud_monitoring
 from . import process_category
 from . import process
 from . import transaction_screening_rule
+from . import transaction_screening_history
+from . import dashboard_chart_seed
+from . import dashboard_scope
 from . import department
 from . import user_profile
 from . import branch
-from . import res_group
 from . import customer_account
 from . import customer
 from . import customer_tier

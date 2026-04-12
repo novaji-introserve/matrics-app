@@ -324,13 +324,36 @@ class ResCharts(models.Model):
                 fields.Datetime.add(now, minutes=ttl_minutes)
             ),
         }
-        self.write(
-            {
-                "cached_payload": json.dumps(cached_payloads),
-                "cache_computed_at": now,
-                "cache_expires_at": fields.Datetime.add(now, minutes=ttl_minutes),
-            }
-        )
+        try:
+            registry = self.env.registry
+            with registry.cursor() as cr:
+                cr.execute(
+                    """
+                    UPDATE res_dashboard_charts
+                    SET cached_payload = %s,
+                        cache_computed_at = %s,
+                        cache_expires_at = %s,
+                        write_uid = %s,
+                        write_date = %s
+                    WHERE id = %s
+                    """,
+                    (
+                        json.dumps(cached_payloads),
+                        now,
+                        fields.Datetime.add(now, minutes=ttl_minutes),
+                        self.env.uid,
+                        now,
+                        self.id,
+                    ),
+                )
+                cr.commit()
+        except psycopg2.Error as exc:
+            _logger.warning(
+                "Skipping dashboard cache write for chart %s (%s) due to database contention: %s",
+                self.name,
+                self.code,
+                exc,
+            )
 
     def _get_dashboard_chart_payload(
         self, chart_service, *, cco=False, branches_id=None, datepicked=7, start_at=None, end_at=None

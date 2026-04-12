@@ -28,6 +28,33 @@ class TransactionMonitoring(models.Model):
     tran_channel = fields.Char(string="Transaction Channel", readonly=True, index=True)
     request_id = fields.Char(string="Request ID", readonly=True, index=True)
     trans_id = fields.Char(string="Transaction ID", readonly=True, index=True)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            self._sync_refno_from_name_vals(vals)
+        records = super().create(vals_list)
+        records._sync_missing_refno_from_name()
+        return records
+
+    def write(self, vals):
+        self._sync_refno_from_name_vals(vals)
+        result = super().write(vals)
+        self._sync_missing_refno_from_name()
+        return result
+
+    @staticmethod
+    def _sync_refno_from_name_vals(vals):
+        name = vals.get('name')
+        if name:
+            vals['refno'] = name
+
+    def _sync_missing_refno_from_name(self):
+        for record in self:
+            if not record.refno and record.name:
+                super(TransactionMonitoring, record).write({
+                    'refno': record.name,
+                })
     
     def _sync_transaction_branch_id_sql(self):
         """
@@ -64,9 +91,7 @@ class TransactionMonitoring(models.Model):
             
             self.env.cr.execute(special_query)
             updated_records_special = self.env.cr.fetchall()
-            
-            self.env.cr.commit()
-            
+
             total_updated = len(updated_records_regular) + len(updated_records_special)
             _logger.info(f"Transaction Branch ID sync completed. Updated {total_updated} records")
             
@@ -97,6 +122,40 @@ class TransactionMonitoring(models.Model):
             return [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id])]
         return []
 
+    def _get_local_currency(self):
+        entity = self.env['nfiu.entity'].search([], limit=1)
+        currency = entity.local_currency.currency_id if entity and entity.local_currency else False
+        if not currency:
+            currency = self.env.ref('base.NGN', raise_if_not_found=False)
+        return currency
+
+    def _open_transaction_monitoring_action(self, name, domain):
+        domain = list(domain)
+        domain.extend(self._check_cco_and_get_branch_domain())
+        return {
+            'name': name,
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.customer.transaction',
+            'view_mode': 'tree,form',
+            'domain': domain,
+            'context': {
+                'search_default_group_branch': 1,
+                'search_default_group_currency': 1,
+            }
+        }
+
+    def _get_period_domain(self, period_key):
+        today = fields.Date.today()
+        if period_key == 'today':
+            return [('date_created', '=', today)]
+        if period_key == 'week':
+            start_date = today - timedelta(days=7)
+            return [('date_created', '>=', start_date), ('date_created', '<=', today)]
+        if period_key == 'month':
+            start_date = today - timedelta(days=30)
+            return [('date_created', '>=', start_date), ('date_created', '<=', today)]
+        raise ValidationError(_("Unsupported reporting period: %s") % period_key)
+
     def _filter_account_length_10(self, domain):
         """Helper method to filter records with account number length of 10"""
         records = self.env['res.customer.transaction'].search(domain)
@@ -107,6 +166,49 @@ class TransactionMonitoring(models.Model):
         records = self.env['res.customer.transaction'].search(domain)
         # print(records)
         return records.filtered(lambda r: len(str(r.account_id.name)) == 14)
+
+    def open_all_transactions_today(self):
+        today = fields.Date.today()
+        return self._open_transaction_monitoring_action(
+            _('All Transactions - Today'),
+            [('date_created', '=', today)],
+        )
+
+    def open_awaiting_review_today(self):
+        return self._open_transaction_monitoring_action(
+            _('Awaiting Review - Today'),
+            [('state', '=', 'new')] + self._get_period_domain('today'),
+        )
+
+    def open_reviewed_today(self):
+        return self._open_transaction_monitoring_action(
+            _('Reviewed - Today'),
+            [('state', '=', 'done')] + self._get_period_domain('today'),
+        )
+
+    def open_awaiting_review_last_week(self):
+        return self._open_transaction_monitoring_action(
+            _('Awaiting Review - Last 1 Week'),
+            [('state', '=', 'new')] + self._get_period_domain('week'),
+        )
+
+    def open_reviewed_last_week(self):
+        return self._open_transaction_monitoring_action(
+            _('Reviewed - Last 1 Week'),
+            [('state', '=', 'done')] + self._get_period_domain('week'),
+        )
+
+    def open_awaiting_review_last_month(self):
+        return self._open_transaction_monitoring_action(
+            _('Awaiting Review - Last 1 Month'),
+            [('state', '=', 'new')] + self._get_period_domain('month'),
+        )
+
+    def open_reviewed_last_month(self):
+        return self._open_transaction_monitoring_action(
+            _('Reviewed - Last 1 Month'),
+            [('state', '=', 'done')] + self._get_period_domain('month'),
+        )
         
 
     def open_customers_all_transactions_today_ngn(self):

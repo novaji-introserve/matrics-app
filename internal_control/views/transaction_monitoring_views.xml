@@ -6,53 +6,87 @@
         <field name="model">res.customer.transaction</field>
         <field name="inherit_id" ref="compliance_management.compliance_transaction_form" />
         <field name="arch" type="xml">
-        <!-- <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                        Transaction Records will be displayed here
-                </p>
-                <p>
-                    No Transaction Records Found
-                </p>
-        </field> -->
-            <!-- <xpath expr="//button[@name='action_create']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath> -->
-           <xpath expr="//div[@class='oe_title']//label[@for='name']" position="replace">
+            <xpath expr="//div[@class='oe_title'][1]" position="replace">
+                <div class="oe_title">
                     <label for="refno" class="oe_edit_only"/>
-                </xpath>
-                
-                <!-- Replace the 'name' field with 'refno' field -->
-                <xpath expr="//div[@class='oe_title']//field[@name='name']" position="replace">
-                    <field name="refno" readonly="1"/>
-                </xpath>
-             
-            <xpath expr="//page[@name='details']//group/group[last()]" position="after">
-                <!-- Transaction Details -->
-                <group string="Transaction Information">
-                    <group string="Transaction Details">
-                        <field name="accountmodule"/>
-                        <field name="tran_channel"/>
-                        <field name="tellerno"/>
-                        <field name="reversal"/>
+                    <h1>
+                        <field name="refno" readonly="1"/>
+                    </h1>
+                    <div class="text-muted">
+                        <span>Transaction Reference</span>
+                    </div>
+                </div>
+            </xpath>
+
+            <xpath expr="//div[@class='oe_title'][2]" position="replace">
+                <group col="2">
+                    <group string="Financial Summary">
+                        <field name="amount" readonly="1"/>
+                        <field name="currency" readonly="1"/>
+                        <field name="transaction_type" readonly="1"/>
                     </group>
-                    <group string="Date Information">
-                        <field name="valuedate"/>
-                        <field name="actualdate"/>
-                        <field name="userid"/>
-                    </group>
-                </group>
-                
-                <!-- Processing Information -->
-                <group string="Processing Information">
-                    <group string="Status Details">
-                        <field name="status"/>
-                        <field name="deptcode"/>
-                    </group>
-                    <group string="Reference Information">
-                        <field name="request_id"/>
-                        <field name="trans_id"/>
+                    <group string="Review Summary">
+                        <field name="risk_level" widget="badge" readonly="1" decoration-danger="risk_level == 'high'" decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('low')"/>
+                        <field name="likely_fraud" widget="boolean_toggle" readonly="1"/>
+                        <field name="date_created" string="Transaction Date" readonly="1"/>
                     </group>
                 </group>
+            </xpath>
+
+            <xpath expr="//page[@name='details']/group" position="replace">
+                <group col="2">
+                    <group string="Customer and Account">
+                        <field name="customer_id" readonly="1"/>
+                        <field name="account_id" readonly="1"/>
+                        <field name="branch_id" readonly="1"/>
+                        <field name="deptcode" readonly="1"/>
+                    </group>
+                    <group string="Transaction Classification">
+                        <field name="transaction_type" readonly="1"/>
+                        <field name="status" readonly="1"/>
+                        <field name="accountmodule" readonly="1"/>
+                        <field name="tran_channel" readonly="1"/>
+                    </group>
+                    <group string="Dates and User Trail">
+                        <field name="date_created" string="Transaction Date" readonly="1"/>
+                        <field name="valuedate" readonly="1"/>
+                        <field name="actualdate" readonly="1"/>
+                        <field name="userid" readonly="1"/>
+                    </group>
+                    <group string="Reference and Processing">
+                        <field name="refno" readonly="1"/>
+                        <field name="trans_id" readonly="1"/>
+                        <field name="request_id" readonly="1"/>
+                        <field name="tellerno" readonly="1"/>
+                        <field name="reversal" readonly="1"/>
+                    </group>
+                </group>
+            </xpath>
+
+            <xpath expr="//page[@name='internal_notes']" position="after">
+                <page name="audit_metadata" string="Audit Metadata">
+                    <group col="2">
+                        <group string="Review Controls">
+                            <field name="state" readonly="1"/>
+                            <field name="risk_level" widget="badge" readonly="1" decoration-danger="risk_level == 'high'" decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('low')"/>
+                            <field name="risk_score" readonly="1"/>
+                            <field name="total_rules" string="Exceptions" readonly="1"/>
+                            <field name="likely_fraud" widget="boolean_toggle" readonly="1"/>
+                        </group>
+                        <group string="System Traceability">
+                            <field name="refno" readonly="1"/>
+                            <field name="trans_id" readonly="1"/>
+                            <field name="request_id" readonly="1"/>
+                            <field name="userid" readonly="1"/>
+                            <field name="tellerno" readonly="1"/>
+                            <field name="accountmodule" readonly="1"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+
+            <xpath expr="//page[@name='internal_notes']/field[@name='narration']" position="attributes">
+                <attribute name="placeholder">Investigation notes, reviewer comments, and audit observations.</attribute>
             </xpath>
         </field>
     </record>
@@ -121,8 +155,8 @@
     </record> 
 
 		
-		<!-- Actions for All Transactions -->
-<!-- <record id="action_all_transactions_today" model="ir.actions.server">
+<!-- Actions for All Transactions -->
+<record id="action_all_transactions_today" model="ir.actions.server">
     <field name="name">Today - All Transactions</field>
     <field name="model_id" ref="model_res_customer_transaction" />
     <field name="state">code</field>
@@ -130,16 +164,8 @@
     <field name="code">action = env['res.customer.transaction'].open_all_transactions_today()</field>
 </record>
 
-<record id="action_all_transactions_last_7_days" model="ir.actions.server">
-    <field name="name">Last 7 Days - All Transactions</field>
-    <field name="model_id" ref="model_res_customer_transaction" />
-    <field name="type">ir.actions.server</field>
-    <field name="state">code</field>
-    <field name="code">action = env['res.customer.transaction'].open_all_transactions_last_7_days()</field>
-</record> -->
-
 <!-- Actions for Awaiting Review -->
-<!-- <record id="action_awaiting_review_today" model="ir.actions.server">
+<record id="action_awaiting_review_today" model="ir.actions.server">
     <field name="name">Today - Awaiting Review</field>
     <field name="model_id" ref="model_res_customer_transaction" />
     <field name="type">ir.actions.server</field>
@@ -147,16 +173,7 @@
     <field name="code">action = env['res.customer.transaction'].open_awaiting_review_today()</field>
 </record>
 
-<record id="action_awaiting_review_last_7_days" model="ir.actions.server">
-    <field name="name">Last 7 Days - Awaiting Review</field>
-    <field name="model_id" ref="model_res_customer_transaction" />
-    <field name="type">ir.actions.server</field>
-    <field name="state">code</field>
-    <field name="code">action = env['res.customer.transaction'].open_awaiting_review_last_7_days()</field>
-</record> -->
-
-<!-- Actions for Reviewed -->
- <!-- <record id="action_reviewed_today" model="ir.actions.server">
+<record id="action_reviewed_today" model="ir.actions.server">
     <field name="name">Today - Reviewed</field>
     <field name="model_id" ref="model_res_customer_transaction" />
     <field name="type">ir.actions.server</field>
@@ -164,13 +181,37 @@
     <field name="code">action = env['res.customer.transaction'].open_reviewed_today()</field>
 </record>
 
-<record id="action_reviewed_last_7_days" model="ir.actions.server">
-    <field name="name">Last 7 Days - Reviewed</field>
+<record id="action_awaiting_review_last_week" model="ir.actions.server">
+    <field name="name">Last 1 Week - Awaiting Review</field>
     <field name="model_id" ref="model_res_customer_transaction" />
     <field name="type">ir.actions.server</field>
     <field name="state">code</field>
-    <field name="code">action = env['res.customer.transaction'].open_reviewed_last_7_days()</field>
-</record> -->
+    <field name="code">action = env['res.customer.transaction'].open_awaiting_review_last_week()</field>
+</record>
+
+<record id="action_reviewed_last_week" model="ir.actions.server">
+    <field name="name">Last 1 Week - Reviewed</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_reviewed_last_week()</field>
+</record>
+
+<record id="action_awaiting_review_last_month" model="ir.actions.server">
+    <field name="name">Last 1 Month - Awaiting Review</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_awaiting_review_last_month()</field>
+</record>
+
+<record id="action_reviewed_last_month" model="ir.actions.server">
+    <field name="name">Last 1 Month - Reviewed</field>
+    <field name="model_id" ref="model_res_customer_transaction" />
+    <field name="type">ir.actions.server</field>
+    <field name="state">code</field>
+    <field name="code">action = env['res.customer.transaction'].open_reviewed_last_month()</field>
+</record>
 
 <!-- Actions for Customer Transactions - All Transactions -->
 <record id="action_customers_all_transactions_today_ngn" model="ir.actions.server">
@@ -373,4 +414,3 @@
 <!-- Continue with similar pattern for all other actions... -->
 
 </odoo>
-

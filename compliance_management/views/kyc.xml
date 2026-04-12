@@ -102,8 +102,8 @@
                             <field name="account_officer_id" />
                             <field name="bvn" />
                             <field name="nin" />
+                            <field name="identification_number" invisible="1" />
                             <field name="identification_type_id" />
-                            <field name="identification_number" />
                             <field name="identification_expiry_date" />
                         </group>
                     </group>
@@ -114,7 +114,6 @@
                 <page name='accounts' string="Accounts">
                     <field name="account_ids" context="{'default_customer_id': active_id}" />
                 </page>
-
 
                 <page name="digital_products" string="Customer Channels">
                     <!-- Simplified view without problematic fields -->

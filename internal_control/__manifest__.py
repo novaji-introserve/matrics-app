@@ -16,6 +16,7 @@
     # for the full list
     'category': 'MATRICS',
     'version': '0.3',
+    'post_init_hook': 'post_init_hook',
 
     # any module necessary for this one to work correctly
     'depends': ['icomply_dashboard', 'compliance_management', 'bi_sql_editor', 'psql_query_execute', 'alert_management','transaction_screening'],
@@ -23,12 +24,13 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+        'data/dashboard_stats.xml',
         # 'views/actions.xml',
         # 'views/branch_view.xml',
         # 'views/account_monitoring_views.xml',
-        'views/screen_rules_cron_job.xml',
         'views/cron_schedule.xml',
         'views/transaction_rule.xml',
+        'views/transaction_screening_history.xml',
         'views/transaction_monitoring_views.xml',
         'views/customer.xml',
         'views/customer_account.xml',
@@ -37,7 +39,6 @@
         'views/process_view.xml',
         'views/process_category_view.xml',        
         # 'views/department.xml',
-        'views/user_profile.xml',
         'views/emplpyee.xml',
         'views/sql_panel.xml', 
         'views/menus.xml',       

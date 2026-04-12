@@ -232,11 +232,6 @@
                 <attribute name="invisible">1</attribute>
             </xpath>
 
-            <!-- Hide identification_number -->
-            <xpath expr="//field[@name='identification_number']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
-
             <!-- Hide identification_expiry_date -->
             <xpath expr="//field[@name='identification_expiry_date']" position="attributes">
                 <attribute name="invisible">1</attribute>

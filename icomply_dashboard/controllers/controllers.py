@@ -7,10 +7,23 @@ from odoo import fields
 class Mydashboard(http.Controller):
     def _get_date_range(self, datepicked):
         today = datetime.now().date()
-        prev_date = today - timedelta(days=datepicked)
+        prev_date = today if not datepicked else today - timedelta(days=datepicked)
         start_of_prev_day = fields.Datetime.to_string(datetime.combine(prev_date, datetime.min.time()))
         end_of_today = fields.Datetime.to_string(datetime.combine(today, datetime.max.time()))
         return start_of_prev_day, end_of_today
+
+    def _normalize_dashboard_args(self, cco, branches_id, datepicked):
+        cco = bool(cco)
+        branches_id = self.check_branches_id(branches_id or [])
+        datepicked = int(datepicked or 0)
+        return cco, branches_id, datepicked
+
+    def _get_branch_clause(self, cco, branches_id, alias="rct"):
+        if cco:
+            return "", []
+        if not branches_id:
+            return None, None
+        return f" AND {alias}.branch_id = ANY(%s)", [branches_id]
 
     def _execute_query(self, sql, params=None, keys=None):
         request.env.cr.execute(sql, params) if params else request.env.cr.execute(sql)
@@ -56,9 +69,8 @@ class Mydashboard(http.Controller):
 
     @http.route('/dashboard/get_top_screening_rules', auth='public', type='json')
     def get_top_screening(self, cco, branches_id, datepicked, **kw):
-        
-        today = datetime.now().date()  # Get today's date
-        prev_date = today - timedelta(days=datepicked)  # Get previous date
+        cco, branches_id, datepicked = self._normalize_dashboard_args(cco, branches_id, datepicked)
+        start_of_prev_day, end_of_today = self._get_date_range(datepicked)
 
         def _execute_query(sql, params=None):
             request.env.cr.execute(sql, params) if params else request.env.cr.execute(sql)
@@ -69,68 +81,24 @@ class Mydashboard(http.Controller):
                 'count': row[2]
             } for row in results]
 
-        if cco:
-            if datepicked > 0:
-                sql = """
-                    SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
-                    FROM res_transaction_screening_rule rtsr
-                    JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
-                    WHERE rct.date_created BETWEEN %s AND %s
-                    GROUP BY rtsr.id, rtsr.name
-                    ORDER BY hit_count DESC
-                    LIMIT 10;
-                """
-                return _execute_query(sql, (prev_date, today))
-            else:  # datepicked == 0
-
-                sql = """
-                    SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
-                    FROM res_transaction_screening_rule rtsr
-                    JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
-                    GROUP BY rtsr.id, rtsr.name
-                    ORDER BY hit_count DESC
-                    LIMIT 10;
-                """
-                return _execute_query(sql)
-
-        else: # cco == False
-            if not branches_id:
-                return []
-
-            if datepicked > 0:
-                sql = """
-                SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
-                FROM res_transaction_screening_rule rtsr
-                JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
-                WHERE rct.date_created BETWEEN %s AND %s AND rct.branch_id = ANY(%s)
-                GROUP BY rtsr.id, rtsr.name
-                ORDER BY hit_count DESC
-                LIMIT 10;
-                """
-    
-                try:
-                    return _execute_query(sql, (prev_date, today, (branches_id, )))
-                except Exception as e:
-                    print(f"error occured {str(e)}")
-            else:
-                sql = """
-                SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
-                FROM res_transaction_screening_rule rtsr
-                JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
-                WHERE rct.branch_id = ANY(%s)
-                GROUP BY rtsr.id, rtsr.name
-                ORDER BY hit_count DESC
-                LIMIT 10;
-
-                """
-    
-                try:
-                    return _execute_query(sql, (branches_id,))
-                except Exception as e:
-                    print(f"error occured {str(e)}")
+        branch_clause, branch_params = self._get_branch_clause(cco, branches_id)
+        if branch_clause is None:
+            return []
+        sql = f"""
+            SELECT rtsr.id, rtsr.name, COUNT(rct.id) AS hit_count
+            FROM res_transaction_screening_rule rtsr
+            JOIN res_customer_transaction rct ON rtsr.id = rct.rule_id
+            WHERE rct.date_created BETWEEN %s AND %s {branch_clause}
+            GROUP BY rtsr.id, rtsr.name
+            ORDER BY hit_count DESC
+            LIMIT 10;
+        """
+        params = [start_of_prev_day, end_of_today] + branch_params
+        return _execute_query(sql, tuple(params))
 
     @http.route('/dashboard/top_branches_by_accounts', auth='public', type='json')
     def top_branches_by_accounts(self, cco, branches_id, datepicked, **kw):
+        cco, branches_id, datepicked = self._normalize_dashboard_args(cco, branches_id, datepicked)
         start_of_prev_day, end_of_today = self._get_date_range(datepicked)
         keys = ["id", "name", "account_count"]
 
@@ -185,6 +153,7 @@ class Mydashboard(http.Controller):
 
     @http.route('/dashboard/top_high_risk_branches_by_accounts', auth='public', type='json')
     def top_high_risk_branches_by_accounts(self, cco, branches_id, datepicked, **kw):
+        cco, branches_id, datepicked = self._normalize_dashboard_args(cco, branches_id, datepicked)
         start_of_prev_day, end_of_today = self._get_date_range(datepicked)
         keys = ["id", "name", "high_risk_accounts"]
 
@@ -241,6 +210,62 @@ class Mydashboard(http.Controller):
             LIMIT 10
         """
         return self._execute_query(sql, (branches_id,), keys)
+
+    @http.route('/dashboard/transactions_by_branch', auth='public', type='json')
+    def transactions_by_branch(self, cco, branches_id, datepicked, **kw):
+        cco, branches_id, datepicked = self._normalize_dashboard_args(cco, branches_id, datepicked)
+        start_of_prev_day, end_of_today = self._get_date_range(datepicked)
+        branch_clause, branch_params = self._get_branch_clause(cco, branches_id)
+        if branch_clause is None:
+            return []
+        sql = f"""
+            SELECT rb.id, rb.name, COUNT(rct.id) AS transaction_count
+            FROM res_customer_transaction rct
+            LEFT JOIN res_branch rb ON rb.id = rct.branch_id
+            WHERE rct.date_created BETWEEN %s AND %s {branch_clause}
+            GROUP BY rb.id, rb.name
+            ORDER BY transaction_count DESC, rb.name
+        """
+        params = [start_of_prev_day, end_of_today] + branch_params
+        return self._execute_query(sql, tuple(params), ["id", "name", "transaction_count"])
+
+    @http.route('/dashboard/transactions_by_currency', auth='public', type='json')
+    def transactions_by_currency(self, cco, branches_id, datepicked, **kw):
+        cco, branches_id, datepicked = self._normalize_dashboard_args(cco, branches_id, datepicked)
+        start_of_prev_day, end_of_today = self._get_date_range(datepicked)
+        branch_clause, branch_params = self._get_branch_clause(cco, branches_id)
+        if branch_clause is None:
+            return []
+        sql = f"""
+            SELECT COALESCE(rc.name, rct.currency, 'Unknown') AS currency_name, COUNT(rct.id) AS transaction_count
+            FROM res_customer_transaction rct
+            LEFT JOIN res_currency rc ON rc.id = rct.currency_id
+            WHERE rct.date_created BETWEEN %s AND %s {branch_clause}
+            GROUP BY COALESCE(rc.name, rct.currency, 'Unknown')
+            ORDER BY transaction_count DESC, currency_name
+        """
+        params = [start_of_prev_day, end_of_today] + branch_params
+        return self._execute_query(sql, tuple(params), ["name", "transaction_count"])
+
+    @http.route('/dashboard/transaction_volume_by_currency', auth='public', type='json')
+    def transaction_volume_by_currency(self, cco, branches_id, datepicked, **kw):
+        cco, branches_id, datepicked = self._normalize_dashboard_args(cco, branches_id, datepicked)
+        start_of_prev_day, end_of_today = self._get_date_range(datepicked)
+        branch_clause, branch_params = self._get_branch_clause(cco, branches_id)
+        if branch_clause is None:
+            return []
+        sql = f"""
+            SELECT DATE(rct.date_created) AS bucket_date,
+                   COALESCE(rc.name, rct.currency, 'Unknown') AS currency_name,
+                   COALESCE(SUM(rct.amount), 0) AS total_amount
+            FROM res_customer_transaction rct
+            LEFT JOIN res_currency rc ON rc.id = rct.currency_id
+            WHERE rct.date_created BETWEEN %s AND %s {branch_clause}
+            GROUP BY DATE(rct.date_created), COALESCE(rc.name, rct.currency, 'Unknown')
+            ORDER BY bucket_date, currency_name
+        """
+        params = [start_of_prev_day, end_of_today] + branch_params
+        return self._execute_query(sql, tuple(params), ["bucket_date", "currency_name", "total_amount"])
 
     @http.route('/dashboard/get_high_risk_customer_by_branch', auth='public', type='json')
     def get_high_risk(self, cco, branches_id, datepicked, **kw):

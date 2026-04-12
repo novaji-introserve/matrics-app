@@ -40,7 +40,4 @@
             </xpath>
         </field>
     </record>
-    <record id="psql_query_execute.action_psql_query" model="ir.actions.act_window">
-        <field name="name">Database Query</field>
-    </record>
 </odoo>

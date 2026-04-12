@@ -3,22 +3,12 @@ access_res_internal_control_account_monitoring,access_res_internal_control_accou
 access_res_internal_control_fraud_monitoring,access_res_internal_control_fraud_monitoring,internal_control.model_res_internal_control_fraud_monitoring,base.group_user,1,1,1,1
 access_process_category_rules,access process category rules,internal_control.model_process_category,base.group_user,1,1,1,1
 access_process_rules,access process rules,internal_control.model_process,base.group_user,1,1,1,1
-access_internal_control_screening_rule,access internal control screening rules,internal_control.model_res_transaction_screening_rule,base.group_user,1,1,1,1
 access_res_partner_town,access res partner town,internal_control.model_res_partner_town,base.group_user,1,1,1,1
-access_res_partner_title,access res partner title,internal_control.model_res_partner_title,base.group_user,1,1,1,1
-access_res_country_state,access res country state,internal_control.model_res_country_state,base.group_user,1,1,1,1
-access_res_marital_status,access res marital status,internal_control.model_res_marital_status,base.group_user,1,1,1,1
-access_res_partner_gender,access res partner gender,internal_control.model_res_partner_gender,base.group_user,1,1,1,1
-access_hr_department,access hr department,internal_control.model_hr_department,base.group_user,1,1,1,1
 access_res_default_transaction_limit,access res default transaction limit,internal_control.model_res_default_transaction_limit,base.group_user,1,1,1,1
-access_res_partner,access res partner,internal_control.model_res_partner,base.group_user,1,1,1,1
 access_res_customer_type,access res customer type,internal_control.model_res_customer_type,base.group_user,1,1,1,1
-access_res_partner_tier,access res partner tier,internal_control.model_res_partner_tier,base.group_user,1,1,1,1
-access_res_partner_account,access res partner account,internal_control.model_res_partner_account,base.group_user,1,1,1,1
 access_res_transaction_status,access res transaction status,internal_control.model_res_transaction_status,base.group_user,1,1,1,1
 access_res_user_status,access res user status,internal_control.model_res_user_status,base.group_user,1,1,1,1
 access_res_account_officer,access res account officer,internal_control.model_res_account_officer,base.group_user,1,1,1,1
-access_res_partner_account_product,access res partner account product,internal_control.model_res_partner_account_product,base.group_user,1,1,1,1
 access_res_sub_branch,access res sub branch,internal_control.model_res_subbranch,base.group_user,1,1,1,1
 access_res_module,access res module,internal_control.model_res_module,base.group_user,1,1,1,1
 access_res_audit_trail,access res audit trail,internal_control.model_res_audit_trail,base.group_user,1,1,1,1

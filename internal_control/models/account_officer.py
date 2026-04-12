@@ -15,5 +15,5 @@ class AccountOfficer(models.Model):
                               string='Staff Status', index=True)
     deptid = fields.Many2one(comodel_name='hr.department',
                               string='Staff Department', index=True)
-    branch_id = fields.Many2one(comodel_name='res_branch',
+    branch_id = fields.Many2one(comodel_name='res.branch',
                               string='Staff Branch', index=True)

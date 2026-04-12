@@ -104,26 +104,64 @@
                                 <separator />
                             </group>
                         </page>
-                        <page name="transaction_profile" string="Transaction Profile">
+                        <page name="transaction_profile" string="Analytical Summary">
+                            <div class="alert alert-info" role="alert" name="transaction_profile_audit_note">
+                                This account transaction profile is presented for audit review.
+                                Metrics below summarize recent debit and credit behavior for the
+                                selected account and should be assessed alongside status, product,
+                                branch, and risk rating.
+                            </div>
                             <group>
-
-                                <group >
+                                <group string="Current Review Context">
                                     <field name="last_transaction_date" readonly="1" />
+                                    <field name="state" readonly="1" widget="badge" decoration-success="state == 'Active'" decoration-warning="state in ('Dormant', 'Flagged')" decoration-danger="state in ('Inactive', 'Closed')" />
+                                    <field name="risk_level" readonly="1" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('low')" />
+                                    <field name="risk_score" readonly="1" />
+                                </group>
+                                <group string="Control Indicators">
                                     <field name="max_debit_daily" readonly="1" />
                                     <field name="overdraft_limit" readonly="1" />
-                                </group>
-
-                                <group>
                                     <field name="date_last_credit_customer" readonly="1" />
                                     <field name="amount_last_credit_customer" readonly="1" />
                                     <field name="date_last_debit_customer" readonly="1" />
-
                                 </group>
-
                             </group>
-                            <!-- <group>
-                                <separator />
-                            </group> -->
+                            <notebook>
+                                <page string="Last 6 Months">
+                                    <separator string="Rolling Six-Month Activity" />
+                                    <group>
+                                        <group string="Credit Review">
+                                            <field name="num_credit_last6m" readonly="1" />
+                                            <field name="avg_credit_last6m" readonly="1" />
+                                            <field name="max_credit_last6m" readonly="1" />
+                                            <field name="tot_credit_last6m" readonly="1" />
+                                        </group>
+                                        <group string="Debit Review">
+                                            <field name="num_debit_last6m" readonly="1" />
+                                            <field name="avg_debit_last6m" readonly="1" />
+                                            <field name="max_debit_last6m" readonly="1" />
+                                            <field name="tot_debit_last6m" readonly="1" />
+                                        </group>
+                                    </group>
+                                </page>
+                                <page string="Last 12 Months">
+                                    <separator string="Rolling Twelve-Month Activity" />
+                                    <group>
+                                        <group string="Credit Review">
+                                            <field name="num_credit_last1y" readonly="1" />
+                                            <field name="avg_credit_last1y" readonly="1" />
+                                            <field name="max_credit_last1y" readonly="1" />
+                                            <field name="tot_credit_last1y" readonly="1" />
+                                        </group>
+                                        <group string="Debit Review">
+                                            <field name="num_debit_last1y" readonly="1" />
+                                            <field name="avg_debit_last1y" readonly="1" />
+                                            <field name="max_debit_last1y" readonly="1" />
+                                            <field name="tot_debit_last1y" readonly="1" />
+                                        </group>
+                                    </group>
+                                </page>
+                            </notebook>
                         </page>
                     </notebook>
 

@@ -1,5 +1,38 @@
 <odoo>
     <data>
+        <record id="view_employee_form_internal_control" model="ir.ui.view">
+            <field name="name">hr.employee.form.internal.control</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page name="internal_control" string="Internal Control">
+                        <group>
+                            <group string="Identity">
+                                <field name="userid"/>
+                                <field name="branch_id"/>
+                                <field name="dept_id"/>
+                                <field name="staff_status"/>
+                            </group>
+                            <group string="Access">
+                                <field name="role_id"/>
+                                <field name="authoriser"/>
+                                <field name="authuserid"/>
+                                <field name="post_userid"/>
+                            </group>
+                            <group string="Operations">
+                                <field name="postgl_acctno"/>
+                                <field name="report_level"/>
+                                <field name="passchange_date"/>
+                                <field name="lockcount"/>
+                                <field name="ip"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
         <record id="hide_work_phone_employee_tree" model="ir.ui.view">
             <field name="name">hide.work.phone.employee.tree</field>
             <field name="model">hr.employee</field>
@@ -17,6 +50,13 @@
                 </xpath>
                 <xpath expr="//field[@name='job_id']" position="attributes">
                     <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="userid" optional="show"/>
+                    <field name="branch_id" optional="show"/>
+                    <field name="department_id" optional="show"/>
+                    <field name="staff_status" optional="hide"/>
+                    <field name="passchange_date" optional="hide"/>
                 </xpath>
                 <!-- <xpath expr="//field[@name='department_id']" position="attributes">
                     <attribute name="invisible">1</attribute>

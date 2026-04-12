@@ -101,7 +101,7 @@ class Customer(models.Model):
                 UPDATE res_partner rp
                 SET branch_id = rpa.branch_id
                 FROM res_partner_account rpa
-                WHERE rp.customer_id::numeric = rpa.customer_id
+                WHERE rp.customer_id = rpa.customer_id::text
                 AND rp.branch_id IS NULL
                 AND rp.customer_id IS NOT NULL
                 AND rpa.branch_id IS NOT NULL
@@ -110,7 +110,6 @@ class Customer(models.Model):
 
             self.env.cr.execute(query)
             updated_records = self.env.cr.fetchall()
-            self.env.cr.commit()
 
             _logger.info(f"Branch ID sync completed. Updated {len(updated_records)} records")
 

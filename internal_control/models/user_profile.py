@@ -9,7 +9,7 @@ class UserProfile(models.Model):
     ] 
     
     userid = fields.Char(required=True, string="User ID", index=True)
-    branch_id = fields.Many2one("res_branch")
+    branch_id = fields.Many2one("res.branch", string="Branch")
     ip = fields.Char(string="IP")
     role_id = fields.Char(string="Role ID")
     authoriser = fields.Char()
@@ -20,5 +20,4 @@ class UserProfile(models.Model):
     lockcount = fields.Integer(0)
     authuserid = fields.Char()
     post_userid = fields.Char()
-    dept_id = fields.Many2one("hr_department", string="Department")
-
+    dept_id = fields.Many2one("hr.department", string="Legacy Department")

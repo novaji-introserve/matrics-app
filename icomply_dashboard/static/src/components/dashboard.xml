@@ -1,86 +1,183 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="owl.Dashboard" owl="1">
-        <div class="icomply-dashboard">
-            <div class="icomply-dashboard__hero">
-                <div class="icomply-dashboard__hero-copy">
-                    <span class="icomply-dashboard__eyebrow">Compliance Intelligence</span>
-                    <h1 class="icomply-dashboard__title">Operational Risk Dashboard</h1>
-                    <p class="icomply-dashboard__subtitle">
-                        Branch concentration, high-risk exposure, and transaction exceptions in one view.
+        <div class="cm-dashboard-shell">
+            <div class="cm-dashboard-hero">
+                <div class="cm-dashboard-hero__copy">
+                    <span class="cm-dashboard-hero__eyebrow">Transaction Monitoring Intelligence</span>
+                    <h1 class="cm-dashboard-hero__title">Operational Insights</h1>
+                    <p class="cm-dashboard-hero__subtitle">
+                        Branch concentration, currency mix, and screening exceptions across the selected review window.
                     </p>
                 </div>
-                <div class="icomply-dashboard__controls">
-                    <label class="icomply-dashboard__filter">
+                <div class="cm-dashboard-hero__controls">
+                    <label class="cm-dashboard-filter">
                         <span>Period</span>
                         <select class="form-select" t-att-value="state.datepicked" t-on-change="onDateChange">
                             <option value="0">Today</option>
-                            <option value="7">Last 7 days</option>
-                            <option value="14">Last 14 days</option>
-                            <option value="30">Last 30 days</option>
-                            <option value="60">Last 60 days</option>
+                            <option value="7">Last 1 week</option>
+                            <option value="30">Last 1 month</option>
+                        </select>
+                    </label>
+                    <label class="cm-dashboard-filter">
+                        <span>Refresh</span>
+                        <select class="form-select" t-att-value="state.refreshRate" t-on-change="onRefreshRateChange">
+                            <option value="1">1 minute</option>
+                            <option value="5">5 minutes</option>
+                            <option value="30">30 minutes</option>
+                            <option value="60">60 minutes</option>
                         </select>
                     </label>
                 </div>
             </div>
 
-            <div class="icomply-dashboard__summary">
-                <div class="icomply-dashboard__stat">
-                    <span class="icomply-dashboard__stat-label">Scope</span>
+            <div class="cm-dashboard-meta">
+                <div class="cm-dashboard-meta__card">
+                    <span class="cm-dashboard-meta__label">Scope</span>
                     <strong t-esc="state.cc ? 'All branches' : 'Assigned branches'" />
                 </div>
-                <div class="icomply-dashboard__stat">
-                    <span class="icomply-dashboard__stat-label">Window</span>
+                <div class="cm-dashboard-meta__card">
+                    <span class="cm-dashboard-meta__label">Window</span>
                     <strong t-esc="currentPeriodLabel" />
                 </div>
-                <div class="icomply-dashboard__stat">
-                    <span class="icomply-dashboard__stat-label">Visible branches</span>
-                    <strong t-esc="state.cc ? 'All' : state.branches_id.length" />
+                <div class="cm-dashboard-meta__card">
+                    <span class="cm-dashboard-meta__label">Metrics</span>
+                    <strong t-esc="state.stats.length" />
                 </div>
             </div>
 
-            <t t-if="state.loading">
-                <div class="icomply-dashboard__empty">Loading dashboard data...</div>
-            </t>
-            <t t-else="">
-                <div class="icomply-dashboard__grid">
-                    <section class="icomply-dashboard__panel">
-                        <div class="icomply-dashboard__panel-head">
-                            <div>
-                                <h2>Top 10 Branch by Accounts Opened</h2>
-                                <p>Click a bar to inspect branch accounts.</p>
+            <div class="cm-dashboard-cards">
+                <t t-if="state.loadingStates.stats">
+                    <t t-foreach="[1,2,3,4]" t-as="placeholder" t-key="placeholder">
+                        <div class="cm-dashboard-cards__placeholder">
+                            <div class="placeholder-glow">
+                                <span class="placeholder col-6"></span>
+                            </div>
+                            <div class="placeholder-glow mt-3">
+                                <span class="placeholder col-8"></span>
                             </div>
                         </div>
-                        <div class="icomply-dashboard__canvas-wrap">
-                            <canvas t-ref="topBranchesChart" />
+                    </t>
+                </t>
+                <t t-else="">
+                    <t t-foreach="state.stats" t-as="stat" t-key="stat.id">
+                        <div class="cm-dashboard-cards__item">
+                            <div
+                                t-att-class="getStatCardClass(stat)"
+                                t-att-style="'--cm-kpi-accent: ' + (stat.scope_color || '#2563eb')"
+                                t-att-data-stat-id="stat.id"
+                                t-on-click="onStatCardClick"
+                            >
+                                <div class="cm-kpi-card__badge">
+                                    <t t-out="getScopeBadge(stat.scope)" />
+                                </div>
+                                <div class="cm-kpi-card__value">
+                                    <t t-out="formatStatValue(stat.val)" />
+                                </div>
+                                <div class="cm-kpi-card__label">
+                                    <t t-out="stat.name" />
+                                </div>
+                                <t t-if="stat.display_summary">
+                                    <div class="cm-kpi-card__summary">
+                                        <t t-out="stat.display_summary" />
+                                    </div>
+                                </t>
+                                <div class="cm-kpi-card__scope">
+                                    <t t-out="getScopeLabel(stat.scope)" />
+                                </div>
+                            </div>
                         </div>
+                    </t>
+                </t>
+            </div>
+
+            <div class="cm-dashboard-grid">
+                <t t-if="state.loadingStates.charts">
+                    <t t-foreach="[1,2,3]" t-as="placeholder" t-key="placeholder">
+                        <section class="cm-dashboard-panel">
+                            <div class="cm-dashboard-panel__header">
+                                <h2>Loading chart data...</h2>
+                                <p>Please wait while the dashboard refreshes.</p>
+                            </div>
+                            <div class="cm-dashboard-panel__body d-flex justify-content-center align-items-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </section>
+                    </t>
+                </t>
+                <t t-else="">
+                    <t t-set="chart" t-value="getChart('transactions_by_branch')"/>
+                    <section class="cm-dashboard-panel">
+                        <div class="cm-dashboard-panel__header">
+                            <div>
+                                <h2 t-esc="chart ? chart.title : 'Transactions by Branch'" />
+                                <p t-esc="chart ? chart.display_summary : 'Transaction counts by branch in the selected period.'" />
+                            </div>
+                        </div>
+                        <t t-if="hasChartData(chart)">
+                            <div class="cm-dashboard-panel__body chart shadow-0 bg-transparent">
+                                <canvas t-ref="transactionsByBranchChart" />
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="cm-dashboard-panel__body cm-dashboard-panel__empty-state">
+                                <div>
+                                    <strong>No data available</strong>
+                                    <p>There are no matching records for this chart in the selected period.</p>
+                                </div>
+                            </div>
+                        </t>
                     </section>
 
-                    <section class="icomply-dashboard__panel">
-                        <div class="icomply-dashboard__panel-head">
+                    <t t-set="chart" t-value="getChart('transactions_by_currency')"/>
+                    <section class="cm-dashboard-panel">
+                        <div class="cm-dashboard-panel__header">
                             <div>
-                                <h2>Top 10 High Risk Branch by Accounts</h2>
-                                <p>Click a bar to inspect high-risk accounts.</p>
+                                <h2 t-esc="chart ? chart.title : 'Transactions by Currency'" />
+                                <p t-esc="chart ? chart.display_summary : 'Transaction counts by currency in the selected period.'" />
                             </div>
                         </div>
-                        <div class="icomply-dashboard__canvas-wrap">
-                            <canvas t-ref="highRiskBranchesChart" />
-                        </div>
+                        <t t-if="hasChartData(chart)">
+                            <div class="cm-dashboard-panel__body chart shadow-0 bg-transparent">
+                                <canvas t-ref="transactionsByCurrencyChart" />
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="cm-dashboard-panel__body cm-dashboard-panel__empty-state">
+                                <div>
+                                    <strong>No data available</strong>
+                                    <p>There are no matching records for this chart in the selected period.</p>
+                                </div>
+                            </div>
+                        </t>
                     </section>
 
-                    <section class="icomply-dashboard__panel icomply-dashboard__panel--wide">
-                        <div class="icomply-dashboard__panel-head">
+                    <t t-set="chart" t-value="getChart('transaction_volume_by_currency')"/>
+                    <section class="cm-dashboard-panel">
+                        <div class="cm-dashboard-panel__header">
                             <div>
-                                <h2>Top Transaction Exception</h2>
-                                <p>Click a point to open transactions for the selected exception rule.</p>
+                                <h2 t-esc="chart ? chart.title : 'Transaction Volume by Currency'" />
+                                <p t-esc="chart ? chart.display_summary : 'Total transaction value by currency in the selected period.'" />
                             </div>
                         </div>
-                        <div class="icomply-dashboard__canvas-wrap icomply-dashboard__canvas-wrap--line">
-                            <canvas t-ref="exceptionsChart" />
-                        </div>
+                        <t t-if="hasChartData(chart)">
+                            <div class="cm-dashboard-panel__body chart shadow-0 bg-transparent">
+                                <canvas t-ref="transactionVolumeByCurrencyChart" />
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="cm-dashboard-panel__body cm-dashboard-panel__empty-state">
+                                <div>
+                                    <strong>No data available</strong>
+                                    <p>There are no matching records for this chart in the selected period.</p>
+                                </div>
+                            </div>
+                        </t>
                     </section>
-                </div>
-            </t>
+                </t>
+            </div>
         </div>
     </t>
 </templates>

@@ -120,5 +120,12 @@
                 </form>
             </field>
         </record>
+
+        <record id="res_charts_action" model="ir.actions.act_window">
+            <field name="name">Dashboard Charts</field>
+            <field name="res_model">res.dashboard.charts</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="res_charts_tree"/>
+        </record>
     </data>
 </odoo>

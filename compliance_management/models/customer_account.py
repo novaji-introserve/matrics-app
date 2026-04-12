@@ -16,6 +16,9 @@ class CustomerAccount(models.Model):
     ]
 
     _order = 'id desc'
+    _ACCOUNT_STATS_LOCK_KEY = 62016421
+    _ACCOUNT_STATS_DEFAULT_BATCH_SIZE = 2000
+    _ACCOUNT_STATS_MAX_BATCH_SIZE = 10000
 
     customer_id = fields.Many2one(
         comodel_name='res.partner', string='Customer', index=True)  # customer
@@ -221,6 +224,13 @@ class CustomerAccount(models.Model):
         # Create index on res_partner_account (only if it doesn't exist)
         self.env.cr.execute(
             "CREATE INDEX IF NOT EXISTS res_partner_account_id_idx ON res_partner_account (id)")
+        self.env.cr.execute(
+            """
+                CREATE INDEX IF NOT EXISTS res_customer_transaction_account_date_type_idx
+                ON res_customer_transaction (account_id, date_created, transaction_type)
+                WHERE account_id IS NOT NULL AND date_created IS NOT NULL
+            """
+        )
 
         # Check if the trigger exists
         self.env.cr.execute("""
@@ -264,7 +274,222 @@ class CustomerAccount(models.Model):
             AND customer_id IS NOT NULL;
         """)
 
+    @api.model
+    def _account_stat_field_names(self):
+        return [
+            'num_credit_last6m', 'avg_credit_last6m', 'max_credit_last6m', 'tot_credit_last6m',
+            'num_debit_last6m', 'avg_debit_last6m', 'max_debit_last6m', 'tot_debit_last6m',
+            'num_credit_last1y', 'avg_credit_last1y', 'max_credit_last1y', 'tot_credit_last1y',
+            'num_debit_last1y', 'avg_debit_last1y', 'max_debit_last1y', 'tot_debit_last1y',
+        ]
 
+    @api.model
+    def _normalize_account_stats_batch_size(self, batch_size=None):
+        batch_size = int(batch_size or self._ACCOUNT_STATS_DEFAULT_BATCH_SIZE)
+        return max(100, min(batch_size, self._ACCOUNT_STATS_MAX_BATCH_SIZE))
+
+    @api.model
+    def _acquire_account_stats_lock(self):
+        self.env.cr.execute("SELECT pg_try_advisory_lock(%s)", (self._ACCOUNT_STATS_LOCK_KEY,))
+        return bool(self.env.cr.fetchone()[0])
+
+    @api.model
+    def _release_account_stats_lock(self):
+        self.env.cr.execute("SELECT pg_advisory_unlock(%s)", (self._ACCOUNT_STATS_LOCK_KEY,))
+
+    @api.model
+    def _iter_account_stats_batches(self, batch_size, account_ids=None):
+        if account_ids:
+            unique_ids = sorted({int(account_id) for account_id in account_ids if account_id})
+            for index in range(0, len(unique_ids), batch_size):
+                yield unique_ids[index:index + batch_size]
+            return
+
+        last_seen_id = 0
+        while True:
+            self.env.cr.execute(
+                """
+                    SELECT id
+                    FROM res_partner_account
+                    WHERE id > %s
+                    ORDER BY id
+                    LIMIT %s
+                """,
+                (last_seen_id, batch_size),
+            )
+            batch_ids = [row[0] for row in self.env.cr.fetchall()]
+            if not batch_ids:
+                break
+            yield batch_ids
+            last_seen_id = batch_ids[-1]
+
+    #  Use:
+    # - All accounts: env['res.partner.account'].queue_account_stat_refresh()
+    # - Specific accounts: env['res.partner.account'].browse(account_ids).queue_account_stat_refresh()
+
+    @api.model
+    def queue_account_stat_refresh(self, batch_size=None, account_ids=None):
+        batch_size = self._normalize_account_stats_batch_size(batch_size)
+        scoped_account_ids = account_ids or self.ids
+        lock_acquired = False
+
+        if not scoped_account_ids:
+            lock_acquired = self._acquire_account_stats_lock()
+            if not lock_acquired:
+                _logger.info('Account statistics refresh is already running; skipping duplicate request.')
+                return False
+
+        try:
+            batch_count = 0
+            use_queue = hasattr(self, 'with_delay')
+
+            for batch_count, batch_ids in enumerate(
+                self._iter_account_stats_batches(batch_size, scoped_account_ids),
+                start=1,
+            ):
+                if use_queue:
+                    self.with_delay(
+                        priority=30,
+                        description=_(
+                            'Account statistics refresh batch %(batch)s (%(size)s accounts)'
+                        ) % {'batch': batch_count, 'size': len(batch_ids)},
+                    ).job_refresh_account_stat_batch(batch_ids)
+                else:
+                    self.job_refresh_account_stat_batch(batch_ids)
+                    self.env.cr.commit()
+
+            _logger.info(
+                'Queued account statistics refresh for %s batches using batch size %s',
+                batch_count,
+                batch_size,
+            )
+        finally:
+            if lock_acquired:
+                self._release_account_stats_lock()
+
+        return batch_count
+
+    @api.model
+    def cron_queue_account_stat_refresh(self, batch_size=None):
+        try:
+            self.queue_account_stat_refresh(batch_size=batch_size)
+        except Exception as exc:
+            _logger.error('Cron job failed for account statistics refresh: %s', exc)
+            return False
+        return True
+
+    @api.model
+    def job_refresh_account_stat_batch(self, account_ids):
+        batch_ids = sorted({int(account_id) for account_id in (account_ids or []) if account_id})
+        if not batch_ids:
+            return 0
+
+        self.env.cr.execute(
+            """
+                WITH selected_accounts AS (
+                    SELECT UNNEST(%s::int[]) AS account_id
+                ),
+                aggregated AS (
+                    SELECT
+                        sa.account_id,
+                        COUNT(t.id) FILTER (
+                            WHERE t.transaction_type = 'C'
+                              AND t.date_created >= (CURRENT_TIMESTAMP - INTERVAL '6 months')
+                        )::integer AS num_credit_last6m,
+                        COALESCE(ROUND((AVG(t.amount) FILTER (
+                            WHERE t.transaction_type = 'C'
+                              AND t.date_created >= (CURRENT_TIMESTAMP - INTERVAL '6 months')
+                        ))::numeric, 2), 0)::double precision AS avg_credit_last6m,
+                        COALESCE(ROUND((MAX(t.amount) FILTER (
+                            WHERE t.transaction_type = 'C'
+                              AND t.date_created >= (CURRENT_TIMESTAMP - INTERVAL '6 months')
+                        ))::numeric, 2), 0)::double precision AS max_credit_last6m,
+                        COALESCE(ROUND((SUM(t.amount) FILTER (
+                            WHERE t.transaction_type = 'C'
+                              AND t.date_created >= (CURRENT_TIMESTAMP - INTERVAL '6 months')
+                        ))::numeric, 2), 0)::double precision AS tot_credit_last6m,
+                        COUNT(t.id) FILTER (
+                            WHERE t.transaction_type = 'D'
+                              AND t.date_created >= (CURRENT_TIMESTAMP - INTERVAL '6 months')
+                        )::integer AS num_debit_last6m,
+                        COALESCE(ROUND((AVG(t.amount) FILTER (
+                            WHERE t.transaction_type = 'D'
+                              AND t.date_created >= (CURRENT_TIMESTAMP - INTERVAL '6 months')
+                        ))::numeric, 2), 0)::double precision AS avg_debit_last6m,
+                        COALESCE(ROUND((MAX(t.amount) FILTER (
+                            WHERE t.transaction_type = 'D'
+                              AND t.date_created >= (CURRENT_TIMESTAMP - INTERVAL '6 months')
+                        ))::numeric, 2), 0)::double precision AS max_debit_last6m,
+                        COALESCE(ROUND((SUM(t.amount) FILTER (
+                            WHERE t.transaction_type = 'D'
+                              AND t.date_created >= (CURRENT_TIMESTAMP - INTERVAL '6 months')
+                        ))::numeric, 2), 0)::double precision AS tot_debit_last6m,
+                        COUNT(t.id) FILTER (
+                            WHERE t.transaction_type = 'C'
+                              AND t.date_created >= (CURRENT_TIMESTAMP - INTERVAL '1 year')
+                        )::integer AS num_credit_last1y,
+                        COALESCE(ROUND((AVG(t.amount) FILTER (
+                            WHERE t.transaction_type = 'C'
+                              AND t.date_created >= (CURRENT_TIMESTAMP - INTERVAL '1 year')
+                        ))::numeric, 2), 0)::double precision AS avg_credit_last1y,
+                        COALESCE(ROUND((MAX(t.amount) FILTER (
+                            WHERE t.transaction_type = 'C'
+                              AND t.date_created >= (CURRENT_TIMESTAMP - INTERVAL '1 year')
+                        ))::numeric, 2), 0)::double precision AS max_credit_last1y,
+                        COALESCE(ROUND((SUM(t.amount) FILTER (
+                            WHERE t.transaction_type = 'C'
+                              AND t.date_created >= (CURRENT_TIMESTAMP - INTERVAL '1 year')
+                        ))::numeric, 2), 0)::double precision AS tot_credit_last1y,
+                        COUNT(t.id) FILTER (
+                            WHERE t.transaction_type = 'D'
+                              AND t.date_created >= (CURRENT_TIMESTAMP - INTERVAL '1 year')
+                        )::integer AS num_debit_last1y,
+                        COALESCE(ROUND((AVG(t.amount) FILTER (
+                            WHERE t.transaction_type = 'D'
+                              AND t.date_created >= (CURRENT_TIMESTAMP - INTERVAL '1 year')
+                        ))::numeric, 2), 0)::double precision AS avg_debit_last1y,
+                        COALESCE(ROUND((MAX(t.amount) FILTER (
+                            WHERE t.transaction_type = 'D'
+                              AND t.date_created >= (CURRENT_TIMESTAMP - INTERVAL '1 year')
+                        ))::numeric, 2), 0)::double precision AS max_debit_last1y,
+                        COALESCE(ROUND((SUM(t.amount) FILTER (
+                            WHERE t.transaction_type = 'D'
+                              AND t.date_created >= (CURRENT_TIMESTAMP - INTERVAL '1 year')
+                        ))::numeric, 2), 0)::double precision AS tot_debit_last1y
+                    FROM selected_accounts sa
+                    LEFT JOIN res_customer_transaction t
+                        ON t.account_id = sa.account_id
+                       AND t.date_created IS NOT NULL
+                       AND t.date_created >= (CURRENT_TIMESTAMP - INTERVAL '1 year')
+                    GROUP BY sa.account_id
+                )
+                UPDATE res_partner_account account
+                SET
+                    num_credit_last6m = aggregated.num_credit_last6m,
+                    avg_credit_last6m = aggregated.avg_credit_last6m,
+                    max_credit_last6m = aggregated.max_credit_last6m,
+                    tot_credit_last6m = aggregated.tot_credit_last6m,
+                    num_debit_last6m = aggregated.num_debit_last6m,
+                    avg_debit_last6m = aggregated.avg_debit_last6m,
+                    max_debit_last6m = aggregated.max_debit_last6m,
+                    tot_debit_last6m = aggregated.tot_debit_last6m,
+                    num_credit_last1y = aggregated.num_credit_last1y,
+                    avg_credit_last1y = aggregated.avg_credit_last1y,
+                    max_credit_last1y = aggregated.max_credit_last1y,
+                    tot_credit_last1y = aggregated.tot_credit_last1y,
+                    num_debit_last1y = aggregated.num_debit_last1y,
+                    avg_debit_last1y = aggregated.avg_debit_last1y,
+                    max_debit_last1y = aggregated.max_debit_last1y,
+                    tot_debit_last1y = aggregated.tot_debit_last1y
+                FROM aggregated
+                WHERE account.id = aggregated.account_id
+            """,
+            (batch_ids,),
+        )
+
+        self.invalidate_cache(fnames=self._account_stat_field_names(), ids=batch_ids)
+        _logger.info('Refreshed transaction statistics for %s accounts', len(batch_ids))
+        return len(batch_ids)
 
     @api.model
     def open_accounts(self):
