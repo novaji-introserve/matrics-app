@@ -98,8 +98,12 @@
                                                    <hr />
 
                                                    <div style="margin: 0.5rem 0;">
-                                                        <span style="margin: 0; padding: 0;">Narration: </span>
-                                                        <span style="margin: 0; padding: 0;" t-esc="object.narration" />
+                                                        <span style="margin: 0; padding: 0; font-weight: normal;">Narration: </span>
+                                                        <span style="margin: 0; padding: 0;" t-out="str(object.narration or '').replace('&amp;lt;p&amp;gt;', '').replace('&amp;lt;/p&amp;gt;', '').replace('&lt;p&gt;', '').replace('&lt;/p&gt;', '')" />
+                                                   </div>
+                                                   <div style="margin: 0.5rem 0;">
+                                                        <span style="margin: 0; padding: 0; font-weight: normal;">Exception Process: </span>
+                                                        <span style="margin: 0; padding: 0;" t-esc="object.process_id or ''" />
                                                    </div>
                                                 <hr />
 

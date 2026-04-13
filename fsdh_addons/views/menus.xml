@@ -33,4 +33,11 @@
         parent="menu_alert_statistics"
         action="action_alert_chart"
         sequence="10"/>
+
+  <menuitem id="menu_escalation_matrix"
+        name="Escalation Matrices"
+        groups="compliance_management.group_compliance_chief_compliance_officer"
+        parent="alert_management.menu_alert_management_configurations"
+        action="action_escalation_matrix"
+        sequence="10"/>
 </odoo>

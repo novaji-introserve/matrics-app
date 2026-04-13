@@ -1,3 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_alert_stat,alert stat,fsdh_addons.model_alert_stat,base.group_user,1,1,1,1
 access_fsdh_escalation_period,fsdh escalation period,fsdh_addons.model_fsdh_escalation_period,base.group_user,1,1,1,1
+access_escalation_matrix_admin,escalation.matrix.admin,model_fsdh_escalation_matrix,base.group_system,1,1,1,1
+access_escalation_matrix_user,escalation.matrix.user,model_fsdh_escalation_matrix,base.group_user,1,0,0,0
+access_escalation_step_admin,escalation.step.admin,model_fsdh_escalation_step,base.group_system,1,1,1,1
+access_escalation_step_user,escalation.step.user,model_fsdh_escalation_step,base.group_user,1,0,0,0
+access_escalation_engine,escalation.engine,model_fsdh_escalation_engine,base.group_system,1,1,1,1
