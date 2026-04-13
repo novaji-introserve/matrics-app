@@ -44,10 +44,11 @@
                             class="btn-warning" icon="fa-trash" 
                             help="Clear all signatures for this rule" 
                             confirm="Are you sure you want to clear all signatures? This will reset the rule." /> -->
-                    <!-- <button name="reset_initialization" string="Reset Initialization" type="object" 
+                    <button name="reset_initialization" string="Reset Initialization" type="object" 
                             class="btn-info" icon="fa-refresh" 
-                            help="Reset rule to initialization state" />
-                    <field name="status" widget="statusbar" options="{'clickable':'1'}" /> -->
+                            help="Reset rule to initialization state"
+                            confirm="This will reset initialization and re-send alerts for all matching records on next run. Continue?" />
+                    <!-- <field name="status" widget="statusbar" options="{'clickable':'1'}" /> -->
                 </header>
                 <sheet>
 
