@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -497,10 +498,10 @@ func (c *MVRiskCalculator) ProcessCustomerBatch(
 	}
 	jobs := make(chan job, len(customerIDs))
 
-	// Determine number of workers
+	// Determine number of workers — use all available CPUs if not configured
 	numWorkers := workersPerBatch
 	if numWorkers < 1 {
-		numWorkers = 4
+		numWorkers = runtime.NumCPU()
 	}
 
 	// Priority customer processing goroutine (runs for duration of this batch only)
@@ -1089,39 +1090,70 @@ func (c *MVRiskCalculator) calculateCompositeScoreFromMVs(
 	return compositeScore, compositePlanLines, nil
 }
 
-// loadBatchMVData bulk-loads MV data for a batch of customers using one query per MV table.
+// loadBatchMVData bulk-loads MV data for a batch of customers in parallel — one goroutine per MV.
 // Returns: customerID -> universeID -> patternCode -> score
 func (c *MVRiskCalculator) loadBatchMVData(ctx context.Context, customerIDs []int) (map[int]map[int]map[string]float64, error) {
-	result := make(map[int]map[int]map[string]float64, len(customerIDs))
-
 	c.cacheMu.RLock()
 	mvMetadata := c.mvMetadata
 	c.cacheMu.RUnlock()
 
-	for universeID, mv := range mvMetadata {
-		query := fmt.Sprintf("SELECT partner_id, risk_data FROM %s WHERE partner_id = ANY($1)", mv.Name)
-		rows, err := c.db.Query(ctx, query, customerIDs)
-		if err != nil {
-			c.logger.Warn("Failed to bulk query MV", zap.String("mv", mv.Name), zap.Error(err))
-			continue
-		}
-		for rows.Next() {
-			var partnerID int
-			var riskDataJSON []byte
-			if err := rows.Scan(&partnerID, &riskDataJSON); err != nil {
-				continue
-			}
-			var riskData map[string]float64
-			if err := json.Unmarshal(riskDataJSON, &riskData); err != nil {
-				continue
-			}
-			if result[partnerID] == nil {
-				result[partnerID] = make(map[int]map[string]float64)
-			}
-			result[partnerID][universeID] = riskData
-		}
-		rows.Close()
+	type mvChunk struct {
+		universeID int
+		partnerID  int
+		riskData   map[string]float64
 	}
+
+	resultCh := make(chan mvChunk, len(customerIDs)*len(mvMetadata))
+
+	var wg sync.WaitGroup
+	// Query all MV tables in parallel — one goroutine per universe
+	for universeID, mv := range mvMetadata {
+		wg.Add(1)
+		go func(univID int, mvMeta *MVMetadata) {
+			defer wg.Done()
+			query := fmt.Sprintf(
+				"SELECT partner_id, risk_data FROM %s WHERE partner_id = ANY($1)",
+				mvMeta.Name,
+			)
+			rows, err := c.db.Query(ctx, query, customerIDs)
+			if err != nil {
+				c.logger.Warn("Failed to bulk query MV",
+					zap.String("mv", mvMeta.Name),
+					zap.Error(err))
+				return
+			}
+			defer rows.Close()
+
+			for rows.Next() {
+				var partnerID int
+				var riskDataJSON []byte
+				if err := rows.Scan(&partnerID, &riskDataJSON); err != nil {
+					continue
+				}
+				var riskData map[string]float64
+				if err := json.Unmarshal(riskDataJSON, &riskData); err != nil {
+					continue
+				}
+				resultCh <- mvChunk{universeID: univID, partnerID: partnerID, riskData: riskData}
+			}
+		}(universeID, mv)
+	}
+
+	// Close channel once all goroutines finish
+	go func() {
+		wg.Wait()
+		close(resultCh)
+	}()
+
+	// Merge results — safe because only this goroutine writes to result
+	result := make(map[int]map[int]map[string]float64, len(customerIDs))
+	for chunk := range resultCh {
+		if result[chunk.partnerID] == nil {
+			result[chunk.partnerID] = make(map[int]map[string]float64)
+		}
+		result[chunk.partnerID][chunk.universeID] = chunk.riskData
+	}
+
 	return result, nil
 }
 

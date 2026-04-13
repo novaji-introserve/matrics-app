@@ -843,27 +843,25 @@ def create_partition_indexes(conn, view_name):
 def populate_partition_chunk(args):
     """Worker function to populate a partition chunk (to be used with multiprocessing)"""
     config_file, view_name, sql_code, chunk_start, chunk_end = args
-    
+
     logger = logging.getLogger(f"__RISK_WORKER_{chunk_start}_{chunk_end}__")
-    
+    conn = None
     try:
-        # Create a new connection for this process
         conn = get_db_connection(config_file)
-        conn.autocommit = False  # Use explicit transactions
-        
+        conn.autocommit = False
+
         with conn.cursor() as cursor:
-            # Set optimizations for this chunk
-            cursor.execute("SET statement_timeout = '600000';")  # 10 minutes per chunk
+            cursor.execute("SET statement_timeout = '600000';")
             cursor.execute("SET work_mem = '512MB';")
             cursor.execute("SET synchronous_commit = 'off';")
-            
+
             logger.info(f"Processing partners {chunk_start} to {chunk_end-1}")
             cursor.execute(sql_code, (chunk_start, chunk_end))
             conn.commit()
-            
+
             logger.info(f"✓ Completed chunk {chunk_start}-{chunk_end-1}")
             return True
-            
+
     except Exception as e:
         logger.error(f"Error processing chunk {chunk_start}-{chunk_end-1}: {str(e)}")
         if conn and not conn.closed:
@@ -873,69 +871,222 @@ def populate_partition_chunk(args):
         if conn and not conn.closed:
             conn.close()
 
-def populate_partitioned_view(config_file, view_name, populate_sql):
-    """
-    Populate the partitioned table with data using multiple worker processes.
-    """
-    logger = logging.getLogger("__RISK_ASSESSMENT_MV__")
-    
+
+def upsert_partition_chunk(args):
+    """Worker function for incremental upsert of changed partners only."""
+    config_file, view_name, sql_code, partner_ids_chunk = args
+
+    logger = logging.getLogger(f"__RISK_UPSERT_WORKER__")
+    conn = None
     try:
         conn = get_db_connection(config_file)
-        
-        # Get partition ranges
+        conn.autocommit = False
+
         with conn.cursor() as cursor:
-            cursor.execute(f"""
-            SELECT 
-                child.relname AS child_table,
-                pg_get_expr(child.relpartbound, child.oid) AS partition_bound
+            cursor.execute("SET statement_timeout = '600000';")
+            cursor.execute("SET work_mem = '512MB';")
+            cursor.execute("SET synchronous_commit = 'off';")
+
+            # sql_code uses %s placeholder for the partner_ids tuple
+            cursor.execute(sql_code, (tuple(partner_ids_chunk),))
+            conn.commit()
+
+            logger.info(f"✓ Upserted {len(partner_ids_chunk)} partners into {view_name}")
+            return True
+
+    except Exception as e:
+        logger.error(f"Error upserting into {view_name}: {str(e)}")
+        if conn and not conn.closed:
+            conn.rollback()
+        return False
+    finally:
+        if conn and not conn.closed:
+            conn.close()
+
+def _get_num_workers():
+    """Use all available CPUs, leaving 2 for the OS and PostgreSQL."""
+    return max(2, multiprocessing.cpu_count() - 2)
+
+
+def _get_partition_ranges(conn, view_name):
+    """Return list of (start_id, end_id) for all partitions of view_name."""
+    with conn.cursor() as cursor:
+        cursor.execute(f"""
+            SELECT pg_get_expr(child.relpartbound, child.oid) AS partition_bound
             FROM pg_inherits
             JOIN pg_class parent ON pg_inherits.inhparent = parent.oid
-            JOIN pg_class child ON pg_inherits.inhrelid = child.oid
-            JOIN pg_namespace nmsp_parent ON nmsp_parent.oid = parent.relnamespace
-            JOIN pg_namespace nmsp_child ON nmsp_child.oid = child.relnamespace
-            WHERE parent.relname = '{view_name}'
+            JOIN pg_class child  ON pg_inherits.inhrelid  = child.oid
+            WHERE parent.relname = %s
             ORDER BY child.relname;
-            """)
-            partitions = cursor.fetchall()
-        
-        # Close the main connection - workers will create their own
+        """, (view_name,))
+        return cursor.fetchall()
+
+
+def populate_partitioned_view(config_file, view_name, populate_sql):
+    """
+    Full population of a partitioned table using all available CPU workers.
+    All partitions are processed in parallel — not sequentially.
+    """
+    logger = logging.getLogger("__RISK_ASSESSMENT_MV__")
+
+    try:
+        conn = get_db_connection(config_file)
+        partitions = _get_partition_ranges(conn, view_name)
         conn.close()
-        
-        # Process each partition in parallel
-        for child_table, bounds in partitions:
-            # Extract the range values from the partition bounds
+
+        # Build ALL chunk args across ALL partitions at once
+        batch_size = 150000
+        all_chunks = []
+        for (bounds,) in partitions:
             match = re.search(r"FROM\s*\((\d+)\)\s*TO\s*\((\d+)\)", bounds)
             if not match:
                 continue
-                
             start_id, end_id = int(match.group(1)), int(match.group(2))
-            
-            # Process this range in smaller chunks with parallel workers
-            batch_size = 150000
-            
-            # Create a list of chunk ranges for this partition
-            chunk_ranges = []
             for chunk_start in range(start_id, end_id, batch_size):
                 chunk_end = min(chunk_start + batch_size, end_id)
-                chunk_ranges.append((config_file, view_name, populate_sql, chunk_start, chunk_end))
-            
-            # Determine number of worker processes (2-4 based on system)
-            num_workers = min(4, max(2, multiprocessing.cpu_count() - 1))
-            
-            # Use a process pool to process chunks in parallel
-            with Pool(processes=num_workers) as pool:
-                results = pool.map(populate_partition_chunk, chunk_ranges)
-                
-            # Check if any chunks failed
-            if not all(results):
-                logger.warning(f"Some chunks failed for partition {child_table}")
-                
-            logger.info(f"✓ Completed partition {child_table}")
-        
-        return True
+                all_chunks.append((config_file, view_name, populate_sql, chunk_start, chunk_end))
+
+        if not all_chunks:
+            logger.warning(f"No partition chunks found for {view_name}")
+            return False
+
+        num_workers = _get_num_workers()
+        logger.info(f"Populating {view_name}: {len(all_chunks)} chunks across {num_workers} workers")
+
+        # Process all partitions in parallel simultaneously
+        with Pool(processes=num_workers) as pool:
+            results = pool.map(populate_partition_chunk, all_chunks)
+
+        failed = results.count(False)
+        if failed:
+            logger.warning(f"{failed}/{len(all_chunks)} chunks failed for {view_name}")
+
+        logger.info(f"✓ Populated {view_name} ({len(all_chunks) - failed}/{len(all_chunks)} chunks ok)")
+        return failed == 0
+
     except Exception as e:
-        logger.error(f"✗ Failed to populate partitioned view {view_name}: {str(e)}")
+        logger.error(f"✗ Failed to populate {view_name}: {str(e)}")
         return False
+
+
+def incremental_update_view(config_file, view_name, populate_sql, last_refresh):
+    """
+    Incremental upsert: only recompute partners whose source data changed
+    since last_refresh. New partners (not yet in the MV) are also included.
+
+    Uses INSERT ... ON CONFLICT DO UPDATE so the table is never dropped.
+    """
+    logger = logging.getLogger("__RISK_ASSESSMENT_MV__")
+
+    try:
+        conn = get_db_connection(config_file)
+
+        with conn.cursor() as cursor:
+            # Partners whose profile changed since last refresh
+            cursor.execute("""
+                SELECT DISTINCT rp.id
+                FROM res_partner rp
+                WHERE rp.write_date > %s
+            """, (last_refresh,))
+            changed_partner_ids = {row[0] for row in cursor.fetchall()}
+
+            # Accounts changed since last refresh (category, branch)
+            cursor.execute("""
+                SELECT DISTINCT customer_id
+                FROM res_partner_account
+                WHERE write_date > %s AND customer_id IS NOT NULL
+            """, (last_refresh,))
+            changed_partner_ids.update(row[0] for row in cursor.fetchall())
+
+            # Channel subscriptions changed since last refresh
+            cursor.execute("""
+                SELECT DISTINCT partner_id
+                FROM customer_channel_subscription
+                WHERE last_updated > %s AND partner_id IS NOT NULL
+            """, (last_refresh,))
+            changed_partner_ids.update(row[0] for row in cursor.fetchall())
+
+            # Partners not yet in this MV at all (new since last run)
+            cursor.execute(f"""
+                SELECT id FROM res_partner
+                WHERE id NOT IN (SELECT partner_id FROM {view_name})
+            """)
+            new_partner_ids = {row[0] for row in cursor.fetchall()}
+
+        conn.close()
+
+        all_ids = list(changed_partner_ids | new_partner_ids)
+        if not all_ids:
+            logger.info(f"No changes detected for {view_name}, skipping.")
+            return True
+
+        logger.info(
+            f"{view_name}: {len(changed_partner_ids)} changed + "
+            f"{len(new_partner_ids)} new = {len(all_ids)} partners to recompute"
+        )
+
+        # Build an upsert version of the populate_sql:
+        # Replace the range-based INSERT with an IN-list upsert
+        upsert_sql = _build_upsert_sql(view_name, populate_sql)
+
+        # Chunk the partner IDs and process in parallel
+        chunk_size = 5000
+        chunks = [all_ids[i:i + chunk_size] for i in range(0, len(all_ids), chunk_size)]
+
+        num_workers = _get_num_workers()
+        logger.info(f"Upserting {len(all_ids)} partners in {len(chunks)} chunks, {num_workers} workers")
+
+        chunk_args = [(config_file, view_name, upsert_sql, chunk) for chunk in chunks]
+
+        with Pool(processes=num_workers) as pool:
+            results = pool.map(upsert_partition_chunk, chunk_args)
+
+        failed = results.count(False)
+        if failed:
+            logger.warning(f"{failed}/{len(chunks)} upsert chunks failed for {view_name}")
+
+        logger.info(f"✓ Incremental update done for {view_name}")
+        return failed == 0
+
+    except Exception as e:
+        logger.error(f"✗ Incremental update failed for {view_name}: {str(e)}")
+        return False
+
+
+def _build_upsert_sql(view_name, populate_sql):
+    """
+    Convert the range-based INSERT SQL into an IN-list upsert SQL.
+
+    Original pattern:
+        INSERT INTO {view_name} (partner_id, partner_name, risk_data)
+        WITH all_risk_flags AS ( ... )
+        SELECT ... FROM res_partner rp
+        WHERE rp.id >= %s AND rp.id < %s;
+
+    Becomes:
+        INSERT INTO {view_name} (partner_id, partner_name, risk_data)
+        WITH all_risk_flags AS ( ... )
+        SELECT ... FROM res_partner rp
+        WHERE rp.id = ANY(%s)
+        ON CONFLICT (partner_id) DO UPDATE
+            SET partner_name = EXCLUDED.partner_name,
+                risk_data     = EXCLUDED.risk_data;
+    """
+    # Replace the range WHERE clause with an IN list placeholder
+    upsert_sql = re.sub(
+        r"WHERE\s+rp\.id\s*>=\s*%s\s*AND\s+rp\.id\s*<\s*%s",
+        "WHERE rp.id = ANY(%s)",
+        populate_sql,
+        flags=re.IGNORECASE,
+    )
+    # Strip trailing semicolon so we can append ON CONFLICT
+    upsert_sql = upsert_sql.rstrip().rstrip(';')
+    upsert_sql += """
+    ON CONFLICT (partner_id) DO UPDATE
+        SET partner_name = EXCLUDED.partner_name,
+            risk_data    = EXCLUDED.risk_data;
+    """
+    return upsert_sql
 
 def record_view_metadata(conn, view_data):
     """Record metadata about the view in the risk.analysis table."""

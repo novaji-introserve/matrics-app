@@ -165,18 +165,18 @@ func main() {
 
 	// Initialize database connection
 	dbConfig := database.ConnectionConfig{
-		Host:            cfg.DBHost,
-		Port:            cfg.DBPort,
-		Database:        cfg.DBName,
-		User:            cfg.DBUser,
-		Password:        cfg.DBPassword,
-		SSLMode:         cfg.DBSSLMode,
-		PoolMinSize:     cfg.DBPoolMin,
-		PoolMaxSize:     cfg.DBPoolMax,
-		MaxIdleTime:     cfg.DBPoolMaxIdleTime,
-		MaxLifetime:     cfg.DBPoolMaxLifetime,
-		ConnectTimeout:  cfg.DBConnectTimeout,
-		QueryTimeout:    cfg.DBQueryTimeout,
+		Host:           cfg.DBHost,
+		Port:           cfg.DBPort,
+		Database:       cfg.DBName,
+		User:           cfg.DBUser,
+		Password:       cfg.DBPassword,
+		SSLMode:        cfg.DBSSLMode,
+		PoolMinSize:    cfg.DBPoolMin,
+		PoolMaxSize:    cfg.DBPoolMax,
+		MaxIdleTime:    cfg.DBPoolMaxIdleTime,
+		MaxLifetime:    cfg.DBPoolMaxLifetime,
+		ConnectTimeout: cfg.DBConnectTimeout,
+		QueryTimeout:   cfg.DBQueryTimeout,
 	}
 
 	dbConnection := database.NewConnection(dbConfig, logger)
@@ -271,9 +271,15 @@ func main() {
 		)
 
 		// Set callback to run risk processing when MV refresh is detected
-		monitor.SetRefreshCallback(func(ctx context.Context) error {
+		monitor.SetRefreshCallback(func(ctx context.Context, since time.Time) error {
 			logger.Info("========================================")
-			logger.Info("MV REFRESH DETECTED - STARTING PROCESSING")
+			if since.IsZero() {
+				logger.Info("MV REFRESH DETECTED - STARTING FULL PROCESSING")
+			} else {
+				logger.Info("MV REFRESH DETECTED - STARTING INCREMENTAL PROCESSING",
+					zap.Time("since", since),
+				)
+			}
 			logger.Info("========================================")
 
 			startTime := time.Now()
@@ -379,20 +385,20 @@ func main() {
 func parseCustomerIDs(idStr string) ([]int, error) {
 	var customerIDs []int
 	idStrings := strings.Split(idStr, ",")
-	
+
 	for _, idStr := range idStrings {
 		idStr = strings.TrimSpace(idStr)
 		if idStr == "" {
 			continue
 		}
-		
+
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
 			return nil, fmt.Errorf("invalid customer ID: %s", idStr)
 		}
 		customerIDs = append(customerIDs, id)
 	}
-	
+
 	return customerIDs, nil
 }
 

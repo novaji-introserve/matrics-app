@@ -89,7 +89,7 @@ class CaseManager(models.Model):
     )
 
     officer_responsible = fields.Many2one(
-        'res.users', string='Officer Responsible', required=True)
+        'res.users', string='Officer Responsible', required=True, tracking=True)
 
     transaction_id = fields.Many2one(
         comodel_name='res.customer.transaction',

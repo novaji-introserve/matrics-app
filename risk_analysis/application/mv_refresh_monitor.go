@@ -28,8 +28,10 @@ type MVRefreshMonitor struct {
 	logger          *zap.Logger
 	pollingInterval time.Duration
 
-	// Callback function to trigger when MV refresh is detected
-	onRefreshCallback func(ctx context.Context) error
+	// Callback receives the previous refresh time so the processor
+	// can run incrementally (only changed customers) instead of all customers.
+	// since == time.Time{} (zero) on first run → full processing.
+	onRefreshCallback func(ctx context.Context, since time.Time) error
 
 	// Control channels
 	stopChan chan struct{}
@@ -59,8 +61,11 @@ func NewMVRefreshMonitor(
 	}
 }
 
-// SetRefreshCallback sets the callback function to execute when MV refresh is detected
-func (m *MVRefreshMonitor) SetRefreshCallback(callback func(ctx context.Context) error) {
+// SetRefreshCallback sets the callback to execute when MV refresh is detected.
+// since is the previous refresh timestamp — pass it to RunIncremental so only
+// customers whose data changed after that time are reprocessed.
+// On first run since is time.Time{} (zero value) → full processing.
+func (m *MVRefreshMonitor) SetRefreshCallback(callback func(ctx context.Context, since time.Time) error) {
 	m.onRefreshCallback = callback
 }
 
@@ -135,11 +140,11 @@ func (m *MVRefreshMonitor) checkAndProcess(ctx context.Context) error {
 			m.logger.Error("Failed to save timestamp to Redis", zap.Error(err))
 		}
 
-		// Trigger processing for first run
-		m.logger.Info("First run detected, triggering risk analysis processing",
+		// First run — full processing (since = zero time)
+		m.logger.Info("First run detected, triggering full risk analysis processing",
 			zap.Time("current_refresh", *currentRefresh),
 		)
-		return m.triggerProcessing(ctx)
+		return m.triggerProcessing(ctx, time.Time{})
 	}
 
 	// Compare timestamps
@@ -150,14 +155,15 @@ func (m *MVRefreshMonitor) checkAndProcess(ctx context.Context) error {
 			zap.Duration("time_since_last", currentRefresh.Sub(lastKnownRefresh)),
 		)
 
-		// Update Redis with new timestamp
+		// Update Redis with new timestamp before triggering so a crash
+		// during processing doesn't cause a repeated full-reprocess.
 		if err := m.saveLastRefreshToRedis(ctx, *currentRefresh); err != nil {
 			m.logger.Error("Failed to update timestamp in Redis", zap.Error(err))
 			return err
 		}
 
-		// Trigger risk analysis processing
-		return m.triggerProcessing(ctx)
+		// Incremental processing — pass previous refresh as the since boundary
+		return m.triggerProcessing(ctx, lastKnownRefresh)
 	}
 
 	m.logger.Debug("No MV refresh detected, skipping processing",
@@ -230,16 +236,26 @@ func (m *MVRefreshMonitor) saveLastRefreshToRedis(ctx context.Context, timestamp
 }
 
 // triggerProcessing executes the callback function to trigger risk analysis
-func (m *MVRefreshMonitor) triggerProcessing(ctx context.Context) error {
+func (m *MVRefreshMonitor) triggerProcessing(ctx context.Context, since time.Time) error {
 	if m.onRefreshCallback == nil {
 		m.logger.Warn("No refresh callback set, skipping processing trigger")
 		return nil
 	}
 
-	m.logger.Info("Triggering risk analysis processing...")
+	logFields := []zap.Field{}
+	if since.IsZero() {
+		logFields = append(logFields, zap.String("mode", "full"))
+	} else {
+		logFields = append(logFields,
+			zap.String("mode", "incremental"),
+			zap.Time("since", since),
+		)
+	}
+
+	m.logger.Info("Triggering risk analysis processing...", logFields...)
 	startTime := time.Now()
 
-	err := m.onRefreshCallback(ctx)
+	err := m.onRefreshCallback(ctx, since)
 
 	duration := time.Since(startTime)
 	if err != nil {
@@ -281,11 +297,11 @@ func (m *MVRefreshMonitor) GetCurrentStatus(ctx context.Context) (map[string]int
 	}
 
 	status := map[string]interface{}{
-		"db_name":                 m.dbName,
-		"polling_interval":        m.pollingInterval.String(),
-		"current_refresh":         currentRefreshStr,
-		"last_known_refresh":      lastKnownRefreshStr,
-		"callback_configured":     m.onRefreshCallback != nil,
+		"db_name":             m.dbName,
+		"polling_interval":    m.pollingInterval.String(),
+		"current_refresh":     currentRefreshStr,
+		"last_known_refresh":  lastKnownRefreshStr,
+		"callback_configured": m.onRefreshCallback != nil,
 	}
 
 	if currentRefresh != nil && lastKnownRefreshStr != "" {
