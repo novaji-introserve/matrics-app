@@ -8,7 +8,7 @@
       <field name="visible" eval="False"/>
     </record>
 
-    <!-- Level 1 (lowest): BUSINESS CONTROL -->
+    <!-- BUSINESS CONTROL -->
     <record id="group_subsidiary_fsdh_capital" model="res.groups">
       <field name="name">Business Control</field>
       <field name="active" eval="True"/>
@@ -17,30 +17,30 @@
       <field name="category_id" ref="module_category_subsidiaries"/>
     </record>
 
-    <!-- Level 2: IT CONTROL – implies BUSINESS CONTROL -->
+    <!-- IT CONTROL -->
     <record id="group_subsidiary_fsdh_asset_mgt" model="res.groups">
       <field name="name">IT Control</field>
       <field name="active" eval="True"/>
       <field name="share" eval="False"/>
-      <field name="implied_ids" eval="[Command.link(ref('base.group_user')), Command.link(ref('group_subsidiary_fsdh_capital'))]"/>
+      <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
       <field name="category_id" ref="module_category_subsidiaries"/>
     </record>
 
-    <!-- Level 3: FSDH CAPITAL – implies IT CONTROL -->
+    <!-- FSDH CAPITAL -->
     <record id="group_subsidiary_business_control" model="res.groups">
       <field name="name">Fsdh Capital</field>
       <field name="active" eval="True"/>
       <field name="share" eval="False"/>
-      <field name="implied_ids" eval="[Command.link(ref('base.group_user')), Command.link(ref('group_subsidiary_fsdh_asset_mgt'))]"/>
+      <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
       <field name="category_id" ref="module_category_subsidiaries"/>
     </record>
 
-    <!-- Level 4 (highest): FSDH ASSET MGT – implies FSDH CAPITAL -->
+    <!-- FSDH ASSET MGT -->
     <record id="group_subsidiary_it_control" model="res.groups">
       <field name="name">Fsdh Asset Mgt</field>
       <field name="active" eval="True"/>
       <field name="share" eval="False"/>
-      <field name="implied_ids" eval="[Command.link(ref('base.group_user')), Command.link(ref('group_subsidiary_business_control'))]"/>
+      <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
       <field name="category_id" ref="module_category_subsidiaries"/>
     </record>
 </odoo>

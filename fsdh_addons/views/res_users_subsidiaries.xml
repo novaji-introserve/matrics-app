@@ -19,7 +19,7 @@
             <xpath expr="//page[@name='access_rights']" position="inside">
                 <group col="6" string="Subsidiaries">
                     <newline/>
-                    <field name="subsidiary_group" widget="selection" required="1"/>
+                    <field name="subsidiary_group" widget="selection"/>
                     <newline/>
                 </group>
             </xpath>
