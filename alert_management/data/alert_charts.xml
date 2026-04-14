@@ -9,7 +9,7 @@
             <field name="display_order">1</field>
             <field name="scope">alert</field>
             <field name="is_visible" eval="True"/>
-            <field name="refresh_mode">live</field>
+            <field name="refresh_mode">scheduled</field>
             <field name="cache_ttl_minutes">60</field>
             <field name="chart_type">line</field>
             <field name="query">
@@ -45,7 +45,7 @@
             <field name="display_order">2</field>
             <field name="scope">alert</field>
             <field name="is_visible" eval="True"/>
-            <field name="refresh_mode">live</field>
+            <field name="refresh_mode">scheduled</field>
             <field name="cache_ttl_minutes">60</field>
             <field name="chart_type">bar</field>
             <field name="query">

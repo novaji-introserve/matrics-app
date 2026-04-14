@@ -13,6 +13,7 @@ from datetime import timedelta, datetime
 import pytz
 from dateutil.relativedelta import relativedelta
 from odoo.exceptions import UserError, AccessError
+from odoo.osv import expression
 from psycopg2.extras import execute_values
 import time
 from datetime import datetime, timedelta
@@ -326,7 +327,7 @@ class Customer(models.Model):
         string='Composite Risk Plan Lines')
 
     show_create_case = fields.Boolean(
-        string="Case Management_v2 Installed",
+        string="Case Management Installed",
         compute='_compute_is_case_manager_installed',
         store=False,)
 
@@ -347,6 +348,24 @@ class Customer(models.Model):
     age_verified = fields.Boolean(string='Age Verified', default=False, readonly=True, tracking=True)
     verification_date = fields.Datetime(string='Verification Date', readonly=True, tracking=True)
     verification_reference_id = fields.Char(string='Verification Reference ID', readonly=True, tracking=True)
+
+    @api.model
+    def _name_search(self, name, args=None, operator='ilike', limit=100, name_get_uid=None):
+        args = args or []
+        if name:
+            name_domain = ['|', '|', '|', '|',
+                ('name', operator, name),
+                ('display_name', operator, name),
+                ('firstname', operator, name),
+                ('lastname', operator, name),
+                ('customer_id', operator, name),
+            ]
+            return self._search(
+                expression.AND([name_domain, args]),
+                limit=limit,
+                access_rights_uid=name_get_uid,
+            )
+        return self._search(args, limit=limit, access_rights_uid=name_get_uid)
 
     def _get_ubo_threshold(self):
         self.ensure_one()
@@ -419,7 +438,7 @@ class Customer(models.Model):
     @api.depends('customer_id')
     def _compute_is_case_manager_installed(self):
         module = self.env['ir.module.module'].sudo().search([
-            ('name', '=', 'case_management_v2'),
+            ('name', '=', 'case_management'),
             ('state', '=', 'installed')
         ], limit=1)
 
@@ -1673,13 +1692,15 @@ class Customer(models.Model):
         }
 
     def action_open_customers(self):
+        search_view = self.env.ref('compliance_management.view_customer_search', raise_if_not_found=False)
         return {
             'name': _('Customers'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
             'domain': [('branch_id.id', 'in', [e.id for e in self.env.user.branches_id]), ('internal_category', '=', 'customer')],
-            'context': {'search_default_group_branch': 1}
+            'context': {'search_default_group_branch': 1},
+            'search_view_id': search_view.id if search_view else False,
         }
 
     @api.model
@@ -1710,13 +1731,15 @@ class Customer(models.Model):
 
             ]
 
+        search_view = self.env.ref('compliance_management.view_customer_search', raise_if_not_found=False)
         return {
             'name': _('Customers'),
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
             'domain': domain,
-            'context': {'search_default_group_branch': 1}
+            'context': {'search_default_group_branch': 1},
+            'search_view_id': search_view.id if search_view else False,
         }
 
     @api.model

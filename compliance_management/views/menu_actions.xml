@@ -249,7 +249,7 @@
         <field name="res_model">res.partner</field>
         <field name="type">ir.actions.act_window</field>
         <field name="view_mode">tree,kanban,form,activity</field>
-        <field name="search_view_id" ref="base.view_res_partner_filter" />
+        <field name="search_view_id" ref="view_customer_search" />
         <field name="context">{'search_default_group_branch': 1}</field>
     </record>
 
@@ -258,13 +258,14 @@
         <field name="name">Customers on PEP List</field>
         <field name="res_model">res.partner</field>
         <field name="view_mode">kanban,tree,form</field>
-        <field name="domain">[('customer_type', '=', 'corporate')]</field>
+        <field name="search_view_id" ref="view_customer_search" />
+        <field name="domain">[('internal_category', '=', 'customer'), ('active', '=', True), ('is_pep', '=', True)]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Conduct EDD for a corporate customer
+                No PEP customers found
             </p>
             <p>
-                Corporate customer enhanced due diligence is conducted here
+                Customers flagged on the PEP list will appear here.
             </p>
         </field>
     </record>
@@ -1016,7 +1017,7 @@ action = {
     <menuitem id="menu_compliance_transactions_done" action="open_transactions_done" parent="menu_compliance_transaction_monitoring" name="Transactions Reviewed" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer,group_compliance_transaction_monitoring_team" sequence="20" />
     <menuitem id="menu_compliance_transactions_all" action="open_transactions_all" parent="menu_compliance_transaction_monitoring" name="All Transactions" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer,group_compliance_transaction_monitoring_team" sequence="30" />
     <menuitem id="menu_compliance_internal_transactions" action="action_open_internal_transactions" parent="menu_compliance_transaction_monitoring" name="Internal Transactions" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer,group_compliance_transaction_monitoring_team" sequence="40" />
-    <menuitem id="menu_change_data_capture" action="action_change_data_capture" parent="menu_compliance_transaction_monitoring" name="Change Data Capture" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer,group_compliance_transaction_monitoring_team" sequence="50" />
+    <menuitem id="menu_change_data_capture" action="action_change_data_capture" parent="menu_compliance_kyc" name="Change Data Capture" groups="group_compliance_compliance_officer,group_compliance_branch_compliance_officer,group_compliance_transaction_monitoring_team" sequence="15" />
     <menuitem id="menu_compliance_kyc_transaction_screening"  parent="menu_compliance_transactions_root" name="Transaction Screening" groups="group_compliance_compliance_officer,group_compliance_transaction_monitoring_team" sequence="20" />
     <menuitem id="menu_compliance_transaction_screening_history" action="open_transaction_screening_history" parent="menu_compliance_kyc_transaction_screening" name="History" groups="group_compliance_compliance_officer,group_compliance_transaction_monitoring_team" sequence="40" />
     <menuitem

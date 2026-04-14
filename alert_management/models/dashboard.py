@@ -84,7 +84,7 @@ class AlertHistoryDashboard(models.Model):
         for chart in chart_records:
             if chart.code == "alert_alerts_per_day":
                 payloads.append(
-                    self._build_alerts_per_day_payload(
+                    self._get_alerts_per_day_payload(
                         chart, period, start_date, end_date, start_at, end_at
                     )
                 )
@@ -100,6 +100,33 @@ class AlertHistoryDashboard(models.Model):
                 )
             )
         return payloads
+
+    def _get_alerts_per_day_payload(
+        self, chart, period, start_date, end_date, start_at, end_at
+    ):
+        if chart.refresh_mode == "live":
+            return self._build_alerts_per_day_payload(
+                chart, period, start_date, end_date, start_at, end_at
+            )
+
+        cached_payload = chart._read_cached_payload(
+            cco=True,
+            branches_id=[],
+            datepicked=period,
+        )
+        if cached_payload:
+            return cached_payload
+
+        payload = self._build_alerts_per_day_payload(
+            chart, period, start_date, end_date, start_at, end_at
+        )
+        chart._store_cached_payload(
+            payload,
+            cco=True,
+            branches_id=[],
+            datepicked=period,
+        )
+        return payload
 
     def _build_alerts_per_day_payload(self, chart, period, start_date, end_date, start_at, end_at):
         domain = [

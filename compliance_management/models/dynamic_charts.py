@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from threading import Thread
+
+from odoo import models, fields, api, _
 from odoo import exceptions
 import ast
 import json
@@ -203,18 +205,6 @@ class ResCharts(models.Model):
     domain_filter = fields.Char(
         string="Domain Filter", help="Domain filter for the action window"
     )
-    use_materialized_view = fields.Boolean(
-        string="Use Materialized View",
-        default=False,
-        help="If enabled, a materialized view will be created for this chart to optimize performance",
-        tracking=True,
-    )
-    materialized_view_refresh_interval = fields.Integer(
-        string="Refresh Interval (minutes)",
-        default=60,
-        help="How often the materialized view should be refreshed (in minutes)",
-        readonly=True
-    )
     last_execution_time = fields.Float(
         string="Last Execution Time (ms)",
         readonly=True,
@@ -226,9 +216,6 @@ class ResCharts(models.Model):
         readonly=True,
     )
     last_error_message = fields.Text(string="Last Error Message", readonly=True)
-    materialized_view_last_refresh = fields.Datetime(
-        string="Last View Refresh", readonly=True
-    )
     active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
 
     def init(self):
@@ -302,6 +289,14 @@ class ResCharts(models.Model):
         cache_entry = cached_payloads.get(cache_key)
         if not isinstance(cache_entry, dict):
             return None
+        expires_at = cache_entry.get("expires_at")
+        if expires_at:
+            try:
+                expires_at_dt = fields.Datetime.to_datetime(expires_at)
+            except Exception:
+                expires_at_dt = None
+            if expires_at_dt and fields.Datetime.now() > expires_at_dt:
+                return None
         return cache_entry.get("payload")
 
     def _store_cached_payload(self, payload, *, cco=False, branches_id=None, datepicked=7):
@@ -328,6 +323,10 @@ class ResCharts(models.Model):
             registry = self.env.registry
             with registry.cursor() as cr:
                 cr.execute(
+                    "SELECT id FROM res_dashboard_charts WHERE id = %s FOR UPDATE NOWAIT",
+                    (self.id,),
+                )
+                cr.execute(
                     """
                     UPDATE res_dashboard_charts
                     SET cached_payload = %s,
@@ -347,9 +346,52 @@ class ResCharts(models.Model):
                     ),
                 )
                 cr.commit()
+        except (psycopg2.errors.LockNotAvailable, psycopg2.errors.SerializationFailure):
+            _logger.info(
+                "Skipping dashboard cache write for chart %s (%s) because the record is being edited.",
+                self.name,
+                self.code,
+            )
         except psycopg2.Error as exc:
             _logger.warning(
                 "Skipping dashboard cache write for chart %s (%s) due to database contention: %s",
+                self.name,
+                self.code,
+                exc,
+            )
+
+    def _clear_cached_payload(self):
+        self.ensure_one()
+        now = fields.Datetime.now()
+        try:
+            registry = self.env.registry
+            with registry.cursor() as cr:
+                cr.execute(
+                    "SELECT id FROM res_dashboard_charts WHERE id = %s FOR UPDATE NOWAIT",
+                    (self.id,),
+                )
+                cr.execute(
+                    """
+                    UPDATE res_dashboard_charts
+                    SET cached_payload = NULL,
+                        cache_computed_at = NULL,
+                        cache_expires_at = NULL,
+                        write_uid = %s,
+                        write_date = %s
+                    WHERE id = %s
+                    """,
+                    (self.env.uid, now, self.id),
+                )
+                cr.commit()
+        except (psycopg2.errors.LockNotAvailable, psycopg2.errors.SerializationFailure):
+            _logger.info(
+                "Skipping dashboard cache clear for chart %s (%s) because the record is being edited.",
+                self.name,
+                self.code,
+            )
+        except psycopg2.Error as exc:
+            _logger.warning(
+                "Skipping dashboard cache clear for chart %s (%s) due to database contention: %s",
                 self.name,
                 self.code,
                 exc,
@@ -376,6 +418,16 @@ class ResCharts(models.Model):
         if cached_payload:
             return cached_payload
 
+        if self.refresh_mode == "manual":
+            return self._build_empty_dashboard_payload(
+                cco=cco,
+                branches_id=branches_id,
+                datepicked=datepicked,
+                start_at=start_at,
+                end_at=end_at,
+                error=_("No cached payload is available yet. Use Run Query to generate it."),
+            )
+
         payload = chart_service.get_dashboard_chart_data(
             self,
             cco,
@@ -389,6 +441,150 @@ class ResCharts(models.Model):
         )
         return payload
 
+    def _build_empty_dashboard_payload(
+        self,
+        *,
+        cco=False,
+        branches_id=None,
+        datepicked=7,
+        start_at=None,
+        end_at=None,
+        error=None,
+    ):
+        self.ensure_one()
+        return {
+            "id": self.code or self.id,
+            "record_id": self.id,
+            "title": self.name,
+            "display_summary": self.display_summary or self.description or "",
+            "type": self.chart_type,
+            "model_name": self.target_model,
+            "filter": self.navigation_filter_field or self.domain_field,
+            "column": self.column,
+            "labels": [],
+            "ids": [],
+            "datefield": self.date_field,
+            "additional_domain": self._build_dashboard_navigation_domain(
+                cco=cco,
+                branches_id=branches_id or [],
+                datepicked=datepicked,
+                start_at=start_at,
+                end_at=end_at,
+            ),
+            "datasets": [
+                {
+                    "label": self.name,
+                    "data": [],
+                    "backgroundColor": [],
+                    "borderColor": [],
+                    "borderWidth": 1,
+                }
+            ],
+            "error": error or False,
+        }
+
+    @api.model
+    def create(self, vals):
+        return super().create(vals)
+
+    def write(self, vals):
+        cache_sensitive_fields = {
+            "query",
+            "x_axis_field",
+            "y_axis_field",
+            "chart_type",
+            "color_scheme",
+            "branch_filter",
+            "branch_field",
+            "date_filter",
+            "date_field",
+            "refresh_mode",
+            "cache_ttl_minutes",
+            "target_model_id",
+            "navigation_filter_field",
+            "navigation_value_field",
+            "navigation_domain",
+            "apply_dashboard_date_filter",
+            "navigation_date_field",
+            "apply_dashboard_branch_filter",
+            "navigation_branch_field",
+            "domain_field_id",
+            "domain_filter",
+            "display_summary",
+            "name",
+            "code",
+            "column",
+            "state",
+            "active",
+            "is_visible",
+            "scope",
+        }
+        if cache_sensitive_fields.intersection(vals):
+            vals = dict(vals)
+            vals.update(
+                {
+                    "cached_payload": False,
+                    "cache_computed_at": False,
+                    "cache_expires_at": False,
+                }
+            )
+        return super().write(vals)
+
+    def _get_paginated_dashboard_chart_payload(
+        self,
+        chart_service,
+        *,
+        cco=False,
+        branches_id=None,
+        datepicked=7,
+        start_at=None,
+        end_at=None,
+        page=0,
+        page_size=50,
+    ):
+        self.ensure_one()
+        payload = self._get_dashboard_chart_payload(
+            chart_service,
+            cco=cco,
+            branches_id=branches_id,
+            datepicked=datepicked,
+            start_at=start_at,
+            end_at=end_at,
+        )
+        labels = list(payload.get("labels", []) or [])
+        ids = list(payload.get("ids", []) or [])
+        datasets = list(payload.get("datasets", []) or [])
+        total = len(labels)
+        page = max(int(page or 0), 0)
+        page_size = max(int(page_size or 50), 1)
+        start_idx = page * page_size
+        end_idx = start_idx + page_size
+
+        paginated_payload = dict(payload)
+        paginated_payload["labels"] = labels[start_idx:end_idx]
+        if ids:
+            paginated_payload["ids"] = ids[start_idx:end_idx]
+        paginated_datasets = []
+        for dataset in datasets:
+            paginated_dataset = dict(dataset)
+            data = list(dataset.get("data", []) or [])
+            colors = list(dataset.get("backgroundColor", []) or [])
+            border_colors = list(dataset.get("borderColor", []) or [])
+            paginated_dataset["data"] = data[start_idx:end_idx]
+            if colors:
+                paginated_dataset["backgroundColor"] = colors[start_idx:end_idx]
+            if border_colors and len(border_colors) == len(data):
+                paginated_dataset["borderColor"] = border_colors[start_idx:end_idx]
+            paginated_datasets.append(paginated_dataset)
+        paginated_payload["datasets"] = paginated_datasets
+        paginated_payload["pagination"] = {
+            "total": total,
+            "page": page,
+            "page_size": page_size,
+            "pages": ((total + page_size - 1) // page_size) if page_size > 0 else 0,
+        }
+        return paginated_payload
+
     @api.model
     def refresh_dashboard_chart_payloads(self, limit=None):
         search_kwargs = {"order": "display_order asc, id asc"}
@@ -399,7 +595,6 @@ class ResCharts(models.Model):
                 ("state", "=", "active"),
                 ("active", "=", True),
                 ("is_visible", "=", True),
-                ("scope", "=", "compliance"),
                 ("refresh_mode", "in", ["scheduled", "manual"]),
             ],
             **search_kwargs,
@@ -456,6 +651,89 @@ class ResCharts(models.Model):
             "params": {
                 "title": "Success",
                 "message": "Chart cache refreshed successfully.",
+                "type": "success",
+                "sticky": False,
+            },
+        }
+
+    @api.model
+    def job_run_query_refresh(self, chart_ids):
+        charts = self.browse(chart_ids).exists()
+        if not charts:
+            return False
+
+        from ..services.chart_data_service import ChartDataService
+
+        payload_service = ChartDataService(self.env)
+        for chart in charts:
+            for period in (0, 1, 7, 30):
+                try:
+                    payload = payload_service.get_dashboard_chart_data(
+                        chart,
+                        cco=True,
+                        branches_id=[],
+                        datepicked=period,
+                        start_at=None,
+                        end_at=None,
+                    )
+                    chart._store_cached_payload(
+                        payload, cco=True, branches_id=[], datepicked=period
+                    )
+                except Exception as exc:
+                    _logger.warning(
+                        "Manual query run failed for chart %s (%s) period=%s: %s",
+                        chart.name,
+                        chart.code,
+                        period,
+                        exc,
+                    )
+        return True
+
+    @api.model
+    def _run_query_refresh_thread(self, chart_ids, uid, context=None):
+        context = context or {}
+        try:
+            with api.Environment.manage():
+                new_cr = self.pool.cursor()
+                try:
+                    env = api.Environment(new_cr, uid, context)
+                    env["res.dashboard.charts"].job_run_query_refresh(chart_ids)
+                    new_cr.commit()
+                finally:
+                    new_cr.close()
+        except Exception as exc:
+            _logger.error("Background chart query refresh failed: %s", exc)
+
+    def action_run_query(self):
+        self.ensure_one()
+        queue_job = self.env["ir.module.module"].sudo().search(
+            [("name", "=", "queue_job"), ("state", "=", "installed")], limit=1
+        )
+
+        if queue_job and hasattr(self, "with_delay"):
+            self.with_delay(
+                priority=30,
+                description=_("Run chart query and refresh cached payload for %s")
+                % (self.display_name,),
+            ).job_run_query_refresh(self.ids)
+            title = _("Query Queued")
+            message = _("The chart query has been queued and the cached payload will be refreshed.")
+        else:
+            worker = Thread(
+                target=self._run_query_refresh_thread,
+                args=(self.ids, self.env.uid, dict(self.env.context)),
+                daemon=True,
+            )
+            worker.start()
+            title = _("Query Started")
+            message = _("The chart query is running in the background and will refresh the cached payload.")
+
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "title": title,
+                "message": message,
                 "type": "success",
                 "sticky": False,
             },
@@ -742,8 +1020,7 @@ class ResCharts(models.Model):
                 except psycopg2.errors.QueryCanceled as e:
                     cr.rollback()
                     raise exceptions.ValidationError(
-                        f"Query execution timed out after 120 seconds. Please optimize your query or "
-                        f"use a materialized view for better performance."
+                        "Query execution timed out after 120 seconds. Please optimize your query."
                     )
                 except psycopg2.Error as e:
                     cr.rollback()
@@ -801,22 +1078,22 @@ class ResCharts(models.Model):
                 preview_results = results[:10] if results else []
                 fields = list(preview_results[0].keys()) if preview_results else []
                 if preview_results:
-                    message = (
-                        f"Query executed successfully in {execution_time:.2f} ms.<br/>"
-                    )
-                    message += f"Total rows: {len(results)}<br/>"
-                    message += f"Fields: {', '.join(fields)}<br/><br/>"
-                    message += "Preview (first 10 rows):<br/>"
-                    message += "<table class='table table-sm'><thead><tr>"
-                    for field in fields:
-                        message += f"<th>{field}</th>"
-                    message += "</tr></thead><tbody>"
+                    preview_lines = []
                     for row in preview_results:
-                        message += "<tr>"
-                        for field in fields:
-                            message += f"<td>{row[field]}</td>"
-                        message += "</tr>"
-                    message += "</tbody></table>"
+                        row_preview = ", ".join(
+                            f"{field}={row.get(field)}" for field in fields
+                        )
+                        preview_lines.append(row_preview)
+                    message = "\n".join(
+                        [
+                            f"Query executed successfully in {execution_time:.2f} ms.",
+                            f"Total rows: {len(results)}",
+                            f"Fields: {', '.join(fields)}",
+                            "",
+                            "Preview (first 10 rows):",
+                            *preview_lines,
+                        ]
+                    )
                 else:
                     message = "Query executed successfully but returned no results."
                 return {
@@ -864,100 +1141,3 @@ class ResCharts(models.Model):
                         "sticky": True,
                     },
                 }
-
-    @api.model
-    def create(self, vals):
-        """Create a new chart record and optionally create its materialized view.
-
-        Args:
-            vals (dict): The values for the new chart record.
-
-        Returns:
-            record: The created chart record.
-        """
-        record = super(ResCharts, self).create(vals)
-        if record.use_materialized_view:
-            self.env["dashboard.chart.view.refresher"].with_context(
-                bypass_validation=True
-            ).create_materialized_view_for_chart(record.id)
-        return record
-
-    def write(self, vals):
-        """Update an existing chart record and manage materialized view creation.
-
-        Args:
-            vals (dict): The values to update.
-
-        Returns:
-            bool: True if the update was successful, False otherwise.
-        """
-        result = super(ResCharts, self).write(vals)
-        if "query" in vals or "use_materialized_view" in vals:
-            for record in self:
-                if record.use_materialized_view:
-                    self.env["dashboard.chart.view.refresher"].with_context(
-                        bypass_validation=True
-                    ).create_materialized_view_for_chart(record.id)
-                elif (
-                    "use_materialized_view" in vals and not record.use_materialized_view
-                ):
-                    self.env[
-                        "dashboard.chart.view.refresher"
-                    ].drop_materialized_view_for_chart(record.id)
-        return result
-
-    def unlink(self):
-        """Delete the chart record and drop its associated materialized view if it exists.
-
-        Returns:
-            bool: True if the deletion was successful, False otherwise.
-        """
-        for record in self:
-            if record.use_materialized_view:
-                self.env[
-                    "dashboard.chart.view.refresher"
-                ].drop_materialized_view_for_chart(record.id)
-        return super(ResCharts, self).unlink()
-
-    def action_refresh_materialized_view(self):
-        """Manually refresh the materialized view for this chart.
-
-        Returns:
-            dict: Action dictionary to display the result notification.
-        """
-        self.ensure_one()
-        if not self.use_materialized_view:
-            return {
-                "type": "ir.actions.client",
-                "tag": "display_notification",
-                "params": {
-                    "title": "Error",
-                    "message": "Materialized view is not enabled for this chart.",
-                    "type": "danger",
-                    "sticky": False,
-                },
-            }
-        success = self.env["dashboard.chart.view.refresher"].refresh_chart_view(self.id)
-        if success:
-            return {
-                "type": "ir.actions.client",
-                "tag": "display_notification",
-                "params": {
-                    "title": "Success",
-                    "message": "Materialized view refreshed successfully.",
-                    "type": "success",
-                    "sticky": False,
-                },
-            }
-        else:
-            return {
-                "type": "ir.actions.client",
-                "tag": "display_notification",
-                "params": {
-                    "title": "Error",
-                    "message": "Failed to refresh materialized view.",
-                    "type": "danger",
-                    "sticky": False,
-                },
-            }
-            

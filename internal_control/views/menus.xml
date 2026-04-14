@@ -192,8 +192,8 @@
     />
 
     <record id="compliance_management.menu_change_data_capture" model="ir.ui.menu">
-        <field name="parent_id" ref="menu_transactions_change_management"/>
-        <field name="sequence">10</field>
+        <field name="parent_id" ref="compliance_management.menu_compliance_kyc"/>
+        <field name="sequence">15</field>
     </record>
 
     <!-- Transaction items parked for review.

@@ -177,7 +177,7 @@ class QueryService:
         if "syntax error" in error_msg.lower():
             return "SQL syntax error. Please check your query format."
         elif "timeout" in error_msg.lower():
-            return "Query timed out. Please simplify your query or enable the materialized view option."
+            return "Query timed out. Please simplify your query."
         elif "does not exist" in error_msg.lower():
             if "column" in error_msg.lower():
                 column = re.search(r'column\s+"([^"]+)"', error_msg)
@@ -193,11 +193,11 @@ class QueryService:
 
     @staticmethod
     def find_column_in_view(field_name, column_names):
-        """Find the most appropriate column name in a materialized view.
+        """Find the most appropriate column name in a query result set.
 
         Args:
             field_name (str): The field name to find.
-            column_names (list): The list of column names in the materialized view.
+            column_names (list): The list of available column names.
 
         Returns:
             str: The most appropriate column name if found, otherwise None.

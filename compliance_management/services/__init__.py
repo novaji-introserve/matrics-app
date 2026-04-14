@@ -16,7 +16,6 @@ from . import open_sanctions
 from . import open_sanctions_importer
 from . import chart_data_service
 from . import security_service
-from . import materialized_view
 from . import database_service
 from . import query_service
 from . import cache_service

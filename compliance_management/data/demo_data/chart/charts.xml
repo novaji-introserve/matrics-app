@@ -35,8 +35,6 @@
             <field name="navigation_date_field">create_date</field>
             <field name="apply_dashboard_branch_filter" eval="True"/>
             <field name="navigation_branch_field">branch_id</field>
-            <field name="use_materialized_view" eval="False"/>
-            <field name="materialized_view_refresh_interval">60</field>
             <field name="target_model_id" ref="compliance_management.model_res_partner_account"/>
         </record>
 
@@ -77,8 +75,6 @@
             <field name="navigation_date_field">create_date</field>
             <field name="apply_dashboard_branch_filter" eval="True"/>
             <field name="navigation_branch_field">branch_id</field>
-            <field name="use_materialized_view" eval="False"/>
-            <field name="materialized_view_refresh_interval">60</field>
             <field name="target_model_id" ref="compliance_management.model_res_partner_account"/>
         </record>
 

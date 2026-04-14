@@ -67,7 +67,7 @@ class Transaction(models.Model):
     branch_code = fields.Char(string="Branch Code")
     
     show_create_case= fields.Boolean(
-        string="Case Management_v2 Installed",
+        string="Case Management Installed",
         compute='_compute_is_case_manager_installed',
         store=False,)
 
@@ -153,7 +153,7 @@ class Transaction(models.Model):
     def _compute_is_case_manager_installed(self):
         for record in self:
             case_model = bool(self.env['ir.module.module'].search([
-                ('name', '=', 'case_management_v2'),
+                ('name', '=', 'case_management'),
                 ('state', '=', 'installed')
             ], limit=1))
             record.show_create_case = bool(case_model)

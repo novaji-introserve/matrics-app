@@ -847,65 +847,73 @@ class CustomerAccount(models.Model):
 
     @api.depends('category')
     def _compute_tier_info(self):
-        """Get tier information from materialized view"""
-        # Get all IDs at once for better performance
-        ids_to_query = self.ids
-        if not ids_to_query:
-            return
+        """Resolve tier information directly from active tier definitions."""
+        categories = {record.category for record in self if record.category}
+        tier_map = self._get_active_tier_map(categories)
 
-        # Query the materialized view directly with SQL for better performance
-        self._cr.execute("""
-            SELECT account_id, tier_level, tier_name 
-            FROM account_tier_materialized 
-            WHERE account_id IN %s
-        """, (tuple(ids_to_query),))
-
-        # Build a dictionary for efficient lookup
-        tier_data = {row[0]: {'tier_level': row[1], 'tier_name': row[2]}
-                     for row in self._cr.fetchall()}
-
-        # Assign values from the dictionary
         for record in self:
-            data = tier_data.get(
-                record.id, {'tier_level': '3', 'tier_name': 'Tier 3'})
+            data = tier_map.get(
+                record.category, {'tier_level': '3', 'tier_name': 'Tier 3'})
             record.tier_level = data['tier_level']
             record.tier_name = data['tier_name']
 
     @api.model
     def _search_tier_level(self, operator, value):
-        """Search method for tier_level using materialized view"""
+        """Search method for tier_level using active tier definitions."""
         if operator not in ('=', '!=', 'in', 'not in'):
             return []
 
+        active_tiers = self.env['res.partner.tier'].search([('status', '=', 'active')])
+        codes_by_level = {'1': [], '2': [], '3': []}
+        for tier in active_tiers:
+            codes_by_level.setdefault(tier.tier_level, []).append(tier.code)
+        all_active_codes = [code for codes in codes_by_level.values() for code in codes]
+
         if operator == '=':
-            # For equality, get IDs directly
-            account_ids = self.env['account.tier.materialized'].get_tier_ids(
-                value)
-            return [('id', 'in', account_ids)]
+            if value == '3':
+                return ['|', ('category', 'in', codes_by_level['3']), ('category', 'not in', all_active_codes)]
+            return [('category', 'in', codes_by_level.get(value, []))]
 
         elif operator == '!=':
-            # For inequality, exclude IDs
-            account_ids = self.env['account.tier.materialized'].get_tier_ids(
-                value)
-            return [('id', 'not in', account_ids)]
+            if value == '3':
+                return [('category', 'in', codes_by_level['1'] + codes_by_level['2'])]
+            return [('category', 'not in', codes_by_level.get(value, []))]
 
         elif operator == 'in':
-            # For 'in' operator, combine multiple tier levels
-            account_ids = []
-            for tier in value:
-                account_ids.extend(
-                    self.env['account.tier.materialized'].get_tier_ids(tier))
-            return [('id', 'in', account_ids)]
+            requested = set(value)
+            matching_codes = []
+            include_default_tier = '3' in requested
+            for tier in requested:
+                matching_codes.extend(codes_by_level.get(tier, []))
+            if include_default_tier:
+                return ['|', ('category', 'in', matching_codes), ('category', 'not in', all_active_codes)]
+            return [('category', 'in', matching_codes)]
 
         elif operator == 'not in':
-            # For 'not in' operator, exclude multiple tier levels
-            account_ids = []
-            for tier in value:
-                account_ids.extend(
-                    self.env['account.tier.materialized'].get_tier_ids(tier))
-            return [('id', 'not in', account_ids)]
+            requested = set(value)
+            excluded_codes = []
+            include_default_tier = '3' in requested
+            for tier in requested:
+                excluded_codes.extend(codes_by_level.get(tier, []))
+            if include_default_tier:
+                return [('category', 'in', codes_by_level['1'] + codes_by_level['2'])]
+            return [('category', 'not in', excluded_codes)]
 
         return []
+
+    @api.model
+    def _get_active_tier_map(self, categories):
+        tiers = self.env['res.partner.tier'].search(
+            [('status', '=', 'active'), ('code', 'in', list(categories))]
+        )
+        tier_map = {}
+        for tier in tiers:
+            if tier.code not in tier_map:
+                tier_map[tier.code] = {
+                    'tier_level': tier.tier_level or '3',
+                    'tier_name': tier.name or 'Tier 3',
+                }
+        return tier_map
 
 class CustomerAccountOfficer(models.Model):
     _name = 'account.officers'

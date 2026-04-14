@@ -56,8 +56,6 @@ class CustomerDigitalProduct(models.Model):
             except Exception as e:
                 _logger.warning(f"Index creation skipped: {e}")
 
-
-
 # view model to display Customer digital products
 class PartnerDigitalProductView(models.Model):
     _name = 'res.partner.digital.product.view'
@@ -80,10 +78,31 @@ class PartnerDigitalProductView(models.Model):
 
     
     def init(self):
-        """Defer view creation to avoid slow loading"""
-        _logger.info(
-            "Partner digital product view initialization deferred for performance")
-        # View will be created manually when needed
+        """Create a lightweight SQL view backed by channel subscriptions."""
+        tools.drop_view_if_exists(self.env.cr, self._table)
+        self.env.cr.execute(f"""
+            CREATE OR REPLACE VIEW {self._table} AS (
+                SELECT
+                    MIN(ccs.id) AS id,
+                    ccs.partner_id,
+                    ccs.customer_id,
+                    NULL::varchar AS customer_segment,
+                    MAX(CASE WHEN ddc.code = 'ussd' THEN ccs.value END) AS ussd,
+                    MAX(CASE WHEN ddc.code = 'onebank' THEN ccs.value END) AS onebank,
+                    MAX(CASE WHEN ddc.code = 'carded_customer' THEN ccs.value END) AS carded_customer,
+                    MAX(CASE WHEN ddc.code = 'alt_bank' THEN ccs.value END) AS alt_bank,
+                    MAX(CASE WHEN ddc.code = 'sterling_pro' THEN ccs.value END) AS sterling_pro,
+                    MAX(CASE WHEN ddc.code = 'banca' THEN ccs.value END) AS banca,
+                    MAX(CASE WHEN ddc.code = 'doubble' THEN ccs.value END) AS doubble,
+                    MAX(CASE WHEN ddc.code = 'specta' THEN ccs.value END) AS specta,
+                    MAX(CASE WHEN ddc.code = 'switch' THEN ccs.value END) AS switch
+                FROM customer_channel_subscription ccs
+                JOIN digital_delivery_channel ddc
+                    ON ddc.id = ccs.channel_id
+                WHERE ccs.partner_id IS NOT NULL
+                GROUP BY ccs.partner_id, ccs.customer_id
+            )
+        """)
 
 
    
@@ -573,12 +592,13 @@ class DigitalDeliveryChannel(models.Model):
                 _logger.info(
                     f"   Total so far: {total_results['subscriptions_created']:,} subscriptions, {total_results['legacy_migrated']:,} legacy, {total_results['partner_links_updated']:,} partner links")
 
-            # Final step: Create materialized view (only once at the end)
-            _logger.info(f"\n=== FINAL STEP: Creating Materialized View ===")
-            view_result = self._create_materialized_view_optimized()
-
             # Final summary
-            summary = f"Completed {total_results['batches_completed']} batches: {total_results['subscriptions_created']:,} subscriptions created, {total_results['legacy_migrated']:,} legacy records migrated, {total_results['partner_links_updated']:,} partner links updated, {view_result}"
+            summary = (
+                f"Completed {total_results['batches_completed']} batches: "
+                f"{total_results['subscriptions_created']:,} subscriptions created, "
+                f"{total_results['legacy_migrated']:,} legacy records migrated, "
+                f"{total_results['partner_links_updated']:,} partner links updated"
+            )
             _logger.info(f"🎉 MIGRATION COMPLETE: {summary}")
 
             return {
@@ -838,63 +858,6 @@ class DigitalDeliveryChannel(models.Model):
         updated_count = self._cr.rowcount
         return updated_count
         
-    def _create_materialized_view_optimized(self):
-        """Create materialized view without blocking"""
-        try:
-            # Check if view exists
-            self._cr.execute("""
-                SELECT EXISTS (
-                    SELECT 1 FROM pg_matviews
-                    WHERE matviewname = 'customer_digital_product_mat'
-                )
-            """)
-
-            if self._cr.fetchone()[0]:
-                _logger.info(
-                    "Materialized view already exists, skipping creation")
-                return "View already exists"
-
-            # Only create if legacy table exists
-            self._cr.execute("""
-                SELECT EXISTS (
-                    SELECT 1 FROM information_schema.tables
-                    WHERE table_name = 'customer_digital_product'
-                )
-            """)
-
-            if not self._cr.fetchone()[0]:
-                _logger.info("No legacy table, skipping materialized view")
-                return "No legacy table for view"
-
-            # Create view with minimal data first
-            _logger.info("Creating materialized view...")
-            self._cr.execute("""
-                CREATE MATERIALIZED VIEW customer_digital_product_mat AS (
-                    SELECT 
-                        ROW_NUMBER() OVER (ORDER BY customer_id) as id,
-                        customer_id,
-                        'Placeholder' as customer_name,
-                        'Standard' as customer_segment,
-                        NULL as ussd, NULL as onebank, NULL as carded_customer,
-                        NULL as alt_bank, NULL as sterling_pro, NULL as banca,
-                        NULL as doubble, NULL as specta, NULL as switch
-                    FROM (SELECT DISTINCT customer_id FROM customer_channel_subscription LIMIT 1000) t
-                )
-            """)
-
-            # Create indexes
-            self._cr.execute(
-                "CREATE UNIQUE INDEX customer_digital_mat_id_idx ON customer_digital_product_mat(id)")
-            self._cr.execute(
-                "CREATE INDEX customer_digital_mat_customer_idx ON customer_digital_product_mat(customer_id)")
-
-            _logger.info("Materialized view created with basic structure")
-            return "View created (basic)"
-
-        except Exception as e:
-            _logger.error(f"Materialized view creation failed: {e}")
-            return f"View error: {e}"
-    
     def action_create_dynamic_demo_subscriptions(self):
         """Create random channel subscriptions dynamically for any channels without hardcoding"""
 
@@ -1025,39 +988,3 @@ class CustomerChannelSubscription(models.Model):
         vals['last_updated'] = fields.Datetime.now()
         return super().write(vals)
 
-   
-class CustomerDigitalProductMaterialized(models.Model):
-    """Materialized view for efficient delivery channel lookups"""
-    _name = 'customer.digital.product.mat'
-    _description = 'Customer Digital Products Materialized'
-    _auto = False  # This is not a regular table
-
-    id = fields.Integer(readonly=True)
-    customer_id = fields.Char(string='Customer ID', readonly=True, index=True)
-    customer_name = fields.Char(string='Name', readonly=True)
-    customer_segment = fields.Char(string='Customer Segment', readonly=True)
-    ussd = fields.Char(string='Uses USSD', readonly=True)
-    onebank = fields.Char(string='Uses One Bank', readonly=True)
-    carded_customer = fields.Char(string='Has A Card', readonly=True)
-    alt_bank = fields.Char(string='Is On Alt Bank', readonly=True)
-    sterling_pro = fields.Char(string='Has Sterling Pro', readonly=True)
-    banca = fields.Char(string='Has Banca', readonly=True)
-    doubble = fields.Char(string='Has Doubble', readonly=True)
-    specta = fields.Char(string='Has Specta', readonly=True)
-    switch = fields.Char(string='Has Switch', readonly=True)
-
-    def init(self):
-        """Minimal initialization - no heavy operations"""
-        _logger.info("Materialized view model initialized (deferred creation)")
-
-    @api.model
-    def refresh_view(self):
-        """Safe refresh method"""
-        try:
-            self._cr.execute(
-                "REFRESH MATERIALIZED VIEW customer_digital_product_mat")
-            return True
-        except Exception as e:
-            _logger.error(f"Failed to refresh materialized view: {e}")
-            return False
-        

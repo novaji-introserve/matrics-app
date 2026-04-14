@@ -3,7 +3,7 @@ from odoo import models, fields, api, SUPERUSER_ID, _
 import logging
 
 
-    
+
 class ComplianceSettings(models.Model):
     _name = 'res.compliance.settings'
     _description = 'Compliance Settings'
@@ -16,9 +16,9 @@ class ComplianceSettings(models.Model):
     code = fields.Char(string='Code', required=True,index=True)
     val = fields.Char(string='Value')
     narration = fields.Text(string='Narration')
-    
+
     active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
-    
+
     @api.model
     def get_setting(self, code):
         """Get a setting value by code"""
@@ -35,9 +35,8 @@ class IrUiMenu(models.Model):
     @api.model
     def _auto_init(self):
         res = super(IrUiMenu, self)._auto_init()
-        # Execute menu hiding after init
-        #self.env.cr.commit()  # Commit any pending changes
-        self._hide_unwanted_menus()
+        # Avoid menu writes during registry init/module upgrade.
+        # Menu hiding is handled by the post-init hook and load_menus().
         return res
     @api.model
     def _hide_unwanted_menus(self):
@@ -112,4 +111,4 @@ class IrUiMenu(models.Model):
         except Exception as e:
             _logger.error(f"Error in load_menus override: {e}")
         return res
-    
+

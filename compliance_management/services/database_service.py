@@ -12,7 +12,7 @@ class DatabaseService:
 
     def __init__(self, env=None):
         """Initialize the DatabaseService.
-        
+
         Args:
             env (Environment, optional): The Odoo environment. Defaults to None.
         """
@@ -20,12 +20,12 @@ class DatabaseService:
 
     def execute_query_with_timeout(self, query, params=None, timeout=30000):
         """Execute a query with a timeout.
-        
+
         Args:
             query (str): The SQL query to execute.
             params (tuple, optional): Parameters for the query. Defaults to None.
             timeout (int, optional): Timeout in milliseconds. Defaults to 30000.
-            
+
         Returns:
             tuple: (success, result, error_message)
         """
@@ -51,150 +51,12 @@ class DatabaseService:
             except:
                 pass
 
-    def check_view_exists(self, view_name):
-        """Check if a materialized view exists.
-        
-        Args:
-            view_name (str): The name of the materialized view.
-            
-        Returns:
-            bool: True if the view exists, False otherwise.
-        """
-        if not self.env:
-            return False
-
-        try:
-            self.env.cr.execute("""
-                SELECT EXISTS (
-                    SELECT FROM pg_catalog.pg_class c
-                    JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-                    WHERE c.relname = %s
-                    AND c.relkind = 'm'
-                )
-            """, (view_name,))
-            return self.env.cr.fetchone()[0]
-        except Exception as e:
-            _logger.error(f"Error checking if view {view_name} exists: {e}")
-            return False
-
-    def create_materialized_view(self, view_name, query, with_data=True):
-        """Create a materialized view.
-        
-        Args:
-            view_name (str): The name of the materialized view.
-            query (str): The SQL query to create the view.
-            with_data (bool, optional): Create the view with data. Defaults to True.
-            
-        Returns:
-            bool: True if the view was created successfully, False otherwise.
-        """
-        if not self.env:
-            return False
-
-        try:
-            if self.check_view_exists(view_name):
-                _logger.info(f"Materialized view {view_name} already exists")
-                return True
-
-            with_data_clause = "WITH DATA" if with_data else "WITH NO DATA"
-            create_view_query = f"""
-                CREATE MATERIALIZED VIEW {view_name} AS
-                {query}
-                {with_data_clause}
-            """
-            self.env.cr.execute(create_view_query)
-            _logger.info(f"Created materialized view: {view_name}")
-            return True
-        except Exception as e:
-            _logger.error(f"Error creating materialized view {view_name}: {e}")
-            return False
-
-    def refresh_materialized_view(self, view_name, concurrently=True):
-        """Refresh a materialized view.
-        
-        Args:
-            view_name (str): The name of the materialized view.
-            concurrently (bool, optional): Refresh concurrently. Defaults to True.
-            
-        Returns:
-            bool: True if the refresh was successful, False otherwise.
-        """
-        if not self.env:
-            return False
-
-        try:
-            if not self.check_view_exists(view_name):
-                _logger.warning(f"Materialized view {view_name} does not exist")
-                return False
-
-            if concurrently:
-                try:
-                    self.env.cr.execute(f"REFRESH MATERIALIZED VIEW CONCURRENTLY {view_name}")
-                except Exception as e:
-                    _logger.info(f"CONCURRENTLY refresh failed, using regular refresh: {e}")
-                    self.env.cr.execute(f"REFRESH MATERIALIZED VIEW {view_name}")
-            else:
-                self.env.cr.execute(f"REFRESH MATERIALIZED VIEW {view_name}")
-
-            _logger.info(f"Refreshed materialized view: {view_name}")
-            return True
-        except Exception as e:
-            _logger.error(f"Error refreshing materialized view {view_name}: {e}")
-            return False
-
-    def drop_materialized_view(self, view_name):
-        """Drop a materialized view if it exists.
-        
-        Args:
-            view_name (str): The name of the materialized view.
-            
-        Returns:
-            bool: True if the view was dropped successfully, False otherwise.
-        """
-        if not self.env:
-            return False
-
-        try:
-            self.env.cr.execute(f"DROP MATERIALIZED VIEW IF EXISTS {view_name}")
-            _logger.info(f"Dropped materialized view: {view_name}")
-            return True
-        except Exception as e:
-            _logger.error(f"Error dropping materialized view {view_name}: {e}")
-            return False
-
-    def create_index_on_view(self, view_name, column_name, unique=False, index_name=None):
-        """Create an index on a materialized view.
-        
-        Args:
-            view_name (str): The name of the materialized view.
-            column_name (str): The column to create the index on.
-            unique (bool, optional): Create a unique index. Defaults to False.
-            index_name (str, optional): The name for the index. Defaults to None.
-            
-        Returns:
-            bool: True if the index was created successfully, False otherwise.
-        """
-        if not self.env:
-            return False
-
-        try:
-            if not index_name:
-                index_name = f"{view_name}_{column_name}_idx"
-            
-            unique_clause = "UNIQUE" if unique else ""
-            self.env.cr.execute(f"CREATE {unique_clause} INDEX {index_name} ON {view_name} ({column_name})")
-            _logger.info(f"Created index {index_name} on {view_name}({column_name})")
-            return True
-        except Exception as e:
-            _logger.error(f"Error creating index on {view_name}({column_name}): {e}")
-            return False
-
     def get_table_columns(self, table_name):
         """Get the columns of a table or view.
-        
+
         Args:
             table_name (str): The name of the table or view.
-            
+
         Returns:
             list: A list of column names, or empty list if an error occurred.
         """
@@ -219,14 +81,14 @@ class DatabaseService:
         """
         if not self.env:
             return None
-            
+
         try:
             if "." in table_name:
                 schema, table = table_name.split(".")
                 query = """
-                    SELECT column_name 
+                    SELECT column_name
                     FROM information_schema.columns
-                    WHERE table_schema = %s AND table_name = %s 
+                    WHERE table_schema = %s AND table_name = %s
                     AND (column_name = 'branch_id' OR column_name LIKE '%%branch%%')
                     ORDER BY CASE WHEN column_name = 'branch_id' THEN 1 ELSE 2 END
                     LIMIT 1
@@ -234,9 +96,9 @@ class DatabaseService:
                 self.env.cr.execute(query, (schema, table))
             else:
                 query = """
-                    SELECT column_name 
+                    SELECT column_name
                     FROM information_schema.columns
-                    WHERE table_schema = 'public' AND table_name = %s 
+                    WHERE table_schema = 'public' AND table_name = %s
                     AND (column_name = 'branch_id' OR column_name LIKE '%%branch%%')
                     ORDER BY CASE WHEN column_name = 'branch_id' THEN 1 ELSE 2 END
                     LIMIT 1
@@ -250,7 +112,7 @@ class DatabaseService:
 
     def initialize_db_settings(self):
         """Initialize database settings for optimal performance.
-        
+
         Returns:
             bool: True if the settings were initialized successfully, False otherwise.
         """
@@ -281,7 +143,7 @@ class DatabaseService:
         """
         if not self.env:
             return
-            
+
         try:
             registry = self.env.registry
             with registry.cursor() as cr:
@@ -300,4 +162,4 @@ class DatabaseService:
                     cr.commit()
         except Exception as e:
             _logger.error(f"Failed to record execution statistics: {e}")
-            
+

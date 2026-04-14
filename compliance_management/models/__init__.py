@@ -61,11 +61,9 @@ from . import res_risk_implication
 from . import fcra_score
 from . import dashboard_cache
 from . import aggregate_customer_score
-from . import dashboard_chart_view_refresher
-from . import res_materialized_views    
-from . import peplist    
-from . import sanction_list    
-from . import digital_product    
+from . import peplist
+from . import sanction_list
+from . import digital_product
 from . import risk_profiling
 from . import account_aggregate
 from . import customer_screening

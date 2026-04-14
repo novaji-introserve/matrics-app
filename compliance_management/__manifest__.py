@@ -31,6 +31,7 @@
         "security/ir.model.access.csv",
         "data/demo_data/location/res.country.state.csv",
         "data/settings/email_smtp.xml",
+        "data/settings/disable_email_digest.xml",
         "data/demo_data/department/department.xml",
         "data/demo_data/risk_assessment/risk_assessment_control_data.xml",
         "data/demo_data/branch/res.branch.csv", #BRANCH
@@ -47,7 +48,7 @@
         "data/schedules/adverse_media_cron.xml",
         'data/schedules/run_risk_assessment_cron.xml',
         'data/schedules/clean_cache.xml',
-        'data/schedules/refresh_charts_materialized_views.xml',
+        'data/schedules/refresh_chart_payload_cache.xml',
         'data/schedules/update_statistic_cron.xml',
         'data/schedules/account_stat_refresh_cron.xml',
 

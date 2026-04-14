@@ -187,7 +187,6 @@
                 <field name="category"/>
              
 
-                <!-- using the materialized view for searching -->
                <filter string="Tier 1 Account" name="tier_1" domain="[('tier_level', '=', '1')]"/>
                 <filter string="Tier 2 Account" name="tier_2" domain="[('tier_level', '=', '2')]"/>
                 <filter string="Tier 3 Account" name="tier_3" domain="[('tier_level', '=', '3')]"/>

@@ -17,7 +17,7 @@ odoo.define('compliance_management/static/src/js/custom_title_service', function
                 let currentTitle = document.title;
                 
                 // Skip if already has our prefix
-                if (currentTitle.startsWith('MATRICS - ')) {
+                if (currentTitle.startsWith('MATRICS | ')) {
                     return;
                 }
                 
@@ -25,9 +25,17 @@ odoo.define('compliance_management/static/src/js/custom_title_service', function
                 if (currentTitle.startsWith('HR - ')) {
                     currentTitle = currentTitle.replace('HR - ', '');
                 }
+
+                // Strip "Odoo" anywhere in the title and normalize leftover separators/spaces
+                currentTitle = currentTitle
+                    .replace(/\bOdoo\b/gi, '')
+                    .replace(/\s*[-|:]\s*$/g, '')
+                    .replace(/^\s*[-|:]\s*/g, '')
+                    .replace(/\s{2,}/g, ' ')
+                    .trim();
                 
                 // Set our custom title
-                const newTitle = "MATRICS - " + currentTitle;
+                const newTitle = currentTitle ? "MATRICS | " + currentTitle : "MATRICS";
                 document.title = newTitle;
                 // console.log("Title updated to:", newTitle);
             }

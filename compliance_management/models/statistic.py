@@ -91,65 +91,8 @@ class Statistic(models.Model):
 
     def init(self):
         super().init()
-        stat_resource_map = {
-            "avg_cust_risk_score": "res_resource_uri_customer",
-            "total_cust": "res_resource_uri_customer",
-            "customers_no_bvn": "res_resource_uri_customer",
-            "pep_customers": "res_resource_uri_customer",
-            "global_pep": "res_resource_uri_global_pep_list",
-            "watch_list": "res_resource_uri_watchlist",
-            "alert_total_today": "res_resource_uri_alert_history",
-            "alert_groups_total": "res_resource_uri_alert_group",
-            "alert_rules_total": "res_resource_uri_alert_rules",
-            "alert_sql_queries_total": "res_resource_uri_alert_sql_query",
-            "case_all_cases": "res_resource_uri_case_manager",
-            "case_draft_cases": "res_resource_uri_case_manager",
-            "case_open_cases": "res_resource_uri_case_manager",
-            "case_overdue_cases": "res_resource_uri_case_manager",
-            "case_closed_cases": "res_resource_uri_case_manager",
-            "case_archived_cases": "res_resource_uri_case_manager",
-        }
-        stat_domain_map = {
-            "avg_cust_risk_score": "[('internal_category', '=', 'customer'), ('active', '=', True)]",
-            "total_cust": "[('internal_category', '=', 'customer'), ('active', '=', True)]",
-            "customers_no_bvn": "[('internal_category', '=', 'customer'), ('active', '=', True), '|', ('bvn', '=', False), ('bvn', 'ilike', 'NOBVN%')]",
-            "pep_customers": "[('internal_category', '=', 'customer'), ('active', '=', True), ('is_pep', '=', True)]",
-            "branch_tot": "[]",
-            "risk_univ_cnt": "[]",
-            "global_pep": "[]",
-            "watch_list": "[]",
-            "alert_total_today": "[]",
-            "alert_groups_total": "[]",
-            "alert_rules_total": "[]",
-            "alert_sql_queries_total": "[]",
-            "case_all_cases": "[]",
-            "case_draft_cases": "[('case_status', '=', 'draft')]",
-            "case_open_cases": "[('case_status', '=', 'open')]",
-            "case_overdue_cases": "[('case_status', '=', 'overdue')]",
-            "case_closed_cases": "[('case_status', '=', 'closed')]",
-            "case_archived_cases": "[('case_status', '=', 'archived'), ('active', '=', False)]",
-        }
-        for stat_code, xml_id in stat_resource_map.items():
-            self.env.cr.execute(
-                """
-                UPDATE res_compliance_stat stat
-                SET resource_id = imd.res_id
-                FROM ir_model_data imd
-                WHERE imd.module = 'compliance_management'
-                  AND imd.name = %s
-                  AND stat.code = %s
-                """,
-                (xml_id, stat_code),
-            )
-        for stat_code, domain_value in stat_domain_map.items():
-            self.env.cr.execute(
-                """
-                UPDATE res_compliance_stat
-                SET domain = %s
-                WHERE code = %s
-                """,
-                (domain_value, stat_code),
-            )
+        # Keep module upgrades fast. Statistic metadata should be managed by
+        # data files or explicit repair scripts, not rewritten on every init.
 
 
     def _get_stat_refresh_config(self):

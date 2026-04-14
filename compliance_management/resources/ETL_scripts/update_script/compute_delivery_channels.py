@@ -868,140 +868,6 @@ class DatabaseMigrator:
                 except:
                     pass
 
-    def create_materialized_view(self):
-        """Create materialized view with improved query"""
-        conn = self.get_connection()
-        try:
-            with conn.cursor() as cursor:
-                # Check if view exists
-                cursor.execute("""
-                    SELECT EXISTS (
-                        SELECT 1 FROM pg_matviews
-                        WHERE matviewname = 'customer_digital_product_mat'
-                    ) as view_exists
-                """)
-
-                if cursor.fetchone()['view_exists']:
-                    self.logger.info(
-                        "Materialized view already exists, checking for proper index...")
-
-                    # Check if a proper unique index exists for concurrent refresh
-                    cursor.execute("""
-                        SELECT count(*) as suitable_indexes FROM pg_indexes 
-                        WHERE tablename = 'customer_digital_product_mat'
-                        AND indexdef LIKE 'CREATE UNIQUE INDEX%'
-                        AND indexdef NOT LIKE '%WHERE%'
-                    """)
-
-                    has_suitable_index = cursor.fetchone()[
-                        'suitable_indexes'] > 0
-
-                    if not has_suitable_index:
-                        self.logger.info(
-                            "No suitable unique index found for concurrent refresh. Creating one...")
-                        try:
-                            # Try to create a proper unique index
-                            cursor.execute("""
-                                CREATE UNIQUE INDEX IF NOT EXISTS customer_digital_mat_id_unique_idx 
-                                ON customer_digital_product_mat(id)
-                            """)
-                            conn.commit()
-                            self.logger.info(
-                                "Created unique index for concurrent refresh")
-                            has_suitable_index = True
-                        except Exception as e:
-                            self.logger.warning(
-                                f"Could not create unique index: {e}")
-
-                    # Try to refresh the view
-                    try:
-                        if has_suitable_index:
-                            # Try concurrent refresh
-                            self.logger.info(
-                                "Refreshing materialized view concurrently...")
-                            cursor.execute(
-                                "REFRESH MATERIALIZED VIEW CONCURRENTLY customer_digital_product_mat")
-                        else:
-                            # Fall back to regular refresh
-                            self.logger.info(
-                                "Refreshing materialized view (non-concurrent)...")
-                            cursor.execute(
-                                "REFRESH MATERIALIZED VIEW customer_digital_product_mat")
-
-                        conn.commit()
-                        self.logger.info(
-                            "Materialized view refreshed successfully")
-                        return "View refreshed successfully"
-                    except Exception as e:
-                        self.logger.warning(f"Could not refresh view: {e}")
-                        self.logger.info("Will skip view refresh")
-                        return "View refresh skipped"
-
-                # View doesn't exist, so create it
-                # Check if legacy table exists
-                cursor.execute("""
-                    SELECT EXISTS (
-                        SELECT 1 FROM information_schema.tables
-                        WHERE table_name = 'customer_digital_product'
-                    ) as table_exists
-                """)
-
-                if not cursor.fetchone()['table_exists']:
-                    self.logger.info(
-                        "No legacy table, creating basic materialized view...")
-
-                    # Create a more optimized basic view
-                    cursor.execute("""
-                        CREATE MATERIALIZED VIEW customer_digital_product_mat AS (
-                            WITH distinct_customers AS (
-                                SELECT DISTINCT customer_id 
-                                FROM customer_channel_subscription
-                                LIMIT 1000
-                            )
-                            SELECT 
-                                ROW_NUMBER() OVER (ORDER BY customer_id) as id,
-                                customer_id,
-                                'Placeholder' as customer_name,
-                                'Standard' as customer_segment,
-                                NULL as ussd, NULL as onebank, NULL as carded_customer,
-                                NULL as alt_bank, NULL as sterling_pro, NULL as banca,
-                                NULL as doubble, NULL as specta, NULL as switch
-                            FROM distinct_customers
-                        ) WITH DATA
-                    """)
-                else:
-                    # Create full featured view from legacy table
-                    self.logger.info(
-                        "Creating full materialized view from legacy table...")
-                    cursor.execute("""
-                        CREATE MATERIALIZED VIEW customer_digital_product_mat AS (
-                            SELECT * FROM customer_digital_product
-                        ) WITH DATA
-                    """)
-
-                # Create a proper unique index for concurrent refresh
-                cursor.execute("""
-                    CREATE UNIQUE INDEX customer_digital_mat_id_unique_idx 
-                    ON customer_digital_product_mat(id)
-                """)
-
-                # Create additional indexes if needed
-                cursor.execute("""
-                    CREATE INDEX IF NOT EXISTS customer_digital_mat_customer_idx 
-                    ON customer_digital_product_mat(customer_id)
-                """)
-
-                conn.commit()
-                self.logger.info(
-                    "Materialized view created with proper indexes")
-                return "View created successfully"
-
-        except Exception as e:
-            self.logger.error(f"Materialized view creation failed: {e}")
-            return f"View error: {e}"
-        finally:
-            self.return_connection(conn)
-
     def run_migration(self):
         """Run the complete migration process - ULTRA-OPTIMIZED"""
         start_time = time.time()
@@ -1040,11 +906,10 @@ class DatabaseMigrator:
             # Skip migration entirely if nothing to do
             if params['subscriptions_complete'] and params['existing_subscriptions'] >= params['expected_subscriptions']:
                 self.logger.info(
-                    "Migration appears to be already complete. Creating materialized view only...")
-                view_result = self.create_materialized_view()
+                    "Migration appears to be already complete. Skipping migration...")
                 elapsed_time = time.time() - start_time
                 self.logger.info(
-                    f"🎉 MIGRATION SKIPPED (already complete) in {elapsed_time:.2f} seconds! {view_result}")
+                    f"🎉 MIGRATION SKIPPED (already complete) in {elapsed_time:.2f} seconds!")
                 return
 
             # Step 3: Prepare batch jobs
@@ -1110,11 +975,7 @@ class DatabaseMigrator:
             self.logger.info(
                 f"All batches completed in {processing_time:.2f}s")
 
-            # Step 5: Create materialized view
-            self.logger.info("Creating materialized view...")
-            view_result = self.create_materialized_view()
-
-            # Step 6: Final cleanup and summary
+            # Step 5: Final cleanup and summary
             elapsed_time = time.time() - start_time
             final_stats = self.stats.get_stats()
 
@@ -1129,8 +990,7 @@ class DatabaseMigrator:
                 f"   Legacy records migrated: {final_stats['legacy_migrated']:,}\n"
                 f"   Partner links updated: {final_stats['partner_links_updated']:,}\n"
                 f"   Performance: {customers_per_second:.1f} customers/second\n"
-                f"   Errors: {final_stats['errors']}\n"
-                f"   Materialized view: {view_result}"
+                f"   Errors: {final_stats['errors']}"
             )
 
             # Return final stats for potential API consumers

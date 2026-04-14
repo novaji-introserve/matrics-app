@@ -11,7 +11,6 @@ from ..services.security_service import SecurityService
 from ..services.database_service import DatabaseService
 from ..services.cache_service import CacheService
 from ..services.chart_data_service import ChartDataService
-from ..services.materialized_view import MaterializedViewService
 from ..utils.cache_key_unique_identifier import get_unique_client_identifier, normalize_cache_key_components
 from ..services.query_service import QueryService
 from ..decorators.security_decorators import validate_sql_input, log_access
@@ -38,7 +37,6 @@ class Compliance(http.Controller):
         self.cache_service = CacheService()
         self.query_service = QueryService()
         self.chart_data_service = ChartDataService()
-        self.materialized_view_service = MaterializedViewService()
         self.get_unique_client_identifier = get_unique_client_identifier
         self.normalize_cache_key_components = normalize_cache_key_components
 
