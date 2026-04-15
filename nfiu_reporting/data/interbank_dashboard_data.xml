@@ -77,7 +77,7 @@
         </record>
 
         <record id="interbank_chart_transactions_by_account_type" model="res.dashboard.charts">
-            <field name="name">Transactions by Account Type</field>
+            <field name="name">Interbank Transactions by Account Type</field>
             <field name="code">interbank_transactions_by_account_type</field>
             <field name="description">Inter-bank transactions grouped by source account type.</field>
             <field name="display_summary">Source account types with the highest transaction volume in the selected period.</field>
@@ -113,7 +113,7 @@
         </record>
 
         <record id="interbank_chart_transactions_by_currency" model="res.dashboard.charts">
-            <field name="name">Transactions by Currency</field>
+            <field name="name">Interbank Transactions by Currency</field>
             <field name="code">interbank_transactions_by_currency</field>
             <field name="description">Inter-bank transactions grouped by transaction currency.</field>
             <field name="display_summary">Transaction currency distribution for the selected period.</field>

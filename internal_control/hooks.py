@@ -2,15 +2,27 @@
 
 from odoo import SUPERUSER_ID, api, fields
 
+INTERNAL_CONTROL_SCOPE = "transaction_monitoring"
+INTERNAL_CONTROL_CHART_CODES = (
+    "transactions_by_branch",
+    "transactions_by_currency",
+    "transaction_volume_by_currency",
+)
+INTERNAL_CONTROL_STAT_CODES = (
+    "tm_total_transactions",
+    "tm_transaction_volume",
+    "tm_high_risk_transactions",
+    "tm_high_risk_accounts",
+)
 
 CHART_DEFINITIONS = [
     {
-        "name": "Transactions by Branch",
+        "name": "All Transactions by Branch",
         "code": "transactions_by_branch",
         "description": "Transaction counts by branch for the selected period.",
         "display_summary": "Bar chart showing how transaction volume is distributed across branches in the selected review window.",
         "display_order": 5,
-        "scope": "interbank",
+        "scope": INTERNAL_CONTROL_SCOPE,
         "is_visible": True,
         "refresh_mode": "scheduled",
         "cache_ttl_minutes": 60,
@@ -44,12 +56,12 @@ CHART_DEFINITIONS = [
         "target_model_xmlid": "compliance_management.model_res_customer_transaction",
     },
     {
-        "name": "Transactions by Currency",
+        "name": "All Transactions by Currency",
         "code": "transactions_by_currency",
         "description": "Transaction counts by currency for the selected period.",
         "display_summary": "Bar chart showing the currency mix of transaction activity in the selected review window.",
         "display_order": 6,
-        "scope": "interbank",
+        "scope": INTERNAL_CONTROL_SCOPE,
         "is_visible": True,
         "refresh_mode": "scheduled",
         "cache_ttl_minutes": 60,
@@ -85,12 +97,12 @@ CHART_DEFINITIONS = [
         "target_model_xmlid": "compliance_management.model_res_customer_transaction",
     },
     {
-        "name": "Transaction Volume by Currency",
+        "name": "All Transactions Volume by Currency",
         "code": "transaction_volume_by_currency",
         "description": "Total transaction amount by currency for the selected period.",
         "display_summary": "Line chart showing total transaction value by currency across the selected review window.",
         "display_order": 7,
-        "scope": "interbank",
+        "scope": INTERNAL_CONTROL_SCOPE,
         "is_visible": True,
         "refresh_mode": "scheduled",
         "cache_ttl_minutes": 60,
@@ -128,7 +140,33 @@ CHART_DEFINITIONS = [
 ]
 
 
+def _sync_internal_control_dashboard_scope(env):
+    now = fields.Datetime.now()
+    env.cr.execute(
+        """
+        UPDATE res_dashboard_charts
+        SET scope = %s,
+            cached_payload = NULL,
+            cache_computed_at = NULL,
+            cache_expires_at = NULL,
+            write_uid = %s,
+            write_date = %s
+        WHERE code IN %s
+        """,
+        (INTERNAL_CONTROL_SCOPE, SUPERUSER_ID, now, INTERNAL_CONTROL_CHART_CODES),
+    )
+    env.cr.execute(
+        """
+        UPDATE res_compliance_stat
+        SET scope = %s
+        WHERE code IN %s
+        """,
+        (INTERNAL_CONTROL_SCOPE, INTERNAL_CONTROL_STAT_CODES),
+    )
+
+
 def _seed_dashboard_charts(env):
+    _sync_internal_control_dashboard_scope(env)
     for definition in CHART_DEFINITIONS:
         values = dict(definition)
         target_model = env.ref(values.pop("target_model_xmlid"), raise_if_not_found=False)
@@ -139,13 +177,12 @@ def _seed_dashboard_charts(env):
             """
             SELECT id
             FROM res_dashboard_charts
-            WHERE code = %(code)s OR name = %(name)s
-            ORDER BY CASE WHEN code = %(code)s THEN 0 ELSE 1 END, id
+            WHERE code = %(code)s
+            ORDER BY id
             LIMIT 1
             """,
             {
                 "code": values["code"],
-                "name": values["name"],
             },
         )
         existing = env.cr.fetchone()
@@ -189,6 +226,9 @@ def _seed_dashboard_charts(env):
                     navigation_branch_field = %(navigation_branch_field)s,
                     date_filter = %(date_filter)s,
                     active = TRUE,
+                    cached_payload = NULL,
+                    cache_computed_at = NULL,
+                    cache_expires_at = NULL,
                     write_uid = %(user_id)s,
                     write_date = %(now)s
                 WHERE id = %(id)s
@@ -255,5 +295,6 @@ def _seed_dashboard_charts(env):
 
 def post_init_hook(cr, registry):
     env = api.Environment(cr, SUPERUSER_ID, {})
+    _sync_internal_control_dashboard_scope(env)
     _seed_dashboard_charts(env)
     cr.commit()

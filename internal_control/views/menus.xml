@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <record id="action_internal_control_shared_dashboard" model="ir.actions.client">
+        <field name="name">Dashboard</field>
+        <field name="tag">owl.compliance_dashboard_v3</field>
+        <field name="params">
+            {"dashboard_scope": "transaction_monitoring"}
+        </field>
+    </record>
+
     <!-- Main navigation -->
     <menuitem
         id="menu_internal_control_main"
@@ -12,7 +20,7 @@
         id="menu_internal_control_dashboard"
         name="Dashboard"
         parent="menu_internal_control_main"
-        action="icomply_dashboard.dashboard_home"
+        action="action_internal_control_shared_dashboard"
         sequence="10"
     />
 

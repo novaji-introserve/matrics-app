@@ -398,11 +398,12 @@ export class Dashboard extends Component {
       },
       options: {
         ...this.buildCommonOptions(normalizedChart, chartType),
-        onClick: (_event, elements) => {
-          if (!elements.length) {
+        onClick: (event, elements) => {
+          const clickedIndex = this._resolveChartClickIndex(code, event, elements);
+          if (clickedIndex < 0) {
             return;
           }
-          this.openChartRecord(chart, elements[0].index);
+          this.openChartRecord(chart, clickedIndex);
         },
       },
     });
@@ -558,8 +559,9 @@ export class Dashboard extends Component {
       return;
     }
     const domain = Array.isArray(chart.additional_domain) ? [...chart.additional_domain] : [];
-    if (chart.filter && Array.isArray(chart.ids) && chart.ids[index] !== undefined && chart.ids[index] !== null) {
-      domain.push([chart.filter, "=", chart.ids[index]]);
+    const filterValue = this._resolveChartFilterValue(chart, index);
+    if (chart.filter && filterValue !== undefined && filterValue !== null && filterValue !== "") {
+      domain.push([chart.filter, "=", filterValue]);
     }
     this.action.doAction({
       type: "ir.actions.act_window",
@@ -570,7 +572,41 @@ export class Dashboard extends Component {
         [false, "tree"],
         [false, "form"],
       ],
+      target: "current",
     });
+  }
+
+  _resolveChartClickIndex(code, event, elements) {
+    if (Array.isArray(elements) && elements.length) {
+      const directIndex = elements[0]?.index;
+      if (Number.isInteger(directIndex)) {
+        return directIndex;
+      }
+    }
+
+    const chartInstance = this.charts[code];
+    if (!chartInstance || !event) {
+      return -1;
+    }
+
+    const nearestElements = chartInstance.getElementsAtEventForMode(
+      event,
+      "nearest",
+      { intersect: false, axis: "xy" },
+      true
+    );
+    const nearestIndex = nearestElements?.[0]?.index;
+    return Number.isInteger(nearestIndex) ? nearestIndex : -1;
+  }
+
+  _resolveChartFilterValue(chart, index) {
+    if (Array.isArray(chart.ids)) {
+      const explicitId = chart.ids[index];
+      if (explicitId !== undefined && explicitId !== null && explicitId !== "") {
+        return explicitId;
+      }
+    }
+    return Array.isArray(chart.labels) ? chart.labels[index] : undefined;
   }
 }
 

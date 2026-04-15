@@ -4,11 +4,9 @@
         <div class="cm-dashboard-shell">
             <div class="cm-dashboard-hero">
                 <div class="cm-dashboard-hero__copy">
-                    <span class="cm-dashboard-hero__eyebrow">Anti-Money Laundering</span>
+                    <span class="cm-dashboard-hero__eyebrow" t-esc="heroEyebrow" />
                     <h1 class="cm-dashboard-hero__title">Operational Insights</h1>
-                    <p class="cm-dashboard-hero__subtitle">
-                        Branch concentration, high-risk exposure, and transaction exceptions across the network.
-                    </p>
+                    <p class="cm-dashboard-hero__subtitle" t-esc="heroSubtitle" />
                 </div>
                 <div class="cm-dashboard-hero__controls">
                     <label class="cm-dashboard-filter">

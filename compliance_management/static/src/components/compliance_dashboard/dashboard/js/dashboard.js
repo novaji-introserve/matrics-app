@@ -54,6 +54,7 @@ export class ComplianceDashboard extends Component {
     this.navigate = useService("action");
     this.serverCache = useService("server_cache");
     this.user = useService("user");
+    this.actionParams = this.props.action?.params || {};
     
     this.state = useState({
       isCategorySortingEnabled: false,
@@ -125,6 +126,28 @@ export class ComplianceDashboard extends Component {
     this._onHorizontalScroll = this._onHorizontalScroll.bind(this);
     this.onDateChange = this.onDateChange.bind(this);
     this.onRefreshRateChange = this.onRefreshRateChange.bind(this);
+  }
+
+  get dashboardScope() {
+    return this.actionParams.dashboard_scope || "compliance";
+  }
+
+  get preferenceKeyPrefix() {
+    return `compliance_dashboard_${this.dashboardScope}`;
+  }
+
+  get heroEyebrow() {
+    if (this.dashboardScope === "interbank") {
+      return "Transaction Monitoring";
+    }
+    return "Anti-Money Laundering";
+  }
+
+  get heroSubtitle() {
+    if (this.dashboardScope === "interbank") {
+      return "Branch concentration, currency mix, and transaction volume across the selected review window.";
+    }
+    return "Branch concentration, high-risk exposure, and transaction exceptions across the network.";
   }
 
   get currentPeriodLabel() {
@@ -199,7 +222,7 @@ export class ComplianceDashboard extends Component {
   _loadRefreshPreference() {
     try {
       const savedRate = Number(
-        window.localStorage.getItem("compliance_dashboard_refresh_rate")
+        window.localStorage.getItem(`${this.preferenceKeyPrefix}_refresh_rate`)
       );
       if ([1, 5, 30, 60].includes(savedRate)) {
         this.state.refreshRate = savedRate;
@@ -212,7 +235,7 @@ export class ComplianceDashboard extends Component {
   _loadPeriodPreference() {
     try {
       const savedPeriod = Number(
-        window.localStorage.getItem("compliance_dashboard_period")
+        window.localStorage.getItem(`${this.preferenceKeyPrefix}_period`)
       );
       if ([0, 1, 7, 30].includes(savedPeriod)) {
         this.state.datepicked = savedPeriod;
@@ -225,7 +248,7 @@ export class ComplianceDashboard extends Component {
   _saveRefreshPreference() {
     try {
       window.localStorage.setItem(
-        "compliance_dashboard_refresh_rate",
+        `${this.preferenceKeyPrefix}_refresh_rate`,
         String(this.state.refreshRate)
       );
     } catch (error) {
@@ -236,7 +259,7 @@ export class ComplianceDashboard extends Component {
   _savePeriodPreference() {
     try {
       window.localStorage.setItem(
-        "compliance_dashboard_period",
+        `${this.preferenceKeyPrefix}_period`,
         String(this.state.datepicked)
       );
     } catch (error) {
@@ -481,6 +504,7 @@ export class ComplianceDashboard extends Component {
         cco: this.state.cco,
         branches_id: this.state.branches_id,
         datepicked: Number(this.state.datepicked),
+        dashboard_scope: this.dashboardScope,
       });
       
       if (result && this._validateStatsData(result)) {
@@ -522,6 +546,7 @@ export class ComplianceDashboard extends Component {
         branches_id: this.state.branches_id,
         category: category,
         datepicked: Number(this.state.datepicked),
+        dashboard_scope: this.dashboardScope,
       });
       
       if (result && this._validateStatsData(result)) {
@@ -582,14 +607,16 @@ export class ComplianceDashboard extends Component {
         cco: this.state.cco,
         branches_id: this.state.branches_id,
         datepicked: Number(this.state.datepicked),
+        dashboard_scope: this.dashboardScope,
       });
 
-      if (!Array.isArray(result) || result.length === 0) {
+      if (this.dashboardScope === "compliance" && (!Array.isArray(result) || result.length === 0)) {
         logDebug('Focused charts returned no data, falling back to legacy charts endpoint');
         result = await this.rpc(`/dashboard/dynamic_charts/`, {
           cco: this.state.cco,
           branches_id: this.state.branches_id,
           datepicked: Number(this.state.datepicked),
+          dashboard_scope: this.dashboardScope,
         });
       }
       

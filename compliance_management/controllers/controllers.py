@@ -99,6 +99,7 @@ class Compliance(http.Controller):
             "interbank",
             "regulatory",
             "risk",
+            "transaction_monitoring",
         }
         if dashboard_scope in allowed_scopes:
             return dashboard_scope
@@ -415,6 +416,15 @@ class Compliance(http.Controller):
             stat_domain,
             order="display_order asc, id asc",
         )
+        if not stat_records and dashboard_scope == "compliance":
+            stat_records = request.env["res.compliance.stat"].sudo().search(
+                [
+                    ("state", "=", "active"),
+                    ("is_visible", "=", True),
+                    ("scope", "in", self.DASHBOARD_SCOPES),
+                ],
+                order="display_order asc, id asc",
+            )
 
         computed_results = [
             {

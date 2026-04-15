@@ -63,6 +63,7 @@ export class ChartRenderer extends Component {
     this.chartRef = useRef("compliance_chart");
     this.chartInstance = null;
     this.normalizedData = null;
+    this.canvasClickHandler = null;
 
     this.animationTimeouts = [];
 
@@ -168,6 +169,7 @@ export class ChartRenderer extends Component {
         },
         options
       });
+      this._attachCanvasClickHandler();
     } catch (error) {
       console.error("Error creating empty chart:", error);
       this.state.error = "Failed to create chart";
@@ -224,6 +226,7 @@ export class ChartRenderer extends Component {
         },
         options
       });
+      this._attachCanvasClickHandler();
 
       this.state.loadedElements = initialCount;
 
@@ -388,6 +391,32 @@ export class ChartRenderer extends Component {
     return baseOptions;
   }
 
+  _attachCanvasClickHandler() {
+    const canvas = this.chartRef.el;
+    if (!canvas) {
+      return;
+    }
+
+    if (this.canvasClickHandler) {
+      canvas.removeEventListener("click", this.canvasClickHandler);
+    }
+
+    this.canvasClickHandler = (event) => this.handleChartClick(event, null);
+    canvas.addEventListener("click", this.canvasClickHandler);
+
+    canvas.style.cursor = this._isChartClickable(this.props.data) ? "pointer" : "default";
+  }
+
+  _isChartClickable(chartData) {
+    if (!chartData?.model_name) {
+      return false;
+    }
+    if (chartData.filter) {
+      return true;
+    }
+    return Array.isArray(chartData.ids) && chartData.ids.some((value) => value !== undefined && value !== null && value !== "");
+  }
+
   /**
    * Animate the remaining chart elements one by one
    */
@@ -471,20 +500,32 @@ export class ChartRenderer extends Component {
    * Handle chart click events
    */
   handleChartClick(event, elements) {
-    if (!elements || elements.length === 0 || !this.props.data) return;
+    if (!this.props.data || !this.chartInstance) return;
 
-    const clickedIndex = elements[0].index;
+    const clickedIndex = this._resolveClickedIndex(event, elements);
+    if (clickedIndex < 0) {
+      return;
+    }
+
     const chartData = this.props.data;
 
     const modelName = chartData.model_name;
     const filterColumn = chartData.filter;
-    const filterID = chartData.ids?.[clickedIndex];
+    const explicitId = chartData.ids?.[clickedIndex];
+    const filterID = this._resolveFilterValue(chartData, clickedIndex);
 
-    if (!modelName || !filterColumn || filterID === undefined) {
+    if (!modelName) {
       return;
     }
 
-    let domain = [[filterColumn, "=", filterID]];
+    let domain = [];
+    if (filterColumn && filterID !== undefined && filterID !== null) {
+      domain.push([filterColumn, "=", filterID]);
+    } else if (explicitId !== undefined && explicitId !== null && explicitId !== "") {
+      domain.push(["id", "=", explicitId]);
+    } else {
+      return;
+    }
 
     if (chartData.additional_domain && Array.isArray(chartData.additional_domain)) {
       chartData.additional_domain.forEach(condition => {
@@ -499,8 +540,39 @@ export class ChartRenderer extends Component {
       name: `${chartData.title} - ${chartData.labels[clickedIndex] || "Unknown"}`,
       res_model: modelName,
       domain,
-      views: [[false, "tree"], [false, "form"]]
+      views: [[false, "tree"], [false, "form"]],
+      target: "current",
     });
+  }
+
+  _resolveClickedIndex(event, elements) {
+    if (Array.isArray(elements) && elements.length) {
+      const directIndex = elements[0]?.index;
+      if (Number.isInteger(directIndex)) {
+        return directIndex;
+      }
+    }
+
+    if (!event || !this.chartInstance) {
+      return -1;
+    }
+
+    const nearestElements = this.chartInstance.getElementsAtEventForMode(
+      event,
+      "nearest",
+      { intersect: false, axis: "xy" },
+      true
+    );
+    const nearestIndex = nearestElements?.[0]?.index;
+    return Number.isInteger(nearestIndex) ? nearestIndex : -1;
+  }
+
+  _resolveFilterValue(chartData, clickedIndex) {
+    const explicitId = chartData.ids?.[clickedIndex];
+    if (explicitId !== undefined && explicitId !== null && explicitId !== "") {
+      return explicitId;
+    }
+    return chartData.labels?.[clickedIndex];
   }
 
   /**
@@ -515,6 +587,10 @@ export class ChartRenderer extends Component {
       }
       this.chartInstance = null;
     }
+    if (this.canvasClickHandler && this.chartRef.el) {
+      this.chartRef.el.removeEventListener("click", this.canvasClickHandler);
+    }
+    this.canvasClickHandler = null;
   }
 }
 

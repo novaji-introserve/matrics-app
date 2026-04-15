@@ -11,7 +11,7 @@
             <field name="code">tm_total_transactions</field>
             <field name="resource_id" ref="compliance_management.res_resource_uri_transaction"/>
             <field name="domain">[]</field>
-            <field name="scope">interbank</field>
+            <field name="scope">transaction_monitoring</field>
             <field name="scope_color">#2563eb</field>
             <field name="display_order">1</field>
             <field name="display_summary">Total transactions currently available for transaction monitoring review.</field>
@@ -23,7 +23,7 @@
             <field name="code">tm_transaction_volume</field>
             <field name="resource_id" ref="compliance_management.res_resource_uri_transaction"/>
             <field name="domain">[]</field>
-            <field name="scope">interbank</field>
+            <field name="scope">transaction_monitoring</field>
             <field name="scope_color">#0f766e</field>
             <field name="display_order">2</field>
             <field name="display_summary">Aggregate transaction value across all monitored transactions.</field>
@@ -35,7 +35,7 @@
             <field name="code">tm_high_risk_transactions</field>
             <field name="resource_id" ref="compliance_management.res_resource_uri_transaction"/>
             <field name="domain">[('risk_level', '=', 'high')]</field>
-            <field name="scope">interbank</field>
+            <field name="scope">transaction_monitoring</field>
             <field name="scope_color">#dc2626</field>
             <field name="display_order">3</field>
             <field name="display_summary">Transactions currently rated high risk and requiring immediate attention.</field>
@@ -47,7 +47,7 @@
             <field name="code">tm_high_risk_accounts</field>
             <field name="resource_id" ref="internal_control.res_resource_uri_account"/>
             <field name="domain">[('risk_level', '=', 'high')]</field>
-            <field name="scope">interbank</field>
+            <field name="scope">transaction_monitoring</field>
             <field name="scope_color">#f97316</field>
             <field name="display_order">4</field>
             <field name="display_summary">Customer accounts linked to high-risk exposure in the monitoring estate.</field>
