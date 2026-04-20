@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="login_ad_toggle" inherit_id="web.login" name="Login - AD Toggle">
+
+        <xpath expr="//div[hasclass('field-login')]" position="before">
+
+            <div id="ad-toggle-wrap" style="display:none;">
+
+                <!-- Divider -->
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    margin: 20px 0 16px;
+                    color: #aaa;
+                    font-size: 12px;
+                    letter-spacing: 0.05em;
+                    text-transform: uppercase;
+                ">
+                    <span style="flex:1; height:1px; background:#e0e0e0;"></span>
+                    <span>or</span>
+                    <span style="flex:1; height:1px; background:#e0e0e0;"></span>
+                </div>
+
+                <!-- Toggle button -->
+                <button type="button" id="btn-toggle-login" style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    width: 100%;
+                    padding: 9px 16px;
+                    border: 1px solid #d0d5dd;
+                    border-radius: 6px;
+                    background: #fff;
+                    color: #344054;
+                    font-size: 14px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+                "
+                onmouseover="
+                    this.style.background='#f9fafb';
+                    this.style.borderColor='#b0b7c3';
+                    this.style.boxShadow='0 1px 4px rgba(0,0,0,0.08)';
+                "
+                onmouseout="
+                    this.style.background='#fff';
+                    this.style.borderColor='#d0d5dd';
+                    this.style.boxShadow='none';
+                ">
+                    <!-- Key icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                         viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round"
+                         style="flex-shrink:0; opacity:0.6;">
+                        <circle cx="7.5" cy="15.5" r="5.5"/>
+                        <path d="M21 2l-9.6 9.6"/>
+                        <path d="M15.5 7.5l3 3L22 7l-3-3"/>
+                    </svg>
+                    <span>Sign in with standard login</span>
+                </button>
+
+            </div>
+
+        </xpath>
+
+        <xpath expr="//div[hasclass('field-login')]" position="attributes">
+            <attribute name="id">normal-email-wrap</attribute>
+        </xpath>
+
+        <xpath expr="//input[@name='password']/.." position="attributes">
+            <attribute name="id">normal-password-wrap</attribute>
+        </xpath>
+
+        <xpath expr="//button[@type='submit'][not(@name)]" position="attributes">
+            <attribute name="id">normal-submit-btn</attribute>
+        </xpath>
+
+    </template>
+</odoo>

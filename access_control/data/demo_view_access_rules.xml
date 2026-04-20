@@ -1,0 +1,1008 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+=============================================================================
+  demo_view_access_rules.xml
+  Demo data for: View Access Control Rules (view.access.rule)
+
+  Model reference: ViewAccessRule (access_control module)
+
+  Groups used:
+    BCO   = group_compliance_branch_compliance_officer
+    BCntO = group_compliance_branch_control_officer
+    CO    = group_compliance_compliance_officer          (inherits BCO)
+    CRM   = group_compliance_compliance_risk_manager
+    RM    = group_compliance_relationship_manager
+    TMT   = group_compliance_transaction_monitoring_team
+    CCO   = group_compliance_chief_compliance_officer   (inherits CO + system + erp_manager)
+
+  HOW model_id XML IDs are derived:
+    Odoo auto-generates ir.model XML IDs as:
+      {defining_module}.model_{_name_with_dots_replaced_by_underscores}
+    Example: model _name = 'res.partner.watchlist' in compliance_management
+             → XML ID = compliance_management.model_res_partner_watchlist
+
+  Access Matrix Summary:
+  ┌──────────────────────────────────────────┬─────┬───────┬────┬─────┬────┬─────┬─────┐
+  │ Rule                                     │ BCO │ BCntO │ CO │ CRM │ RM │ TMT │ CCO │
+  ├──────────────────────────────────────────┼─────┼───────┼────┼─────┼────┼─────┼─────┤
+  │ Customer & Compliance Mgt                │  ✓  │       │ ✓  │  ✓  │ ✓  │  ✓  │  ✓  │
+  │ Case Manager                             │  ✓  │       │ ✓  │     │    │  ✓  │  ✓  │
+  │ PEP List / Global PEP                    │     │       │ ✓  │     │    │     │  ✓  │
+  │ WatchList / Sanction List                │     │       │ ✓  │     │    │  ✓  │  ✓  │
+  │ Sanction Screening Matches               │     │       │ ✓  │     │    │  ✓  │  ✓  │
+  │ Risk (Assessment)                        │     │       │ ✓  │  ✓  │    │     │  ✓  │
+  │ Customer Accounts                        │  ✓  │       │ ✓  │  ✓  │ ✓  │  ✓  │  ✓  │
+  │ Transaction History                      │     │       │ ✓  │     │    │  ✓  │  ✓  │
+  │ Adverse Media Screening                  │     │       │ ✓  │     │    │     │  ✓  │
+  │ Adverse Media Logs                       │     │       │ ✓  │     │    │  ✓  │  ✓  │
+  │ Account Type / Products / Branches       │     │       │    │     │    │     │  ✓  │
+  │ Risk Categories/Universe/Subject/Types   │     │       │ ✓  │  ✓  │    │     │  ✓  │
+  │ Risk Analysis / Lines                    │     │       │ ✓  │  ✓  │    │     │  ✓  │
+  │ Dashboard Chart                          │     │       │    │     │    │     │  ✓  │
+  │ PEP / Adverse / Sanction Config          │     │       │ ✓  │     │    │     │  ✓  │
+  │ Slider Settings / Statistics             │     │       │ ✓  │  ✓  │    │     │  ✓  │
+  │ Compliance Settings                      │     │       │    │     │    │     │  ✓  │
+  │ Alert Manager / Transaction              │     │       │ ✓  │     │    │  ✓  │  ✓  │
+  │ Sector / Employee                        │     │       │    │     │    │     │  ✓  │
+  │ Enhanced Due Diligence                   │     │       │ ✓  │     │ ✓  │     │  ✓  │
+  │ Composite Risk / Risk Assess Line        │     │       │ ✓  │  ✓  │    │     │  ✓  │
+  │ Users / User Settings / Groups           │     │       │    │     │    │     │  ✓  │
+  │ Risk Assessment Type / Control           │     │       │ ✓  │  ✓  │    │     │  ✓  │
+  │ Settings                                 │     │  ✓    │    │     │    │     │  ✓  │
+  │ Change Password / res.users.identitycheck│  ✓  │  ✓    │ ✓  │  ✓  │ ✓  │  ✓  │  ✓  │
+  │ Model Access                             │     │       │    │     │    │     │  ✓  │
+  │ Spreadsheet Dashboard                    │  ✓  │  ✓    │ ✓  │  ✓  │ ✓  │  ✓  │  ✓  │
+  │ Customer Risk Analysis                   │     │       │ ✓  │  ✓  │    │     │  ✓  │
+  └──────────────────────────────────────────┴─────┴───────┴────┴─────┴────┴─────┴─────┘
+=============================================================================
+-->
+<odoo noupdate="1">
+<data>
+
+    <!-- =========================================================
+         RULE 1 — Customer & Compliance Mgt Access Rule
+         Model   : res.partner
+         Groups  : BCO, CO, CRM, RM, TMT, CCO
+    ========================================================= -->
+    <record id="view_access_rule_1_82f3fd06" model="view.access.rule">
+        <field name="name">Customer &amp; Compliance Mgt Access Rule</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_compliance_dashboard'),
+            ref('compliance_management.menu_compliance_dd'),
+            ref('compliance_management.menu_sanction_screening_root'),
+            ref('compliance_management.menu_adverse_media_root'),
+            ref('compliance_management.menu_compliance_configuration'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_res_pep'),
+            ref('compliance_management.action_res_partner_fep'),
+            ref('compliance_management.action_res_partner_greylist'),
+            ref('compliance_management.action_res_partner_watchlist'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_branch_compliance_officer'),
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_compliance_risk_manager'),
+            ref('compliance_management.group_compliance_relationship_manager'),
+            ref('compliance_management.group_compliance_transaction_monitoring_team'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 2 — Case Manager
+         Model   : case.manager  (defined in case_management_v2)
+         Groups  : BCO, CO, TMT, CCO
+         NOTE: all refs use case_management_v2 module prefix
+    ========================================================= -->
+    <record id="view_access_rule_2_be4c2243" model="view.access.rule">
+        <field name="name">Case Manager</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="case_management_v2.model_case_manager"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('case_management_v2.menu_case_management_root'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('case_management_v2.action_archived_cases'),
+            ref('case_management_v2.action_my_cases'),
+            ref('case_management_v2.action_closed_cases'),
+            ref('case_management_v2.action_cases_created_by_me'),
+            ref('case_management_v2.action_draft_cases'),
+            ref('case_management_v2.action_case_manager'),
+            ref('case_management_v2.action_open_cases'),
+            ref('case_management_v2.action_overdue_cases'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_branch_compliance_officer'),
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_transaction_monitoring_team'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 3 — PEP List
+         Model   : pep.list  →  compliance_management.model_pep_list
+         Groups  : CO, CCO
+    ========================================================= -->
+    <record id="view_access_rule_3_d7f27018" model="view.access.rule">
+        <field name="name">Pep List</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_pep_list"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_compliance_peplist'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_peplist'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 4 — WatchList
+         Model   : res.partner.watchlist  →  model_res_partner_watchlist
+         Groups  : CO, TMT, CCO
+    ========================================================= -->
+    <record id="view_access_rule_4_f0de20be" model="view.access.rule">
+        <field name="name">WatchList</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_partner_watchlist"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_watchlist'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_res_partner_watchlist'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_transaction_monitoring_team'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 5 — Global PEP List
+         Model   : pep.list  →  compliance_management.model_pep_list
+         Groups  : CO, CCO
+    ========================================================= -->
+    <record id="view_access_rule_5_6100373c" model="view.access.rule">
+        <field name="name">Global PepList</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_pep_list"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_global_pep_list'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_res_global_pep'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 7 — Sanction List
+         Model   : sanction.list  →  compliance_management.model_sanction_list
+         Groups  : CO, TMT, CCO
+    ========================================================= -->
+    <record id="view_access_rule_7_2e1b2ba4" model="view.access.rule">
+        <field name="name">Sanction List</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_sanction_list"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_sanction'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_sanction_list'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_transaction_monitoring_team'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 8 — Sanction Screening Matches
+         Model   : res.partner.screening.result  →  model_res_partner_screening_result
+         Groups  : CO, TMT, CCO
+    ========================================================= -->
+    <record id="view_access_rule_8_33afe144" model="view.access.rule">
+        <field name="name">Sanction Screening  Matches</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_partner_screening_result"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_compliance_sanction_matches'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_screening_result_blacklist'),
+            ref('compliance_management.action_screening_result_fep'),
+            ref('compliance_management.action_screening_result_global_pep'),
+            ref('compliance_management.action_screening_result_pending'),
+            ref('compliance_management.action_screening_result_pep'),
+            ref('compliance_management.action_screening_result_sanction'),
+            ref('compliance_management.action_screening_result_watchlist'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_transaction_monitoring_team'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 9 — Risk (Assessment)
+         Model   : res.risk.assessment  →  model_res_risk_assessment
+         Groups  : CO, CRM, CCO
+    ========================================================= -->
+    <record id="view_access_rule_9_91a0ed73" model="view.access.rule">
+        <field name="name">Risk</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_risk_assessment"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_compliance_risk'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_list_risk_assessment_cp'),
+            ref('compliance_management.action_list_risk_assessment'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_compliance_risk_manager'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 10 — Customer Accounts
+         Model   : res.partner.account  →  model_res_partner_account
+         Groups  : BCO, CO, CRM, RM, TMT, CCO
+    ========================================================= -->
+    <record id="view_access_rule_10_7d614e95" model="view.access.rule">
+        <field name="name">Customer Accounts</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_partner_account"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_branch_compliance_officer'),
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_compliance_risk_manager'),
+            ref('compliance_management.group_compliance_relationship_manager'),
+            ref('compliance_management.group_compliance_transaction_monitoring_team'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 12 — Transaction History
+         Model   : res.transaction.screening.history  →  model_res_transaction_screening_history
+         Groups  : CO, TMT, CCO
+    ========================================================= -->
+    <record id="view_access_rule_12_693e27d7" model="view.access.rule">
+        <field name="name">Transaction History</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_transaction_screening_history"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_compliance_kyc_transaction_screening'),
+            ref('compliance_management.menu_compliance_transaction_screening_history'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_list_transaction_screening_history'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_transaction_monitoring_team'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 13 — Adverse Media Screening
+         Model   : adverse.media  →  compliance_management.model_adverse_media
+         Groups  : CO, CCO
+    ========================================================= -->
+    <record id="view_access_rule_13_51e8020b" model="view.access.rule">
+        <field name="name">Adverse Media screening</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_adverse_media"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_adverse_media_root'),
+            ref('compliance_management.menu_adverse_media'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_adverse_media'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 14 — Adverse Media Logs
+         Model   : adverse.media.alert  →  compliance_management.model_adverse_media_alert
+         Groups  : CO, TMT, CCO
+    ========================================================= -->
+    <record id="view_access_rule_14_ad45ce41" model="view.access.rule">
+        <field name="name">Adverse Media Logs</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_adverse_media_alert"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_adverse_media_alert'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_adverse_media_alert'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_transaction_monitoring_team'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 15 — Account Type (Configuration)
+         Model   : res.partner.account.type  →  model_res_partner_account_type
+         Groups  : CCO only
+    ========================================================= -->
+    <record id="view_access_rule_15_780caa73" model="view.access.rule">
+        <field name="name">Account Type</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_partner_account_type"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_compliance_account_type'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_list_customer_account_type'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 16 — Account Products (Configuration)
+         Model   : res.partner.account.product  →  model_res_partner_account_product
+         Groups  : CCO only
+    ========================================================= -->
+    <record id="view_access_rule_16_6d4ef5bc" model="view.access.rule">
+        <field name="name">Account Products</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_partner_account_product"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_compliance_account_product'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_list_account_product'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 17 — Configuration / Branches
+         Model   : res.branch  →  compliance_management.model_res_branch
+         Groups  : CCO only
+    ========================================================= -->
+    <record id="view_access_rule_17_957de19e" model="view.access.rule">
+        <field name="name">Configuration/Branches</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_branch"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_compliance_branch'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_list_branch'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 18 — Risk Categories (Configuration)
+         Model   : res.risk.category  →  model_res_risk_category
+         Groups  : CO, CRM, CCO
+    ========================================================= -->
+    <record id="view_access_rule_18_b8d46f8b" model="view.access.rule">
+        <field name="name">Risk Categories</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_risk_category"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_risk_assessment'),
+            ref('compliance_management.menu_compliance_risk_category'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_list_risk_category'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_compliance_risk_manager'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 19 — Risk Universe (Configuration)
+         Model   : res.risk.universe  →  model_res_risk_universe
+         Groups  : CO, CRM, CCO
+    ========================================================= -->
+    <record id="view_access_rule_19_cbe77185" model="view.access.rule">
+        <field name="name">Risk Universe</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_risk_universe"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_compliance_risk_universe'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_list_risk_universe'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_compliance_risk_manager'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 20 — Risk Subject (Configuration)
+         Model   : res.risk.subject  →  model_res_risk_subject
+         Groups  : CO, CRM, CCO
+    ========================================================= -->
+    <record id="view_access_rule_20_f1473730" model="view.access.rule">
+        <field name="name">Risk Subject</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_risk_subject"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_compliance_risk_subject'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_list_risk_subject'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_compliance_risk_manager'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 21 — Risk Types (Configuration)
+         Model   : res.risk.type  →  model_res_risk_type
+         Groups  : CO, CRM, CCO
+    ========================================================= -->
+    <record id="view_access_rule_21_2b82fdb6" model="view.access.rule">
+        <field name="name">Risk Types</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_risk_type"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_compliance_risk_type'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_list_risk_type'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_compliance_risk_manager'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 22 — Risk Analysis (Configuration)
+         Model   : risk.analysis  →  compliance_management.model_risk_analysis
+         Groups  : CO, CRM, CCO
+    ========================================================= -->
+    <record id="view_access_rule_22_8d30b0aa" model="view.access.rule">
+        <field name="name">Risk Analysis</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_risk_analysis"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_compliance_risk_assessment_plan'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_list_risk_assessment_plan'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_compliance_risk_manager'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 23 — Configuration / Dashboard Chart
+         Model   : res.dashboard.charts  →  model_res_dashboard_charts
+         Groups  : CCO only
+    ========================================================= -->
+    <record id="view_access_rule_23_6bcd9f00" model="view.access.rule">
+        <field name="name">Configuration / Dashboard Chart</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_dashboard_charts"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_compliance_dashboard_charts'),
+            ref('compliance_management.menu_dashboard_chart'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.res_charts_action'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 24 — PEP Configuration
+         Model   : pep.source  →  compliance_management.model_pep_source
+         Groups  : CO, CCO
+    ========================================================= -->
+    <record id="view_access_rule_24_eb58321d" model="view.access.rule">
+        <field name="name">PEP Configuration</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_pep_source"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_pep_configurations'),
+            ref('compliance_management.menu_pep_sources'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_pep_sources'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 25 — Configuration / Adverse Media
+         Model   : media.keyword  →  compliance_management.model_media_keyword
+         Groups  : CO, CCO
+    ========================================================= -->
+    <record id="view_access_rule_25_8ec4eeee" model="view.access.rule">
+        <field name="name">Configuration / Adverse Media</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_media_keyword"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_compliance_adverse_media_config'),
+            ref('compliance_management.menu_media_keyword'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_media_keyword'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 26 — Configuration / Slider Settings
+         Model   : res.fcra.score  →  compliance_management.model_res_fcra_score
+         Action  : action_fcra_score_action (actual ID in menu_actions.xml)
+         Groups  : CO, CRM, CCO
+         NOTE: slider settings sub-menu is inside menu_compliance_risk_settings
+    ========================================================= -->
+    <record id="view_access_rule_26_38260e09" model="view.access.rule">
+        <field name="name">Configuration / Slider setting</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_fcra_score"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_compliance_risk_settings'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_fcra_score_action'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_compliance_risk_manager'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 27 — Configuration / Statistics
+         Model   : res.compliance.stat  →  compliance_management.model_res_compliance_stat
+         Action  : action_list_compliance_stat (actual ID in menu_actions.xml)
+         Groups  : CO, CRM, CCO
+    ========================================================= -->
+    <record id="view_access_rule_27_2e3d85c5" model="view.access.rule">
+        <field name="name">Configuration / Statistics</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_compliance_stat"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_compliance_stat'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_list_compliance_stat'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_compliance_risk_manager'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 28 — Compliance Settings
+         Model   : res.compliance.settings  →  model_res_compliance_settings
+         Groups  : CCO only
+    ========================================================= -->
+    <record id="view_access_rule_28_cab7b71f" model="view.access.rule">
+        <field name="name">Compliance Settings</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_compliance_settings"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_compliance_compliance_settings'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_compliance_settings'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 29 — Configuration / Sanction Screening
+         Model   : res.partner.screening.alert  →  model_res_partner_screening_alert
+         Groups  : CO, CCO
+    ========================================================= -->
+    <record id="view_access_rule_29_ec13e6ed" model="view.access.rule">
+        <field name="name">Configuration / Sanction Screening</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_partner_screening_alert"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_compliance_sc_config'),
+            ref('compliance_management.menu_sanction_screening_alert'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_sc_alert'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 30 — Alert Manager
+         Model   : alert.history  →  alert_management.model_alert_history
+         NOTE: alert.history is defined in alert_management module
+         Groups  : CO, TMT, CCO
+    ========================================================= -->
+    <record id="view_access_rule_30_349b9071" model="view.access.rule">
+        <field name="name">Alert Manager</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="alert_management.model_alert_history"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('alert_management.menu_alert_management_main'),
+            ref('alert_management.menu_alert_history'),
+            ref('alert_management.menu_alert_user_history'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('alert_management.action_alert_history_status'),
+            ref('alert_management.action_alert_history_individual'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_transaction_monitoring_team'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 32 — Transaction
+         Model   : res.customer.transaction  →  model_res_customer_transaction
+         Groups  : CO, TMT, CCO
+    ========================================================= -->
+    <record id="view_access_rule_32_ee870c3b" model="view.access.rule">
+        <field name="name">Transaction</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_customer_transaction"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_transaction_monitoring_team'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 33 — Sector (Configuration)
+         Model   : res.partner.sector  →  compliance_management.model_res_partner_sector
+         Action  : action_list_customer_sector (actual ID in menu_actions.xml)
+         Groups  : CCO only
+    ========================================================= -->
+    <record id="view_access_rule_33_4c326ed0" model="view.access.rule">
+        <field name="name">Sector</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_partner_sector"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_compliance_sector'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_list_customer_sector'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 34 — Employee
+         Model   : hr.employee  →  hr.model_hr_employee
+         Groups  : CCO only
+         NOTE: No compliance-specific employee actions found.
+               This rule grants CCO access to the hr.employee model only.
+    ========================================================= -->
+    <record id="view_access_rule_34_4a07686c" model="view.access.rule">
+        <field name="name">Employee</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 35 — Enhanced Due Diligence (EDD)
+         Model   : res.partner.edd  →  compliance_management.model_res_partner_edd
+         Groups  : CO, RM, CCO
+    ========================================================= -->
+    <record id="view_access_rule_35_688d2a4d" model="view.access.rule">
+        <field name="name">Edd</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_partner_edd"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('compliance_management.menu_compliance_edd'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_res_partner_edd'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_relationship_manager'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 36 — Composite Risk Score
+         Model   : res.partner.composite.plan.line  →  model_res_partner_composite_plan_line
+         Groups  : CO, CRM, CCO
+    ========================================================= -->
+    <record id="view_access_rule_36_09a60695" model="view.access.rule">
+        <field name="name">Composite Risk Score</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_partner_composite_plan_line"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_compliance_risk_manager'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 37 — Risk Assessment Line
+         Model   : res.risk.assessment.line  →  model_res_risk_assessment_line
+         Groups  : CO, CRM, CCO
+    ========================================================= -->
+    <record id="view_access_rule_37_432dbf54" model="view.access.rule">
+        <field name="name">Risk assessment Line</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_risk_assessment_line"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_compliance_risk_manager'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 38 — User Settings
+         Model   : res.users  →  base.model_res_users
+         Groups  : CCO only
+    ========================================================= -->
+    <record id="view_access_rule_38_8978600c" model="view.access.rule">
+        <field name="name">Users Settings</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="base.model_res_users"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 39 — Users
+         Model   : res.users  →  base.model_res_users
+         Groups  : CCO only
+    ========================================================= -->
+    <record id="view_access_rule_39_6152c703" model="view.access.rule">
+        <field name="name">Users</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="base.model_res_users"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('base.action_res_users'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 40 — Risk Assessment Type
+         Model   : res.risk.assessment.type  →  model_res_risk_assessment_type
+         Groups  : CO, CRM, CCO
+    ========================================================= -->
+    <record id="view_access_rule_40_d457e3ba" model="view.access.rule">
+        <field name="name">Risk Assessment type</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_risk_assessment_type"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_compliance_risk_manager'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 41 — Risk Assessment Control
+         Model   : risk.assessment.control  →  model_risk_assessment_control
+         Groups  : CO, CRM, CCO
+    ========================================================= -->
+    <record id="view_access_rule_41_bd09d31e" model="view.access.rule">
+        <field name="name">Risk assessment control</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_risk_assessment_control"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_compliance_risk_manager'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 42 — Groups
+         Model   : res.groups  →  base.model_res_groups
+         Groups  : CCO only
+    ========================================================= -->
+    <record id="view_access_rule_42_a0c84090" model="view.access.rule">
+        <field name="name">Groups</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="base.model_res_groups"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('base.menu_action_res_groups'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('base.action_res_groups'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 43 — res.users.identitycheck (Password Check Wizard)
+         Model   : res.users.identitycheck  →  base.model_res_users_identitycheck
+         Groups  : ALL groups (every user needs identity check)
+    ========================================================= -->
+    <record id="view_access_rule_43_cc69b7d5" model="view.access.rule">
+        <field name="name">res.users.identitycheck</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="base.model_res_users_identitycheck"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_branch_compliance_officer'),
+            ref('compliance_management.group_compliance_branch_control_officer'),
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_compliance_risk_manager'),
+            ref('compliance_management.group_compliance_relationship_manager'),
+            ref('compliance_management.group_compliance_transaction_monitoring_team'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 44 — Settings
+         Model   : res.config.settings  →  base.model_res_config_settings
+         Groups  : BCntO, CCO
+    ========================================================= -->
+    <record id="view_access_rule_44_9264abe7" model="view.access.rule">
+        <field name="name">Settings</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="base.model_res_config_settings"/>
+        <field name="menu_ids" eval="[(6, 0, [
+            ref('base_setup.menu_config'),
+        ])]"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('base_setup.action_general_configuration'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_branch_control_officer'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 45 — Change Password Wizard
+         Model   : change.password.wizard  →  base.model_change_password_wizard
+         Groups  : ALL groups (everyone can change their own password)
+    ========================================================= -->
+    <record id="view_access_rule_45_524fa679" model="view.access.rule">
+        <field name="name">change password wizard</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="base.model_change_password_wizard"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('base.change_password_wizard_action'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_branch_compliance_officer'),
+            ref('compliance_management.group_compliance_branch_control_officer'),
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_compliance_risk_manager'),
+            ref('compliance_management.group_compliance_relationship_manager'),
+            ref('compliance_management.group_compliance_transaction_monitoring_team'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 46 — Model Access (Access Rights)
+         Model   : ir.model.access  →  base.model_ir_model_access
+         Groups  : CCO only
+    ========================================================= -->
+    <record id="view_access_rule_46_68f76f5d" model="view.access.rule">
+        <field name="name">Model Access</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="base.model_ir_model_access"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('base.ir_access_act'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- RULE 259 — Spreadsheet Dashboard: omitted — spreadsheet_dashboard module not installed -->
+
+    <!-- =========================================================
+         RULE 260 — Risk Analysis Lines
+         Model   : res.partner.risk.plan.line  →  model_res_partner_risk_plan_line
+         Groups  : CO, CRM, CCO
+    ========================================================= -->
+    <record id="view_access_rule_260_99789ef7" model="view.access.rule">
+        <field name="name">Risk Analysis</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_res_partner_risk_plan_line"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_compliance_risk_manager'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+    <!-- =========================================================
+         RULE 261 — Customer Risk Analysis
+         Model   : risk.analysis  →  compliance_management.model_risk_analysis
+         Groups  : CO, CRM, CCO
+    ========================================================= -->
+    <record id="view_access_rule_261_10aada4d" model="view.access.rule">
+        <field name="name">Customer Risk Analysis</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="compliance_management.model_risk_analysis"/>
+        <field name="action_ids" eval="[(6, 0, [
+            ref('compliance_management.action_list_risk_assessment_plan'),
+        ])]"/>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('compliance_management.group_compliance_compliance_officer'),
+            ref('compliance_management.group_compliance_compliance_risk_manager'),
+            ref('compliance_management.group_compliance_chief_compliance_officer'),
+        ])]"/>
+    </record>
+
+</data>
+</odoo>

@@ -8,3 +8,4 @@ from . import alert_group_ext
 from . import alert_rules_ext
 from . import alert_history_ext
 from . import escalation_engine
+from . import case_manager_ext

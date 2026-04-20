@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Inject escalation_matrix_id into the case.manager form view -->
+    <record id="view_case_manager_escalation_form" model="ir.ui.view">
+        <field name="name">case.manager.form.escalation</field>
+        <field name="model">case.manager</field>
+        <field name="inherit_id" ref="case_management_v2.view_case_manager_form"/>
+        <field name="arch" type="xml">
+            <!-- Add after create_date in the second group -->
+            <field name="create_date" position="after">
+                <field
+                    name="escalation_matrix_id"
+                    options="{'no_create': True, 'no_open': True}"
+                    attrs="{'readonly': [('case_status', 'not in', ['draft', 'open', 'overdue'])]}"
+                    help="Select an escalation matrix. Unresolved cases will be escalated according to its TAT steps."
+                />
+            </field>
+        </field>
+    </record>
+
+</odoo>

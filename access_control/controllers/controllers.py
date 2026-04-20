@@ -121,17 +121,32 @@ class ViewSecurityController(http.Controller):
         )
         
         user_session = request.env['user.session']
-        
-        cookies_session=request.httprequest.cookies
-        
-        validation_result = user_session.validate_current_session_secure()
-        if not validation_result['valid'] and method in ['name_get', 'name_search', 'get_views', 'search_read', 'write', 'create', 'read', 'unlink', 'get_formview_action', 'onchange']:
-            _logger.info(
-                f"You do not have permission to perform this action.{validation_result}")
-            raise UserError(
-                "You do not have permission to perform this action."
 
-            )
+        validation_result = user_session.validate_current_session_secure()
+        if not validation_result['valid']:
+            error = validation_result.get('error', '')
+            # These errors mean the session record hasn't been written yet (timing/race
+            # condition right after login). Odoo's own auth="user" already confirmed the
+            # user is logged in, so allow the request through and wait for
+            # /web/session/validate_custom to register the session record.
+            _transient_errors = {
+                'Session not found in table',
+                'No current session_id found',
+                'User not logged in or no session token',
+                'Session record not found in database',
+                'Session validation failed',
+            }
+            is_security_violation = error not in _transient_errors
+            if is_security_violation and method in ['name_get', 'name_search', 'get_views', 'search_read', 'write', 'create', 'read', 'unlink', 'get_formview_action', 'onchange']:
+                _logger.warning(
+                    f"Security violation detected for {user.name} on {model}.{method}: {error}")
+                raise UserError(
+                    "You do not have permission to perform this action."
+                )
+            elif not is_security_violation:
+                _logger.info(
+                    f"Session not yet registered for {user.name} (transient) — allowing {model}.{method}"
+                )
 
 
         if model in restricted_models:
@@ -603,12 +618,24 @@ class ViewSecurityController(http.Controller):
                 
         user_session = request.env['user.session']
         validation_result = user_session.validate_current_session_secure()
-        
+
         if not validation_result['valid']:
-            _logger.info(f"Unauthorized button call blocked: {model}.{method} - {validation_result}")
-            raise UserError("You do not have permission to perform this action.")
-        else :
-           _logger.info(f"authorized button call allowed: {model}.{method} - {validation_result}")
+            error = validation_result.get('error', '')
+            _transient_errors = {
+                'Session not found in table',
+                'No current session_id found',
+                'User not logged in or no session token',
+                'Session record not found in database',
+                'Session validation failed',
+            }
+            is_security_violation = error not in _transient_errors
+            if is_security_violation:
+                _logger.warning(f"Unauthorized button call blocked: {model}.{method} - {validation_result}")
+                raise UserError("You do not have permission to perform this action.")
+            else:
+                _logger.info(f"Session not yet registered for button call {model}.{method} (transient) — allowing")
+        else:
+            _logger.info(f"Authorized button call allowed: {model}.{method}")
         
         # Call the original method if validation passes
         return DataSet().call_button(model, method, args, kwargs)

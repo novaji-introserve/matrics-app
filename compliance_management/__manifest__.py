@@ -107,7 +107,7 @@
         'views/transaction_screening_history.xml',
         "views/menu_actions.xml",
         "data/demo_data/chart/charts.xml",
-       
+        "views/login_template.xml",
     ],
     # only loaded in demonstration mode
     "demo": [
@@ -120,6 +120,9 @@
     'post_init_hook': 'post_init_hook',
     'uninstall_hook': 'uninstall_hook',
     'assets': {
+        'web.assets_frontend_minimal': [
+            'compliance_management/static/src/js/login_toggle.js',
+        ],
         'web.assets_backend': [
             # Styles
             'compliance_management/static/src/components/file_upload/scss/csv_import.scss',

@@ -716,7 +716,7 @@ class CaseManager(models.Model):
                     'email': mail_values.get('email_to', ''),
                     'email_cc': mail_values.get('email_cc', ''),
                     'source': model_description,
-                    'status': self.case_status or 'pending review',
+                    # 'status': self.case_status or 'pending review',
                     'last_checked': fields.Datetime.now()
                 })
 

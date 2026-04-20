@@ -142,11 +142,15 @@ export class RiskSliderField extends Component {
     }
   }
 
-  onDragEnd() {
+  onDragEnd(ev) {
     if (!this.state.readonly) {
       this.state.isDragging = false;
-      // Update record only when dragging ends
-      this.props.record.update({ [this.props.name]: this.pendingValue });
+      // Read the value directly from the input to avoid stale pendingValue
+      // when the drag completes faster than the debounce interval (50ms)
+      const value = parseFloat(ev.target.value);
+      this.state.value = value;
+      this.pendingValue = value;
+      this.props.record.update({ [this.props.name]: value });
     }
   }
 

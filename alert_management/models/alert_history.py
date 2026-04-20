@@ -134,18 +134,24 @@ class alert_history(models.Model):
         return records
     
     def _convert_to_time(self, datetime_value):
-        """Convert a datetime string to a time string in HH:MM:SS format."""
-        if datetime_value:
+        """Convert a datetime string or datetime object to a time string in HH:MM:SS format."""
+        if not datetime_value:
+            return None
+        if isinstance(datetime_value, str):
             datetime_obj = datetime.strptime(datetime_value, '%Y-%m-%d %H:%M:%S')
-            return datetime_obj.strftime('%H:%M:%S') if datetime_obj else None
-        return None
+        else:
+            datetime_obj = datetime_value
+        return datetime_obj.strftime('%H:%M:%S')
     
     def _convert_to_date(self, datetime_value):
-        """Convert a datetime string to a date string in YYYY-MM-DD format."""
-        if datetime_value:
+        """Convert a datetime string or datetime object to a date string in YYYY-MM-DD format."""
+        if not datetime_value:
+            return None
+        if isinstance(datetime_value, str):
             datetime_obj = datetime.fromisoformat(datetime_value)
-            return datetime_obj.date().isoformat()
-        return None
+        else:
+            datetime_obj = datetime_value
+        return datetime_obj.date().isoformat()
 
     def generate_csv(self):
         """Generate CSV download action"""

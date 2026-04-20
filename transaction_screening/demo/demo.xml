@@ -1,30 +1,494 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    AML MODULE DEMO DATA — transaction_screening
+    =====================================================================
+    Loaded automatically when the module is installed in demo mode.
+    To force-reload on an existing install run:
+        Settings → Technical → Scheduled Actions
+        → "Reload Demo Data" (if available), or reinstall in demo mode.
+
+    What this file creates
+    ──────────────────────
+    1. Three demo customer partners (retail, individual, corporate)
+    2. Two AML configuration records (one active, one archived)
+    3. Nine demo transactions spread across the three customers
+    4. Three customer behavioral profiles (one per customer)
+    5. Three velocity alerts   in states: open / reviewed / escalated
+    6. Three structuring alerts in states: open / false_positive / escalated
+    7. Four anomaly alerts       in states: open / reviewed / escalated / closed
+-->
 <odoo>
     <data>
-<!--
-          <record id="object0" model="transaction_screening.transaction_screening">
-            <field name="name">Object 0</field>
-            <field name="value">0</field>
-          </record>
 
-          <record id="object1" model="transaction_screening.transaction_screening">
-            <field name="name">Object 1</field>
-            <field name="value">10</field>
-          </record>
+        <!-- ============================================================
+             1. DEMO CUSTOMERS
+             Three res.partner records representing the customer types
+             that commonly appear in AML investigations.
+             ============================================================ -->
 
-          <record id="object2" model="transaction_screening.transaction_screening">
-            <field name="name">Object 2</field>
-            <field name="value">20</field>
-          </record>
+        <record id="demo_aml_partner_retail" model="res.partner">
+            <field name="name">Demo — Retail Customer (Tier 1 KYC)</field>
+            <field name="customer_rank">1</field>
+            <field name="active">True</field>
+            <field name="phone">+2348012340001</field>
+            <field name="email">demo.retail@aml-test.invalid</field>
+            <field name="comment">AML demo record — low-tier retail. Normal txns ≈ ₦18,500 avg.</field>
+        </record>
 
-          <record id="object3" model="transaction_screening.transaction_screening">
-            <field name="name">Object 3</field>
-            <field name="value">30</field>
-          </record>
+        <record id="demo_aml_partner_individual" model="res.partner">
+            <field name="name">Demo — Mid-Tier Individual</field>
+            <field name="customer_rank">1</field>
+            <field name="active">True</field>
+            <field name="phone">+2348012340002</field>
+            <field name="email">demo.individual@aml-test.invalid</field>
+            <field name="comment">AML demo record — salaried individual. Normal txns ≈ ₦185,000 avg.</field>
+        </record>
 
-          <record id="object4" model="transaction_screening.transaction_screening">
-            <field name="name">Object 4</field>
-            <field name="value">40</field>
-          </record>
--->
+        <record id="demo_aml_partner_corporate" model="res.partner">
+            <field name="name">Demo — Corporate Account (Ltd)</field>
+            <field name="customer_rank">1</field>
+            <field name="is_company">True</field>
+            <field name="active">True</field>
+            <field name="phone">+2348012340003</field>
+            <field name="email">demo.corporate@aml-test.invalid</field>
+            <field name="comment">AML demo record — corporate. Normal txns ≈ ₦3,800,000 avg.</field>
+        </record>
+
+
+        <!-- ============================================================
+             2. AML CONFIGURATION
+             One active record (read by detection engine at runtime).
+             One inactive archived record for comparison/reference.
+             The active config is the one returned by get_active_config().
+             ============================================================ -->
+
+        <!--
+            ACTIVE — NFIU Standard 2025
+            CTR threshold : ₦5,000,000
+            Velocity      : 10 transactions or ₦10M in 24 hours
+            Structuring   : 3+ sub-threshold txns totalling ≥80% of CTR in 72h
+            Anomaly       : Z-score ≥ 3.0, requires 10 transactions of history
+            Weights       : Velocity 30%, Structuring 40%, Anomaly 30%
+        -->
+        <record id="demo_aml_config_nfiu" model="res.aml.config">
+            <field name="name">NFIU Standard Configuration 2025</field>
+            <field name="active">True</field>
+            <field name="currency_id" ref="base.NGN"/>
+            <field name="ctr_threshold">5000000.00</field>
+            <field name="velocity_window_hours">24</field>
+            <field name="velocity_max_count">10</field>
+            <field name="velocity_max_amount">10000000.00</field>
+            <field name="structuring_window_hours">72</field>
+            <field name="structuring_min_count">3</field>
+            <field name="structuring_approach_pct">80.0</field>
+            <field name="anomaly_zscore_threshold">3.0</field>
+            <field name="anomaly_min_history">10</field>
+            <field name="velocity_risk_weight">0.30</field>
+            <field name="structuring_risk_weight">0.40</field>
+            <field name="anomaly_risk_weight">0.30</field>
+        </record>
+
+        <!--
+            ARCHIVED — Stricter thresholds (inactive, for reference only)
+            CTR threshold : ₦3,000,000
+            Velocity      : 5 transactions or ₦6M in 12 hours
+            Structuring   : 2+ sub-threshold txns totalling ≥70% of CTR in 48h
+            Anomaly       : Z-score ≥ 2.5, requires only 5 transactions of history
+        -->
+        <record id="demo_aml_config_strict" model="res.aml.config">
+            <field name="name">Strict Config — Archived (Demo)</field>
+            <field name="active">False</field>
+            <field name="currency_id" ref="base.NGN"/>
+            <field name="ctr_threshold">3000000.00</field>
+            <field name="velocity_window_hours">12</field>
+            <field name="velocity_max_count">5</field>
+            <field name="velocity_max_amount">6000000.00</field>
+            <field name="structuring_window_hours">48</field>
+            <field name="structuring_min_count">2</field>
+            <field name="structuring_approach_pct">70.0</field>
+            <field name="anomaly_zscore_threshold">2.5</field>
+            <field name="anomaly_min_history">5</field>
+            <field name="velocity_risk_weight">0.30</field>
+            <field name="structuring_risk_weight">0.40</field>
+            <field name="anomaly_risk_weight">0.30</field>
+        </record>
+
+
+        <!-- ============================================================
+             3. DEMO TRANSACTIONS
+             Nine transactions across the three demo customers.
+             Designed to illustrate each detection type:
+               • Retail   — small regular txns + one near-CTR-threshold
+               • Individual — salary-range txns + one massive anomaly
+               • Corporate  — three txns all just below ₦5M (structuring)
+             ============================================================ -->
+
+        <!-- ── Retail customer (Tier 1) ─────────────────────────────── -->
+        <record id="demo_txn_retail_1" model="res.customer.transaction">
+            <field name="name">DEMO/TXN/R001</field>
+            <field name="customer_id" ref="demo_aml_partner_retail"/>
+            <field name="amount">22500.00</field>
+            <field name="date_created">2025-01-10 09:15:00</field>
+            <field name="state">done</field>
+            <field name="narration">Demo: regular ATM withdrawal — within normal range for this customer</field>
+        </record>
+
+        <record id="demo_txn_retail_2" model="res.customer.transaction">
+            <field name="name">DEMO/TXN/R002</field>
+            <field name="customer_id" ref="demo_aml_partner_retail"/>
+            <field name="amount">18000.00</field>
+            <field name="date_created">2025-01-11 14:22:00</field>
+            <field name="state">done</field>
+            <field name="narration">Demo: airtime top-up and utility bills — normal transaction</field>
+        </record>
+
+        <!--
+            This ₦4,850,000 cash deposit is 589 standard deviations above
+            this Tier 1 customer's mean of ₦18,500. It also sits just below
+            the ₦5M CTR threshold (structuring).
+        -->
+        <record id="demo_txn_retail_3" model="res.customer.transaction">
+            <field name="name">DEMO/TXN/R003</field>
+            <field name="customer_id" ref="demo_aml_partner_retail"/>
+            <field name="amount">4850000.00</field>
+            <field name="date_created">2025-01-12 11:05:00</field>
+            <field name="state">new</field>
+            <field name="narration">Demo: ₦4.85M cash deposit — extreme anomaly (Z≈589) + near-CTR structuring flag</field>
+        </record>
+
+        <!-- ── Mid-tier individual ──────────────────────────────────── -->
+        <record id="demo_txn_individual_1" model="res.customer.transaction">
+            <field name="name">DEMO/TXN/I001</field>
+            <field name="customer_id" ref="demo_aml_partner_individual"/>
+            <field name="amount">200000.00</field>
+            <field name="date_created">2025-01-08 10:00:00</field>
+            <field name="state">done</field>
+            <field name="narration">Demo: monthly salary receipt — within normal range</field>
+        </record>
+
+        <record id="demo_txn_individual_2" model="res.customer.transaction">
+            <field name="name">DEMO/TXN/I002</field>
+            <field name="customer_id" ref="demo_aml_partner_individual"/>
+            <field name="amount">185000.00</field>
+            <field name="date_created">2025-01-09 13:10:00</field>
+            <field name="state">done</field>
+            <field name="narration">Demo: rent payment — exactly at customer mean, baseline transaction</field>
+        </record>
+
+        <!--
+            ₦2,900,000 is ~44 standard deviations above this customer's
+            mean of ₦185,000. Triggers anomaly alert (Z≈43.8).
+        -->
+        <record id="demo_txn_individual_3" model="res.customer.transaction">
+            <field name="name">DEMO/TXN/I003</field>
+            <field name="customer_id" ref="demo_aml_partner_individual"/>
+            <field name="amount">2900000.00</field>
+            <field name="date_created">2025-01-13 16:45:00</field>
+            <field name="state">new</field>
+            <field name="narration">Demo: ₦2.9M transfer — 44 standard deviations above customer mean (anomaly)</field>
+        </record>
+
+        <!-- ── Corporate account (structuring pattern) ─────────────── -->
+        <!--
+            Three payments to different beneficiaries within 5 hours,
+            all deliberately kept just below the ₦5M CTR threshold.
+            Total = ₦14,450,000. Classic smurfing pattern.
+        -->
+        <record id="demo_txn_corporate_1" model="res.customer.transaction">
+            <field name="name">DEMO/TXN/C001</field>
+            <field name="customer_id" ref="demo_aml_partner_corporate"/>
+            <field name="amount">4800000.00</field>
+            <field name="date_created">2025-01-14 09:00:00</field>
+            <field name="state">done</field>
+            <field name="narration">Demo: vendor payment 1/3 — ₦4.8M (structuring pattern, below ₦5M CTR)</field>
+        </record>
+
+        <record id="demo_txn_corporate_2" model="res.customer.transaction">
+            <field name="name">DEMO/TXN/C002</field>
+            <field name="customer_id" ref="demo_aml_partner_corporate"/>
+            <field name="amount">4900000.00</field>
+            <field name="date_created">2025-01-14 11:30:00</field>
+            <field name="state">done</field>
+            <field name="narration">Demo: vendor payment 2/3 — ₦4.9M (structuring pattern, below ₦5M CTR)</field>
+        </record>
+
+        <record id="demo_txn_corporate_3" model="res.customer.transaction">
+            <field name="name">DEMO/TXN/C003</field>
+            <field name="customer_id" ref="demo_aml_partner_corporate"/>
+            <field name="amount">4750000.00</field>
+            <field name="date_created">2025-01-14 14:00:00</field>
+            <field name="state">new</field>
+            <field name="narration">Demo: vendor payment 3/3 — ₦4.75M. Triggers structuring: total ₦14.45M, 3 txns, all below ₦5M CTR in 5 hours</field>
+        </record>
+
+
+        <!-- ============================================================
+             4. CUSTOMER BEHAVIORAL PROFILES
+             One profile per demo customer.
+             The m2 field is the Welford variance accumulator:
+                 m2 = stddev² × (n − 1)
+             Odoo computes stddev_amount automatically from m2 and
+             transaction_count via the stored @api.depends field.
+
+             Retail     → mean ₦18,500    / stddev ₦8,200    / 45 txns
+             Individual → mean ₦185,000   / stddev ₦62,000   / 120 txns
+             Corporate  → mean ₦3,800,000 / stddev ₦1,200,000 / 200 txns
+             ============================================================ -->
+
+        <record id="demo_profile_retail" model="res.aml.customer.profile">
+            <field name="customer_id" ref="demo_aml_partner_retail"/>
+            <field name="transaction_count">45</field>
+            <field name="mean_amount">18500.00</field>
+            <!-- m2 = 8200² × (45−1) = 67,240,000 × 44 = 2,958,560,000 -->
+            <field name="m2" eval="8200**2 * 44"/>
+            <!-- stddev_amount computed: sqrt(2,958,560,000 / 44) = 8,200 -->
+            <field name="last_updated">2025-01-09 08:00:00</field>
+        </record>
+
+        <record id="demo_profile_individual" model="res.aml.customer.profile">
+            <field name="customer_id" ref="demo_aml_partner_individual"/>
+            <field name="transaction_count">120</field>
+            <field name="mean_amount">185000.00</field>
+            <!-- m2 = 62000² × (120−1) = 3,844,000,000 × 119 = 457,436,000,000 -->
+            <field name="m2" eval="62000**2 * 119"/>
+            <!-- stddev_amount computed: sqrt(457,436,000,000 / 119) = 62,000 -->
+            <field name="last_updated">2025-01-10 08:00:00</field>
+        </record>
+
+        <record id="demo_profile_corporate" model="res.aml.customer.profile">
+            <field name="customer_id" ref="demo_aml_partner_corporate"/>
+            <field name="transaction_count">200</field>
+            <field name="mean_amount">3800000.00</field>
+            <!-- m2 = 1,200,000² × (200−1) = 1,440,000,000,000 × 199 = 286,560,000,000,000 -->
+            <field name="m2" eval="1200000**2 * 199"/>
+            <!-- stddev_amount computed: sqrt(286,560,000,000,000 / 199) = 1,200,000 -->
+            <field name="last_updated">2025-01-12 08:00:00</field>
+        </record>
+
+
+        <!-- ============================================================
+             5. VELOCITY ALERTS
+             Three alerts showing the full state progression.
+             Each references a transaction that crossed the velocity limit
+             (too many transactions or too much volume in 24 hours).
+             ============================================================ -->
+
+        <!--
+            OPEN: Retail customer made 13 transactions in one day totalling
+            ₦12.8M — exceeds both the 10-txn and ₦10M limits.
+        -->
+        <record id="demo_velocity_alert_1" model="res.aml.velocity.alert">
+            <field name="name">VAL/DEMO/00001</field>
+            <field name="transaction_id" ref="demo_txn_retail_3"/>
+            <field name="customer_id" ref="demo_aml_partner_retail"/>
+            <field name="window_hours">24</field>
+            <field name="txn_count">13</field>
+            <field name="total_amount">12800000.00</field>
+            <field name="risk_score">100.00</field>
+            <field name="state">open</field>
+            <field name="created_at">2025-01-12 11:06:00</field>
+        </record>
+
+        <!--
+            REVIEWED: Individual customer made 16 transactions in one day
+            totalling ₦15.4M. Under investigation.
+        -->
+        <record id="demo_velocity_alert_2" model="res.aml.velocity.alert">
+            <field name="name">VAL/DEMO/00002</field>
+            <field name="transaction_id" ref="demo_txn_individual_3"/>
+            <field name="customer_id" ref="demo_aml_partner_individual"/>
+            <field name="window_hours">24</field>
+            <field name="txn_count">16</field>
+            <field name="total_amount">15400000.00</field>
+            <field name="risk_score">100.00</field>
+            <field name="state">reviewed</field>
+            <field name="created_at">2025-01-13 16:46:00</field>
+            <field name="notes">Customer contacted by phone. Claims transactions are contributions for a group cooperative scheme. Requested member list and contribution schedule. Awaiting documentation.</field>
+        </record>
+
+        <!--
+            ESCALATED: Corporate made 19 transactions in one day totalling
+            ₦18.5M. Escalated to CCO. STR in preparation.
+        -->
+        <record id="demo_velocity_alert_3" model="res.aml.velocity.alert">
+            <field name="name">VAL/DEMO/00003</field>
+            <field name="transaction_id" ref="demo_txn_corporate_3"/>
+            <field name="customer_id" ref="demo_aml_partner_corporate"/>
+            <field name="window_hours">24</field>
+            <field name="txn_count">19</field>
+            <field name="total_amount">18500000.00</field>
+            <field name="risk_score">100.00</field>
+            <field name="state">escalated</field>
+            <field name="created_at">2025-01-14 14:01:00</field>
+            <field name="notes">Three payments totalling ₦14.45M within a single business day, all individually below the ₦5M CTR threshold. Combined with velocity breach (19 transactions, ₦18.5M volume). Escalated to CCO for STR decision. Account under enhanced monitoring.</field>
+        </record>
+
+
+        <!-- ============================================================
+             6. STRUCTURING / SMURFING ALERTS
+             Three alerts showing the pattern detection.
+             Structuring means multiple sub-CTR transactions whose
+             combined total approaches the CTR reporting threshold.
+             ============================================================ -->
+
+        <!--
+            OPEN: Retail customer — 3 transactions in 72 hours totalling
+            ₦4,910,000 (98.2% of the ₦5M CTR threshold). All sub-threshold.
+        -->
+        <record id="demo_structuring_alert_1" model="res.aml.structuring.alert">
+            <field name="name">SAL/DEMO/00001</field>
+            <field name="transaction_id" ref="demo_txn_retail_3"/>
+            <field name="customer_id" ref="demo_aml_partner_retail"/>
+            <field name="window_hours">72</field>
+            <field name="txn_count">3</field>
+            <field name="total_amount">4910000.00</field>
+            <field name="ctr_threshold">5000000.00</field>
+            <!-- risk_score = (4.91/5.0)*70 + (3/3)*30 = 68.74 + 30 = 98.74 -->
+            <field name="risk_score">98.74</field>
+            <field name="state">open</field>
+            <field name="created_at">2025-01-12 11:06:00</field>
+        </record>
+
+        <!--
+            FALSE POSITIVE: Individual — 4 sub-threshold transactions
+            totalling ₦4.21M. Investigated and found legitimate.
+        -->
+        <record id="demo_structuring_alert_2" model="res.aml.structuring.alert">
+            <field name="name">SAL/DEMO/00002</field>
+            <field name="transaction_id" ref="demo_txn_individual_3"/>
+            <field name="customer_id" ref="demo_aml_partner_individual"/>
+            <field name="window_hours">72</field>
+            <field name="txn_count">4</field>
+            <field name="total_amount">4210000.00</field>
+            <field name="ctr_threshold">5000000.00</field>
+            <!-- risk_score = (4.21/5.0)*70 + (4/3)*30 = 58.94 + 40 = 98.94, capped at 100 -->
+            <field name="risk_score">98.94</field>
+            <field name="state">false_positive</field>
+            <field name="created_at">2025-01-13 16:47:00</field>
+            <field name="notes">Confirmed false positive. Customer was splitting a property purchase deposit across two accounts as instructed by their conveyancing solicitor. Sale agreement and solicitor letter sighted. Beneficiary accounts verified as legitimate law firm escrow accounts. Closed.</field>
+        </record>
+
+        <!--
+            ESCALATED: Corporate — 3 payments of ₦4.8M, ₦4.9M and ₦4.75M
+            in 5 hours, all to different beneficiaries, all just below ₦5M.
+            Total ₦14.45M. Classic smurfing pattern.
+        -->
+        <record id="demo_structuring_alert_3" model="res.aml.structuring.alert">
+            <field name="name">SAL/DEMO/00003</field>
+            <field name="transaction_id" ref="demo_txn_corporate_3"/>
+            <field name="customer_id" ref="demo_aml_partner_corporate"/>
+            <field name="window_hours">72</field>
+            <field name="txn_count">3</field>
+            <field name="total_amount">14450000.00</field>
+            <field name="ctr_threshold">5000000.00</field>
+            <!-- risk_score = min(100, (14.45/5.0)*70 + (3/3)*30) = min(100, 202.3 + 30) = 100 -->
+            <field name="risk_score">100.00</field>
+            <field name="state">escalated</field>
+            <field name="created_at">2025-01-14 14:02:00</field>
+            <field name="notes">Classic structuring/smurfing: three payments of ₦4.8M, ₦4.9M and ₦4.75M to three different beneficiaries within 5 hours, each deliberately kept just below the ₦5M CTR threshold. Total ₦14.45M. STR filed with NFIU reference NFIU/STR/2025/0042. Account temporarily restricted pending investigation outcome.</field>
+        </record>
+
+
+        <!-- ============================================================
+             7. ANOMALY ALERTS
+             Four alerts showing different Z-score scenarios.
+
+             Z-score interpretation:
+               ±3.0 — threshold (just barely flagged)
+               ±5.0 — strongly unusual
+               ±10+ — extreme (almost certainly not accidental)
+               negative — unusually SMALL transaction
+
+             Risk score formula: min(100, (|Z| / 3.0) × 50)
+               at Z=3.0  → score = 50
+               at Z=6.0  → score = 100 (capped)
+             ============================================================ -->
+
+        <!--
+            OPEN — MILD ANOMALY (Z = +3.20)
+            Individual customer. Transaction ₦383,400 vs mean ₦185,000.
+            Z = (383400 − 185000) / 62000 = 198400 / 62000 ≈ 3.2
+            Just above the 3.0 threshold. Worth reviewing but may be legitimate.
+        -->
+        <record id="demo_anomaly_alert_1" model="res.aml.anomaly.alert">
+            <field name="name">AAL/DEMO/00001</field>
+            <field name="transaction_id" ref="demo_txn_individual_1"/>
+            <field name="customer_id" ref="demo_aml_partner_individual"/>
+            <field name="transaction_amount">383400.00</field>
+            <field name="customer_mean">185000.00</field>
+            <field name="customer_stddev">62000.00</field>
+            <field name="zscore">3.20</field>
+            <!-- risk_score = min(100, (3.2/3.0)*50) = min(100, 53.33) = 53.33 -->
+            <field name="risk_score">53.33</field>
+            <field name="state">open</field>
+            <field name="created_at">2025-01-08 10:01:00</field>
+        </record>
+
+        <!--
+            REVIEWED — STRONG ANOMALY (Z = +43.79)
+            Individual customer. Transaction ₦2,900,000 vs mean ₦185,000.
+            Z = (2900000 − 185000) / 62000 = 2715000 / 62000 ≈ 43.79
+            Risk score capped at 100. Under investigation.
+        -->
+        <record id="demo_anomaly_alert_2" model="res.aml.anomaly.alert">
+            <field name="name">AAL/DEMO/00002</field>
+            <field name="transaction_id" ref="demo_txn_individual_3"/>
+            <field name="customer_id" ref="demo_aml_partner_individual"/>
+            <field name="transaction_amount">2900000.00</field>
+            <field name="customer_mean">185000.00</field>
+            <field name="customer_stddev">62000.00</field>
+            <field name="zscore">43.79</field>
+            <!-- risk_score = min(100, (43.79/3.0)*50) = min(100, 729.8) = 100 -->
+            <field name="risk_score">100.00</field>
+            <field name="state">reviewed</field>
+            <field name="created_at">2025-01-13 16:46:00</field>
+            <field name="notes">Transaction is 44 standard deviations above this customer's historical mean of ₦185,000. Customer verbally claims it is property sale proceeds. Case officer has requested: (1) Sale agreement, (2) Land title transfer, (3) Solicitor confirmation, (4) Buyer identity verification. Awaiting documents.</field>
+        </record>
+
+        <!--
+            ESCALATED — EXTREME ANOMALY (Z = +589.21)
+            Retail Tier-1 customer. Transaction ₦4,850,000 vs mean ₦18,500.
+            Z = (4850000 − 18500) / 8200 = 4831500 / 8200 ≈ 589
+            A Tier-1 customer with a lifetime mean of ₦18,500 depositing ₦4.85M
+            in cash is almost certainly not normal behaviour.
+        -->
+        <record id="demo_anomaly_alert_3" model="res.aml.anomaly.alert">
+            <field name="name">AAL/DEMO/00003</field>
+            <field name="transaction_id" ref="demo_txn_retail_3"/>
+            <field name="customer_id" ref="demo_aml_partner_retail"/>
+            <field name="transaction_amount">4850000.00</field>
+            <field name="customer_mean">18500.00</field>
+            <field name="customer_stddev">8200.00</field>
+            <field name="zscore">589.21</field>
+            <field name="risk_score">100.00</field>
+            <field name="state">escalated</field>
+            <field name="created_at">2025-01-12 11:06:00</field>
+            <field name="notes">Transaction is 589 standard deviations above this Tier-1 customer's lifetime mean of ₦18,500. In 45 prior transactions this customer has never exceeded ₦95,000. A ₦4.85M cash deposit is inexplicable from historical behaviour alone. Account restricted. STR filed. Escalated to CCO and MLRO for immediate review. Combined with velocity and structuring flags on same transaction — high-confidence suspicious activity.</field>
+        </record>
+
+        <!--
+            CLOSED — NEGATIVE ANOMALY (Z = −3.15)
+            Corporate customer. Transaction ₦14,800 vs mean ₦3,800,000.
+            Z = (14800 − 3800000) / 1200000 = −3785200 / 1200000 ≈ −3.15
+            This direction flags unusually SMALL transactions (mule account
+            testing, unusual withdrawals, or simply petty cash).
+            Investigated and confirmed legitimate.
+        -->
+        <record id="demo_anomaly_alert_4" model="res.aml.anomaly.alert">
+            <field name="name">AAL/DEMO/00004</field>
+            <field name="transaction_id" ref="demo_txn_corporate_1"/>
+            <field name="customer_id" ref="demo_aml_partner_corporate"/>
+            <field name="transaction_amount">14800.00</field>
+            <field name="customer_mean">3800000.00</field>
+            <field name="customer_stddev">1200000.00</field>
+            <!-- Z is negative: amount is far BELOW the mean -->
+            <field name="zscore">-3.15</field>
+            <!-- risk_score = min(100, (|-3.15|/3.0)*50) = min(100, 52.5) = 52.5 -->
+            <field name="risk_score">52.50</field>
+            <field name="state">closed</field>
+            <field name="created_at">2025-01-14 09:01:00</field>
+            <field name="notes">Negative anomaly: ₦14,800 transaction from a corporate account with a mean of ₦3.8M (3.15 standard deviations below mean). Investigated: confirmed as petty cash disbursement for office stationery purchase. Authorised by finance controller. Receipt obtained and filed. Closed — no suspicious activity.</field>
+        </record>
+
     </data>
 </odoo>

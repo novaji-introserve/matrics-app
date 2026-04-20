@@ -23,6 +23,7 @@
         "views/res_users_subsidiaries.xml",
         "views/menus.xml",
         "views/mail_template_escalation.xml",
+        "views/case_manager_escalation.xml",
         # Example data removed to avoid duplicate 'total_alerts' code on re-install
         # "data/alert_stat_example.xml",
     ],

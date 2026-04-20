@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ── AML Config ─────────────────────────────────────────────────── -->
+        <record id="view_aml_config_form" model="ir.ui.view">
+            <field name="name">res.aml.config.form</field>
+            <field name="model">res.aml.config</field>
+            <field name="arch" type="xml">
+                <form string="AML Detection Configuration">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" />
+                            <h1><field name="name" /></h1>
+                        </div>
+                        <group>
+                            <group string="Currency">
+                                <field name="currency_id" />
+                                <field name="active" widget="boolean_toggle" />
+                            </group>
+                            <group string="CTR Threshold">
+                                <field name="ctr_threshold" />
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Velocity Detection">
+                                <group>
+                                    <field name="velocity_window_hours" />
+                                    <field name="velocity_max_count" />
+                                    <field name="velocity_max_amount" />
+                                </group>
+                            </page>
+                            <page string="Structuring Detection">
+                                <group>
+                                    <field name="structuring_window_hours" />
+                                    <field name="structuring_min_count" />
+                                    <field name="structuring_approach_pct" />
+                                </group>
+                            </page>
+                            <page string="Anomaly Detection">
+                                <group>
+                                    <field name="anomaly_zscore_threshold" />
+                                    <field name="anomaly_min_history" />
+                                </group>
+                            </page>
+                            <page string="Risk Weights">
+                                <p class="text-muted">Weights must sum to 1.0</p>
+                                <group>
+                                    <field name="velocity_risk_weight" />
+                                    <field name="structuring_risk_weight" />
+                                    <field name="anomaly_risk_weight" />
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_aml_config_tree" model="ir.ui.view">
+            <field name="name">res.aml.config.tree</field>
+            <field name="model">res.aml.config</field>
+            <field name="arch" type="xml">
+                <tree string="AML Configurations">
+                    <field name="name" />
+                    <field name="ctr_threshold" />
+                    <field name="currency_id" />
+                    <field name="velocity_window_hours" />
+                    <field name="structuring_window_hours" />
+                    <field name="active" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_aml_config" model="ir.actions.act_window">
+            <field name="name">AML Configuration</field>
+            <field name="res_model">res.aml.config</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your AML detection configuration
+                </p>
+                <p>Set the dynamic CTR threshold, velocity, structuring and anomaly detection parameters.</p>
+            </field>
+        </record>
+
+        <menuitem
+            id="menu_aml_config"
+            name="AML Configuration"
+            action="action_aml_config"
+            parent="compliance_management.menu_compliance_configuration"
+            groups="compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer"
+            sequence="95" />
+
+        <!-- ── Customer Behavioral Profiles ──────────────────────────────── -->
+        <record id="view_aml_customer_profile_tree" model="ir.ui.view">
+            <field name="name">res.aml.customer.profile.tree</field>
+            <field name="model">res.aml.customer.profile</field>
+            <field name="arch" type="xml">
+                <tree string="Customer Behavioral Profiles" default_order="last_updated desc">
+                    <field name="customer_id" />
+                    <field name="transaction_count" />
+                    <field name="mean_amount" />
+                    <field name="stddev_amount" />
+                    <field name="last_updated" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_aml_customer_profile" model="ir.actions.act_window">
+            <field name="name">Customer Behavioral Profiles</field>
+            <field name="res_model">res.aml.customer.profile</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem
+            id="menu_aml_customer_profile"
+            name="AML Customer Profiles"
+            action="action_aml_customer_profile"
+            parent="compliance_management.menu_compliance_configuration"
+            groups="compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer"
+            sequence="96" />
+
+    </data>
+</odoo>

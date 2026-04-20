@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ── Velocity Alerts ────────────────────────────────────────────── -->
+        <record id="view_aml_velocity_alert_tree" model="ir.ui.view">
+            <field name="name">res.aml.velocity.alert.tree</field>
+            <field name="model">res.aml.velocity.alert</field>
+            <field name="arch" type="xml">
+                <tree string="Velocity Alerts" decoration-danger="state == 'escalated'" decoration-muted="state in ('closed','false_positive')">
+                    <field name="name" />
+                    <field name="customer_id" />
+                    <field name="transaction_id" />
+                    <field name="txn_count" />
+                    <field name="total_amount" />
+                    <field name="window_hours" />
+                    <field name="risk_score" widget="progressbar" options="{'editable': false}" />
+                    <field name="state" widget="badge"
+                        decoration-success="state == 'closed'"
+                        decoration-warning="state in ('reviewed','escalated')"
+                        decoration-danger="state == 'open'"
+                        decoration-muted="state == 'false_positive'" />
+                    <field name="created_at" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_aml_velocity_alert_form" model="ir.ui.view">
+            <field name="name">res.aml.velocity.alert.form</field>
+            <field name="model">res.aml.velocity.alert</field>
+            <field name="arch" type="xml">
+                <form string="Velocity Alert">
+                    <header>
+                        <field name="state" widget="statusbar"
+                            statusbar_visible="open,reviewed,escalated,closed" />
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" />
+                            <h1><field name="name" readonly="1" /></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="customer_id" />
+                                <field name="transaction_id" />
+                                <field name="created_at" />
+                            </group>
+                            <group>
+                                <field name="window_hours" />
+                                <field name="txn_count" />
+                                <field name="total_amount" />
+                                <field name="risk_score" />
+                            </group>
+                        </group>
+                        <group string="Review Notes">
+                            <field name="notes" nolabel="1" />
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" />
+                        <field name="activity_ids" widget="mail_activity" />
+                        <field name="message_ids" widget="mail_thread" />
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_aml_velocity_alert_search" model="ir.ui.view">
+            <field name="name">res.aml.velocity.alert.search</field>
+            <field name="model">res.aml.velocity.alert</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="customer_id" />
+                    <field name="name" />
+                    <filter string="Open" name="open" domain="[('state','=','open')]" />
+                    <filter string="Escalated" name="escalated" domain="[('state','=','escalated')]" />
+                    <separator />
+                    <group expand="0" string="Group By">
+                        <filter string="Customer" name="by_customer" context="{'group_by': 'customer_id'}" />
+                        <filter string="State" name="by_state" context="{'group_by': 'state'}" />
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_aml_velocity_alerts" model="ir.actions.act_window">
+            <field name="name">Velocity Alerts</field>
+            <field name="res_model">res.aml.velocity.alert</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_aml_velocity_alert_search" />
+            <field name="context">{'search_default_open': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">No velocity alerts</p>
+                <p>Alerts are raised when a customer exceeds the configured transaction count or volume within the velocity window.</p>
+            </field>
+        </record>
+
+        <!-- ── Structuring Alerts ─────────────────────────────────────────── -->
+        <record id="view_aml_structuring_alert_tree" model="ir.ui.view">
+            <field name="name">res.aml.structuring.alert.tree</field>
+            <field name="model">res.aml.structuring.alert</field>
+            <field name="arch" type="xml">
+                <tree string="Structuring Alerts" decoration-danger="state == 'escalated'" decoration-muted="state in ('closed','false_positive')">
+                    <field name="name" />
+                    <field name="customer_id" />
+                    <field name="transaction_id" />
+                    <field name="txn_count" />
+                    <field name="total_amount" />
+                    <field name="ctr_threshold" />
+                    <field name="window_hours" />
+                    <field name="risk_score" widget="progressbar" options="{'editable': false}" />
+                    <field name="state" widget="badge"
+                        decoration-success="state == 'closed'"
+                        decoration-warning="state in ('reviewed','escalated')"
+                        decoration-danger="state == 'open'"
+                        decoration-muted="state == 'false_positive'" />
+                    <field name="created_at" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_aml_structuring_alert_form" model="ir.ui.view">
+            <field name="name">res.aml.structuring.alert.form</field>
+            <field name="model">res.aml.structuring.alert</field>
+            <field name="arch" type="xml">
+                <form string="Structuring Alert">
+                    <header>
+                        <field name="state" widget="statusbar"
+                            statusbar_visible="open,reviewed,escalated,closed" />
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" />
+                            <h1><field name="name" readonly="1" /></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="customer_id" />
+                                <field name="transaction_id" />
+                                <field name="created_at" />
+                            </group>
+                            <group>
+                                <field name="window_hours" />
+                                <field name="txn_count" />
+                                <field name="total_amount" />
+                                <field name="ctr_threshold" />
+                                <field name="risk_score" />
+                            </group>
+                        </group>
+                        <group string="Review Notes">
+                            <field name="notes" nolabel="1" />
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" />
+                        <field name="activity_ids" widget="mail_activity" />
+                        <field name="message_ids" widget="mail_thread" />
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_aml_structuring_alert_search" model="ir.ui.view">
+            <field name="name">res.aml.structuring.alert.search</field>
+            <field name="model">res.aml.structuring.alert</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="customer_id" />
+                    <field name="name" />
+                    <filter string="Open" name="open" domain="[('state','=','open')]" />
+                    <filter string="Escalated" name="escalated" domain="[('state','=','escalated')]" />
+                    <separator />
+                    <group expand="0" string="Group By">
+                        <filter string="Customer" name="by_customer" context="{'group_by': 'customer_id'}" />
+                        <filter string="State" name="by_state" context="{'group_by': 'state'}" />
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_aml_structuring_alerts" model="ir.actions.act_window">
+            <field name="name">Structuring Alerts</field>
+            <field name="res_model">res.aml.structuring.alert</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_aml_structuring_alert_search" />
+            <field name="context">{'search_default_open': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">No structuring alerts</p>
+                <p>Alerts are raised when multiple sub-CTR-threshold transactions from the same customer approach the reporting threshold within the structuring window.</p>
+            </field>
+        </record>
+
+        <!-- ── Anomaly Alerts ─────────────────────────────────────────────── -->
+        <record id="view_aml_anomaly_alert_tree" model="ir.ui.view">
+            <field name="name">res.aml.anomaly.alert.tree</field>
+            <field name="model">res.aml.anomaly.alert</field>
+            <field name="arch" type="xml">
+                <tree string="Anomaly Alerts" decoration-danger="state == 'escalated'" decoration-muted="state in ('closed','false_positive')">
+                    <field name="name" />
+                    <field name="customer_id" />
+                    <field name="transaction_id" />
+                    <field name="transaction_amount" />
+                    <field name="customer_mean" />
+                    <field name="zscore" />
+                    <field name="risk_score" widget="progressbar" options="{'editable': false}" />
+                    <field name="state" widget="badge"
+                        decoration-success="state == 'closed'"
+                        decoration-warning="state in ('reviewed','escalated')"
+                        decoration-danger="state == 'open'"
+                        decoration-muted="state == 'false_positive'" />
+                    <field name="created_at" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_aml_anomaly_alert_form" model="ir.ui.view">
+            <field name="name">res.aml.anomaly.alert.form</field>
+            <field name="model">res.aml.anomaly.alert</field>
+            <field name="arch" type="xml">
+                <form string="Anomaly Alert">
+                    <header>
+                        <field name="state" widget="statusbar"
+                            statusbar_visible="open,reviewed,escalated,closed" />
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" />
+                            <h1><field name="name" readonly="1" /></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="customer_id" />
+                                <field name="transaction_id" />
+                                <field name="created_at" />
+                            </group>
+                            <group>
+                                <field name="transaction_amount" />
+                                <field name="customer_mean" />
+                                <field name="customer_stddev" />
+                                <field name="zscore" />
+                                <field name="risk_score" />
+                            </group>
+                        </group>
+                        <group string="Review Notes">
+                            <field name="notes" nolabel="1" />
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" />
+                        <field name="activity_ids" widget="mail_activity" />
+                        <field name="message_ids" widget="mail_thread" />
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_aml_anomaly_alert_search" model="ir.ui.view">
+            <field name="name">res.aml.anomaly.alert.search</field>
+            <field name="model">res.aml.anomaly.alert</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="customer_id" />
+                    <field name="name" />
+                    <filter string="Open" name="open" domain="[('state','=','open')]" />
+                    <filter string="Escalated" name="escalated" domain="[('state','=','escalated')]" />
+                    <separator />
+                    <group expand="0" string="Group By">
+                        <filter string="Customer" name="by_customer" context="{'group_by': 'customer_id'}" />
+                        <filter string="State" name="by_state" context="{'group_by': 'state'}" />
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_aml_anomaly_alerts" model="ir.actions.act_window">
+            <field name="name">Anomaly Alerts</field>
+            <field name="res_model">res.aml.anomaly.alert</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_aml_anomaly_alert_search" />
+            <field name="context">{'search_default_open': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">No anomaly alerts</p>
+                <p>Alerts are raised when a transaction amount deviates significantly (by Z-score) from the customer's historical baseline.</p>
+            </field>
+        </record>
+
+        <!-- ── Menu items under Transaction Monitoring ───────────────────── -->
+        <menuitem
+            id="menu_aml_velocity_alerts"
+            name="AML Velocity Alerts"
+            action="action_aml_velocity_alerts"
+            parent="compliance_management.menu_compliance_transaction_monitoring"
+            groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_transaction_monitoring_team"
+            sequence="40" />
+
+        <menuitem
+            id="menu_aml_structuring_alerts"
+            name="AML Structuring Alerts"
+            action="action_aml_structuring_alerts"
+            parent="compliance_management.menu_compliance_transaction_monitoring"
+            groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_transaction_monitoring_team"
+            sequence="41" />
+
+        <menuitem
+            id="menu_aml_anomaly_alerts"
+            name="AML Anomaly Alerts"
+            action="action_aml_anomaly_alerts"
+            parent="compliance_management.menu_compliance_transaction_monitoring"
+            groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_transaction_monitoring_team"
+            sequence="42" />
+
+        <!-- ── Transaction form: add AML tab ─────────────────────────────── -->
+        <record id="transaction_form_aml" model="ir.ui.view">
+            <field name="name">transaction_form_aml</field>
+            <field name="model">res.customer.transaction</field>
+            <field name="inherit_id" ref="compliance_management.compliance_transaction_form" />
+            <field name="priority">25</field>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page string="AML Detection" name="aml_detection">
+                        <group>
+                            <group>
+                                <field name="aml_risk_score" />
+                                <field name="aml_flags" />
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Velocity Alerts">
+                                <field name="aml_velocity_alert_ids" readonly="1">
+                                    <tree>
+                                        <field name="name" />
+                                        <field name="txn_count" />
+                                        <field name="total_amount" />
+                                        <field name="risk_score" />
+                                        <field name="state" />
+                                        <field name="created_at" />
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Structuring Alerts">
+                                <field name="aml_structuring_alert_ids" readonly="1">
+                                    <tree>
+                                        <field name="name" />
+                                        <field name="txn_count" />
+                                        <field name="total_amount" />
+                                        <field name="ctr_threshold" />
+                                        <field name="risk_score" />
+                                        <field name="state" />
+                                        <field name="created_at" />
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Anomaly Alerts">
+                                <field name="aml_anomaly_alert_ids" readonly="1">
+                                    <tree>
+                                        <field name="name" />
+                                        <field name="transaction_amount" />
+                                        <field name="customer_mean" />
+                                        <field name="zscore" />
+                                        <field name="risk_score" />
+                                        <field name="state" />
+                                        <field name="created_at" />
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>
