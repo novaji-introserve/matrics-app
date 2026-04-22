@@ -284,6 +284,99 @@
             </field>
         </record>
 
+        <!-- ── Dormant Account Alerts ─────────────────────────────────────── -->
+        <record id="view_aml_dormant_alert_tree" model="ir.ui.view">
+            <field name="name">res.aml.dormant.alert.tree</field>
+            <field name="model">res.aml.dormant.alert</field>
+            <field name="arch" type="xml">
+                <tree string="Dormant Account Alerts" decoration-danger="state == 'escalated'" decoration-muted="state in ('closed','false_positive')">
+                    <field name="name" />
+                    <field name="customer_id" />
+                    <field name="transaction_id" />
+                    <field name="last_transaction_date" />
+                    <field name="dormant_days" />
+                    <field name="transaction_amount" />
+                    <field name="risk_score" widget="progressbar" options="{'editable': false}" />
+                    <field name="state" widget="badge"
+                        decoration-success="state == 'closed'"
+                        decoration-warning="state in ('reviewed','escalated')"
+                        decoration-danger="state == 'open'"
+                        decoration-muted="state == 'false_positive'" />
+                    <field name="created_at" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_aml_dormant_alert_form" model="ir.ui.view">
+            <field name="name">res.aml.dormant.alert.form</field>
+            <field name="model">res.aml.dormant.alert</field>
+            <field name="arch" type="xml">
+                <form string="Dormant Account Alert">
+                    <header>
+                        <field name="state" widget="statusbar"
+                            statusbar_visible="open,reviewed,escalated,closed" />
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" />
+                            <h1><field name="name" readonly="1" /></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="customer_id" />
+                                <field name="transaction_id" />
+                                <field name="created_at" />
+                            </group>
+                            <group>
+                                <field name="last_transaction_date" />
+                                <field name="dormant_days" />
+                                <field name="transaction_amount" />
+                                <field name="risk_score" />
+                            </group>
+                        </group>
+                        <group string="Review Notes">
+                            <field name="notes" nolabel="1" />
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" />
+                        <field name="activity_ids" widget="mail_activity" />
+                        <field name="message_ids" widget="mail_thread" />
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_aml_dormant_alert_search" model="ir.ui.view">
+            <field name="name">res.aml.dormant.alert.search</field>
+            <field name="model">res.aml.dormant.alert</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="customer_id" />
+                    <field name="name" />
+                    <filter string="Open" name="open" domain="[('state','=','open')]" />
+                    <filter string="Escalated" name="escalated" domain="[('state','=','escalated')]" />
+                    <separator />
+                    <group expand="0" string="Group By">
+                        <filter string="Customer" name="by_customer" context="{'group_by': 'customer_id'}" />
+                        <filter string="State" name="by_state" context="{'group_by': 'state'}" />
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_aml_dormant_alerts" model="ir.actions.act_window">
+            <field name="name">Dormant Account Alerts</field>
+            <field name="res_model">res.aml.dormant.alert</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_aml_dormant_alert_search" />
+            <field name="context">{'search_default_open': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">No dormant account alerts</p>
+                <p>Alerts are raised when a transaction occurs on an account that has been inactive beyond the configured dormancy threshold.</p>
+            </field>
+        </record>
+
         <!-- ── Menu items under Transaction Monitoring ───────────────────── -->
         <menuitem
             id="menu_aml_velocity_alerts"
@@ -309,6 +402,14 @@
             groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_transaction_monitoring_team"
             sequence="42" />
 
+        <menuitem
+            id="menu_aml_dormant_alerts"
+            name="AML Dormant Account Alerts"
+            action="action_aml_dormant_alerts"
+            parent="compliance_management.menu_compliance_transaction_monitoring"
+            groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_transaction_monitoring_team"
+            sequence="43" />
+
         <!-- ── Transaction form: add AML tab ─────────────────────────────── -->
         <record id="transaction_form_aml" model="ir.ui.view">
             <field name="name">transaction_form_aml</field>
@@ -325,6 +426,19 @@
                             </group>
                         </group>
                         <notebook>
+                            <page string="Dormant Account Alerts">
+                                <field name="aml_dormant_alert_ids" readonly="1">
+                                    <tree>
+                                        <field name="name" />
+                                        <field name="last_transaction_date" />
+                                        <field name="dormant_days" />
+                                        <field name="transaction_amount" />
+                                        <field name="risk_score" />
+                                        <field name="state" />
+                                        <field name="created_at" />
+                                    </tree>
+                                </field>
+                            </page>
                             <page string="Velocity Alerts">
                                 <field name="aml_velocity_alert_ids" readonly="1">
                                     <tree>

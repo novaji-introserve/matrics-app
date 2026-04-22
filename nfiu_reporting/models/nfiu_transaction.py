@@ -60,9 +60,9 @@ class NFIUTransaction(models.Model):
     _inherit = 'res.customer.transaction'
 
     report_id = fields.Many2one(
-        'nfiu.report', string='Report', required=True, ondelete='cascade')
+        'nfiu.report', string='Report', ondelete='set null')
     transaction_number = fields.Char(
-        string='Transaction Number', required=True, size=50)
+        string='Transaction Number', size=50)
     internal_ref_number = fields.Char(
         string='Internal Reference Number', size=50)
     transaction_location = fields.Char(string='Transaction Location', size=255)
@@ -81,11 +81,11 @@ class NFIUTransaction(models.Model):
         ('E', 'Electronic Transfer'),
         ('k', 'Other'),
         ('T', 'Wire Transfer'),
-    ], string='Transaction Mode Code', required=True, default='E')
+    ], string='Transaction Mode Code', default='E')
 
     transmode_comment = fields.Char(string='Transaction Mode Comment', size=50)
     amount_local = fields.Float(
-        string='Amount (Local Currency)', digits=(10, 2), required=True)
+        string='Amount (Local Currency)', digits=(10, 2))
     from_person_id = fields.Many2one('res.partner', string='From Person')
     '''
     # From party details
@@ -161,10 +161,10 @@ class NFIUTransaction(models.Model):
                 'comments': record.comments,
                 'reported_by': self.env.user.id,
             })
+            record.report_fiu()
             record.write({
                 'suspicious_transaction': True,
                 'state': 'suspicious',
-                'report_nfiu': True,
             })
 
     def action_unmark_as_suspicious(self):
@@ -172,16 +172,21 @@ class NFIUTransaction(models.Model):
             record.write({
                 'suspicious_transaction': False,
                 'state': 'new',
+                'report_nfiu': False,
             })
-            
+
     def action_mark_unusual(self):
         for record in self:
+            record.report_fiu()
             record.write({
                 'suspicious_transaction': False,
                 'state': 'unusual',
             })
 
     def report_fiu(self):
+        print("*****")
+        import pprint
+        pprint.pprint(self.read()[0])
         self.write({
             'report_nfiu': True,
             'transaction_number': self.name,

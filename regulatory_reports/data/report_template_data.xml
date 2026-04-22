@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ── Worksheets (reused across Excel templates) ──────────────── -->
+        <record id="worksheet_summary" model="res.regulatory.report.template.worksheet">
+            <field name="name">Summary</field>
+        </record>
+        <record id="worksheet_transactions" model="res.regulatory.report.template.worksheet">
+            <field name="name">Transactions</field>
+        </record>
+        <record id="worksheet_details" model="res.regulatory.report.template.worksheet">
+            <field name="name">Details</field>
+        </record>
+        <record id="worksheet_schedule" model="res.regulatory.report.template.worksheet">
+            <field name="name">Schedule</field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             CBN — Central Bank of Nigeria
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="template_cbn_excel" model="res.regulatory.report.template">
+            <field name="name">CBN Prudential Return</field>
+            <field name="code">CBN-XLS-001</field>
+            <field name="entity_id" ref="report_entity_cbn"/>
+            <field name="report_type">xls</field>
+            <field name="status">active</field>
+            <field name="description">Excel template for CBN prudential returns.
+                Contains Summary, Transactions and Schedule worksheets.</field>
+            <field name="template_file">UGxhY2Vob2xkZXIgLSB1cGxvYWQgYWN0dWFsIENCTiBFeGNlbCB0ZW1wbGF0ZQ==</field>
+            <field name="template_file_name">CBN_Prudential_Return_Template.xlsx</field>
+        </record>
+
+        <record id="template_cbn_pdf" model="res.regulatory.report.template">
+            <field name="name">CBN Monthly Liquidity Report</field>
+            <field name="code">CBN-PDF-001</field>
+            <field name="entity_id" ref="report_entity_cbn"/>
+            <field name="report_type">pdf</field>
+            <field name="status">active</field>
+            <field name="description">PDF template for CBN monthly liquidity and capital adequacy reporting.</field>
+            <field name="template_file">UGxhY2Vob2xkZXIgLSB1cGxvYWQgYWN0dWFsIENCSCBQREYgdGVtcGxhdGU=</field>
+            <field name="template_file_name">CBN_Monthly_Liquidity_Template.pdf</field>
+        </record>
+
+        <record id="template_cbn_csv" model="res.regulatory.report.template">
+            <field name="name">CBN Transaction Data Export</field>
+            <field name="code">CBN-CSV-001</field>
+            <field name="entity_id" ref="report_entity_cbn"/>
+            <field name="report_type">csv</field>
+            <field name="status">active</field>
+            <field name="description">CSV template for bulk transaction data submission to CBN.</field>
+            <field name="template_file">UGxhY2Vob2xkZXIgLSB1cGxvYWQgYWN0dWFsIENCTiBDU1YgdGVtcGxhdGU=</field>
+            <field name="template_file_name">CBN_Transaction_Data_Template.csv</field>
+        </record>
+
+        <record id="template_cbn_docx" model="res.regulatory.report.template">
+            <field name="name">CBN Compliance Declaration</field>
+            <field name="code">CBN-DOCX-001</field>
+            <field name="entity_id" ref="report_entity_cbn"/>
+            <field name="report_type">docx</field>
+            <field name="status">active</field>
+            <field name="description">Word document template for CBN compliance declaration and narrative reports.</field>
+            <field name="template_file">UGxhY2Vob2xkZXIgLSB1cGxvYWQgYWN0dWFsIENCTiBXb3JkIHRlbXBsYXRl</field>
+            <field name="template_file_name">CBN_Compliance_Declaration_Template.docx</field>
+        </record>
+
+        <record id="template_cbn_txt" model="res.regulatory.report.template">
+            <field name="name">CBN RTGS Payment Report</field>
+            <field name="code">CBN-TXT-001</field>
+            <field name="entity_id" ref="report_entity_cbn"/>
+            <field name="report_type">txt</field>
+            <field name="status">active</field>
+            <field name="description">Plain text fixed-width template for CBN RTGS payment reporting.</field>
+            <field name="template_file">UGxhY2Vob2xkZXIgLSB1cGxvYWQgYWN0dWFsIENCTiB0ZXh0IHRlbXBsYXRl</field>
+            <field name="template_file_name">CBN_RTGS_Payment_Template.txt</field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             FIRS — Federal Inland Revenue Service
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="template_firs_excel" model="res.regulatory.report.template">
+            <field name="name">FIRS Annual Tax Return</field>
+            <field name="code">FIRS-XLS-001</field>
+            <field name="entity_id" ref="report_entity_firs"/>
+            <field name="report_type">xls</field>
+            <field name="status">active</field>
+            <field name="description">Excel template for FIRS annual company income tax return filing.</field>
+            <field name="template_file">UGxhY2Vob2xkZXIgLSB1cGxvYWQgYWN0dWFsIEZJUlMgRXhjZWwgdGVtcGxhdGU=</field>
+            <field name="template_file_name">FIRS_Annual_Tax_Return_Template.xlsx</field>
+        </record>
+
+        <record id="template_firs_csv" model="res.regulatory.report.template">
+            <field name="name">FIRS WHT Remittance Schedule</field>
+            <field name="code">FIRS-CSV-001</field>
+            <field name="entity_id" ref="report_entity_firs"/>
+            <field name="report_type">csv</field>
+            <field name="status">active</field>
+            <field name="description">CSV template for withholding tax remittance schedule submission to FIRS.</field>
+            <field name="template_file">UGxhY2Vob2xkZXIgLSB1cGxvYWQgYWN0dWFsIEZJUlMgQ1NWIHRlbXBsYXRl</field>
+            <field name="template_file_name">FIRS_WHT_Remittance_Template.csv</field>
+        </record>
+
+        <record id="template_firs_pdf" model="res.regulatory.report.template">
+            <field name="name">FIRS VAT Return</field>
+            <field name="code">FIRS-PDF-001</field>
+            <field name="entity_id" ref="report_entity_firs"/>
+            <field name="report_type">pdf</field>
+            <field name="status">active</field>
+            <field name="description">PDF template for monthly VAT return filing with FIRS.</field>
+            <field name="template_file">UGxhY2Vob2xkZXIgLSB1cGxvYWQgYWN0dWFsIEZJUlMgUERGIHRlbXBsYXRl</field>
+            <field name="template_file_name">FIRS_VAT_Return_Template.pdf</field>
+        </record>
+
+        <record id="template_firs_txt" model="res.regulatory.report.template">
+            <field name="name">FIRS e-TCC Data File</field>
+            <field name="code">FIRS-TXT-001</field>
+            <field name="entity_id" ref="report_entity_firs"/>
+            <field name="report_type">txt</field>
+            <field name="status">active</field>
+            <field name="description">Plain text template for FIRS electronic Tax Clearance Certificate data submission.</field>
+            <field name="template_file">UGxhY2Vob2xkZXIgLSB1cGxvYWQgYWN0dWFsIEZJUlMgdGV4dCB0ZW1wbGF0ZQ==</field>
+            <field name="template_file_name">FIRS_eTCC_Data_Template.txt</field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             CAC — Corporate Affairs Commission
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="template_cac_excel" model="res.regulatory.report.template">
+            <field name="name">CAC Statutory Annual Return</field>
+            <field name="code">CAC-XLS-001</field>
+            <field name="entity_id" ref="report_entity_cac"/>
+            <field name="report_type">xls</field>
+            <field name="status">active</field>
+            <field name="description">Excel template for CAC statutory annual return — shareholder register and financials.</field>
+            <field name="template_file">UGxhY2Vob2xkZXIgLSB1cGxvYWQgYWN0dWFsIENBQyBFeGNlbCB0ZW1wbGF0ZQ==</field>
+            <field name="template_file_name">CAC_Statutory_Annual_Return_Template.xlsx</field>
+        </record>
+
+        <record id="template_cac_docx" model="res.regulatory.report.template">
+            <field name="name">CAC Change of Directors Notice</field>
+            <field name="code">CAC-DOCX-001</field>
+            <field name="entity_id" ref="report_entity_cac"/>
+            <field name="report_type">docx</field>
+            <field name="status">active</field>
+            <field name="description">Word document template for notifying CAC of changes in company directors.</field>
+            <field name="template_file">UGxhY2Vob2xkZXIgLSB1cGxvYWQgYWN0dWFsIENBQyBXb3JkIHRlbXBsYXRl</field>
+            <field name="template_file_name">CAC_Change_of_Directors_Template.docx</field>
+        </record>
+
+        <record id="template_cac_pdf" model="res.regulatory.report.template">
+            <field name="name">CAC Beneficial Ownership Declaration</field>
+            <field name="code">CAC-PDF-001</field>
+            <field name="entity_id" ref="report_entity_cac"/>
+            <field name="report_type">pdf</field>
+            <field name="status">active</field>
+            <field name="description">PDF template for CAC beneficial ownership declaration filing.</field>
+            <field name="template_file">UGxhY2Vob2xkZXIgLSB1cGxvYWQgYWN0dWFsIENBQyBQREYgdGVtcGxhdGU=</field>
+            <field name="template_file_name">CAC_Beneficial_Ownership_Template.pdf</field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             SEC — Securities and Exchange Commission
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="template_sec_excel" model="res.regulatory.report.template">
+            <field name="name">SEC Periodic Disclosure Return</field>
+            <field name="code">SEC-XLS-001</field>
+            <field name="entity_id" ref="report_entity_sec"/>
+            <field name="report_type">xls</field>
+            <field name="status">active</field>
+            <field name="description">Excel template for SEC periodic disclosure and portfolio reporting.</field>
+            <field name="template_file">UGxhY2Vob2xkZXIgLSB1cGxvYWQgYWN0dWFsIFNFQyBFeGNlbCB0ZW1wbGF0ZQ==</field>
+            <field name="template_file_name">SEC_Periodic_Disclosure_Template.xlsx</field>
+        </record>
+
+        <record id="template_sec_pdf" model="res.regulatory.report.template">
+            <field name="name">SEC Annual Report Filing</field>
+            <field name="code">SEC-PDF-001</field>
+            <field name="entity_id" ref="report_entity_sec"/>
+            <field name="report_type">pdf</field>
+            <field name="status">active</field>
+            <field name="description">PDF template for SEC annual report filing including audited financials.</field>
+            <field name="template_file">UGxhY2Vob2xkZXIgLSB1cGxvYWQgYWN0dWFsIFNFQyBQREYgdGVtcGxhdGU=</field>
+            <field name="template_file_name">SEC_Annual_Report_Template.pdf</field>
+        </record>
+
+        <record id="template_sec_csv" model="res.regulatory.report.template">
+            <field name="name">SEC Transaction Reporting</field>
+            <field name="code">SEC-CSV-001</field>
+            <field name="entity_id" ref="report_entity_sec"/>
+            <field name="report_type">csv</field>
+            <field name="status">active</field>
+            <field name="description">CSV template for SEC capital market transaction reporting.</field>
+            <field name="template_file">UGxhY2Vob2xkZXIgLSB1cGxvYWQgYWN0dWFsIFNFQyBDU1YgdGVtcGxhdGU=</field>
+            <field name="template_file_name">SEC_Transaction_Reporting_Template.csv</field>
+        </record>
+
+        <record id="template_sec_txt" model="res.regulatory.report.template">
+            <field name="name">SEC CSCS Data Extract</field>
+            <field name="code">SEC-TXT-001</field>
+            <field name="entity_id" ref="report_entity_sec"/>
+            <field name="report_type">txt</field>
+            <field name="status">active</field>
+            <field name="description">Plain text template for SEC/CSCS depository data extract submission.</field>
+            <field name="template_file">UGxhY2Vob2xkZXIgLSB1cGxvYWQgYWN0dWFsIFNFQyB0ZXh0IHRlbXBsYXRl</field>
+            <field name="template_file_name">SEC_CSCS_Data_Extract_Template.txt</field>
+        </record>
+
+    </data>
+</odoo>

@@ -67,6 +67,34 @@ class AMLStructuringAlert(models.Model):
         return super().create(vals_list)
 
 
+class AMLDormantAlert(models.Model):
+    _name = 'res.aml.dormant.alert'
+    _description = 'AML Dormant Account Suddenly Active Alert'
+    _order = 'created_at desc'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+
+    name = fields.Char(string='Alert Ref', readonly=True, copy=False, default='New')
+    transaction_id = fields.Many2one(
+        'res.customer.transaction', string='Transaction',
+        required=True, ondelete='cascade', index=True,
+    )
+    customer_id = fields.Many2one('res.partner', string='Customer', required=True, index=True)
+    last_transaction_date = fields.Datetime(string='Last Transaction Date')
+    dormant_days = fields.Integer(string='Days Dormant')
+    transaction_amount = fields.Float(string='Transaction Amount', digits=(20, 2))
+    risk_score = fields.Float(string='Risk Score', digits=(5, 2))
+    state = fields.Selection(ALERT_STATE, default='open', required=True, tracking=True)
+    created_at = fields.Datetime(string='Created', default=fields.Datetime.now, readonly=True)
+    notes = fields.Text(string='Review Notes')
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('name', 'New') == 'New':
+                vals['name'] = self.env['ir.sequence'].next_by_code('res.aml.dormant.alert') or 'DAL/NEW'
+        return super().create(vals_list)
+
+
 class AMLAnomalyAlert(models.Model):
     _name = 'res.aml.anomaly.alert'
     _description = 'AML Statistical Anomaly Alert'

@@ -67,13 +67,28 @@ class Report(models.Model):
         if not self.template_id.template_file:
             raise UserError("Please upload a template file first.")
 
+        filename = self.template_id.template_file_name or ''
+        if filename and not filename.lower().endswith('.xlsx'):
+            raise UserError(
+                f"The template file '{filename}' is not a supported format.\n"
+                "openpyxl requires an .xlsx file. "
+                "If you have an .xls file, open it in Excel and Save As → Excel Workbook (.xlsx)."
+            )
+
         try:
             # Decode binary data
-
             file_data = base64.b64decode(self.template_id.template_file)
 
             # Create Excel workbook object from binary data
-            workbook = load_workbook(io.BytesIO(file_data))
+            try:
+                workbook = load_workbook(io.BytesIO(file_data))
+            except Exception:
+                raise UserError(
+                    "Could not open the template as an Excel file.\n"
+                    "Make sure the uploaded file is a valid .xlsx workbook "
+                    "(not .xls, .csv or .pdf). "
+                    "Open it in Excel and Save As → Excel Workbook (.xlsx)."
+                )
             changes_count = 0
             # Perform find and replace
             item_ids = self.template_id.item_ids

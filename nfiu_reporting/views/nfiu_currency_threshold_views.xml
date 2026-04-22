@@ -10,6 +10,7 @@
                     <field name="name" />
                     <field name="shortname"/>
                     <field name="currency_id" />
+                    <field name="customer_type" />
                     <field name="threshold" />
                     <field name="write_uid" />
                     <field name="write_date" />
@@ -34,6 +35,7 @@
                         <group>
                             <group>
                                 <field name="currency_id" />
+                                <field name="customer_type" />
                                 <field name="shortname"/>
                             </group>
                             <group>
@@ -63,9 +65,12 @@
                 <search>
                     <field name="name" />
                     <field name="currency_id" />
+                    <field name="customer_type" />
                     <group expand="0" string="Group By">
                         <filter string="Currency" name="group_currency_threshold_currency_id"
                             context="{'group_by': 'currency_id'}" />
+                        <filter string="Customer Type" name="group_currency_threshold_customer_type"
+                            context="{'group_by': 'customer_type'}" />
                     </group>
                 </search>
             </field>

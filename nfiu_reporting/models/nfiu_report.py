@@ -304,21 +304,34 @@ class NFIUReport(models.Model):
         if person.source_of_wealth:
             ET.SubElement(parent, 'source_of_wealth').text = person.source_of_wealth
 
+
+    def _split_partner_name(self, name):
+        """Split a res.partner full name into (first_name, last_name).
+        Last word is treated as surname; everything before it is the first name.
+        Falls back to '-' for either part if the name is empty.
+        """
+        parts = (name or '').strip().split()
+        if len(parts) >= 2:
+            return ' '.join(parts[:-1]), parts[-1]
+        elif len(parts) == 1:
+            return parts[0], parts[0]
+        return '-', '-'
+
     def _add_person_xml(self, parent, person):
-        """Add person XML elements"""
+        """Add person XML elements. person is a res.partner record."""
         if not person:
             return
-        # Add basic person details   
+
+        first_name, last_name = self._split_partner_name(person.name)
+
         ET.SubElement(parent, 'gender').text = person.gender or '-'
         if person.title:
             ET.SubElement(parent, 'title').text = person.title or ''
-        ET.SubElement(parent, 'first_name').text = person.firstname or ''
-        if person.middlename:
-            ET.SubElement(parent, 'middle_name').text = person.middlename
+        ET.SubElement(parent, 'first_name').text = first_name
         # Add prefix if available
         if person.prefix:
             ET.SubElement(parent, 'prefix').text = person.prefix
-        ET.SubElement(parent, 'last_name').text = person.lastname
+        ET.SubElement(parent, 'last_name').text = last_name
         
         if person.dob:
             ET.SubElement(parent, 'birthdate').text = person.dob.strftime('%Y-%m-%dT%H:%M:%S')
@@ -363,6 +376,68 @@ class NFIUReport(models.Model):
         # Add source of wealth
         if person.source_of_wealth:
             ET.SubElement(parent, 'source_of_wealth').text = person.source_of_wealth
+
+
+
+    # def _add_person_xml(self, parent, person):
+    #     """Add person XML elements"""
+    #     if not person:
+    #         return
+    #     # Add basic person details   
+    #     ET.SubElement(parent, 'gender').text = person.gender or '-'
+    #     if person.title:
+    #         ET.SubElement(parent, 'title').text = person.title or ''
+    #     ET.SubElement(parent, 'first_name').text = person.firstname or ''
+    #     if person.middlename:
+    #         ET.SubElement(parent, 'middle_name').text = person.middlename
+    #     # Add prefix if available
+    #     if person.prefix:
+    #         ET.SubElement(parent, 'prefix').text = person.prefix
+    #     ET.SubElement(parent, 'last_name').text = person.lastname
+        
+    #     if person.dob:
+    #         ET.SubElement(parent, 'birthdate').text = person.dob.strftime('%Y-%m-%dT%H:%M:%S')
+    #     # Add birth place if available
+    #     if person.birth_place:
+    #         ET.SubElement(parent, 'birth_place').text = person.birth_place
+    #     # Add mother's name if available
+    #     if person.mothers_name:
+    #         ET.SubElement(parent, 'mothers_name').text = person.mothers_name
+    #     # Add alias and SSN if available
+    #     if person.alias:
+    #         ET.SubElement(parent, 'alias').text = person.alias
+    #     # Add SSN if available
+    #     if person.ssn:
+    #         ET.SubElement(parent, 'ssn').text = person.ssn
+            
+    #     # Add passport info
+    #     if person.passport_number:
+    #         ET.SubElement(parent, 'passport_number').text = person.passport_number
+    #         if person.passport_country:
+    #             ET.SubElement(parent, 'passport_country').text = person.passport_country
+        
+    #     if person.id_number:
+    #         ET.SubElement(parent, 'id_number').text = person.id_number
+            
+    #     # Add nationalities and residence
+    #     if person.nationality1:
+    #         ET.SubElement(parent, 'nationality1').text = person.nationality1
+    #     if person.nationality2:
+    #         ET.SubElement(parent, 'nationality2').text = person.nationality2
+    #     if person.nationality3:
+    #         ET.SubElement(parent, 'nationality3').text = person.nationality3
+    #     if person.residence:
+    #         ET.SubElement(parent, 'residence').text = person.residence
+            
+    #     # Add occupation and employer
+    #     if person.occupation:
+    #         ET.SubElement(parent, 'occupation').text = person.occupation
+    #     if person.employer_name:
+    #         ET.SubElement(parent, 'employer_name').text = person.employer_name
+            
+    #     # Add source of wealth
+    #     if person.source_of_wealth:
+    #         ET.SubElement(parent, 'source_of_wealth').text = person.source_of_wealth
 
     def _add_address_xml(self, parent, address):
         """Add address XML elements"""

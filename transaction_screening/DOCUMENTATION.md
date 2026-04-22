@@ -1,11 +1,5 @@
 # Transaction Screening Module — Full Technical Documentation
 
-**Module technical name:** `transaction_screening`  
-**Author:** Novaji Introserve Limited  
-**Version:** 0.1  
-**License:** LGPL-3
-
----
 
 ## Table of Contents
 
@@ -26,6 +20,7 @@
    - [Anomaly Detection (Z-Score)](#63-anomaly-detection-z-score)
    - [Composite AML Risk Score](#64-composite-aml-risk-score)
 7. [Execution Flow: What Happens When a Transaction is Screened](#7-execution-flow-what-happens-when-a-transaction-is-screened)
+   - [Why AML Runs After Screening Rules](#why-aml-runs-after-screening-rules-not-before-not-independently)
 8. [Customer Behavioral Profiles — How Baselines Are Built](#8-customer-behavioral-profiles--how-baselines-are-built)
 9. [Sequences (Alert Reference Numbers)](#9-sequences-alert-reference-numbers)
 10. [Cron Jobs](#10-cron-jobs)
@@ -35,6 +30,7 @@
 14. [How to Configure the CTR Threshold](#14-how-to-configure-the-ctr-threshold)
 15. [Database Tables Created](#15-database-tables-created)
 16. [AML Detection Default Values and Their Meaning](#16-aml-detection-default-values-and-their-meaning)
+17. [Transaction Screening Daemon (screen_daemon.py)](#17-transaction-screening-daemon-screen_daemonpy)
 
 ---
 
@@ -42,10 +38,10 @@
 
 The `transaction_screening` module has two layers of capability:
 
-**Layer 1 — Rules-Based Screening (original)**  
+**Layer 1 — Rules-Based Screening **  
 When a transaction is screened, the system evaluates it against a list of compliance rules defined in `res.transaction.screening.rule`. If any rule matches and that rule is marked as "blocking", the transaction is placed on hold (`blocked = True`). This is pure if/then logic: the rules are either SQL queries or Python expressions that the compliance team configures.
 
-**Layer 2 — AML Statistical Detection (added)**  
+**Layer 2 — AML Statistical Detection **  
 After rule-based screening completes, the system runs three additional statistical checks that no rule can replicate:
 
 | Check | What It Detects |
@@ -491,7 +487,24 @@ The `aml_risk_score` field on the transaction is updated every time `action_scre
 
 ## 7. Execution Flow: What Happens When a Transaction is Screened
 
-When someone calls `transaction.action_screen()` (from the UI or from another module), this is the exact sequence of events:
+### Why AML Runs AFTER Screening Rules (Not Before, Not Independently)
+
+This is a deliberate design decision, not an accident.
+
+**Screening rules** are deterministic and instant. Each rule is a simple if/then check: "if amount > ₦5M and customer is Tier 1, flag it". They evaluate in milliseconds, produce a binary result (match or no match), and write a history record. They require no statistical context.
+
+**AML detection** is statistical and more expensive. Each check runs a SQL window query across potentially thousands of past transactions for the same customer, updates a behavioral profile in the database, and may create an alert record with full context. It needs the transaction to already exist and be committed.
+
+**Why sequential, not parallel:**
+- Rules run first as the primary compliance gate. If a rule blocks a transaction, the compliance officer sees that immediately — and the AML scores below it give them additional evidence of *why* it is suspicious.
+- AML always runs regardless of whether any rule matched. A clean transaction (no rule hit) can still have a high AML score. A rule-blocked transaction can have zero AML flags. They are independent layers — the result of one does not gate the other.
+- Putting AML first would mean paying the statistical cost even on transactions that a rule will immediately block, wasting computation.
+
+**Summary:** Rules are cheap and exact. AML is expensive and probabilistic. Run cheap first, expensive second. Both always run.
+
+---
+
+When someone calls `transaction.action_screen()` (from the UI, the daemon, or `multi_screen()`), this is the exact sequence of events:
 
 ```
 action_screen() called
@@ -807,3 +820,92 @@ This table summarises every configurable default and the real-world reasoning be
 | Velocity Weight | 0.30 | 30% of composite score |
 | Structuring Weight | 0.40 | 40% of composite score — structuring is weighted highest as it is the most deliberate AML typology |
 | Anomaly Weight | 0.30 | 30% of composite score |
+
+---
+
+## 17. Transaction Screening Daemon (`screen_daemon.py`)
+
+### The Problem It Solves
+
+Odoo's ORM `create()` hook previously called `action_screen()` on every transaction at insert time. For a system receiving millions of transactions from a core banking system this causes severe performance problems — every import would stall while Odoo runs statistical queries for every single row.
+
+The daemon moves screening out of the insert path entirely. Transactions are saved to the database immediately (state = `new`). The daemon then picks them up in controlled batches and screens them asynchronously.
+
+### How It Works
+
+```
+Terminal (screen_daemon.py)
+│
+├─ 1. Reads credentials from .env
+│       ODOO_URL, ODOO_DATABASE, ODOO_USERNAME, ODOO_PASSWORD
+│       SCREEN_BATCH_SIZE, SCREEN_SLEEP_SECONDS
+│
+├─ 2. Authenticates via Odoo XML-RPC
+│       POST /xmlrpc/2/common → authenticate() → returns uid
+│
+└─ 3. while True loop
+        │
+        ├─ Search: find up to BATCH_SIZE transactions where state = 'new', oldest first
+        │
+        ├─ If found: call multi_screen([id1, id2, id3 ...])
+        │    │
+        │    └─ Odoo ORM loads those records as a recordset
+        │         └─ for each transaction:
+        │               action_screen()
+        │                 ├─ screening rules run → history saved
+        │                 └─ _run_aml_detection() → alerts created
+        │               transaction.state → 'done'
+        │
+        ├─ If not found: idle (prints every 30 cycles so you know it is alive)
+        │
+        └─ sleep(SCREEN_SLEEP_SECONDS) → repeat
+```
+
+### what `multi_screen` is
+
+`multi_screen` is a method on `res.customer.transaction` that safely loops over a recordset and calls `action_screen()` on each transaction individually:
+
+```python
+def multi_screen(self):          # self = recordset of N transactions
+    for e in self:               # one transaction at a time
+        try:
+            e.action_screen()    # rules → AML → state = done
+        except Exception as ex:
+            print(...)           # one failure does not abort the batch
+```
+
+When the daemon calls `multi_screen([1001, 1002, 1003])` via XML-RPC, Odoo loads those three transaction records and sets them as `self` before the method runs. The try/except inside means if transaction 1002 raises an error (e.g. missing customer), 1001 and 1003 still get screened.
+
+### What the while loop is for
+
+Without the loop, the script would connect, process one batch, print results, and exit. The loop makes it keep running — every `SCREEN_SLEEP_SECONDS` seconds it checks again for new transactions. Set `SCREEN_SLEEP_SECONDS=0` in `.env` to run continuously with no pause between batches for maximum throughput.
+
+### Configuration (.env variables)
+
+| Variable | Default | Description |
+|---|---|---|
+| `ODOO_URL` | `http://localhost:8069` | URL of the running Odoo instance |
+| `ODOO_DATABASE` | `compliance_db` | Database to connect to |
+| `ODOO_USERNAME` | `cco` | Odoo user login (must have access to `res.customer.transaction`) |
+| `ODOO_PASSWORD` | — | That user's password |
+| `SCREEN_BATCH_SIZE` | `100` | How many transactions to process per cycle. Raise for throughput, lower if cycles time out. |
+| `SCREEN_SLEEP_SECONDS` | `1` | Seconds to pause between cycles. Set to `0` for continuous processing. |
+
+### Running the Daemon
+
+```bash
+cd /home/novaji/odoo
+python3 screen_daemon.py
+```
+
+Sample output:
+```
+[20:19:45] Connected  db=compliance_db  uid=2  batch=100  interval=1.0s
+[20:19:45] Daemon running — press Ctrl+C to stop
+
+[20:19:46]  cycle=     1  batch= 100  total=      100
+[20:19:47]  cycle=     2  batch=  87  total=      187
+[20:19:48]  cycle=     3  idle  total=      187
+```
+
+Stop it at any time with **Ctrl+C**.

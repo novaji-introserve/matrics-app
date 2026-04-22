@@ -3,7 +3,7 @@
 Compliance Management Demo Data Generator
 ==========================================
 Run with:
-    python odoo-bin shell -d <your_db> --no-http < generate_demo_data.py
+    python odoo-bin shell -c odoo.conf -d <your_db> --no-http < generate_demo_data.py
 
 Or inside an Odoo shell session, paste the content.
 
@@ -29,6 +29,7 @@ DEMO_CONFIG = {
     'genders': {'count': 2, 'enabled': True},           # Male/Female
     'tiers': {'count': 3, 'enabled': True},             # Tier 1/2/3
     'sectors': {'count': 12, 'enabled': True},          # Industry sectors
+    'industries': {'count': 12, 'enabled': True},       # Customer industry classifications
     'education_levels': {'count': 7, 'enabled': True},  # Education levels
     'id_types': {'count': 6, 'enabled': True},          # ID document types
     'kyc_limits': {'count': 3, 'enabled': True},        # KYC limit configurations
@@ -39,7 +40,7 @@ DEMO_CONFIG = {
     'account_types': {'count': 6, 'enabled': True},     # Account product types
 
     # Master Data (Scalable)
-    'individual_customers': {'count': 100, 'enabled': True},   # Individual customers
+    'individual_customers': {'count': 20, 'enabled': True},   # Individual customers
     'corporate_customers': {'count': 20, 'enabled': True},    # Corporate entities
     'accounts_per_customer': {'min': 1, 'max': 3},            # Accounts per customer
 
@@ -121,9 +122,25 @@ CORPORATE_NAMES = [
 ]
 
 SECTOR_NAMES = [
-    'Agriculture', 'Banking & Finance', 'Construction', 'Education', 'Healthcare', 
-    'Information Technology', 'Manufacturing', 'Oil & Gas', 'Real Estate', 
+    'Agriculture', 'Banking & Finance', 'Construction', 'Education', 'Healthcare',
+    'Information Technology', 'Manufacturing', 'Oil & Gas', 'Real Estate',
     'Retail & Trading', 'Telecommunications', 'Transport & Logistics'
+]
+
+# (name, code) pairs — code must be unique and non-null
+INDUSTRY_NAMES = [
+    ('Agribusiness',               'AGRI'),
+    ('Financial Services',         'FINS'),
+    ('Civil Engineering',          'CENG'),
+    ('Education & Training',       'EDTR'),
+    ('Pharmaceuticals & Health',   'PHRM'),
+    ('Software & IT Services',     'SITS'),
+    ('Heavy Manufacturing',        'HMFG'),
+    ('Petroleum & Energy',         'PENG'),
+    ('Property & Mortgage',        'PROP'),
+    ('Consumer Goods & Retail',    'CGRT'),
+    ('Telecom & Media',            'TMED'),
+    ('Shipping & Logistics',       'SLOG'),
 ]
 
 TIER_NAMES = [
@@ -432,6 +449,21 @@ if DEMO_CONFIG['sectors']['enabled'] and DEMO_CONFIG['sectors']['count'] > 0:
     print(f"   {len(sectors)} sectors ready.")
 
 # ──────────────────────────────────────────────────────────────
+# 5b. CUSTOMER INDUSTRIES  (customer.industry — separate from sector)
+# ──────────────────────────────────────────────────────────────
+industries = []
+if DEMO_CONFIG.get('industries', {}).get('enabled') and DEMO_CONFIG['industries']['count'] > 0:
+    print("\n[5b/22] Creating Customer Industries...")
+    target = min(DEMO_CONFIG['industries']['count'], len(INDUSTRY_NAMES))
+    for name, code in INDUSTRY_NAMES[:target]:
+        rec = env['customer.industry'].search([('code', '=', code)], limit=1)
+        if not rec:
+            rec = env['customer.industry'].create({'name': name, 'code': code})
+        industries.append(rec)
+    track_stat('Industries', len(industries))
+    print(f"   {len(industries)} industries ready.")
+
+# ──────────────────────────────────────────────────────────────
 # 6. EDUCATION LEVELS
 # ──────────────────────────────────────────────────────────────
 edu_levels = []
@@ -650,6 +682,7 @@ if DEMO_CONFIG['individual_customers']['enabled'] and DEMO_CONFIG['individual_cu
             'risk_level': risk,
             'risk_score': {'low': random.uniform(0, 30), 'medium': random.uniform(31, 60), 'high': random.uniform(61, 100)}[risk],
             'sector_id': random.choice(sectors).id if sectors else False,
+            'customer_industry_id': random.choice(industries).id if industries else False,
             'tier_id': tiers[tier_idx].id if tiers and tier_idx < len(tiers) else False,
             'branch_id': random.choice(branches).id if branches else False,
             'account_officer_id': random.choice(officers).id if officers else False,
@@ -727,6 +760,7 @@ if DEMO_CONFIG['corporate_customers']['enabled'] and DEMO_CONFIG['corporate_cust
             'risk_level': risk,
             'risk_score': {'low': random.uniform(0, 30), 'medium': random.uniform(31, 60), 'high': random.uniform(61, 100)}[risk],
             'sector_id': random.choice(sectors).id if sectors else False,
+            'customer_industry_id': random.choice(industries).id if industries else False,
             'tier_id': tiers[tier_idx].id if tiers and tier_idx < len(tiers) else False,
             'branch_id': random.choice(branches).id if branches else False,
             'account_officer_id': random.choice(officers).id if officers else False,
@@ -1107,6 +1141,8 @@ if DEMO_CONFIG.get('transactions_per_account'):
                 'account_officer_id': acct.account_officer_id.id if acct.account_officer_id else False,
                 'tran_type': tran_type.id if tran_type else False,
                 'amount': base_amount,
+                'amount_local': base_amount,
+                'transmode_code': random.choice(['A', 'E', 'T', 'B']),
                 'currency_id': ngn_currency.id if ngn_currency else False,
                 'narration': f'{tran_type.tranname if tran_type else "Transaction"} - {ref}',
                 'date_created': trans_date,

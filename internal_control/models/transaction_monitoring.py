@@ -854,7 +854,7 @@ class TransactionMonitoring(models.Model):
 
 
     @api.model
-    def action_screen(self):
+    def action_screen(self, rules=None):
         '''
         Apply additional logic here if needed
         This method is called when the screen action is triggered.
@@ -863,7 +863,7 @@ class TransactionMonitoring(models.Model):
         records = self.search([])
         for record in records:
             try:
-                super(TransactionMonitoring, record).action_screen()
+                super(TransactionMonitoring, record).action_screen(rules=rules)
             except Exception as e:
                 _logger.error(f"Error screening transaction {record.id}: {str(e)}")
                 continue

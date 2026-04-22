@@ -45,7 +45,13 @@ class Transaction(models.Model):
         10, 2), related="customer_id.risk_score")
     risk_level = fields.Char(string='Risk Rating',
                              related="customer_id.risk_level")
-    
+    transaction_risk_level = fields.Selection(
+        string='Transaction Risk Level',
+        selection=[('low', 'Low'), ('medium', 'Medium'), ('high', 'High')],
+        tracking=True, index=True,
+        help="Worst risk level matched by screening rules on this transaction.",
+    )
+
     state = fields.Selection(string='Status', selection=[(
         'new', 'To Review'), ('done', 'Done')], tracking=True, index=True, default='new')
     likely_fraud = fields.Boolean(string='Likely Fraud',tracking=True,related='rule_id.likely_fraud')
@@ -85,11 +91,8 @@ class Transaction(models.Model):
     
     
     @api.model
-    def create(self,vals_list):
-        records = super(Transaction, self).create(vals_list)
-        for rec in records:
-            rec.action_screen()
-        return records
+    def create(self, vals_list):
+        return super(Transaction, self).create(vals_list)
 
     @api.depends('rule_ids')
     def transaction_total_rules(self):
@@ -199,85 +202,150 @@ class Transaction(models.Model):
             e.write({'state': 'done'})
             
     def multi_screen(self):
-        for e in self:
-            try:
-                e.action_screen()
-            except Exception as ex:
-                print(f"Error screening transaction {e.name}: {ex}")
-
-    def action_screen(self):
-        if not self:
-            return
-        self.ensure_one()
         rules = self.env['res.transaction.screening.rule'].search(
-            [('state', '=', 'active')], order='priority')
-        
-        if rules:
-            risk_levels = []
-            for rule in rules:
-                # try:
-                if rule.condition_select == 'python':
-                    localdict = {
-                        'result': None,
-                        'transaction': self,
-                        'customer': self.customer_id,
-                        'branch': self.branch_id,
-                        'account': self.account_id,
-                        'currency': self.currency_id,
-                        'env': self.env
-                    }
-                    if rule._satisfy_condition(localdict) == True:
-                        history_id = self.env['res.transaction.screening.history'].create({
-                            'transaction_id': self.id,
-                            'rule_id': rule.id,
-                            'risk_level': rule.risk_level
-                        })
-                        self.rule_id = rule
-                        risk_levels.append(rule.risk_level)
-                        if rule.transaction_flag =='suspicious':
-                            self.action_mark_as_suspicious()
-                            
-                if rule.condition_select == 'sql':
-                    # self.action_compute_rule_lines(rule)
-                    query = rule.sql_query
-                    char_to_replace = {
-                                    '#TRANSACTION_ID#': f"{self.id}",
-                                    '#AMOUNT#': f"{self.amount}",
-                                    '#ACCOUNT_ID#': f"{self.account_id.id}",
-                                    "#CUSTOMER_ID#": f"{self.customer_id.id}",
-                                    # "#TRAN_DATE#": f"{self.date_created}",
-                                    "#TRAN_DATE#": f"{self.date_created or (self.created_date if hasattr(self, 'created_date') else None)}",
-                                    "#BRANCH_ID#": f"{self.branch_id.id}",
-                                    "#CURRENCY_ID#": f"{self.currency_id.id}"}
-                    # Iterate over all key-value pairs in dictionary
-                    for key, value in char_to_replace.items():
-                        # Replace key character with value character in string
-                        query = query.replace(key, value)
-                        
-                    self.env.cr.execute(query)
-                    _logger.info(f'this is the query to execute {query}')
-                    rec = self.env.cr.fetchone()
-                    _logger.info(f'this is the result of the query {rec}, this is the trans amount {self.amount}')
-                    if rec is not None:
-                        history_id = self.env['res.transaction.screening.history'].create({
-                            'transaction_id': self.id,
-                            'rule_id': rule.id,
-                            'risk_level': rule.risk_level
-                        })
-                        self.rule_id = rule
-                        risk_levels.append(rule.risk_level)
-                        if rule.transaction_flag =='suspicious':
-                            self.action_mark_as_suspicious()
-            
-            if 'high' in risk_levels:
-                self.risk_level = 'high'
-                return
-            if 'medium' in risk_levels:
-                self.risk_level = 'medium'
-                return
-            self.risk_level = 'low'
+            [('state', '=', 'active')], order='priority'
+        )
+        if not rules:
+            return True
+
+        for tx in self:
+            try:
+                tx.action_screen(rules=rules)  
+            except Exception as ex:
+                _logger.error("Error screening transaction %s: %s", tx.name, ex)
+        return True
+
+    def action_screen(self, rules=None):
+        """
+        Screen a single transaction against all active rules.
+
+        Args:
+            rules: pre-fetched recordset from multi_screen().
+                If None (called from a UI button) rules are fetched here.
+        """
+        self.ensure_one()
+
+        # Fallback: called standalone from UI button
+        if rules is None:
+            rules = self.env['res.transaction.screening.rule'].search(
+                [('state', '=', 'active')], order='priority asc'
+            )
+
+        if not rules:
+            _logger.info("[action_screen] No active rules — marking done  ref=%s", self.name)
+            self.write({'state': 'done'})
             return
-                
+
+        _logger.debug(
+            "[action_screen] START  ref=%s | amount=%s | customer=%s | rules=%d",
+            self.name, self.amount, self.customer_id.name or 'N/A', len(rules)
+        )
+
+        # Clear stale history so re-screening doesn't produce duplicate rows
+        self.env['res.transaction.screening.history'].search(
+            [('transaction_id', '=', self.id)]
+        ).unlink()
+
+        risk_levels  = []
+        matched_rule = None
+
+        for rule in rules:
+            matched = False
+
+            try:
+                with self.env.cr.savepoint():
+                    if rule.condition_select == 'python':
+                        localdict = {
+                            'result':      False,
+                            'transaction': self,
+                            'customer':    self.customer_id,
+                            'branch':      self.branch_id,
+                            'account':     self.account_id,
+                            'currency':    self.currency_id,
+                            'env':         self.env,
+                        }
+                        matched = rule._satisfy_condition(localdict)
+                        _logger.debug(
+                            "[action_screen] rule='%s' (python) → %s",
+                            rule.name, 'MATCHED' if matched else 'no match'
+                        )
+
+                    elif rule.condition_select == 'sql':
+                        placeholders = {
+                            '#TRANSACTION_ID#': str(self.id),
+                            '#AMOUNT#':         str(self.amount),
+                            '#ACCOUNT_ID#':     str(self.account_id.id),
+                            '#CUSTOMER_ID#':    str(self.customer_id.id),
+                            '#TRAN_DATE#':      str(self.date_created or ''),
+                            '#BRANCH_ID#':      str(self.branch_id.id),
+                            '#CURRENCY_ID#':    str(self.currency_id.id),
+                        }
+                        query = rule.sql_query
+                        for placeholder, value in placeholders.items():
+                            query = query.replace(placeholder, value)
+
+                        self.env.cr.execute(query)
+                        rec     = self.env.cr.fetchone()
+                        matched = rec is not None
+                        _logger.debug(
+                            "[action_screen] rule='%s' (sql) → %s | result=%s",
+                            rule.name, 'MATCHED' if matched else 'no match', rec
+                        )
+
+                    else:
+                        _logger.warning(
+                            "[action_screen] rule='%s' has unknown condition_select='%s' — skipped",
+                            rule.name, rule.condition_select
+                        )
+
+            except Exception as ex:
+                # One broken rule must NOT abort screening of the remaining rules
+                _logger.error(
+                    "[action_screen] rule='%s' raised an error on tx=%s: %s",
+                    rule.name, self.name, ex, exc_info=True
+                )
+                continue
+
+            if matched:
+                self.env['res.transaction.screening.history'].create({
+                    'transaction_id': self.id,
+                    'rule_id':        rule.id,
+                    'risk_level':     rule.risk_level,
+                })
+                risk_levels.append(rule.risk_level)
+                matched_rule = rule  
+
+                if rule.transaction_flag == 'suspicious':
+                    self.action_mark_as_suspicious()
+                    _logger.info(
+                        "[action_screen] tx=%s marked SUSPICIOUS by rule='%s'",
+                        self.name, rule.name
+                    )
+                elif rule.transaction_flag == 'unusual':
+                    self.action_mark_unusual()
+                    _logger.info(
+                        "[action_screen] tx=%s marked UNUSUAL by rule='%s'",
+                        self.name, rule.name
+                    )
+
+        # Worst risk level wins: high > medium > low
+        RISK_ORDER = ['high', 'medium', 'low']
+        final_risk = next((r for r in RISK_ORDER if r in risk_levels), 'low')
+
+        _logger.info(
+            "[action_screen] DONE  ref=%s | matched=%d rule(s) | final_risk=%s",
+            self.name, len(risk_levels), final_risk
+        )
+
+        # Single write — one UPDATE to the DB instead of scattered assignments
+        vals = {
+            'state':                  'done',
+            'transaction_risk_level': final_risk,   # dedicated field, NOT the related= risk_level
+        }
+        if matched_rule:
+            vals['rule_id'] = matched_rule.id
+
+        self.write(vals)                
 
     @api.model
     def open_transactions(self):

@@ -18,9 +18,7 @@
                                 <field name="currency_id" />
                                 <field name="active" widget="boolean_toggle" />
                             </group>
-                            <group string="CTR Threshold">
-                                <field name="ctr_threshold" />
-                            </group>
+
                         </group>
                         <notebook>
                             <page string="Velocity Detection">
@@ -43,12 +41,19 @@
                                     <field name="anomaly_min_history" />
                                 </group>
                             </page>
+                            <page string="Dormant Account Detection">
+                                <group>
+                                    <field name="dormant_enabled" widget="boolean_toggle" />
+                                    <field name="dormant_min_days" attrs="{'invisible': [('dormant_enabled','=',False)]}" />
+                                </group>
+                            </page>
                             <page string="Risk Weights">
                                 <p class="text-muted">Weights must sum to 1.0</p>
                                 <group>
                                     <field name="velocity_risk_weight" />
                                     <field name="structuring_risk_weight" />
                                     <field name="anomaly_risk_weight" />
+                                    <field name="dormant_risk_weight" />
                                 </group>
                             </page>
                         </notebook>
@@ -63,7 +68,6 @@
             <field name="arch" type="xml">
                 <tree string="AML Configurations">
                     <field name="name" />
-                    <field name="ctr_threshold" />
                     <field name="currency_id" />
                     <field name="velocity_window_hours" />
                     <field name="structuring_window_hours" />
@@ -80,15 +84,16 @@
                 <p class="o_view_nocontent_smiling_face">
                     Create your AML detection configuration
                 </p>
-                <p>Set the dynamic CTR threshold, velocity, structuring and anomaly detection parameters.</p>
+                <p>Set velocity, structuring, anomaly and dormant account detection parameters. CTR thresholds are managed in NFIU Currency Thresholds.</p>
             </field>
         </record>
 
+        <!-- Configuration > Transaction Monitoring > AML Configuration -->
         <menuitem
             id="menu_aml_config"
             name="AML Configuration"
             action="action_aml_config"
-            parent="compliance_management.menu_compliance_configuration"
+            parent="compliance_management.menu_compliance_transaction_screening"
             groups="compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer"
             sequence="95" />
 
@@ -117,7 +122,7 @@
             id="menu_aml_customer_profile"
             name="AML Customer Profiles"
             action="action_aml_customer_profile"
-            parent="compliance_management.menu_compliance_configuration"
+            parent="compliance_management.menu_compliance_transaction_screening"
             groups="compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer"
             sequence="96" />
 

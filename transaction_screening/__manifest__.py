@@ -25,6 +25,8 @@
     'data': [
         'security/ir.model.access.csv',
         'data/aml_sequences.xml',
+        'security/aml_dormant_access.xml',
+        'demo/demo.xml',
         'views/transaction_screening_rule.xml',
         'views/transaction.xml',
         'views/aml_config.xml',
@@ -32,8 +34,6 @@
         'views/menuitems.xml',
     ],
 
-    'demo': [
-        'demo/demo.xml',
-    ],
+    'demo': [],
     'license': 'LGPL-3',
 }

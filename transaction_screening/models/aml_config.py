@@ -17,15 +17,6 @@ class AMLConfig(models.Model):
         required=True,
     )
 
-    # CTR threshold — configurable per NFIU directive
-    ctr_threshold = fields.Monetary(
-        string='CTR Threshold',
-        currency_field='currency_id',
-        default=5000000.0,
-        required=True,
-        help="Cash Transaction Report threshold. Transactions at or above this trigger CTR filing.",
-    )
-
     # Velocity detection
     velocity_window_hours = fields.Integer(
         string='Velocity Window (hours)', default=24, required=True,
@@ -67,29 +58,46 @@ class AMLConfig(models.Model):
         help="Minimum historical transactions required before anomaly detection activates.",
     )
 
+    # Dormant account detection
+    dormant_enabled = fields.Boolean(
+        string='Enable Dormant Account Detection', default=True,
+        help="Flag transactions from accounts that have been inactive for a long period.",
+    )
+    dormant_min_days = fields.Integer(
+        string='Dormancy Threshold (days)', default=180, required=True,
+        help="Number of days of inactivity before an account is considered dormant.",
+    )
+
     # Composite risk weights (must sum to 1.0)
     velocity_risk_weight = fields.Float(string='Velocity Risk Weight', default=0.30)
-    structuring_risk_weight = fields.Float(string='Structuring Risk Weight', default=0.40)
-    anomaly_risk_weight = fields.Float(string='Anomaly Risk Weight', default=0.30)
+    structuring_risk_weight = fields.Float(string='Structuring Risk Weight', default=0.35)
+    anomaly_risk_weight = fields.Float(string='Anomaly Risk Weight', default=0.25)
+    dormant_risk_weight = fields.Float(
+        string='Dormant Account Risk Weight', default=0.10,
+        help="Weight of dormant account score in the composite AML risk score.",
+    )
 
-    @api.constrains('velocity_risk_weight', 'structuring_risk_weight', 'anomaly_risk_weight')
+    @api.constrains('velocity_risk_weight', 'structuring_risk_weight', 'anomaly_risk_weight', 'dormant_risk_weight')
     def _check_weights(self):
         for rec in self:
-            total = rec.velocity_risk_weight + rec.structuring_risk_weight + rec.anomaly_risk_weight
+            total = (rec.velocity_risk_weight + rec.structuring_risk_weight
+                     + rec.anomaly_risk_weight + rec.dormant_risk_weight)
             if abs(total - 1.0) > 0.001:
                 raise ValidationError(
-                    "Risk weights must sum to 1.0 (currently %.3f). Adjust Velocity + Structuring + Anomaly weights." % total
+                    "Risk weights must sum to 1.0 (currently %.3f). "
+                    "Adjust Velocity + Structuring + Anomaly + Dormant weights." % total
                 )
 
-    @api.constrains('ctr_threshold')
-    def _check_ctr_threshold(self):
-        for rec in self:
-            if rec.ctr_threshold <= 0:
-                raise ValidationError("CTR threshold must be a positive amount.")
-
     @api.model
-    def get_active_config(self):
-        """Return active config, creating a default if none exists."""
+    def get_active_config(self, currency=None):
+        """Return active config for the given currency, falling back to the default."""
+        if currency:
+            config = self.search(
+                [('active', '=', True), ('currency_id', '=', currency.id)],
+                limit=1, order='write_date desc',
+            )
+            if config:
+                return config
         config = self.search([('active', '=', True)], limit=1, order='write_date desc')
         if not config:
             config = self.create({'name': 'Default AML Configuration'})

@@ -54,47 +54,47 @@
     <menuitem
         id="menu_regulatory_report"
         name="Regulatory"
-        groups="compliance_management.group_compliance_compliance_officer,base.group_system"
+        groups="compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer,base.group_system"
         parent="compliance_management.menu_compliance_configuration"
         sequence="3000" />
     <menuitem
         id="menu_regulatory_report_entity"
         name="Report Entities"
-        groups="compliance_management.group_compliance_compliance_officer,base.group_system"
+        groups="compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer,base.group_system"
         parent="menu_regulatory_report"
         action="action_regulatory_report_entity"
         sequence="5" />
     <menuitem
         id="menu_regulatory_report_template"
         name="Report Templates"
-        groups="compliance_management.group_compliance_compliance_officer,base.group_system"
+        groups="compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer,base.group_system"
         parent="menu_regulatory_report"
         action="action_regulatory_report_template"
         sequence="10" />
     <menuitem
         id="menu_regulatory_report_item"
         name="Report Items"
-        groups="compliance_management.group_compliance_compliance_officer,base.group_system"
+        groups="compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer,base.group_system"
         parent="menu_regulatory_report"
         action="action_regulatory_report_item"
         sequence="20" />
      <menuitem
         id="menu_regulatory_report_template_item"
         name="Report Template Items"
-        groups="compliance_management.group_compliance_compliance_officer,base.group_system"
+        groups="compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer,base.group_system"
         parent="menu_regulatory_report"
         action="action_regulatory_report_template_item"
         sequence="20" />
     <menuitem
         id="menu_regulatory_report_root"
         name="Regulatory"
-        groups="group_regulatory_report,base.group_system"
+        groups="compliance_management.group_compliance_chief_compliance_officer,group_regulatory_report,base.group_system"
         parent="compliance_management.menu_compliance_root"
         sequence="1000" />
     <menuitem
         id="menu_regulatory_report_report"
         name="Reports"
-        groups="group_regulatory_report,base.group_system"
+        groups="compliance_management.group_compliance_chief_compliance_officer,group_regulatory_report,base.group_system"
         parent="menu_regulatory_report_root"
         action="action_regulatory_report"
         sequence="1000" />

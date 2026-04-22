@@ -43,6 +43,7 @@
         'views/report.xml',
         'views/menuitems.xml',
         'data/report_entity_data.xml',
+        'data/report_template_data.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

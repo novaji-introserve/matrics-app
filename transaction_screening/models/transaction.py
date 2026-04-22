@@ -27,6 +27,9 @@ class Transaction(models.Model):
     aml_anomaly_alert_ids = fields.One2many(
         'res.aml.anomaly.alert', 'transaction_id', string='Anomaly Alerts', readonly=True,
     )
+    aml_dormant_alert_ids = fields.One2many(
+        'res.aml.dormant.alert', 'transaction_id', string='Dormant Account Alerts', readonly=True,
+    )
 
     @api.model
     def action_view_blocked_transactions(self):
@@ -60,8 +63,8 @@ class Transaction(models.Model):
         for transaction in self:
             transaction.write({'blocked': False})
 
-    def action_screen(self):
-        result = super().action_screen()
+    def action_screen(self, rules=None):
+        result = super().action_screen(rules=rules)
         exceptions = self.env['res.transaction.screening.history'].search([
             ('transaction_id', '=', self.id)
         ])
@@ -76,11 +79,11 @@ class Transaction(models.Model):
     # ------------------------------------------------------------------ AML detection
 
     def _run_aml_detection(self):
-        """Run velocity, structuring and anomaly checks; update composite aml_risk_score."""
+        """Run velocity, structuring, anomaly and dormant checks; update composite aml_risk_score."""
         if not self.customer_id:
             return 0.0
 
-        config = self.env['res.aml.config'].get_active_config()
+        config = self.env['res.aml.config'].get_active_config(currency=self.currency_id)
         flags = []
 
         v_score = self._check_velocity(config)
@@ -95,10 +98,15 @@ class Transaction(models.Model):
         if a_score > 0:
             flags.append('ANOMALY')
 
+        d_score = self._check_dormant(config)
+        if d_score > 0:
+            flags.append('DORMANT')
+
         composite = round(
             v_score * config.velocity_risk_weight +
             s_score * config.structuring_risk_weight +
-            a_score * config.anomaly_risk_weight,
+            a_score * config.anomaly_risk_weight +
+            d_score * config.dormant_risk_weight,
             2,
         )
 
@@ -138,7 +146,16 @@ class Transaction(models.Model):
 
     def _check_structuring(self, config):
         """Detect structuring: multiple sub-CTR-threshold transactions whose total approaches the threshold."""
-        threshold = config.ctr_threshold
+        # Pull NFIU-mandated threshold by currency + customer type (individual vs corporate)
+        status_value = self.customer_id.customer_status.customer_status
+        customer_type = self.env['customer.type.config'].get_customer_type(status_value)
+        nfiu_threshold = self.env['nfiu.currency.threshold'].search([
+            ('currency_id', '=', self.currency_id.id),
+            ('customer_type', '=', customer_type),
+        ], limit=1)
+        if not nfiu_threshold:
+            return 0.0
+        threshold = nfiu_threshold.threshold
         amount = self.amount or 0.0
 
         # A transaction at or above the threshold is a direct CTR event, not structuring
@@ -197,4 +214,35 @@ class Transaction(models.Model):
             })
 
         profile.update_with_transaction(amount)
+        return risk_score
+
+    def _check_dormant(self, config):
+        """Flag if the customer's account was inactive for longer than dormant_min_days."""
+        if not config.dormant_enabled:
+            return 0.0
+
+        current_date = self.date_created or fields.Datetime.now()
+        last_txn = self.env['res.customer.transaction'].search([
+            ('customer_id', '=', self.customer_id.id),
+            ('date_created', '<', current_date),
+            ('id', '!=', self.id),
+            ('state', 'not in', ['cancelled', 'rejected']),
+        ], order='date_created desc', limit=1)
+
+        if not last_txn:
+            return 0.0
+
+        dormant_days = (current_date - last_txn.date_created).days
+        if dormant_days < config.dormant_min_days:
+            return 0.0
+
+        risk_score = min(100.0, (dormant_days / config.dormant_min_days) * 60)
+        self.env['res.aml.dormant.alert'].create({
+            'transaction_id': self.id,
+            'customer_id': self.customer_id.id,
+            'last_transaction_date': last_txn.date_created,
+            'dormant_days': dormant_days,
+            'transaction_amount': self.amount or 0.0,
+            'risk_score': risk_score,
+        })
         return risk_score

@@ -704,28 +704,28 @@
 
 
     <!-- Compliance module root menu item -->
-    <menuitem id="menu_compliance_root" name="Compliance" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer,compliance_management.group_compliance_relationship_manager,compliance_management.group_compliance_transaction_monitoring_team" web_icon="compliance_management,static/description/icons-compliance.png" sequence="-1000" />
+    <menuitem id="menu_compliance_root" name="Compliance" groups="compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer,compliance_management.group_compliance_relationship_manager,compliance_management.group_compliance_transaction_monitoring_team" web_icon="compliance_management,static/description/icons-compliance.png" sequence="-1000" />
 
     <!-- Risk main menu -->
-    <menuitem id="menu_compliance_risk" name="Risk" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_compliance_risk_manager" parent="menu_compliance_root" sequence="30" />
+    <menuitem id="menu_compliance_risk" name="Risk" groups="compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_compliance_risk_manager" parent="menu_compliance_root" sequence="30" />
 
     <!-- Configuration main menu -->
-    <menuitem id="menu_compliance_configuration" name="Configuration" groups="compliance_management.group_compliance_compliance_officer,base.group_system" parent="menu_compliance_root" sequence="1500" />
+    <menuitem id="menu_compliance_configuration" name="Configuration" groups="compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer,base.group_system" parent="menu_compliance_root" sequence="1500" />
 
     <!-- Sanction screening main menu -->
-    <menuitem id="menu_sanction_screening_root" name="Screening" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" parent="menu_compliance_root" sequence="150" />
+    <menuitem id="menu_sanction_screening_root" name="Screening" groups="compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" parent="menu_compliance_root" sequence="150" />
 
     <!-- Due dilligence main menu -->
-    <menuitem id="menu_compliance_dd" name="Due Diligence" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer,compliance_management.group_compliance_transaction_monitoring_team" parent="menu_compliance_root" sequence="5" />
+    <menuitem id="menu_compliance_dd" name="Due Diligence" groups="compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer,compliance_management.group_compliance_transaction_monitoring_team" parent="menu_compliance_root" sequence="5" />
 
     <!-- KYC main menu -->
-    <menuitem id="menu_compliance_kyc" name="KYC" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer,compliance_management.group_compliance_relationship_manager,compliance_management.group_compliance_transaction_monitoring_team" parent="menu_compliance_root" sequence="10" />
+    <menuitem id="menu_compliance_kyc" name="KYC" groups="compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer,compliance_management.group_compliance_relationship_manager,compliance_management.group_compliance_transaction_monitoring_team" parent="menu_compliance_root" sequence="10" />
 
     <!-- Dashboard main menu -->
-    <menuitem id="menu_compliance_dashboard" name="Dashboard" action="action_compliance_dashboard" parent="compliance_management.menu_compliance_root" groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" sequence="-1" />
+    <menuitem id="menu_compliance_dashboard" name="Dashboard" action="action_compliance_dashboard" parent="compliance_management.menu_compliance_root" groups="compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer" sequence="-1" />
 
     <!-- Adverse media main menu -->
-    <menuitem id="menu_adverse_media_root" name="Adverse Media" parent="menu_compliance_root" sequence="499" groups="compliance_management.group_compliance_compliance_officer" />
+    <menuitem id="menu_adverse_media_root" name="Adverse Media" parent="menu_compliance_root" sequence="499" groups="compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer" />
 
     <!-- Main menu for customer on sidebar -->
     <menuitem name="Customers" id="contacts.menu_contacts" sequence="20" web_icon="compliance_management,static/description/icons-contact.png" groups="group_tech_support" />
