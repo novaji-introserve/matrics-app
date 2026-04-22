@@ -105,7 +105,8 @@ class Report(models.Model):
             run = self.env['res.regulatory.report.run'].create({
                 'name': self.name,
                 'processed_file': processed_binary,
-                'processed_filename': f"{self.template_id.entity_id.code}_{self.template_id.code}",
+                'processed_filename': f"{self.template_id.entity_id.code}_{self.template_id.code}.xlsx",
+                # 'processed_filename': f"{self.template_id.entity_id.code}_{self.template_id.code}",
                 'changes_count': 1,
                 'report_id': self.id
             })

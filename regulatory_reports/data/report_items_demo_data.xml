@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ════════════════════════════════════════════════════════════════
+             STATIC ITEMS — Fixed values updated manually each month
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="item_institution_name" model="res.regulatory.report.item">
+            <field name="name">Institution Name</field>
+            <field name="code">INST_NAME</field>
+            <field name="source">static</field>
+            <field name="source_value">Sterling Plc</field>
+            <field name="status">active</field>
+            <field name="description">Legal name of the reporting institution</field>
+        </record>
+
+        <record id="item_cbn_code" model="res.regulatory.report.item">
+            <field name="name">CBN Institution Code</field>
+            <field name="code">CBN_CODE</field>
+            <field name="source">static</field>
+            <field name="source_value">000016</field>
+            <field name="status">active</field>
+            <field name="description">CBN assigned institution code</field>
+        </record>
+
+        <record id="item_reporting_period" model="res.regulatory.report.item">
+            <field name="name">Reporting Period</field>
+            <field name="code">RPT_PERIOD</field>
+            <field name="source">static</field>
+            <field name="source_value">April 2026</field>
+            <field name="status">active</field>
+            <field name="description">Reporting month and year. Update this every month before running the report.</field>
+        </record>
+
+        <record id="item_prepared_by" model="res.regulatory.report.item">
+            <field name="name">Prepared By</field>
+            <field name="code">PREPARED_BY</field>
+            <field name="source">static</field>
+            <field name="source_value">Chief Compliance Officer</field>
+            <field name="status">active</field>
+            <field name="description">Name and title of the officer preparing the return</field>
+        </record>
+
+        <record id="item_date_submitted" model="res.regulatory.report.item">
+            <field name="name">Date Submitted</field>
+            <field name="code">DATE_SUBMITTED</field>
+            <field name="source">sql_single</field>
+            <field name="source_sql">SELECT TO_CHAR(NOW(), 'DD-Mon-YYYY')</field>
+            <field name="status">active</field>
+            <field name="description">Today's date — auto-generated when report is run</field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             SECTION A — BALANCE SHEET
+             NOTE: items marked static require the Odoo accounting module
+             (account_move_line) which is not installed. Update manually or
+             switch source to sql_single once accounting is enabled.
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="item_total_assets" model="res.regulatory.report.item">
+            <field name="name">Total Assets</field>
+            <field name="code">TOTAL_ASSETS</field>
+            <field name="source">static</field>
+            <field name="source_value">0.00</field>
+            <field name="status">active</field>
+            <field name="description">
+                Sum of all asset accounts in millions (NGN). Update manually.
+                Switch to sql_single with the query below once the accounting
+                module (account_move_line) is installed:
+                SELECT ROUND(SUM(debit - credit) / 1000000.0, 2)
+                FROM account_move_line aml
+                JOIN account_account aa ON aa.id = aml.account_id
+                WHERE aa.account_type IN ('asset_current','asset_non_current','asset_fixed')
+                AND aml.parent_state = 'posted'
+            </field>
+        </record>
+
+        <record id="item_total_loans" model="res.regulatory.report.item">
+            <field name="name">Total Loans and Advances</field>
+            <field name="code">TOTAL_LOANS</field>
+            <field name="source">sql_single</field>
+            <field name="source_sql">
+                SELECT COALESCE(ROUND(SUM(amount) / 1000000.0, 2), 0)
+                FROM res_customer_transaction
+                WHERE transaction_type = 'L'
+                AND state = 'done'
+                AND date_created &lt;= DATE_TRUNC('month', NOW()) + INTERVAL '1 month' - INTERVAL '1 day'
+            </field>
+            <field name="status">active</field>
+            <field name="description">Total outstanding loan balances in millions (NGN). Requires transaction_type = 'L' in res_customer_transaction.</field>
+        </record>
+
+        <record id="item_total_deposits" model="res.regulatory.report.item">
+            <field name="name">Total Deposits</field>
+            <field name="code">TOTAL_DEPOSITS</field>
+            <field name="source">sql_single</field>
+            <field name="source_sql">
+                SELECT COALESCE(ROUND(SUM(amount) / 1000000.0, 2), 0)
+                FROM res_customer_transaction
+                WHERE transaction_type = 'D'
+                AND state = 'done'
+                AND date_created &gt;= DATE_TRUNC('month', NOW())
+                AND date_created &lt;  DATE_TRUNC('month', NOW()) + INTERVAL '1 month'
+            </field>
+            <field name="status">active</field>
+            <field name="description">Total customer deposits this month in millions (NGN). Requires transaction_type = 'D' in res_customer_transaction.</field>
+        </record>
+
+        <record id="item_total_borrowings" model="res.regulatory.report.item">
+            <field name="name">Total Borrowings</field>
+            <field name="code">TOTAL_BORROWINGS</field>
+            <field name="source">static</field>
+            <field name="source_value">0.00</field>
+            <field name="status">active</field>
+            <field name="description">
+                Total borrowings and long-term liabilities in millions (NGN). Update manually.
+                Requires account_move_line (accounting module).
+            </field>
+        </record>
+
+        <record id="item_shareholders_funds" model="res.regulatory.report.item">
+            <field name="name">Shareholders Funds</field>
+            <field name="code">SHAREHOLDERS_FUNDS</field>
+            <field name="source">static</field>
+            <field name="source_value">0.00</field>
+            <field name="status">active</field>
+            <field name="description">
+                Total equity and shareholders funds in millions (NGN). Update manually.
+                Requires account_move_line (accounting module).
+            </field>
+        </record>
+
+        <record id="item_cash_equivalents" model="res.regulatory.report.item">
+            <field name="name">Cash and Equivalents</field>
+            <field name="code">CASH_EQUIV</field>
+            <field name="source">static</field>
+            <field name="source_value">0.00</field>
+            <field name="status">active</field>
+            <field name="description">
+                Cash and cash equivalent balances in millions (NGN). Update manually.
+                Requires account_move_line (accounting module).
+            </field>
+        </record>
+
+        <record id="item_npl" model="res.regulatory.report.item">
+            <field name="name">Non-Performing Loans</field>
+            <field name="code">NPL_AMOUNT</field>
+            <field name="source">sql_single</field>
+            <field name="source_sql">
+                SELECT COALESCE(ROUND(SUM(amount) / 1000000.0, 2), 0)
+                FROM res_customer_transaction
+                WHERE transaction_type = 'L'
+                AND state = 'non_performing'
+            </field>
+            <field name="status">active</field>
+            <field name="description">Total non-performing loan balances in millions (NGN). Requires transaction_type = 'L' and state = 'non_performing'.</field>
+        </record>
+
+        <record id="item_capital_adequacy" model="res.regulatory.report.item">
+            <field name="name">Capital Adequacy Ratio</field>
+            <field name="code">CAR_RATIO</field>
+            <field name="source">static</field>
+            <field name="source_value">18.5%</field>
+            <field name="status">active</field>
+            <field name="description">Capital adequacy ratio. Update manually each month after internal risk-weighted assets calculation. CBN minimum is 15%.</field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             SECTION B — INCOME STATEMENT
+             Requires accounting module (account_move_line). Static for now.
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="item_interest_income" model="res.regulatory.report.item">
+            <field name="name">Interest Income</field>
+            <field name="code">INTEREST_INCOME</field>
+            <field name="source">static</field>
+            <field name="source_value">0.00</field>
+            <field name="status">active</field>
+            <field name="description">
+                Interest income earned this month in millions (NGN). Update manually.
+                Requires account_move_line (accounting module).
+            </field>
+        </record>
+
+        <record id="item_interest_expense" model="res.regulatory.report.item">
+            <field name="name">Interest Expense</field>
+            <field name="code">INTEREST_EXPENSE</field>
+            <field name="source">static</field>
+            <field name="source_value">0.00</field>
+            <field name="status">active</field>
+            <field name="description">
+                Interest expense paid this month in millions (NGN). Update manually.
+                Requires account_move_line (accounting module).
+            </field>
+        </record>
+
+        <record id="item_profit_after_tax" model="res.regulatory.report.item">
+            <field name="name">Profit After Tax</field>
+            <field name="code">PAT</field>
+            <field name="source">static</field>
+            <field name="source_value">0.00</field>
+            <field name="status">active</field>
+            <field name="description">
+                Net profit after tax for the month in millions (NGN). Update manually.
+                Requires account_move_line (accounting module).
+            </field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             LARGE TRANSACTIONS — SQL Multi
+             Returns 7 columns mapped to A3 on LargeTransactions sheet.
+             Columns: S/N, Transaction Ref, Customer Name, Account Number,
+                      Amount, Date, Branch
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="item_large_transactions" model="res.regulatory.report.item">
+            <field name="name">Large Transactions List</field>
+            <field name="code">LARGE_TXN_LIST</field>
+            <field name="source">sql_multi</field>
+            <field name="source_sql">
+                SELECT
+                    ROW_NUMBER() OVER (ORDER BY t.date_created DESC)    AS sn,
+                    COALESCE(t.transaction_number, t.name)               AS transaction_ref,
+                    p.name                                               AS customer_name,
+                    COALESCE(pa.name, '')                                AS account_number,
+                    TO_CHAR(t.amount, 'FM999,999,999,990.00')           AS amount,
+                    TO_CHAR(t.date_created, 'DD-Mon-YYYY')              AS transaction_date,
+                    COALESCE(rb.name, t.branch_code, '')                AS branch
+                FROM res_customer_transaction t
+                JOIN res_partner p  ON p.id  = t.customer_id
+                LEFT JOIN res_partner_account pa ON pa.id = t.account_id
+                LEFT JOIN res_branch rb           ON rb.id = t.branch_id
+                WHERE t.amount &gt;= 5000000
+                AND t.date_created &gt;= DATE_TRUNC('month', NOW())
+                AND t.date_created &lt;  DATE_TRUNC('month', NOW()) + INTERVAL '1 month'
+                ORDER BY t.amount DESC
+            </field>
+            <field name="status">active</field>
+            <field name="description">All transactions above NGN 5,000,000 this month. Returns 7 columns: S/N, Transaction Ref, Customer Name, Account Number, Amount, Date, Branch. Mapped to cell A3 on the LargeTransactions sheet.</field>
+        </record>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             FIRS VAT RETURN ITEMS
+             Requires account_move_line. Static for now.
+             ════════════════════════════════════════════════════════════════ -->
+
+        <record id="item_firs_tin" model="res.regulatory.report.item">
+            <field name="name">FIRS Tax Identification Number</field>
+            <field name="code">FIRS_TIN</field>
+            <field name="source">static</field>
+            <field name="source_value">ABJ010256102</field>
+            <field name="status">active</field>
+            <field name="description">Company TIN as registered with FIRS</field>
+        </record>
+
+        <record id="item_vat_total_supplies" model="res.regulatory.report.item">
+            <field name="name">VAT Total Supplies (Box 2)</field>
+            <field name="code">VAT_BOX2</field>
+            <field name="source">static</field>
+            <field name="source_value">0.00</field>
+            <field name="status">active</field>
+            <field name="description">
+                Box 2 — Total supplies including VAT this month. Update manually.
+                Requires account_move / account_move_line (accounting module).
+            </field>
+        </record>
+
+        <record id="item_vat_output_tax" model="res.regulatory.report.item">
+            <field name="name">VAT Output Tax (Box 5)</field>
+            <field name="code">VAT_BOX5</field>
+            <field name="source">static</field>
+            <field name="source_value">0.00</field>
+            <field name="status">active</field>
+            <field name="description">
+                Box 5 — VAT charged on sales this month. Update manually.
+                Requires account_move / account_move_line (accounting module).
+            </field>
+        </record>
+
+        <record id="item_vat_input_tax" model="res.regulatory.report.item">
+            <field name="name">VAT Input Tax (Box 8)</field>
+            <field name="code">VAT_BOX8</field>
+            <field name="source">static</field>
+            <field name="source_value">0.00</field>
+            <field name="status">active</field>
+            <field name="description">
+                Box 8 — VAT paid on purchases this month. Update manually.
+                Requires account_move / account_move_line (accounting module).
+            </field>
+        </record>
+
+    </data>
+</odoo>

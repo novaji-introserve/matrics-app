@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ════════════════════════════════════════════════════════════════
+             CBN MONTHLY PRUDENTIAL RETURN — Cell Mappings
+             Template: CBN-XLS-001
+             File:     CBN_Monthly_Prudential_Return_Template.xlsx
+             ════════════════════════════════════════════════════════════════ -->
+
+        <!-- ── Header section ────────────────────────────────────────────── -->
+        <record id="titem_cbn_period" model="res.regulatory.report.template.item">
+            <field name="name">C5</field>
+            <field name="template_id" ref="template_cbn_excel"/>
+            <field name="worksheet_id" ref="worksheet_summary"/>
+            <field name="item_id" ref="item_reporting_period"/>
+            <field name="description">Reporting period label (e.g. April 2026)</field>
+        </record>
+
+        <record id="titem_cbn_code" model="res.regulatory.report.template.item">
+            <field name="name">C6</field>
+            <field name="template_id" ref="template_cbn_excel"/>
+            <field name="worksheet_id" ref="worksheet_summary"/>
+            <field name="item_id" ref="item_cbn_code"/>
+            <field name="description">CBN institution code</field>
+        </record>
+
+        <record id="titem_cbn_prepared_by" model="res.regulatory.report.template.item">
+            <field name="name">C7</field>
+            <field name="template_id" ref="template_cbn_excel"/>
+            <field name="worksheet_id" ref="worksheet_summary"/>
+            <field name="item_id" ref="item_prepared_by"/>
+            <field name="description">Officer who prepared the return</field>
+        </record>
+
+        <record id="titem_cbn_date_submitted" model="res.regulatory.report.template.item">
+            <field name="name">C8</field>
+            <field name="template_id" ref="template_cbn_excel"/>
+            <field name="worksheet_id" ref="worksheet_summary"/>
+            <field name="item_id" ref="item_date_submitted"/>
+            <field name="description">Auto-generated submission date</field>
+        </record>
+
+        <!-- ── Section A — Balance Sheet (current month column = D) ──────── -->
+        <record id="titem_cbn_total_assets" model="res.regulatory.report.template.item">
+            <field name="name">D13</field>
+            <field name="template_id" ref="template_cbn_excel"/>
+            <field name="worksheet_id" ref="worksheet_summary"/>
+            <field name="item_id" ref="item_total_assets"/>
+            <field name="description">Total assets — current month (₦ Millions)</field>
+        </record>
+
+        <record id="titem_cbn_total_loans" model="res.regulatory.report.template.item">
+            <field name="name">D14</field>
+            <field name="template_id" ref="template_cbn_excel"/>
+            <field name="worksheet_id" ref="worksheet_summary"/>
+            <field name="item_id" ref="item_total_loans"/>
+            <field name="description">Total loans and advances — current month (₦ Millions)</field>
+        </record>
+
+        <record id="titem_cbn_total_deposits" model="res.regulatory.report.template.item">
+            <field name="name">D15</field>
+            <field name="template_id" ref="template_cbn_excel"/>
+            <field name="worksheet_id" ref="worksheet_summary"/>
+            <field name="item_id" ref="item_total_deposits"/>
+            <field name="description">Total deposits — current month (₦ Millions)</field>
+        </record>
+
+        <record id="titem_cbn_total_borrowings" model="res.regulatory.report.template.item">
+            <field name="name">D16</field>
+            <field name="template_id" ref="template_cbn_excel"/>
+            <field name="worksheet_id" ref="worksheet_summary"/>
+            <field name="item_id" ref="item_total_borrowings"/>
+            <field name="description">Total borrowings — current month (₦ Millions)</field>
+        </record>
+
+        <record id="titem_cbn_shareholders_funds" model="res.regulatory.report.template.item">
+            <field name="name">D17</field>
+            <field name="template_id" ref="template_cbn_excel"/>
+            <field name="worksheet_id" ref="worksheet_summary"/>
+            <field name="item_id" ref="item_shareholders_funds"/>
+            <field name="description">Shareholders funds — current month (₦ Millions)</field>
+        </record>
+
+        <record id="titem_cbn_cash" model="res.regulatory.report.template.item">
+            <field name="name">D18</field>
+            <field name="template_id" ref="template_cbn_excel"/>
+            <field name="worksheet_id" ref="worksheet_summary"/>
+            <field name="item_id" ref="item_cash_equivalents"/>
+            <field name="description">Cash and equivalents — current month (₦ Millions)</field>
+        </record>
+
+        <record id="titem_cbn_npl" model="res.regulatory.report.template.item">
+            <field name="name">D20</field>
+            <field name="template_id" ref="template_cbn_excel"/>
+            <field name="worksheet_id" ref="worksheet_summary"/>
+            <field name="item_id" ref="item_npl"/>
+            <field name="description">Non-performing loans — current month (₦ Millions)</field>
+        </record>
+
+        <record id="titem_cbn_car" model="res.regulatory.report.template.item">
+            <field name="name">D22</field>
+            <field name="template_id" ref="template_cbn_excel"/>
+            <field name="worksheet_id" ref="worksheet_summary"/>
+            <field name="item_id" ref="item_capital_adequacy"/>
+            <field name="description">Capital adequacy ratio (%)</field>
+        </record>
+
+        <!-- ── Section B — Income Statement (current month column = D) ───── -->
+        <record id="titem_cbn_interest_income" model="res.regulatory.report.template.item">
+            <field name="name">D26</field>
+            <field name="template_id" ref="template_cbn_excel"/>
+            <field name="worksheet_id" ref="worksheet_summary"/>
+            <field name="item_id" ref="item_interest_income"/>
+            <field name="description">Interest income — current month (₦ Millions)</field>
+        </record>
+
+        <record id="titem_cbn_interest_expense" model="res.regulatory.report.template.item">
+            <field name="name">D27</field>
+            <field name="template_id" ref="template_cbn_excel"/>
+            <field name="worksheet_id" ref="worksheet_summary"/>
+            <field name="item_id" ref="item_interest_expense"/>
+            <field name="description">Interest expense — current month (₦ Millions)</field>
+        </record>
+
+        <record id="titem_cbn_pat" model="res.regulatory.report.template.item">
+            <field name="name">D33</field>
+            <field name="template_id" ref="template_cbn_excel"/>
+            <field name="worksheet_id" ref="worksheet_summary"/>
+            <field name="item_id" ref="item_profit_after_tax"/>
+            <field name="description">Profit after tax — current month (₦ Millions)</field>
+        </record>
+
+        <!-- ── LargeTransactions sheet — multi-row from A3 downward ──────── -->
+        <record id="titem_cbn_large_txn" model="res.regulatory.report.template.item">
+            <field name="name">A3</field>
+            <field name="template_id" ref="template_cbn_excel"/>
+            <field name="worksheet_id" ref="worksheet_large_transactions"/>
+            <field name="item_id" ref="item_large_transactions"/>
+            <field name="description">Large transactions table — rows inserted from A3 downward. 7 columns: S/N, Ref, Customer, Account, Amount, Date, Branch.</field>
+        </record>
+
+    </data>
+</odoo>
