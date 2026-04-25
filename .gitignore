@@ -8,6 +8,7 @@ fastapi/logs/
 fastapi/.env
 .env
 seatunnel/logs/
+seatunnel/jobs/
 apache-seatunnel-2.3.12.tar.gz
 *.pyc
 __pycache__/

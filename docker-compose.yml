@@ -152,9 +152,26 @@ services:
     networks:
       - odoo-net
 
-   
+  seatunnel:
+    build:
+      context: .
+      dockerfile: .docker/seatunnel/Dockerfile
+    container_name: seatunnel
+    restart: always
+    ports:
+      - "5801:5801"   # Hazelcast cluster
+      - "9080:9080"   # REST API v2
+    volumes:
+      - ./seatunnel/config/hazelcast.yaml:/opt/seatunnel/config/hazelcast.yaml
+      - ./seatunnel/config/seatunnel.yaml:/opt/seatunnel/config/seatunnel.yaml
+      - ./seatunnel/jobs:/opt/seatunnel/jobs
+      - /home/jonathan/storage/seatunnel/logs:/opt/seatunnel/logs
+    networks:
+      - odoo-net
+
+
 networks:
   odoo-net:
-    driver: bridge     
-    
+    driver: bridge
+
       # run as a service
