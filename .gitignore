@@ -10,5 +10,7 @@ fastapi/.env
 seatunnel/logs/
 seatunnel/jobs/
 apache-seatunnel-2.3.12.tar.gz
+custom/*
+!custom/.gitkeep
 *.pyc
 __pycache__/
