@@ -4,7 +4,7 @@
 # ./upgrade_modules.sh compliance_management case_management
 set -euo pipefail
 
-CONTAINER_NAME="${CONTAINER_NAME:-odoo-16-odoo16-1}"
+CONTAINER_NAME="${CONTAINER_NAME:-matrics-odoo16-1}"
 DB_NAME="${DB_NAME:-icomply_dev}"
 DB_HOST="${DB_HOST:-pgbouncer}"
 DB_PORT="${DB_PORT:-5433}"

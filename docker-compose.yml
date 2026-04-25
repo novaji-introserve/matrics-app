@@ -9,9 +9,19 @@ services:
       - "5432:5432"
     environment:
       - POSTGRES_USER=odoo
-      - POSTGRES_PASSWORD=odoo16@2022      
+      - POSTGRES_PASSWORD=odoo16@2022
       - POSTGRES_DB=postgres
     restart: always             # run as a service
+    command: >
+      postgres
+        -c shared_buffers=2GB
+        -c effective_cache_size=8GB
+        -c work_mem=32MB
+        -c maintenance_work_mem=512MB
+        -c max_connections=100
+        -c checkpoint_completion_target=0.9
+        -c wal_buffers=64MB
+        -c random_page_cost=1.1
     volumes:
         - /home/jonathan/storage/postgresql:/var/lib/postgresql/data
 
@@ -32,7 +42,7 @@ services:
     image: redis:7-alpine
     container_name: redis
     restart: unless-stopped
-    command: redis-server --appendonly yes
+    command: redis-server --appendonly yes --maxmemory 2gb --maxmemory-policy allkeys-lru
     ports:
       - "6379:6379"
     volumes:
