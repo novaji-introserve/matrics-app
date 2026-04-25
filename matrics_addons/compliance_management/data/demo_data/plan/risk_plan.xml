@@ -1,0 +1,111 @@
+<odoo>
+     <data noupdate="1">
+ <record id="risk_plan_1" model="res.compliance.risk.assessment.plan">
+        <field name="name">Customers without BVN</field>
+        <field name="risk_score">2</field>
+        <field name="code">cust_no_bvn</field>
+        <field name="sql_query">SELECT risk_score FROM res_partner WHERE id = %s AND (bvn IS NULL OR bvn LIKE '%%[a-zA-Z]%%' OR bvn LIKE 'NOBVN%%')</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">static</field>
+        <field name="narration">Customers without BVN are high risk</field>
+    </record>
+    <record id="risk_plan_2" model="res.compliance.risk.assessment.plan">
+        <field name="name">Customers without Phone</field>
+        <field name="risk_score">2</field>
+        <field name="code">cust_no_phone</field>
+        <field name="sql_query">select risk_score from res_partner where id=%s and mobile is null and phone is null</field>
+        <field name="priority">2</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">static</field>
+        <field name="narration">Customers without mobile phone are medium risk</field>
+    </record>
+
+    <record id="risk_plan_inavlid_name" model="res.compliance.risk.assessment.plan">
+        <field name="name">Customers With Invalid Names</field>
+        <field name="risk_score">2</field>
+        <field name="code">cust_invalid_name</field>
+        <field name="sql_query">SELECT risk_score 
+            FROM res_partner 
+            WHERE id = %s
+            AND (trim(name) = '' OR trim(name) ~ '^[^a-zA-Z0-9]')</field>
+        <field name="priority">2</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">static</field>
+        <field name="narration">Customers with empty or invalid names</field>
+    </record>
+
+    <record id="risk_plan_repeated_phone" model="res.compliance.risk.assessment.plan">
+        <field name="name">Customers with Repeated Phone Number Up To 3 Accounts and Above</field>
+        <field name="risk_score">2</field>
+        <field name="code">cust_repeated_phone</field>
+        <field name="sql_query">SELECT risk_score
+            FROM res_partner
+            WHERE id = %s
+            AND customer_phone IN (
+                SELECT customer_phone
+                FROM res_partner
+                WHERE customer_phone IS NOT NULL AND customer_phone != ''
+                GROUP BY customer_phone
+                HAVING COUNT(*) >= 3)
+            ORDER BY customer_phone </field>
+        <field name="priority">2</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">static</field>
+        <field name="narration">Detects customers using the same phone number for three or more account openings, flagging potential fraud risks.
+        </field>
+    </record>
+
+    <record id="risk_plan_3" model="res.compliance.risk.assessment.plan">
+        <field name="name">Customers on SanctionList</field>
+        <field name="risk_score">4</field>
+        <field name="code">cust_sanctionlist</field>
+        <field name="sql_query">select risk_score from res_partner where id=%s and likely_sanction=true</field>
+        <field name="priority">3</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">static</field>
+        <field name="narration">Customers on Sanction list are significantly high risk</field>
+    </record>
+    <record id="risk_plan_pep" model="res.compliance.risk.assessment.plan">
+        <field name="name">Customers on PEPlist</field>
+        <field name="risk_score">2</field>
+        <field name="code">cust_pep</field>
+        <field name="sql_query">SELECT 8 FROM res_partner WHERE id = %s AND is_pep = true</field>
+        <field name="condition_python">result = 10 if customer.is_pep == True else 1</field>
+        <field name="priority">4</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">python</field>
+        <field name="narration">Customers on PEPlist are significantly high risk</field>
+    </record>
+    <!-- <record id="risk_plan_fep" model="res.compliance.risk.assessment.plan">
+        <field name="name">Customers on FEPlist</field>
+        <field name="risk_score">20</field>
+        <field name="code">cust_fep</field>
+        <field name="sql_query">select 20 from res_partner where id=%s and is_fep=true</field>
+        <field name="priority">5</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">dynamic</field>
+        <field name="narration">Customers on FEPlist are significantly high risk</field>
+    </record> -->
+    <record id="risk_plan_watchlist" model="res.compliance.risk.assessment.plan">
+        <field name="name">Customers on Watchlist</field>
+        <field name="risk_score">2</field>
+        <field name="code">cust_watchlist</field>
+        <field name="sql_query">select risk_score from res_partner where id=%s and is_watchlist=true</field>
+        <field name="priority">6</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">static</field>
+        <field name="narration">Customers on Watchlist are significantly high risk</field>
+    </record>
+    <record id="risk_plan_default" model="res.compliance.risk.assessment.plan">
+        <field name="name">Default Risk Score</field>
+        <field name="risk_score">1</field>
+        <field name="code">default_plan</field>
+        <field name="sql_query">select risk_rating from res_risk_assessment where is_default=true limit 1</field>
+        <field name="priority">1</field>
+        <field name="state">active</field>
+        <field name="compute_score_from">static</field>
+        <field name="narration">Default Plan for risk rating</field>
+    </record>
+    </data>
+</odoo>

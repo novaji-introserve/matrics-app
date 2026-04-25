@@ -1,0 +1,8 @@
+<odoo>
+    <data noupdate="1">
+        <record id="digest_emails_disable" model="ir.config_parameter">
+            <field name="key">digest_emails</field>
+            <field name="value">False</field>
+        </record>
+    </data>
+</odoo>

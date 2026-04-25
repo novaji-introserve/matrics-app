@@ -1,0 +1,141 @@
+<odoo>
+    <!-- Tree View -->
+    <record id="view_alert_rules_tree" model="ir.ui.view">
+        <field name="name">alert.rules.tree</field>
+        <field name="model">alert.rules</field>
+        <field name="arch" type="xml">
+            <tree string="Alert Rules">
+                <field name="name" />
+                <field name="alert_id" />
+                <field name="model_id" />
+                <field name="frequency_id" />
+                <field name="first_owner" />
+                <field name="second_owner" />
+                <field name="specific_email_recipients" />
+                <field name="process_id" string="Process" />
+                <field name="status" widget="selection" string="Status" />
+                <field name="risk_rating" decoration-success="risk_rating == 'low'" decoration-warning="risk_rating == 'medium'" decoration-danger="risk_rating == 'high'" widget="badge" />
+                <field name="last_checked" string="Last Checked" widget="datetime" />
+                <field name="date_created" string="Date Created" />
+            </tree>
+        </field>
+    </record>
+    <!-- Form View -->
+    <record id="view_alert_rules_form" model="ir.ui.view">
+        <field name="name">alert.rules.form</field>
+        <field name="model">alert.rules</field>
+        <field name="arch" type="xml">
+            <form string="Alert Rule" create="False">
+                <header>
+                    <field name="status" widget="statusbar" options="{'clickable':'1'}" />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe-edit-only" />
+                        <h1>
+                            <field name="name" placeholder="Enter exception rule title" />
+                        </h1>
+                    </div>
+                    <group string="PROCESS DETAILS">
+                        <group>
+                            <field name="process_id" string="Process" />
+                            <field name="model_id" />
+                        </group>
+                        <group >
+                            <field name="risk_rating" string="Risk Rating" />
+                        </group>
+                        <group string="SQL" colspan="2">
+                            <field name="sql_text" />
+                        </group>
+                        <group string="Alert SQL Query" colspan="2">
+                            <field name="alert_query" />
+                        </group>
+                    </group>
+                    <group>
+
+
+                    </group>
+                    <group>
+                        <group string="Last Check">
+                            <field name="last_checked" string="Last Checked" widget="datetime" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Narration">
+                            <field name="narration" string="Narration" style="padding: 2rem;" placeholder="Enter narration here..." />
+                        </page>
+                        <page string="Schedule">
+                            <group>
+                                <group>
+                                    <field name="frequency_id" />
+                                </group>
+                                <group>
+                                    <field name="cron_string" string="Cron String" widget="ace"/>
+                                </group>
+                            </group>
+                             <div class="alert alert-info" role="alert" name="sql_tips">Scheduler works with  a  Cron string, which you can use for repeated jobs to run periodically at fixed times, dates or intervals.
+                             A cron expression is a string of 5 to 7 fields separated by spaces, used to schedule recurring tasks in operating systems and applications (e.g., 0 0 * * * for daily at midnight). It defines the exact minute, hour, day, month, and day of the week to execute commands.
+                             To learn how to  define  your cron string go to https://crontab.guru/
+                            </div>
+                        </page>
+                        <page string="Receipients">
+                            <group>
+                                <group class="">
+                                    <field name="specific_email_recipients" widget="many2many_tags" />
+                                </group>
+                                <group>
+                                    <field name="alert_id" />
+                                </group>
+                                <group class="">
+                                    <field name="first_owner" />
+                                </group>
+                                <group class="">
+                                    <field name="second_owner" />
+                                </group>
+                                <group colspan="2">
+                                    <field name="recipients" />
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <!-- Add the chatter here -->
+                <div class="oe_chatter">
+                    <field name="message_ids" widget="mail_thread" />
+                    <field name="activity_ids" widget="mail_activity" />
+                </div>
+            </form>
+        </field>
+    </record>
+    <record id="view_alert_rules_search" model="ir.ui.view">
+        <field name="name">alert.rules.search</field>
+        <field name="model">alert.rules</field>
+        <field name="arch" type="xml">
+            <search string="Search Alert Rules">
+                <field name="name" />
+                <field name="alert_id" />
+                <field name="model_id" />
+                <field name="frequency_id" />
+                <field name="first_owner" />
+                <field name="second_owner" />
+                <field name="process_id" />
+                <field name="status" />
+                <field name="risk_rating" />
+                <group expand="0" string="Group By">
+                    <filter string="Model" name="group_by_model_id" context="{'group_by': 'model_id'}" />
+                    <filter string="Alert Group" name="group_by_alert_id" context="{'group_by': 'alert_id'}" />
+                    <filter string="Status" name="group_by_status" context="{'group_by': 'status'}" />
+                    <filter string="Risk Rating" name="group_by_risk_rating" context="{'group_by': 'risk_rating'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+    <!-- Action -->
+    <record id="action_alert_rules" model="ir.actions.act_window">
+        <field name="name">Alert Rules</field>
+        <field name="res_model">alert.rules</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_alert_rules_search" />
+        <field name="context">{}</field>
+    </record>
+</odoo>

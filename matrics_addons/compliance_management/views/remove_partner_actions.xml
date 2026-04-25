@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Call the method to remove unwanted partner actions -->
+        <function model="res.partner" name="remove_unwanted_partner_actions"/>
+    </data>
+
+  
+</odoo>

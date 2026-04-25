@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Exception Type View -->
+    <record id="view_exception_type_tree" model="ir.ui.view">
+        <field name="name">exception.type.tree</field>
+        <field name="model">rulebook.exception_type</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_exception_type_form" model="ir.ui.view">
+        <field name="name">exception.type.form</field>
+        <field name="model">rulebook.exception_type</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name" />
+                </group>
+            </form>
+        </field>
+    </record>
+
+</odoo>

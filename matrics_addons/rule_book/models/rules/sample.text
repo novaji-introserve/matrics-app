@@ -1,0 +1,86 @@
+
+def _notify_reg_officers(self, action_url, regulator):
+        """Send consolidated email notification to responsible officers"""
+        try:
+            template = self.env.ref(
+                'rule_book.email_template_reg_document_alert')
+            if not template:
+                _logger.error(
+                    "Email template not found")
+                raise ValidationError("Email template not found")
+
+            # Search for all records in reg.model
+            reg_records = self.env['regulatory.alert'].search([])
+
+            # Collect all users from the alert_officers Many2many field
+            officers = reg_records.mapped('alert_officers')
+            if not officers:
+                _logger.warning("No officers configured for alerts")
+                return
+
+            # Get email from address
+            email_from = os.getenv("EMAIL_FROM")
+            if not email_from:
+                _logger.error("EmailFrom environment variable not configured")
+                raise ValidationError("Email sender address not configured")
+
+            # Prepare email values
+            officers_name = ", ".join(officers.mapped('name')) or ""
+            officers_email = ", ".join(officers.mapped('email')) or ""
+            # ctx = {
+            #     'regulator': regulator,
+            #     'record_link': action_url,
+            #     'email_from': email_from,
+            #     'officers_name': officers_name,
+            #     'datetime': datetime.now().replace(microsecond=0),
+            #     "current_year": fields.Date.today().year,
+            #     'email_to': officers_email,  # Add email_to to the context
+            # }
+            global global_data
+
+            global_data = {
+                'email_cc': '',
+                'regulator': regulator,
+                'record_link': action_url,
+                'email_from': email_from,
+                'officers_name': officers_name,
+                'datetime': datetime.now().replace(microsecond=0),
+                "current_year": fields.Date.today().year,
+                'email_to': officers_email,  # Add email_to to the context
+            }
+
+
+            try:
+                # Render the template with context
+               
+                # template_id = template.with_context(**ctx)
+                # email_result = template_id.send_mail(
+                #     self.id,
+                #     force_send=True,
+                #     raise_exception=True,
+                #     email_values={
+                #         'email_to': officers_email,
+                #         'email_from': email_from,
+                #         'email_cc': '',
+                #     }
+                # )
+                
+                email_result=  template.send_mail(self.id, force_send=True, email_values={})
+
+
+                mail = self.env['mail.mail'].browse(email_result)
+                if mail.state == 'sent':
+                    # insert into alert history table
+                    _logger.info(
+                        f"Consolidated email sent to regulatory alert officers ({officers_email})")
+
+            except Exception as e:
+                _logger.error(
+                    f"Failed to send regulatory alert email: {str(e)}")
+                raise
+
+        except Exception as e:
+            _logger.error(
+                f"Error in regulatory alert process: {str(e)}", exc_info=True)
+            raise ValidationError(
+                f"Failed to send regulatory alert email: {str(e)}")

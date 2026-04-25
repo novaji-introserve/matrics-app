@@ -1,0 +1,611 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="compl_cust_tree_inherit_res_partner" model="ir.ui.view">
+        <field name="name">model_res_partner_tree_inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree" />
+        <field name="arch" type="xml">
+            <!-- Update the tree attributes instead of replacing the entire tree -->
+            <xpath expr="//tree" position="attributes">
+                <attribute name="sample"/>
+                <attribute name="create">false</attribute>
+                <attribute name="delete">false</attribute>
+            </xpath>
+
+
+
+            <!-- Replace the phone field with custom fields -->
+            <xpath expr="//field[@name='phone']" position="before">
+                <field name="customer_id" optional="show" />
+                <field name="firstname" optional="show" />
+                <field name="lastname" optional="show" />
+                <field name="identity_verification" optional="show" widget="badge" decoration-warning="identity_verification == 'pending'" decoration-info="identity_verification == 'processing'" decoration-success="identity_verification == 'done'" />
+                <field name="risk_score" widget="badge" decoration-info="1" on_change="1" type="measure" />
+                <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level == 'medium'" decoration-success="risk_level =='low'" />
+                <field name="branch_id" optional="hide" />
+                <field name="registration_date" optional="hide" />
+                <field name="tier_id" optional="hide" />
+                <field name="show_create_case_button" invisible="1"/>
+            </xpath>
+
+            <!-- Hide the original phone field -->
+            <xpath expr="//field[@name='phone']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
+
+            <!-- Add the formatted_phone field after hiding the original phone field -->
+            <xpath expr="//field[@name='phone']" position="after">
+                <field name="formatted_phone" string="Formatted Phone" optional="show" />
+            </xpath>
+
+            <!-- Modify activity_ids field -->
+            <xpath expr="//field[@name='activity_ids']" position="replace">
+                <field name="activity_ids" invisible="1" widget="list_activity" />
+            </xpath>
+
+            <!-- Modify user_id field -->
+            <xpath expr="//field[@name='user_id']" position="replace">
+                <field name="user_id" optional="show" invisible="1" widget="many2one_avatar_user" domain="[('share', '=', False)]" />
+            </xpath>
+
+            <!-- <xpath expr="//group" position="inside">
+                <field name="risk_score" type="measure" string="Average Risk Score" aggregate="avg"/>
+            </xpath> -->
+
+            <!-- <xpath expr="//group" position="inside">
+                <field name="risk_score" type="measure" string="Average Risk Score" aggregate="avg"/>
+            </xpath> -->
+
+
+
+        </field>
+    </record>
+
+
+    <record id="customer_actions_inherit_res_partner" model="ir.ui.view">
+        <field name="name">res_partner_compliance_actions</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form" />
+        <field name="priority">1600</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="create">false</attribute>
+                <attribute name="edit">false</attribute>
+                <attribute name="delete">false</attribute>
+                <attribute name="duplicate">false</attribute>
+            </xpath>
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <field name="show_create_case_button" invisible="1"/>
+                    <field name="show_create_case" invisible="1"/>
+
+                    <button name="action_initiate_edd" class="oe_highlight" type="object" string="Initiate EDD" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="This will trigger a request to carry out EDD on this customer. Are you sure?" />
+
+                    <button name="action_add_pep" class="oe_highlight" type="object" string="Add to PEP List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to PEP List. Are you sure?" attrs="{'invisible': [('is_pep', '=',True)]}" />
+
+                    <button name="action_unmark_pep" class="oe_highlight" type="object" string="Delist from Global PEP" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Unlink this customer from Global PEP list. Are you sure?" attrs="{'invisible': [('global_pep', '=',False)]}" />
+
+                    <button name="action_remove_pep" type="object" string="Remove From PEP List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove Customer from PEP List. Are you sure?" attrs="{'invisible': [('is_pep', '!=',True)]}" />
+
+                    <button name="action_add_fep" class="oe_highlight" type="object" string="Add to FEP List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to FEP List. Are you sure?" attrs="{'invisible': [('is_fep', '=',True)]}" style="display: none;" />
+
+                    <button name="action_remove_fep" type="object" string="Remove from FEP List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from FEP List. Are you sure?" attrs="{'invisible': [('is_fep', '!=',True)]}" />
+
+                    <!-- <button name="action_blacklist" class="oe_highlight" type="object" string="Add to Blacklist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to Blacklist. Are you sure?" attrs="{'invisible': [('is_blacklist', '=',True)]}" /> -->
+
+                    <!-- <button name="action_remove_blacklist" type="object" string="Remove from Blacklist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from Blacklist. Are you sure?" attrs="{'invisible': [('is_blacklist', '!=',True)]}" /> -->
+
+                    <button name="action_watchlist" class="oe_highlight" type="object" string="Add to Watchlist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to Watchlist. Are you sure?" attrs="{'invisible': [('is_watchlist', '=',True)]}" />
+
+                    <button name="action_remove_watchlist" type="object" string="Remove from Watchlist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from Watchlist. Are you sure?" attrs="{'invisible': [('is_watchlist', '!=',True)]}" />
+                    <!-- SANCTION LIST -->
+                    <button name="action_sanction_list" class="oe_highlight" type="object" string="Add to Sanctions List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to SanctionList. Are you sure?" attrs="{'invisible': [('likely_sanction', '=',True)]}" />
+
+                    <button name="action_remove_sanction_list" type="object" string="Remove from Sanctions List" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from SanctionList. Are you sure?" attrs="{'invisible': [('likely_sanction', '!=',True)]}" />
+                    <!--End Sanction list  -->
+                    <button name="action_greylist" class="oe_highlight" type="object" string="Add to Greylist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Add Customer to Greylist. Are you sure?" attrs="{'invisible': [('is_greylist', '=',True)]}" />
+
+                    <button name="action_remove_greylist" type="object" string="Remove from Greylist" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Remove from Greylist. Are you sure?" attrs="{'invisible': [('is_greylist', '!=',True)]}" />
+
+                    <button name="action_conduct_risk_assessment" class="oe_highlight" type="object" string="Conduct Risk Assessment" groups="compliance_management.group_compliance_branch_compliance_officer" confirm="Conduct Risk Assessment. Are you sure?" />
+
+                    <button name="action_compute_risk_score_with_plan" class="oe_highlight" type="object" string="Run Risk Analysis" confirm="Compute Risk Score: Using your defined Risk Analysis, the Customer risk score and level will be recomputed. This process cannot be reversed. Are you sure to proceed?" />
+                    <button name="run_identity_verification" class="oe_highlight" type="object" string="Run Identity Verification" />
+
+                    <!-- groups="compliance_management.group_compliance_branch_compliance_officer" -->
+                    <button name="scan_news_articles" class="oe_highlight" type="object" string="Run Media Screening" groups="compliance_management.group_compliance_compliance_officer" confirm="Run Media Screening: Are you sure?" />
+
+                    <button name="action_screen_customer" string="Run Sanction Screening" type="object" class="btn-primary" groups="compliance_management.group_compliance_compliance_officer" confirm="Run Media Screening: Are you sure?"/>
+
+                    <button name="action_create_case" class="oe_highlight" string="Create Case" type="object" attrs="{'invisible': [('show_create_case_button', '=', False)]}"/>
+
+                    <button 
+                            name="action_create_customer_case" 
+                            class="oe_highlight" 
+                            string="Create Case" 
+                            type="object" 
+                            attrs="{'invisible': ['|', ('id', '=', False), ('show_create_case', '=', False)]}"/>
+
+                </header>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" type="object" name="action_total_accounts" icon="fa-star">
+                    <field name="total_accounts" widget="statinfo"/>
+                </button>
+
+                <button class="oe_stat_button" type="object" name="get_risk_level" icon="fa-thermometer-0">
+                    <div class="o_stat_info">
+                        <!-- High risk - red background -->
+                        <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level == 'medium'" decoration-success="risk_level == 'low'"/>
+                        <span class="o_stat_text">Risk Level</span>
+                    </div>
+                </button>
+
+                <button class="oe_stat_button" type="object" name="get_risk_score" icon="fa-star">
+                    <field string="Risk Score" name="risk_score" widget="statinfo"/>
+                </button>
+
+                <button class="oe_stat_button" type="object" name="action_view_ownership_lines" icon="fa-sitemap">
+                    <field string="UBOs" name="ubo_count" widget="statinfo"/>
+                </button>
+            </xpath>
+
+            <xpath expr="//field[@name='website']" position="replace">
+                <field name="industry_id" invisible="1" />
+                <!-- <attribute name="invisible">1</attribute> -->
+            </xpath>
+
+            <xpath expr="//field[@name='street']" position="after">
+                <field name="region_id" invisible="0" />
+            </xpath>
+
+            <xpath expr="//field[@name='region_id']" position="after">
+                <field name="state_residence" invisible="0" />
+            </xpath>
+
+            <xpath expr="//field[@name='function']" position="replace">
+                <field name="employment_status" invisible="0" />
+                <field name="active" invisible="1" />
+            </xpath>
+
+            <xpath expr="//field[@name='mobile']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='type']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='category_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='company_reg_date']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+
+            <xpath expr="//form//field[@name='street2']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//form//field[@name='company_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//form//field[@name='company_type']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//div[@class='o_row']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//span[@class='o_form_label o_td_label']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//div[@class='o_address_format']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//div[@class='o_address_format']" position="after">
+                <field name="street" invisible="0" readonly="1"/>
+
+            </xpath>
+
+            <xpath expr="//div[@class='o_address_format']" position="before">
+                <field name="first_risk_rating" invisible="0" readonly="1"/>
+            </xpath>
+
+
+            <xpath expr="//field[@name='education_level_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <!-- Hide identification_type_id -->
+            <xpath expr="//field[@name='identification_type_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <!-- Hide identification_expiry_date -->
+            <xpath expr="//field[@name='identification_expiry_date']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+
+            <!-- Readonly fields -->
+
+            <xpath expr="//field[@name='middlename']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='othername']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='customer_id']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='branch_id']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='customer_id']" position="after">
+                <field name="identity_verification" readonly="1" widget="badge" decoration-warning="identity_verification == 'pending'" decoration-info="identity_verification == 'processing'" decoration-success="identity_verification == 'done'"/>
+            </xpath>
+
+            <xpath expr="//sheet" position="inside">
+                <group string="Ownership / UBO Overview" attrs="{'invisible': [('is_company', '=', False)]}">
+                    <group>
+                        <field name="ubo_count" readonly="1"/>
+                        <field name="ownership_total_pct" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="has_unverified_ubo" readonly="1"/>
+                        <field name="has_high_risk_ubo" readonly="1"/>
+                    </group>
+                    <field name="ubo_summary" nolabel="1" readonly="1"/>
+                </group>
+            </xpath>
+
+            <!--  -->
+
+            <xpath expr="//field[@name='vat']" position="attributes">
+                <!-- <attribute name="readonly">1</attribute> -->
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+
+            <xpath expr="//field[@name='sector_id']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='phone']" position="attributes">
+                <attribute name="readonly">1</attribute>
+                <attribute name="invisible">0</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='email']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='industry_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='employment_status']" position="after">
+                <field name="formatted_phone" readonly="1"/>
+            </xpath>
+
+            <xpath expr="//field[@name='vat']" position="replace">
+                <field name="customer_industry_id" readonly="1"/>
+            </xpath>
+
+
+            <xpath expr="//field[@name='title']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//field[@id='individual']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="view_res_partner_shareholders_tree" model="ir.ui.view">
+        <field name="name">res.partner.shareholders.tree</field>
+        <field name="model">res.partner.shareholders</field>
+        <field name="arch" type="xml">
+            <tree string="Ownership / UBO Records">
+                <field name="name"/>
+                <field name="owner_type"/>
+                <field name="role"/>
+                <field name="ownership_type"/>
+                <field name="pct_equity"/>
+                <field name="effective_ownership_pct"/>
+                <field name="is_control_person"/>
+                <field name="is_ubo"/>
+                <field name="verification_status"/>
+                <field name="is_pep"/>
+                <field name="is_sanctioned"/>
+                <field name="country_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_res_partner_shareholders_form" model="ir.ui.view">
+        <field name="name">res.partner.shareholders.form</field>
+        <field name="model">res.partner.shareholders</field>
+        <field name="arch" type="xml">
+            <form string="Ownership / UBO Record">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="customer_id"/>
+                            <field name="name"/>
+                            <field name="owner_type"/>
+                            <field name="role"/>
+                            <field name="ownership_type"/>
+                            <field name="relationship_to_customer"/>
+                        </group>
+                        <group>
+                            <field name="pct_equity"/>
+                            <field name="voting_rights_pct"/>
+                            <field name="effective_ownership_pct"/>
+                            <field name="is_control_person"/>
+                            <field name="is_ubo" readonly="1"/>
+                            <field name="verification_status"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="country_id"/>
+                            <field name="bvn"/>
+                            <field name="identification_number"/>
+                        </group>
+                        <group>
+                            <field name="is_pep"/>
+                            <field name="is_sanctioned"/>
+                            <field name="source_of_wealth"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_customer_search" model="ir.ui.view">
+        <field name="name">Customer Search Custom</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="priority" eval="1000"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="replace">
+                <search string="Search Customer">
+                    <field name="name" filter_domain="['|', '|', '|', ('display_name', 'ilike', self), ('name', 'ilike', self), ('firstname', 'ilike', self), ('lastname', 'ilike', self)]"/>
+                    <field name="parent_id" domain="[('is_company', '=', True)]" operator="child_of"/>
+                    <field name="email" filter_domain="[('email', 'ilike', self)]"/>
+                    <field name="phone" filter_domain="['|', ('phone', 'ilike', self), ('mobile', 'ilike', self)]"/>
+                    <field name="category_id" string="Tag" operator="child_of"/>
+                    <field name="customer_id" filter_domain="[('customer_id', 'ilike', self)]"/>
+                    <field name="identity_verification"/>
+                    <separator/>
+                    <filter string="Customers" name="type_customer" domain="[('internal_category', '=', 'customer')]"/>
+                    <filter string="Corporate" name="corporate_customer" domain="[('is_company', '=', True)]"/>
+                    <filter string="Without BVN" name="bvn" domain="['|', ('bvn', '=', False), ('bvn', 'ilike', 'NOBVN%')]"/>
+                    <filter string="Without Phone No." name="customer_phone" domain="[('customer_phone', '=', False)]"/>
+                    <filter string="Pending Verification" name="pending_verification" domain="[('identity_verification', '=', 'pending')]"/>
+                    <filter string="Verification In Progress" name="processing_identity" domain="[('identity_verification', '=', 'processing')]"/>
+                    <filter string="Verified" name="verified_identity" domain="[('identity_verification', '=', 'done')]"/>
+
+                    <!-- <filter string="Vendors" name="type_vendor" domain="[('internal_category', '=', 'vendor')]"/>
+                    <filter string="Partners" name="type_partner" domain="[('internal_category', '=', 'partner')]"/>
+                    <filter string="Respondents" name="type_respondent" domain="[('internal_category', '=', 'respondent')]"/>
+                    <filter string="Correspondent" name="type_correspondent" domain="[('internal_category', '=', 'correspondent')]"/> -->
+                    <separator/>
+                    <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                    <separator/>
+                    <group expand="0" name="group_by" string="Group By">
+                        <!-- <filter name="group_branch" string="Branch" domain="[]" context="{'group_by' : 'branch_id'}" /> -->
+                        <filter name="group_tier" string="Tier" context="{'group_by': 'tier_id'}"/>
+                        <filter name="group_risk_level" string="Risk Level" context="{'group_by': 'risk_level'}"/>
+                        <filter name="group_identity_verification" string="Identity Verification" context="{'group_by': 'identity_verification'}"/>
+                        <filter name="group_internal_category" string="Category" context="{'group_by': 'internal_category'}"/>
+                    </group>
+                </search>
+            </xpath>
+        </field>
+    </record>
+
+
+
+    <!-- Override the menu item to use the new action -->
+    <!-- <record id="contacts.res_partner_menu_contacts" model="ir.ui.menu">
+        <field name="action" ref="contacts_action_contacts_inherit"/>
+    </record> -->
+
+    <!-- Disable create in tree view -->
+    <record id="view_partner_tree_no_create" model="ir.ui.view">
+        <field name="name">res.partner.tree.no.create</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <tree position="attributes">
+                <attribute name="create">false</attribute>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Disable create in kanban view -->
+    <record id="view_partner_kanban_no_create" model="ir.ui.view">
+        <field name="name">res.partner.kanban.no.create</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.res_partner_kanban_view"/>
+        <field name="arch" type="xml">
+            <kanban position="attributes">
+                <attribute name="create">false</attribute>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- customers matching pep tree view -->
+    <record id="compliance_pep_customers_tree" model="ir.ui.view">
+        <field name="name">res_compliance_pep_customers_tree</field>
+        <field name="model">res.customer.pep</field>
+        <field name="arch" type="xml">
+            <tree string="Customer matching PEP" create="False" delete="False">
+                <field name="name" string="Name" />
+                <field name="customer_id" />
+                <field name="firstname" />
+                <field name="lastname" />
+                <!-- <field name="unique_identifier"/> -->
+                <field name="branch_id" />
+                <field name="pep_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- customers matching pep form -->
+    <record id="view_form_res_customer_pep" model="ir.ui.view">
+        <field name="name">res.customer.pep.form</field>
+        <field name="model">res.customer.pep</field>
+        <field name="arch" type="xml">
+            <form string="PEP Match Detail" create="false" edit="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="customer_id" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Personal Information">
+                            <field name="name" readonly="1"/>
+                            <field name="firstname" readonly="1"/>
+                            <field name="lastname" readonly="1"/>
+
+                        </group>
+
+                        <group string="Addtional Details">
+                            <field name="branch_id" readonly="1"/>
+                            <field name="internal_category" readonly="1"/>
+
+                        </group>
+
+                        <!-- <field name="pep_id" readonly="1"/> -->
+                    </group>
+                </sheet>
+
+            </form>
+        </field>
+    </record>
+
+
+
+
+    <record id="view_customer_pep_search" model="ir.ui.view">
+        <field name="name">Customer PEP Search Custom</field>
+        <field name="model">res.customer.pep</field>
+        <field name="priority" eval="1000"/>
+        <field name="arch" type="xml">
+            <search string="Search Customer PEP">
+                <field name="name"/>
+                <field name="customer_id"/>
+                <field name="firstname"/>
+                <field name="lastname"/>
+                <separator/>
+                <filter string="Customers" name="type_customer" domain="[('internal_category', '=', 'customer')]"/>
+                <filter string="Vendors" name="type_vendor" domain="[('internal_category', '=', 'vendor')]"/>
+                <filter string="Partners" name="type_partner" domain="[('internal_category', '=', 'partner')]"/>
+                <filter string="Respondents" name="type_respondent" domain="[('internal_category', '=', 'respondent')]"/>
+                <filter string="Correspondent" name="type_correspondent" domain="[('internal_category', '=', 'correspondent')]"/>
+                <separator/>
+                <group expand="0" name="group_by" string="Group By">
+                    <filter name="group_branch" string="Branch" domain="[]" context="{'group_by' : 'branch_id'}" />
+                    <filter name="group_internal_category" string="Category" context="{'group_by': 'internal_category'}"/>
+                </group>
+            </search>
+
+        </field>
+    </record>
+
+    <record model="ir.actions.server" id="action_mark_pep">
+        <field name="name">Mark PEP</field>
+        <field name="model_id" ref="model_res_customer_pep"/>
+        <field name="binding_model_id" ref="model_res_customer_pep"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_mark_pep()</field>
+    </record>
+
+    <record id="action_view_customer_global_pep" model="ir.actions.server">
+        <field name="name">Customers Matching Global PEP</field>
+        <field name="model_id" ref="model_res_partner" />
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.action_view_global_pep_customer()</field>
+    </record>
+
+    <record id="action_view_likely_sanction_customer" model="ir.actions.server">
+        <field name="name">Customers Likely On Sanction List</field>
+        <field name="model_id" ref="model_res_partner" />
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.action_view_likely_sanction_customer()</field>
+    </record>
+
+    <record id="action_customer_form_initiate_edd" model="ir.actions.server">
+        <field name="name">Initiate EDD</field>
+        <field name="model_id" ref="model_res_partner"/>
+        <field name="binding_model_id" ref="model_res_partner"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="groups_id" eval="[(4, ref('compliance_management.group_compliance_branch_compliance_officer'))]"/>
+        <field name="code">action = records.action_initiate_edd()</field>
+    </record>
+
+    <record id="action_customer_form_conduct_risk_assessment" model="ir.actions.server">
+        <field name="name">Conduct Risk Assessment</field>
+        <field name="model_id" ref="model_res_partner"/>
+        <field name="binding_model_id" ref="model_res_partner"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="groups_id" eval="[(4, ref('compliance_management.group_compliance_branch_compliance_officer'))]"/>
+        <field name="code">action = records.action_conduct_risk_assessment()</field>
+    </record>
+
+    <record id="action_customer_form_run_identity_verification" model="ir.actions.server">
+        <field name="name">Run Identity Verification</field>
+        <field name="model_id" ref="model_res_partner"/>
+        <field name="binding_model_id" ref="model_res_partner"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="code">action = records.run_identity_verification()</field>
+    </record>
+
+    <record id="action_customer_form_run_media_screening" model="ir.actions.server">
+        <field name="name">Run Media Screening</field>
+        <field name="model_id" ref="model_res_partner"/>
+        <field name="binding_model_id" ref="model_res_partner"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="groups_id" eval="[(4, ref('compliance_management.group_compliance_compliance_officer'))]"/>
+        <field name="code">action = records.scan_news_articles()</field>
+    </record>
+
+    <record id="action_customer_form_run_sanction_screening" model="ir.actions.server">
+        <field name="name">Run Sanction Screening</field>
+        <field name="model_id" ref="model_res_partner"/>
+        <field name="binding_model_id" ref="model_res_partner"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="groups_id" eval="[(4, ref('compliance_management.group_compliance_compliance_officer'))]"/>
+        <field name="code">action = records.action_screen_customer()</field>
+    </record>
+
+
+</odoo>

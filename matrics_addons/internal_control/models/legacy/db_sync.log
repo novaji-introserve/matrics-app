@@ -1,0 +1,55 @@
+2025-01-16 16:04:33,962 - INFO - Table sync_timestamps ensured.
+2025-01-16 16:04:33,964 - INFO - Table sync_attempts ensured.
+2025-01-16 16:04:33,966 - INFO - Table sync_logs ensured.
+2025-01-16 16:04:34,576 - WARNING - Columns in source but not in target for tbl_transactions: {'baseamount', 'currencycode'}
+2025-01-16 16:04:34,577 - DEBUG - Fetching last sync info for tbl_transactions
+2025-01-16 16:04:34,581 - INFO - Starting sync of tbl_transactions
+2025-01-16 16:04:34,582 - DEBUG - Checking for changes since 2000-01-01 00:00:00
+2025-01-16 16:04:34,750 - INFO - Fetching batch 1 from tbl_transactions
+2025-01-16 16:06:12,948 - INFO - Processed batch 1 in 38.64 seconds. Rows in this batch: 99976. Total rows processed: 100000
+2025-01-16 16:06:12,949 - INFO - Fetching batch 2 from tbl_transactions
+2025-01-16 16:08:19,410 - INFO - Processed batch 2 in 57.12 seconds. Rows in this batch: 99902. Total rows processed: 200000
+2025-01-16 16:08:19,412 - INFO - Fetching batch 3 from tbl_transactions
+2025-01-16 16:10:37,038 - INFO - Processed batch 3 in 44.19 seconds. Rows in this batch: 98420. Total rows processed: 300000
+2025-01-16 16:10:37,040 - INFO - Fetching batch 4 from tbl_transactions
+2025-01-16 16:12:00,252 - INFO - Processed batch 4 in 43.44 seconds. Rows in this batch: 99937. Total rows processed: 400000
+2025-01-16 16:12:00,253 - INFO - Fetching batch 5 from tbl_transactions
+2025-01-16 16:13:39,739 - INFO - Processed batch 5 in 49.23 seconds. Rows in this batch: 99965. Total rows processed: 500000
+2025-01-16 16:13:39,741 - INFO - Fetching batch 6 from tbl_transactions
+2025-01-16 16:15:38,022 - INFO - Processed batch 6 in 39.60 seconds. Rows in this batch: 97685. Total rows processed: 600000
+2025-01-16 16:15:38,023 - INFO - Fetching batch 7 from tbl_transactions
+2025-01-16 16:17:33,531 - INFO - Processed batch 7 in 40.98 seconds. Rows in this batch: 98848. Total rows processed: 700000
+2025-01-16 16:17:33,532 - INFO - Fetching batch 8 from tbl_transactions
+2025-01-16 16:19:38,849 - INFO - Processed batch 8 in 47.89 seconds. Rows in this batch: 99016. Total rows processed: 800000
+2025-01-16 16:19:38,850 - INFO - Fetching batch 9 from tbl_transactions
+2025-01-16 16:21:40,234 - INFO - Processed batch 9 in 65.51 seconds. Rows in this batch: 100000. Total rows processed: 900000
+2025-01-16 16:21:40,235 - INFO - Fetching batch 10 from tbl_transactions
+2025-01-16 16:23:29,224 - INFO - Processed batch 10 in 48.27 seconds. Rows in this batch: 97569. Total rows processed: 1000000
+2025-01-16 16:23:29,225 - INFO - Fetching batch 11 from tbl_transactions
+2025-01-16 16:24:06,590 - ERROR - Error syncing table tbl_transactions: ('01000', '[01000] [Microsoft][ODBC SQL Server Driver][DBNETLIB]ConnectionRead (recv()). (10053) (SQLGetData); [01000] [Microsoft][ODBC SQL Server Driver][DBNETLIB]General network error. Check your network documentation. (11)')
+2025-01-16 16:24:06,684 - ERROR - Failed to sync tbl_transactions: ('01000', '[01000] [Microsoft][ODBC SQL Server Driver][DBNETLIB]ConnectionRead (recv()). (10053) (SQLGetData); [01000] [Microsoft][ODBC SQL Server Driver][DBNETLIB]General network error. Check your network documentation. (11)')
+2025-01-16 16:24:07,222 - INFO - All tables synchronized successfully.
+2025-01-16 16:30:16,037 - ERROR - Connection error: ('08001', '[08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]SQL Server does not exist or access denied. (17) (SQLDriverConnect); [08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]ConnectionOpen (Connect()). (53)')
+2025-01-16 16:30:16,050 - ERROR - Error during synchronization: ('08001', '[08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]SQL Server does not exist or access denied. (17) (SQLDriverConnect); [08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]ConnectionOpen (Connect()). (53)')
+2025-01-16 16:35:16,905 - INFO - Table sync_timestamps ensured.
+2025-01-16 16:35:16,907 - INFO - Table sync_attempts ensured.
+2025-01-16 16:35:16,909 - INFO - Table sync_logs ensured.
+2025-01-16 16:35:17,432 - WARNING - Columns in source but not in target for tbl_transactions: {'baseamount', 'currencycode'}
+2025-01-16 16:35:17,433 - DEBUG - Fetching last sync info for tbl_transactions
+2025-01-16 16:35:17,436 - INFO - Starting sync of tbl_transactions
+2025-01-16 16:35:17,436 - DEBUG - Checking for changes since 2000-01-01 00:00:00
+2025-01-16 16:35:17,599 - INFO - Fetching batch 1 from tbl_transactions
+2025-01-16 16:37:08,577 - INFO - Processed batch 1 in 33.82 seconds. Rows in this batch: 99976. Total rows processed: 100000
+2025-01-16 16:37:08,582 - INFO - Fetching batch 2 from tbl_transactions
+2025-01-16 16:39:06,693 - INFO - Processed batch 2 in 42.79 seconds. Rows in this batch: 99902. Total rows processed: 200000
+2025-01-16 16:39:06,695 - INFO - Fetching batch 3 from tbl_transactions
+2025-01-16 16:41:43,384 - INFO - Processed batch 3 in 49.98 seconds. Rows in this batch: 98420. Total rows processed: 300000
+2025-01-16 16:41:43,385 - INFO - Fetching batch 4 from tbl_transactions
+2025-01-16 16:43:30,553 - INFO - Processed batch 4 in 45.66 seconds. Rows in this batch: 99937. Total rows processed: 400000
+2025-01-16 16:43:30,554 - INFO - Fetching batch 5 from tbl_transactions
+2025-01-16 16:45:34,608 - INFO - Processed batch 5 in 47.11 seconds. Rows in this batch: 99965. Total rows processed: 500000
+2025-01-16 16:45:34,609 - INFO - Fetching batch 6 from tbl_transactions
+2025-01-16 16:48:00,252 - INFO - Processed batch 6 in 63.61 seconds. Rows in this batch: 97685. Total rows processed: 600000
+2025-01-16 16:48:00,254 - INFO - Fetching batch 7 from tbl_transactions
+2025-01-16 16:50:35,044 - INFO - Processed batch 7 in 53.51 seconds. Rows in this batch: 98848. Total rows processed: 700000
+2025-01-16 16:50:35,046 - INFO - Fetching batch 8 from tbl_transactions

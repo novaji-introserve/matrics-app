@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="CaseDashboard" owl="1">
+        <div class="case-dashboard-shell">
+            <div class="case-dashboard-hero">
+                <div class="case-dashboard-hero__copy">
+                    <span class="case-dashboard-hero__eyebrow">Case Management</span>
+                    <h1 class="case-dashboard-hero__title">Investigations Overview</h1>
+                    <p class="case-dashboard-hero__subtitle">
+                        Track case volume, status movement, and risk intensity across your assigned workload.
+                    </p>
+                </div>
+                <div class="case-dashboard-hero__controls">
+                    <label class="case-dashboard-filter">
+                        <span>Period</span>
+                        <select class="form-select" t-model="state.period" t-on-change="OnChangePeriod" t-att-disabled="state.isLoading">
+                            <option value="0">Today</option>
+                            <option value="1">Yesterday</option>
+                            <option value="7">Last 7 Days</option>
+                            <option value="30">Last 1 Month</option>
+                        </select>
+                    </label>
+                    <label class="case-dashboard-filter">
+                        <span>Refresh</span>
+                        <select class="form-select" t-att-value="state.refreshRate" t-on-change="onRefreshRateChange" t-att-disabled="state.isLoading">
+                            <option value="1">1 min</option>
+                            <option value="5">5 mins</option>
+                            <option value="10">10 mins</option>
+                            <option value="30">30 mins</option>
+                            <option value="60">60 mins</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+
+            <div class="case-dashboard-meta">
+                <div class="case-dashboard-meta__card">
+                    <span class="case-dashboard-meta__label">Scope</span>
+                    <strong>My Cases</strong>
+                </div>
+                <div class="case-dashboard-meta__card">
+                    <span class="case-dashboard-meta__label">Window</span>
+                    <strong t-esc="currentPeriodLabel" />
+                </div>
+                <div class="case-dashboard-meta__card">
+                    <span class="case-dashboard-meta__label">Cards</span>
+                    <strong t-esc="state.stats.length" />
+                </div>
+            </div>
+
+            <div t-if="state.isLoading" class="case-dashboard-loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p>Loading dashboard data...</p>
+            </div>
+
+            <div t-else="">
+                <div class="case-dashboard-cards">
+                    <t t-foreach="state.stats" t-as="stat" t-key="stat.id">
+                        <KpiCard t-props="getKpiCardProps(stat)" />
+                    </t>
+                </div>
+
+                <div class="case-dashboard-grid">
+                    <section class="case-dashboard-panel">
+                        <div class="case-dashboard-panel__header">
+                            <div>
+                                <h2>Case Status Distribution</h2>
+                                <p>How active cases are distributed across the lifecycle.</p>
+                            </div>
+                        </div>
+                        <div class="case-dashboard-panel__body">
+                            <ChartRenderer type="'pie'" title="'Status Distribution'" config="state.caseStatusChart" onClick.bind="viewByStatus" />
+                        </div>
+                    </div>
+                    <section class="case-dashboard-panel">
+                        <div class="case-dashboard-panel__header">
+                            <div>
+                                <h2>Case Rating Distribution</h2>
+                                <p>Risk concentration across low, medium, and high priority cases.</p>
+                            </div>
+                        </div>
+                        <div class="case-dashboard-panel__body">
+                            <ChartRenderer type="'bar'" title="'Priority Distribution'" config="state.caseRatingChart" onClick.bind="viewByRating" />
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+   <!-- API Settings Views -->
+    <record id="view_newsearch_settings_form" model="ir.ui.view">
+        <field name="name">icomply.newsearch.settings.form</field>
+        <field name="model">icomply.newsearch.settings</field>
+        <field name="arch" type="xml">
+            <form string="Newsearch API Settings">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="api_key" password="True"/>
+                            <field name="api_endpoint"/>
+                        </group>
+                        <group>
+                            <field name="update_frequency"/>
+                            <field name="last_update" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

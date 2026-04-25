@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_regulatory_report_user,res.regulatory.report user,model_res_regulatory_report,regulatory_reports.group_regulatory_report,1,1,1,1
+access_regulatory_report_officer,res.regulatory.report officer,model_res_regulatory_report,compliance_management.group_compliance_compliance_officer,1,1,1,1
+access_regulatory_report_run_user,res.regulatory.report.run user,model_res_regulatory_report_run,regulatory_reports.group_regulatory_report,1,1,1,1
+access_regulatory_report_run_officer,res.regulatory.report.run officer,model_res_regulatory_report_run,compliance_management.group_compliance_compliance_officer,1,1,1,1

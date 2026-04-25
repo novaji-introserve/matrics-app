@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="owl.ComplianceDashboardV3" owl="1">
+        <div class="cm-dashboard-shell">
+            <div class="cm-dashboard-hero">
+                <div class="cm-dashboard-hero__copy">
+                    <span class="cm-dashboard-hero__eyebrow" t-esc="heroEyebrow" />
+                    <h1 class="cm-dashboard-hero__title">Operational Insights</h1>
+                    <p class="cm-dashboard-hero__subtitle" t-esc="heroSubtitle" />
+                </div>
+                <div class="cm-dashboard-hero__controls">
+                    <label class="cm-dashboard-filter">
+                        <span>Period</span>
+                        <select class="form-select" t-att-value="state.datepicked" t-on-change="onDateChange">
+                            <option value="0">Today</option>
+                            <option value="1">Yesterday</option>
+                            <option value="7">Last 7 days</option>
+                            <option value="30">Last 1 month</option>
+                        </select>
+                    </label>
+                    <label class="cm-dashboard-filter">
+                        <span>Refresh</span>
+                        <select class="form-select" t-att-value="state.refreshRate" t-on-change="onRefreshRateChange">
+                            <option value="1">1 minute</option>
+                            <option value="5">5 minutes</option>
+                            <option value="30">30 minutes</option>
+                            <option value="60">60 minutes</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+
+            <div class="cm-dashboard-meta">
+                <div class="cm-dashboard-meta__card">
+                    <span class="cm-dashboard-meta__label">Scope</span>
+                    <strong t-esc="state.cco ? 'All branches' : 'Assigned branches'" />
+                </div>
+                <div class="cm-dashboard-meta__card">
+                    <span class="cm-dashboard-meta__label">Window</span>
+                    <strong t-esc="currentPeriodLabel" />
+                </div>
+                <div class="cm-dashboard-meta__card">
+                    <span class="cm-dashboard-meta__label">Charts</span>
+                    <strong t-esc="selectedCharts.length" />
+                </div>
+            </div>
+
+            <div class="cm-dashboard-cards">
+                <t t-if="state.loadingStates.stats">
+                    <t t-foreach="[1,2,3,4,5,6]" t-as="placeholder" t-key="placeholder">
+                        <div class="cm-dashboard-cards__placeholder">
+                            <div class="placeholder-glow">
+                                <span class="placeholder col-6"></span>
+                            </div>
+                            <div class="placeholder-glow mt-3">
+                                <span class="placeholder col-8"></span>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+                <t t-else="">
+                    <t t-foreach="state.stats" t-as="cardItem" t-key="cardItem.id">
+                        <div class="cm-dashboard-cards__item">
+                            <Card t-props="getCardProps(cardItem)" />
+                        </div>
+                    </t>
+                </t>
+            </div>
+
+            <div class="cm-dashboard-grid">
+                <t t-if="state.loadingStates.charts">
+                    <t t-foreach="[1,2,3]" t-as="placeholder" t-key="placeholder">
+                        <section class="cm-dashboard-panel cm-dashboard-panel--wide">
+                            <div class="cm-dashboard-panel__header">
+                                <h2>Loading chart data...</h2>
+                                <p>Please wait while the dashboard refreshes.</p>
+                            </div>
+                            <div class="cm-dashboard-panel__body d-flex justify-content-center align-items-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </section>
+                    </t>
+                </t>
+                <t t-else="">
+                    <t t-if="selectedCharts.length">
+                        <t t-foreach="primaryCharts" t-as="chart" t-key="chart.id">
+                            <section class="cm-dashboard-panel cm-dashboard-panel--wide">
+                                <div class="cm-dashboard-panel__header">
+                                    <div>
+                                        <h2 t-esc="chart.title" />
+                                        <p t-esc="chart.display_summary" />
+                                    </div>
+                                </div>
+                                <t t-if="hasChartData(chart)">
+                                    <div class="cm-dashboard-panel__body chart shadow-0 bg-transparent">
+                                        <ChartRenderer 
+                                            data="chart" 
+                                            admin="state.cco" 
+                                            branches_id="state.branches_id" 
+                                            date="state.datepicked" 
+                                            isLoading="state.loadingStates.charts"
+                                            dynamic="state.useDynamicLoading" 
+                                        />
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <div class="cm-dashboard-panel__body cm-dashboard-panel__empty-state">
+                                        <div>
+                                            <strong>No data available</strong>
+                                            <p>This chart is configured and loaded, but there are no matching records for the current scope.</p>
+                                        </div>
+                                    </div>
+                                </t>
+                            </section>
+                            <t t-if="chart.id === 'top_accounts' and casePieCharts.length">
+                                <div class="cm-dashboard-grid cm-dashboard-grid--split">
+                                    <t t-foreach="casePieCharts" t-as="chart" t-key="chart.id">
+                                        <section class="cm-dashboard-panel">
+                                            <div class="cm-dashboard-panel__header">
+                                                <div>
+                                                    <h2 t-esc="chart.title" />
+                                                    <p>Case distribution for the selected scope and period.</p>
+                                                </div>
+                                            </div>
+                                            <t t-if="hasChartData(chart)">
+                                                <div class="cm-dashboard-panel__body chart shadow-0 bg-transparent">
+                                                    <ChartRenderer 
+                                                        data="chart" 
+                                                        admin="state.cco" 
+                                                        branches_id="state.branches_id" 
+                                                        date="state.datepicked" 
+                                                        isLoading="state.loadingStates.charts"
+                                                        dynamic="state.useDynamicLoading" 
+                                                    />
+                                                </div>
+                                            </t>
+                                            <t t-else="">
+                                                <div class="cm-dashboard-panel__body cm-dashboard-panel__empty-state">
+                                                    <div>
+                                                        <strong>No data available</strong>
+                                                        <p>There are no matching cases for this view and filter set.</p>
+                                                    </div>
+                                                </div>
+                                            </t>
+                                        </section>
+                                    </t>
+                                </div>
+                            </t>
+                        </t>
+                    </t>
+                    <t t-else="">
+                        <div class="cm-dashboard-empty">
+                            No dashboard chart configuration was found for the selected view.
+                        </div>
+                    </t>
+                </t>
+            </div>
+        </div>
+    </t>
+</templates>

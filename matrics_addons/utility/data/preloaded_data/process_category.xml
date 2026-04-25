@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Preload data for Process Categories -->
+    <record id="process_category_1" model="process.category">
+        <field name="name">Compliance Review</field>
+        <field name="description">Reviewing compliance with applicable regulations.</field>
+    </record>
+    <record id="process_category_2" model="process.category">
+        <field name="name">Fraud Detection</field>
+        <field name="description">Identifying potential fraudulent activities.</field>
+    </record>
+    <record id="process_category_3" model="process.category">
+        <field name="name">Transaction Monitoring</field>
+        <field name="description">Monitoring transactions for unusual patterns.</field>
+    </record>
+    <record id="process_category_4" model="process.category">
+        <field name="name">AML Checks</field>
+        <field name="description">Conducting Anti-Money Laundering checks on transactions.</field>
+    </record>
+    <record id="process_category_5" model="process.category">
+        <field name="name">Risk Assessment</field>
+        <field name="description">Evaluating risks associated with various operations.</field>
+    </record>
+    <record id="process_category_6" model="process.category">
+        <field name="name">Audit Trail Review</field>
+        <field name="description">Reviewing audit trails for accountability.</field>
+    </record>
+    <record id="process_category_7" model="process.category">
+        <field name="name">Regulatory Compliance</field>
+        <field name="description">Ensuring compliance with regulatory requirements.</field>
+    </record>
+    <record id="process_category_8" model="process.category">
+        <field name="name">Loan Management</field>
+        <field name="description">Managing loans and related processes.</field>
+    </record>
+    <record id="process_category_9" model="process.category">
+        <field name="name">Credit Card Screening</field>
+        <field name="description">Screening credit card transactions for security.</field>
+    </record>
+    <record id="process_category_10" model="process.category">
+        <field name="name">Fraud Reporting</field>
+        <field name="description">Reporting fraudulent activities for further investigation.</field>
+    </record>
+    <record id="process_category_11" model="process.category">
+        <field name="name">Customer Identification</field>
+        <field name="description">Identifying customers to prevent fraud.</field>
+    </record>
+    <record id="process_category_12" model="process.category">
+        <field name="name">Due Diligence</field>
+        <field name="description">Conducting due diligence on clients and transactions.</field>
+    </record>
+    <record id="process_category_13" model="process.category">
+        <field name="name">Internal Control Checks</field>
+        <field name="description">Verifying internal controls to mitigate risks.</field>
+    </record>
+    <record id="process_category_14" model="process.category">
+        <field name="name">Policy Enforcement</field>
+        <field name="description">Enforcing organizational policies and procedures.</field>
+    </record>
+    <record id="process_category_15" model="process.category">
+        <field name="name">Anti-Bribery</field>
+        <field name="description">Implementing measures against bribery and corruption.</field>
+    </record>
+    <record id="process_category_16" model="process.category">
+        <field name="name">Whistleblower Investigation</field>
+        <field name="description">Investigating reports from whistleblowers.</field>
+    </record>
+    <record id="process_category_17" model="process.category">
+        <field name="name">Risk Management</field>
+        <field name="description">Managing risks to improve business resilience.</field>
+    </record>
+    <record id="process_category_18" model="process.category">
+        <field name="name">Capital Monitoring</field>
+        <field name="description">Monitoring capital to ensure financial health.</field>
+    </record>
+    <record id="process_category_19" model="process.category">
+        <field name="name">Cashflow Compliance</field>
+        <field name="description">Ensuring compliance with cash flow regulations.</field>
+    </record>
+    <record id="process_category_20" model="process.category">
+        <field name="name">Asset Auditing</field>
+        <field name="description">Conducting audits of company assets.</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data noupdate="1">
+    
+        <!-- Sample Watchlist Records -->
+        <record id="watchlist_demo_01" model="res.partner.watchlist">
+            <field name="surname">Okonkwo</field>
+            <field name="first_name">Chinedu</field>
+            <field name="middle_name">Ifeanyi</field>
+            <field name="name">Chinedu Ifeanyi Okonkwo</field>
+            <field name="bvn">8041365792</field>
+        </record>
+
+        <record id="watchlist_demo_02" model="res.partner.watchlist">
+            <field name="surname">Abubakar</field>
+            <field name="first_name">Fatima</field>
+            <field name="middle_name">Zainab</field>
+            <field name="name">Fatima Zainab Abubakar</field>
+            <field name="bvn">6729451083</field>
+        </record>
+
+        <record id="watchlist_demo_03" model="res.partner.watchlist">
+            <field name="surname">Johnson</field>
+            <field name="first_name">David</field>
+            <field name="middle_name">Michael</field>
+            <field name="name">David Michael Johnson</field>
+            <field name="bvn">9024351083</field>
+        </record>
+
+
+
+
+        <!-- Sample Blacklist Records with New Names -->
+        <record id="blacklist_demo_01" model="res.partner.blacklist">
+            <field name="surname">Smith</field>
+            <field name="first_name">John</field>
+            <field name="middle_name">Alexander</field>
+            <field name="name">John Alexander Smith</field>
+            <field name="bvn">5298431026</field>
+        </record>
+
+        <record id="blacklist_demo_02" model="res.partner.blacklist">
+            <field name="surname">Taylor</field>
+            <field name="first_name">Emma</field>
+            <field name="middle_name">Rose</field>
+            <field name="name">Emma Rose Taylor</field>
+            <field name="bvn">7610954832</field>
+        </record>
+
+        <record id="blacklist_demo_03" model="res.partner.blacklist">
+            <field name="surname">Williams</field>
+            <field name="first_name">Michael</field>
+            <field name="middle_name">James</field>
+            <field name="name">Michael James Williams</field>
+            <field name="bvn">3942087651</field>
+
+        </record>
+
+        <!-- Sample Watchlist Records -->
+        <record id="watchlist_demo_1" model="res.partner.watchlist">
+            <field name="surname">Okonkwo</field>
+            <field name="first_name">Chinedu</field>
+            <field name="middle_name">Ifeanyi</field>
+            <field name="name">Chinedu Ifeanyi Okonkwo</field>
+            <field name="bvn">8041365792</field>
+        </record>
+
+        <record id="watchlist_demo_2" model="res.partner.watchlist">
+            <field name="surname">Abubakar</field>
+            <field name="first_name">Fatima</field>
+            <field name="middle_name">Zainab</field>
+            <field name="name">Fatima Zainab Abubakar</field>
+            <field name="bvn">6729451083</field>
+        </record>
+
+        <record id="watchlist_demo_3" model="res.partner.watchlist">
+            <field name="surname">Johnson</field>
+            <field name="first_name">David</field>
+            <field name="middle_name">Michael</field>
+            <field name="name">David Michael Johnson</field>
+            <field name="bvn">9024351083</field>
+        </record>
+    
+    </data>
+    
+
+</odoo>

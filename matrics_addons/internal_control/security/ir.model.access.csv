@@ -1,0 +1,23 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_res_internal_control_account_monitoring,access_res_internal_control_account_monitoring,internal_control.model_res_internal_control_account_monitoring,base.group_user,1,1,1,1
+access_res_internal_control_fraud_monitoring,access_res_internal_control_fraud_monitoring,internal_control.model_res_internal_control_fraud_monitoring,base.group_user,1,1,1,1
+access_process_category_rules,access process category rules,internal_control.model_process_category,base.group_user,1,1,1,1
+access_process_rules,access process rules,internal_control.model_process,base.group_user,1,1,1,1
+access_res_partner_town,access res partner town,internal_control.model_res_partner_town,base.group_user,1,1,1,1
+access_res_default_transaction_limit,access res default transaction limit,internal_control.model_res_default_transaction_limit,base.group_user,1,1,1,1
+access_res_customer_type,access res customer type,internal_control.model_res_customer_type,base.group_user,1,1,1,1
+access_res_transaction_status,access res transaction status,internal_control.model_res_transaction_status,base.group_user,1,1,1,1
+access_res_user_status,access res user status,internal_control.model_res_user_status,base.group_user,1,1,1,1
+access_res_account_officer,access res account officer,internal_control.model_res_account_officer,base.group_user,1,1,1,1
+access_res_sub_branch,access res sub branch,internal_control.model_res_subbranch,base.group_user,1,1,1,1
+access_res_module,access res module,internal_control.model_res_module,base.group_user,1,1,1,1
+access_res_audit_trail,access res audit trail,internal_control.model_res_audit_trail,base.group_user,1,1,1,1
+access_res_glclasslv2,access res glclasslv2,internal_control.model_res_glclasslv2,base.group_user,1,1,1,1
+access_res_glclasslv3,access res glclasslv3,internal_control.model_res_glclasslv3,base.group_user,1,1,1,1
+access_res_mandatepicts,access res mandatepicts,internal_control.model_res_mandatepicts,base.group_user,1,1,1,1
+access_res_reactivation,access res reactivation,internal_control.model_res_reactivation,base.group_user,1,1,1,1
+access_bankgl,access bankgl,internal_control.model_res_bankgl,base.group_user,1,1,1,1
+access_bank_product,access bank product,internal_control.model_res_bank_product,base.group_user,1,1,1,1
+
+
+

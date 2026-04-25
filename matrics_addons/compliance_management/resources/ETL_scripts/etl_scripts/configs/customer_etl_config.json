@@ -1,0 +1,248 @@
+{
+  "tables": {
+    "test_ods_sb_productdb_products": {
+      "source_table": "test_ods_sb_productdb_products",
+      "target_table": "res_partner_account_product",
+      "target_primary_key": "product_id",
+      "batch_size": 1000,
+      "dependencies": [],
+      "mappings": {
+        "code": {
+          "target": "code",
+          "type": "direct"
+        },
+        "product_id": {
+          "target": "product_id",
+          "type": "direct"
+        },
+        "name": {
+          "target": "name",
+          "type": "direct"
+        },
+        "product_category": {
+          "target": "product_category",
+          "type": "direct"
+        },
+        "description": {
+          "target": "description",
+          "type": "direct"
+        },
+        "product_type_name": {
+          "target": "product_type",
+          "type": "direct"
+        }
+      }
+    },
+    
+    "test_ods_dimindustries": {
+      "source_table": "test_ods_dimindustries",
+      "target_table": "customer_industry",
+      "target_primary_key": "code",
+      "batch_size": 1000,
+      "dependencies": [],
+      "mappings": {
+        "code": { "target": "code", "type": "direct" },
+        "description": { "target": "name", "type": "direct" }
+      }
+    },
+
+    "test_ods_account_officers": {
+      "source_table": "test_ods_account_officers",
+      "target_table": "account_officers",
+      "target_primary_key": "dept_acct_off_code",
+      "batch_size": 5000,
+      "dependencies": [],
+      "mappings": {
+        "dept_acct_off_code": {
+          "target": "code",
+          "type": "direct"
+        },
+        "name": {
+          "target": "name",
+          "type": "direct"
+        },
+        "area": {
+          "target": "area",
+          "type": "direct"
+        }
+      }
+    },
+
+    "test_ods_sectors": {
+      "source_table": "test_ods_sectors",
+      "target_table": "res_partner_sector",
+      "target_primary_key": "code",
+      "batch_size": 5000,
+      "dependencies": [],
+      "mappings": {
+        "code": {
+          "target": "code",
+          "type": "direct"
+        },
+        "description": {
+          "target": "name",
+          "type": "direct"
+        }
+      }
+    },
+
+    "test_ods_branches": {
+      "source_table": "test_ods_branches",
+      "target_table": "res_branch",
+      "target_primary_key": "branch_name",
+      "batch_size": 1000,
+      "dependencies": [],
+      "mappings": {
+        "branch_code": {
+          "target": "code",
+          "type": "direct"
+        },
+        "branch_name": {
+          "target": "name",
+          "type": "direct"
+        },
+        "zone": {
+          "target": "zone",
+          "type": "direct"
+        },
+        "address": {
+          "target": "address",
+          "type": "direct"
+        },
+        "state_located": {
+          "target": "state_located",
+          "type": "direct"
+        },
+        "town_area": {
+          "target": "town_area",
+          "type": "direct"
+        },
+        "region": {
+          "target": "region",
+          "type": "direct"
+        }
+      }
+    },
+    "test_ods_customers": {
+      "source_table": "test_ods_customers",
+      "target_table": "res_partner",
+      "target_primary_key": "customer_id",
+      "batch_size": 1000,
+      "dependencies": [],
+      "mappings": {
+        "customer_id": {
+          "target": "customer_id",
+          "type": "direct"
+        },
+        "name_1": {
+          "target": "name",
+          "type": "direct"
+        },
+        "customer_since": {
+          "target": "registration_date",
+          "type": "direct"
+        },
+        "street": {
+          "target": "street",
+          "type": "direct"
+        },
+        "title": {
+          "target": "customer_title",
+          "type": "direct"
+        },
+       
+        "address": {
+          "target": "address",
+          "type": "direct"
+        },
+        "town_country": {
+          "target": "town",
+          "type": "direct"
+        },
+        "given_names": {
+          "target": "firstname",
+          "type": "direct"
+        },
+        "family_name": {
+          "target": "lastname",
+          "type": "direct"
+        },
+        "date_of_birth": {
+          "target": "dob",
+          "type": "direct"
+        },
+        "marital_status": {
+          "target": "marital_status",
+          "type": "direct"
+        },
+        "phone_1": {
+          "target": "phone",
+          "type": "direct"
+        },
+        "email_1": {
+          "target": "email",
+          "type": "direct"
+        },
+        "sms_1": {
+          "target": "customer_phone",
+          "type": "direct"
+        },
+        "pep": {
+          "target": "pep",
+          "type": "direct"
+        },
+        "employment_status": {
+          "target": "employment_status",
+          "type": "direct"
+        },
+        "state_residence": {
+          "target": "state_residence",
+          "type": "direct"
+        },
+        "gender": {
+          "target": "gender",
+          "type": "direct"
+        },
+        "middle_name": {
+          "target": "middlename",
+          "type": "direct"
+        },
+        "bvn": {
+          "target": "bvn",
+          "type": "direct"
+        },
+        "nin": {
+          "target": "nin",
+          "type": "direct"
+        },
+        "customer_rating": {
+          "target": "customer_rating",
+          "type": "direct"
+        },
+        "sector": {
+          "target": "sector_id",
+          "type": "lookup",
+          "lookup_table": "res_partner_sector",
+          "lookup_key": "code",
+          "lookup_value": "id"
+        },
+        "account_officer": {
+          "target": "account_officer_id",
+          "type": "lookup",
+          "lookup_table": "account_officers",
+          "lookup_key": "name",
+          "lookup_value": "id"
+        },
+        "industry": {
+          "target": "customer_industry_id",
+          "type": "lookup",
+          "lookup_table": "customer_industry",
+          "lookup_key": "code",
+          "lookup_value": "id"
+        }
+      }
+    }
+
+   
+  }
+}

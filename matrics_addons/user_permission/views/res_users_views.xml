@@ -1,0 +1,22 @@
+<odoo>
+    <record id="view_res_users_form_custom" model="ir.ui.view">
+        <field name="name">res.users.form.inherit.custom</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='preferences']" position="after">
+                <page name="permissions" string="Permissions">
+                    <field name="custom_permission_ids" context="{'default_user_id': active_id}">
+                        <tree string="Permissions">
+                            <field name="model_id" />
+                            <field name="can_create" />
+                            <field name="can_read" />
+                            <field name="can_write" />
+                            <field name="can_delete" />
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

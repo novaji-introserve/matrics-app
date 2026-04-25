@@ -1,0 +1,284 @@
+<odoo>
+
+   <data noupdate="1">
+    <!-- Settings-->
+    <record id="res_compl_settings_risk_plan_computation" model="res.compliance.settings">
+        <field name="name">Risk Analysis Computation</field>
+        <field name="code">risk_plan_computation</field>
+        <field name="val">sum</field>
+        <field name="narration">Deteremines the policy for computing the risk Analysis from the set
+            of plan
+            Values:
+            avg: use the average
+            sum: use the sum total
+            max: use the maximum. Default
+        </field>
+    </record>
+
+    <record id="res_compl_settings_risk_assessment_computation" model="res.compliance.settings">
+        <field name="name">Risk Assessment Computation</field>
+        <field name="code">risk_assessment_computation</field>
+        <field name="val">avg</field>
+        <field name="narration">Deteremines the policy for computing the risk assessment from the set
+            of plan
+            Values:
+            avg: use the average Default
+            sum: use the sum total
+            max: use the maximum. 
+        </field>
+    </record>
+
+    <record id="res_compl_settings_risk_composite_computation" model="res.compliance.settings">
+        <field name="name">Risk Composite Computation</field>
+        <field name="code">risk_composite_computation</field>
+        <field name="val">avg</field>
+        <field name="narration">Deteremines the policy for computing the risk composite from the set
+            of plan
+            Values:
+            avg: use the average Default
+            sum: use the sum total
+            max: use the maximum. 
+        </field>
+    </record>
+
+    <record id="res_compl_settings_default_risk_score" model="res.compliance.settings">
+        <field name="name">Default Risk Score</field>
+        <field name="code">default_risk_score</field>
+        <field name="val">1</field>
+        <field name="narration">Default Risk Score</field>
+    </record>
+    <record id="res_compl_settings_low_risk_threshold" model="res.compliance.settings">
+        <field name="name">Low Risk Threshold</field>
+        <field name="code">low_risk_threshold</field>
+        <field name="val">3.9</field>
+        <field name="narration">Low Risk Threshold</field>
+    </record>
+    <record id="res_compl_settings_medium_risk_threshold" model="res.compliance.settings">
+        <field name="name">Medium Risk Threshold</field>
+        <field name="code">medium_risk_threshold</field>
+        <field name="val">6.9</field>
+        <field name="narration">Medium Risk Threshold</field>
+    </record>
+    <record id="res_compl_settings_high_risk_threshold" model="res.compliance.settings">
+        <field name="name">High Risk Threshold</field>
+        <field name="code">high_risk_threshold</field>
+        <field name="val">9</field>
+        <field name="narration">High Risk Threshold</field>
+    </record>
+    <record id="res_compl_settings_max_risk_score" model="res.compliance.settings">
+        <field name="name">Maximum Risk Threshold</field>
+        <field name="code">maximum_risk_threshold</field>
+        <field name="val">9</field>
+        <field name="narration">Maximum Risk Threshold</field>
+    </record>
+    <function model="ir.config_parameter" name="set_param"
+        eval="('gemini_api_key', 'AIzaSyAvRsSTIahJWVT-iwPC1nPrSqUoK_fsBq4')" />
+    <function model="ir.config_parameter" name="set_param"
+        eval="('opensanctions_api_key', '1731b7a13f6c63e6a9bbb550981e6a18')" />
+     <function model="ir.config_parameter" name="set_param"
+            eval="('risk_management.max_slider_score', '9')" />
+     <function model="ir.config_parameter" name="set_param"
+            eval="('risk_management.min_slider_score', '0')" />
+    <!--  Gender -->
+    <record id="res_partner_gender_male" model="res.partner.gender">
+        <field name="name">Male</field>
+    </record>
+    <record id="res_partner_gender_female" model="res.partner.gender">
+        <field name="name">Female</field>
+    </record>
+    <record id="res_partner_gender_trans" model="res.partner.gender">
+        <field name="name">Trans Gender</field>
+    </record>
+    <record id="res_partner_gender_other" model="res.partner.gender">
+        <field name="name">Other</field>
+    </record>
+    <!-- Maritak Status-->
+    <record id="res_partner_marital_single" model="res.marital.status">
+        <field name="name">Single</field>
+    </record>
+    <record id="res_partner_marital_married" model="res.marital.status">
+        <field name="name">Married</field>
+    </record>
+    <record id="res_partner_marital_divorced" model="res.marital.status">
+        <field name="name">Divorced</field>
+    </record>
+    <!-- Compliance Stats  -->
+    <record id="res_compl_stat_1" model="res.compliance.stat">
+        <field name="name">Avg. Customer Risk Score</field>
+        <field name="code">avg_cust_risk_score</field>
+        <field name="resource_id" ref="compliance_management.res_resource_uri_customer"/>
+        <field name="domain">[('internal_category', '=', 'customer'), ('active', '=', True)]</field>
+        <field name="scope">bank</field>
+        <field name="display_summary">Average customer risk score across active customer records.</field>
+        <field name="sql_query">SELECT ROUND(AVG(risk_score), 2) FROM res_partner WHERE internal_category = 'customer' AND active IS TRUE</field>
+    </record>
+    <record id="res_compl_stat_2" model="res.compliance.stat">
+        <field name="name">Total Customers</field>
+        <field name="code">total_cust</field>
+        <field name="resource_id" ref="compliance_management.res_resource_uri_customer"/>
+        <field name="domain">[('internal_category', '=', 'customer'), ('active', '=', True)]</field>
+        <field name="scope">bank</field>
+        <field name="display_summary">Total active customers currently tracked in compliance.</field>
+        <field name="sql_query">SELECT COUNT(id) FROM res_partner WHERE internal_category = 'customer' AND active IS TRUE</field>
+    </record>
+    <record id="res_compl_stat_3" model="res.compliance.stat">
+        <field name="name">Customers without BVN</field>
+        <field name="code">customers_no_bvn</field>
+        <field name="resource_id" ref="compliance_management.res_resource_uri_customer"/>
+        <field name="domain">[('internal_category', '=', 'customer'), ('active', '=', True), '|', ('bvn', '=', False), ('bvn', 'ilike', 'NOBVN%')]</field>
+        <field name="scope">regulatory</field>
+        <field name="display_summary">Active customers missing BVN details and requiring remediation.</field>
+        <field name="sql_query">SELECT COUNT(id) FROM res_partner WHERE internal_category = 'customer' AND active IS TRUE AND (bvn IS NULL OR bvn LIKE 'NOBVN%')</field>
+        <!-- <field name="sql_query">select count(id) from res_partner where bvn is null </field> -->
+    </record>
+    <record id="res_compl_stat_4" model="res.compliance.stat">
+        <field name="name">PEP Customers</field>
+        <field name="code">pep_customers</field>
+        <field name="resource_id" ref="compliance_management.res_resource_uri_customer"/>
+        <field name="domain">[('internal_category', '=', 'customer'), ('active', '=', True), ('is_pep', '=', True)]</field>
+        <field name="scope">regulatory</field>
+        <field name="display_summary">Customers currently flagged as politically exposed persons.</field>
+        <field name="sql_query">SELECT COUNT(id) FROM res_partner WHERE internal_category = 'customer' AND active IS TRUE AND is_pep IS TRUE</field>
+    </record>
+    <record id="res_compl_stat_5" model="res.compliance.stat">
+        <field name="name">Branches</field>
+        <field name="code">branch_tot</field>
+        <field name="domain">[]</field>
+        <field name="scope">branch</field>
+        <field name="display_summary">Total branches represented in the monitoring footprint.</field>
+        <field name="sql_query">select count(id) from res_branch</field>
+    </record>
+    <record id="res_compl_stat_6" model="res.compliance.stat">
+        <field name="name">Risk Universe</field>
+        <field name="code">risk_univ_cnt</field>
+        <field name="domain">[]</field>
+        <field name="scope">risk</field>
+        <field name="display_summary">Number of risk-universe categories configured for assessment.</field>
+        <field name="sql_query">select count(id) from res_risk_universe</field>
+    </record>
+    <record id="res_compl_stat_7" model="res.compliance.stat">
+        <field name="name">Global PEP List</field>
+        <field name="code">global_pep</field>
+        <field name="resource_id" ref="compliance_management.res_resource_uri_global_pep_list"/>
+        <field name="domain">[]</field>
+        <field name="scope">regulatory</field>
+        <field name="display_summary">Entries currently available in the imported global PEP list.</field>
+        <field name="sql_query">select count(id) from res_pep</field>
+    </record>
+    <record id="res_compl_stat_8" model="res.compliance.stat">
+        <field name="name">WatchList</field>
+        <field name="code">watch_list</field>
+        <field name="resource_id" ref="compliance_management.res_resource_uri_watchlist"/>
+        <field name="domain">[]</field>
+        <field name="scope">regulatory</field>
+        <field name="display_summary">Watchlist records available for customer screening checks.</field>
+        <field name="sql_query">select count(id) from res_partner_watchlist</field>
+    </record>
+   
+    <!--  KYC Limit -->
+
+    <record id="res_partner_kyc_limit_1" model="res.partner.kyc.limit">
+        <field name="name">Less Than Ngn 50000</field>
+        <field name="code">less_than_ngn_50000</field>
+        
+    </record>
+
+
+    <record id="res_partner_kyc_limit_2" model="res.partner.kyc.limit">
+        <field name="name">Between 51000-500000</field>
+        <field name="code">between_51000-500000</field>
+    </record>
+
+
+    <record id="res_partner_kyc_limit_3" model="res.partner.kyc.limit">
+        <field name="name">Between 500000-1m</field>
+        <field name="code">between_500000-1m</field>
+    </record>
+
+
+    <record id="res_partner_kyc_limit_4" model="res.partner.kyc.limit">
+        <field name="name">Between 1m-5m</field>
+        <field name="code">between_1m-5m</field>
+    </record>
+
+
+    <record id="res_partner_kyc_limit_5" model="res.partner.kyc.limit">
+        <field name="name">Above 5m</field>
+        <field name="code">above_5m</field>
+    </record>
+
+    
+    <!-- Identification Type-->
+
+    <record id="res_partner_iden_type_1" model="res.identification.type">
+        <field name="name">Voters Id</field>
+        <field name="code">voters_id</field>
+        
+    </record>
+
+
+    <record id="res_partner_iden_type_2" model="res.identification.type">
+        <field name="name">International Passport</field>
+        <field name="code">international_passport</field>
+    </record>
+
+
+    <record id="res_partner_iden_type_5" model="res.identification.type">
+        <field name="name">Driving License</field>
+        <field name="code">driving_license</field>
+    </record>
+
+
+    <record id="res_partner_iden_type_6" model="res.identification.type">
+        <field name="name">Military Card</field>
+        <field name="code">military_card</field>
+    </record>
+
+
+    <record id="res_partner_iden_type_12" model="res.identification.type">
+        <field name="name">Juridicary Card</field>
+        <field name="code">juridicary_card</field>
+    </record>
+
+
+    <record id="res_partner_iden_type_99" model="res.identification.type">
+        <field name="name">Permit For Permanent Residence</field>
+        <field name="code">permit_for_permanent_residence</field>
+    </record>
+
+
+    <record id="res_partner_iden_type_13" model="res.identification.type">
+        <field name="name">Nysc Id/Call Up Letter</field>
+        <field name="code">nysc_id/call_up_letter</field>
+    </record>
+
+
+    <record id="res_partner_iden_type_8" model="res.identification.type">
+        <field name="name">Office Id Card</field>
+        <field name="code">office_id_card</field>
+    </record>
+
+
+    <record id="res_partner_iden_type_9" model="res.identification.type">
+        <field name="name">Military Id Card</field>
+        <field name="code">military_id_card</field>
+    </record>
+
+
+    <record id="res_partner_iden_type_10" model="res.identification.type">
+        <field name="name">Foreign Id Card</field>
+        <field name="code">foreign_id_card</field>
+    </record>
+
+
+    <record id="res_partner_iden_type_7" model="res.identification.type">
+        <field name="name">Nimc</field>
+        <field name="code">nimc</field>
+    </record>
+
+   
+
+
+
+</data>
+</odoo>

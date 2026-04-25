@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data noupdate="0">
+    <!-- Create demo users for assignment -->
+    <record id="keyword_officer_john" model="res.users">
+      <field name="name">John Doe</field>
+      <field name="login">john.smith@example.com</field>
+      <field name="password">demo123</field>
+      <field name="groups_id" eval="[(6, 0, [ref('base.group_user')])]"/>
+      <field name="email">john.smith@example.com</field>
+    </record>
+
+
+    <!-- Create demo keywords with various risk levels -->
+    <record id="keyword_tracking_1" model="keyword.tracking">
+      <field name="name">Suspicious Payment</field>
+      <field name="code">SP001</field>
+      <field name="risk_level">high</field>
+      <field name="assigned_officers" eval="[(6, 0, [ref('keyword_officer_john')])]"/>
+      <field name="active" eval="True"/>
+    </record>
+
+    <record id="keyword_tracking_2" model="keyword.tracking">
+      <field name="name">Unusual Transaction</field>
+      <field name="code">UT002</field>
+      <field name="risk_level">medium</field>
+      <field name="assigned_officers" eval="[(6, 0, [ref('keyword_officer_john')])]"/>
+      <field name="active" eval="True"/>
+    </record>
+
+    <record id="keyword_tracking_3" model="keyword.tracking">
+      <field name="name">Illegal</field>
+      <field name="code">OA003</field>
+      <field name="risk_level">high</field>
+      <field name="assigned_officers" eval="[(6, 0, ref('keyword_officer_john')])]"/>
+      <field name="active" eval="True"/>
+    </record>
+
+    <record id="keyword_tracking_4" model="keyword.tracking">
+      <field name="name">Terrorism</field>
+      <field name="code">TR004</field>
+      <field name="risk_level">high</field>
+      <field name="assigned_officers" eval="[(6, 0, [ref('keyword_officer_john')])]"/>
+      <field name="active" eval="True"/>
+    </record>
+
+    <record id="keyword_tracking_5" model="keyword.tracking">
+      <field name="name">Tax Evasion</field>
+      <field name="code">TE005</field>
+      <field name="risk_level">high</field>
+      <field name="assigned_officers" eval="[(6, 0, [ref('keyword_officer_john')])]"/>
+      <field name="active" eval="True"/>
+    </record>
+
+    <record id="keyword_tracking_6" model="keyword.tracking">
+      <field name="name">Money Laundering</field>
+      <field name="code">ML006</field>
+      <field name="risk_level">high</field>
+      <field name="assigned_officers" eval="[(6, 0, [ref('keyword_officer_john')])]"/>
+      <field name="active" eval="True"/>
+    </record>
+
+
+    <record id="keyword_tracking_9" model="keyword.tracking">
+      <field name="name">Sanction</field>
+      <field name="code">SNCT009</field>
+      <field name="risk_level">high</field>
+      <field name="assigned_officers" eval="[(6, 0, [ref('keyword_officer_john')])]"/>
+      <field name="active" eval="True"/>
+    </record>
+
+    <record id="keyword_tracking_10" model="keyword.tracking">
+      <field name="name">Politically Exposed Person</field>
+      <field name="code">PEP010</field>
+      <field name="risk_level">high</field>
+      <field name="assigned_officers" eval="[(6, 0, [ref('keyword_officer_john')])]"/>
+      <field name="active" eval="True"/>
+    </record>
+
+    
+  </data>
+</odoo>

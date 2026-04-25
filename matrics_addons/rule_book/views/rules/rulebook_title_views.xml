@@ -1,0 +1,127 @@
+<odoo>
+    <record id="view_rulebook_title_tree" model="ir.ui.view">
+        <field name="name">rulebook.title.tree</field>
+        <field name="model">rulebook.title</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="file_name" />
+                <field name="released_date" />
+                <field name="source_id" />
+                <field name="created_on" optional="hide" />
+                <field name="created_by" optional="hide" />
+                <field name="input_type" widget="badge" decoration-info="input_type=='ai'" decoration-primary="input_type == 'manual'" />
+                <field name="status" widget="badge" decoration-success="status=='active'" decoration-muted="status == 'inactive'" decoration-danger="status == 'deleted'" />
+
+                <!-- Invisible column -->
+                <field name="active" invisible="1" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_rulebook_title_form" model="ir.ui.view">
+        <field name="name">rulebook.title.form</field>
+        <field name="model">rulebook.title</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_scan_keywords" string="Scan for Keywords" icon="fa-search"  type="object" class="oe_highlight" attrs="{'invisible': [('file', '=', False)]}"/>
+                    <button type="object" class="oe_highlight oe_left " name="open_keyword_log" icon="fa-history"  string="View Keyword Logs" attrs="{'invisible': [('file', '=', False)]}" />
+                    <button name="action_view_rulebooks" type="object" class="oe_highlight oe_left" icon="fa-book" string="Create Rulebook"/>
+
+                </header>
+
+                <sheet>
+
+                    <notebook>
+
+                        <page string="General Information">
+
+                            <group>
+                                <field name="name" />
+                                <field name="ref_number" />
+                                <field name="released_date" />
+                                <field name="source_id" />
+                                <field name="created_by" readonly="1" />
+                                <field name="external_resource_url" readonly="1" widget="url" />
+                                <field name="input_type" widget="badge" readonly="1" decoration-info="input_type=='ai'" decoration-primary="input_type == 'manual'" />
+                            </group>
+                            <group>
+                                <field name="created_on" readonly="1" />
+                                <field name="status" />
+                            </group>
+                        </page>
+
+                        <page string="Share Document" attrs="{'invisible': [('file', '=', False)]}">
+                            <group>
+                                <field name="email_recipient_ids" widget="many2many_tags" placeholder="Select recipients..."/>
+                                <field name="email_cc_ids" widget="many2many_tags" placeholder="Select CC recipients..."/>
+                                <field name="email_subject" placeholder="Email subject..."/>
+                                <field name="email_body" widget="html"/>
+
+                            </group>
+
+                            <div class="mb-4">
+                                <button name="action_send_email" class="btn btn-primary" type="object" icon="fa-envelope" string=" Send Email" attrs="{'invisible': [('file', '=', False)]}"/>
+                            </div>
+
+
+                            <div class="alert alert-info" role="alert">
+                                <i class="fa fa-info-circle"/>
+ The current file will be automatically attached to the email.
+                            </div>
+                        </page>
+
+                        <page string="View Document">
+
+                            <div class="row">
+
+                                <div class="col">
+                                    <group>
+                                        <field name="file" filename="file_name" widget="pdf_viewer" options="{'preview_image': 'file'}" />
+                                    </group>
+                                </div>
+
+
+                            </div>
+                        </page>
+
+                    </notebook>
+
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+               
+            </form>
+        </field>
+    </record>
+
+    <record id="view_rulebook_title_search_" model="ir.ui.view">
+        <field name="name">rulebook.title.search</field>
+        <field name="model">rulebook.title</field>
+        <field name="arch" type="xml">
+            <search string="Rulebook Source">
+                <field name="name" />
+                <field name="status" />
+                <field name="source_id" />
+                <field name="external_resource_url" />
+                <field name="created_on" />
+                <group expand="1" string="Group By">
+                    <filter string="Created By" name="created_by" />
+                    <filter string="Source" name="source_id" />
+                    <filter string="Status" name="status" />
+                    <!-- Archive filter -->
+                    <filter string="Archived" name="archived" domain="[('active', '=', False)]"/>
+                </group>
+                <searchpanel>
+                    <field name="source_id" icon="fa-cog" enable_counters="1" string="Source" />
+                    <field name="input_type" icon="fa-user-tie" enable_counters="1" string="Input Type" />
+                    <field name="status" icon="fa-check" enable_counters="1" string="Status" />
+                    <!-- Archive filter in search panel -->
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+</odoo>

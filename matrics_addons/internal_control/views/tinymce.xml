@@ -1,0 +1,8 @@
+<odoo>
+    <template id="assets_backend" inherit_id="web.assets_backend_legacy_lazy" name="TinyMCE Assets">
+        <xpath expr="." position="inside">
+            <!-- Load TinyMCE from CDN -->
+            <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+        </xpath>
+    </template>
+</odoo>

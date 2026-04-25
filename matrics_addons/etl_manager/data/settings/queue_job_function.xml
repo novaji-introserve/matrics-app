@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Create the channel first -->
+        <record id="channel_etl" model="queue.job.channel">
+            <field name="name">ETL</field>
+            <!-- Don't add function_ids yet - will add them later to avoid circular reference -->
+        </record>
+
+        <!-- Then create the job functions -->
+        <record id="job_function_etl_extract" model="queue.job.function">
+            <field name="model_id" ref="model_etl_fast_sync_postgres"/>
+            <field name="method">_extract_batch_to_csv</field>
+            <field name="channel_id" ref="channel_etl"/>
+            <field name="retry_pattern_id" ref="queue_job.retry_pattern_job_error"/>
+            <field name="related_action_id" ref="queue_job.related_action_store_id"/>
+        </record>
+
+        <record id="job_function_etl_coordinator" model="queue.job.function">
+            <field name="model_id" ref="model_etl_fast_sync_postgres"/>
+            <field name="method">_monitor_extraction_progress</field>
+            <field name="channel_id" ref="channel_etl"/>
+            <field name="retry_pattern_id" ref="queue_job.retry_pattern_job_error"/>
+            <field name="related_action_id" ref="queue_job.related_action_store_id"/>
+        </record>
+
+        <record id="job_function_etl_load" model="queue.job.function">
+            <field name="model_id" ref="model_etl_fast_sync_postgres"/>
+            <field name="method">_load_csv_file_to_db</field>
+            <field name="channel_id" ref="channel_etl"/>
+            <field name="retry_pattern_id" ref="queue_job.retry_pattern_job_error"/>
+            <field name="related_action_id" ref="queue_job.related_action_store_id"/>
+        </record>
+
+        <!-- Now update the channel with the job functions -->
+        <record id="channel_etl" model="queue.job.channel">
+            <field name="job_function_ids" eval="[(4, ref('job_function_etl_extract')), 
+                                                (4, ref('job_function_etl_coordinator')), 
+                                                (4, ref('job_function_etl_load'))]"/>
+        </record>
+    </data>
+</odoo>

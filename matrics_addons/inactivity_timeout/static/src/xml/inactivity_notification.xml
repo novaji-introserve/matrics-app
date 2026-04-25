@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- Use standard HTML template instead of t-name -->
+    <template id="inactivity_timeout_warning_template">
+        <div class="o_notification_title mb-2 fw-bold">
+            Session Expiring Soon
+        </div>
+        <div class="o_notification_content mb-3">
+            Your session will expire in <span data-minutes-placeholder="true"></span> minute(s) due to inactivity.
+        </div>
+        <button class="o_notification_button btn btn-primary">
+            Stay Logged In
+        </button>
+    </template>
+</templates>

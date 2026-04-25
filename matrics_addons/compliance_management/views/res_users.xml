@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <record id="view_users_form_branch_access" model="ir.ui.view">
+      <field name="name">res.users.form.branch.access</field>
+      <field name="model">res.users</field>
+      <field name="inherit_id" ref="base.view_users_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//notebook" position="inside">
+          <page string="Branch Access" name="branch_access">
+            <group name="branch_group">
+              <group name="branch_fields" string="Branch Settings">
+                <field name="branches_id" widget="many2many_tags"/>
+                <field name="default_branch_id" />
+              </group>
+            </group>
+          </page>
+        </xpath>
+      </field>
+    </record>
+    </data>
+  </odoo>
+
+  <!-- <odoo>
+  <data>
+    <record id="user_branch_menu" model="ir.ui.view">
+      <field name="name">user_branch_menu</field>
+      <field name="model">res.users</field>
+      <field name="inherit_id" ref="base.view_users_form"/>
+      <field name="arch" type="xml">
+          <xpath expr="//notebook" position="inside">
+              <page string="Branch Access">
+                  <tree>
+                      <field name="branches_id"/>
+                  </tree>
+              </page>
+          </xpath>
+      </field>
+  </record>
+  </data>
+</odoo> -->
