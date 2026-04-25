@@ -10,6 +10,7 @@ seatunnel:
     print-job-metrics-info-interval: 60
     slot-service:
       dynamic-slot: true
+    task-execution-thread-share-mode: ALL
     checkpoint:
       interval: 10000
       timeout: 60000

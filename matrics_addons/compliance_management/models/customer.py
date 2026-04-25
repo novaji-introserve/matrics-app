@@ -1495,25 +1495,39 @@ class Customer(models.Model):
 
         return records
 
+    # Override email/phone to enable tracking so form views receive "record modified" notification
+    email = fields.Char(tracking=True)
+    phone = fields.Char(tracking=True)
+
+    _RISK_TRIGGER_FIELDS = frozenset({
+        'email', 'phone', 'bvn', 'customer_id',
+        'is_pep', 'is_watchlist', 'is_fep', 'is_blacklist', 'global_pep',
+    })
+
     def write(self, vals):
-        # Apply updates from vals
         result = super(Customer, self).write(vals)
 
-        # Trigger notification for UI refresh
+        # Refresh dashboard widgets
         self.env['bus.bus']._sendmany([
             ('dashboard_refresh_channel', 'refresh', {
                 'type': 'refresh',
                 'channelName': 'dashboard_refresh_channel',
-                'model': self._name
+                'model': self._name,
             })
         ])
 
-        # Only update risk scores if we're not already in a risk score update
-        # This prevents recursion
-        if not self.env.context.get('computing_risk', False):
-            # Create a new context to mark that we're computing risk
-            new_ctx = dict(self.env.context, computing_risk=True)
-            self = self.with_context(new_ctx)
+        # Notify open form views — triggers "Record has been modified" banner
+        # mail.thread uses partner as the bus channel for connected clients
+        self.env['bus.bus']._sendmany([
+            (partner, 'res.partner/write', {'id': partner.id})
+            for partner in self
+        ])
+
+        # Trigger risk assessment when compliance-relevant fields change.
+        # Guarded by computing_risk to prevent recursion from action_compute_risk_score_with_plan
+        # writing risk_score/risk_level back.
+        if not self.env.context.get('computing_risk') and self._RISK_TRIGGER_FIELDS.intersection(vals):
+            self.with_context(computing_risk=True).action_enqueue_risk_score_with_plan(priority=15)
 
         return result
 
@@ -2028,6 +2042,27 @@ class Customer(models.Model):
                 'risk_level': risk_level
             })
 
+        return True
+
+    def action_enqueue_risk_score_with_plan(self, priority=10):
+        """Enqueue risk scoring via queue_job — returns immediately.
+
+        priority=20  → onboarding (new customer, runs before background jobs)
+        priority=15  → write-triggered (field changed by CDC sync)
+        priority=10  → background / bulk recalculation
+
+        Uses channel='root.compliance' so risk jobs never compete with ETL jobs.
+        identity_key deduplicates bursts: multiple updates to the same partner
+        before a worker picks it up result in only one risk job running.
+        """
+        for partner in self:
+            identity_key = f"risk_score_{partner.id}"
+            partner.with_delay(
+                priority=priority,
+                identity_key=identity_key,
+                description=f"Risk score: {partner.name or partner.id}",
+                channel='root.compliance',
+            ).action_compute_risk_score_with_plan()
         return True
 
     def action_greylist(self):

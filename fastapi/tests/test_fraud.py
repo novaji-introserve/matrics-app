@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
 from main import app
-from repo.fraud.predict import FraudPredictionResponse
+from custom.fastapi.repo.fraud.predict import FraudPredictionResponse
 
 
 client = TestClient(app)
