@@ -23,7 +23,8 @@ services:
         -c wal_buffers=64MB
         -c random_page_cost=1.1
     volumes:
-        - /home/jonathan/storage/postgresql:/var/lib/postgresql/data
+        - ${STORAGE_PATH}/postgresql:/var/lib/postgresql/data
+        - ./custom:/custom
 
   pgbouncer:
     build:
@@ -46,7 +47,7 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - /home/jonathan/storage/redis:/data
+      - ${STORAGE_PATH}/redis:/data
     networks:
       - odoo-net
 
@@ -75,9 +76,10 @@ services:
       #- /etc/localtime:/etc/localtime:ro
       - ./entrypoint.sh:/entrypoint.sh   # if you want to install additional Python packages, uncomment this line!
       - ./addons:/mnt/extra-addons
-      - /home/jonathan/projects/icomply_odoo:/mnt/icomply_odoo
-      - /home/jonathan/storage/odoo16/lib:/usr/local/lib
-      - /home/jonathan/storage/odoo16/data:/root/.local/share/Odoo
+      - ./matrics_addons:/mnt/matrics-addons
+      - ./custom:/mnt/custom
+      - ${STORAGE_PATH}/odoo16/lib:/usr/local/lib
+      - ${STORAGE_PATH}/odoo16/data:/root/.local/share/Odoo
       - ./etc:/etc/odoo
     restart: always
 
@@ -91,6 +93,7 @@ services:
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     volumes:
       - ./fastapi:/app
+      - ./custom:/app/custom
       - /home/jonathan/projects/fraud_detection:/training-data:ro
     ports:
       - "8001:8000"
@@ -165,7 +168,8 @@ services:
       - ./seatunnel/config/hazelcast.yaml:/opt/seatunnel/config/hazelcast.yaml
       - ./seatunnel/config/seatunnel.yaml:/opt/seatunnel/config/seatunnel.yaml
       - ./seatunnel/jobs:/opt/seatunnel/jobs
-      - /home/jonathan/storage/seatunnel/logs:/opt/seatunnel/logs
+      - ./custom:/opt/seatunnel/custom
+      - ${STORAGE_PATH}/seatunnel/logs:/opt/seatunnel/logs
     networks:
       - odoo-net
 
