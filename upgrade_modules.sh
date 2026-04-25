@@ -4,6 +4,13 @@
 # ./upgrade_modules.sh compliance_management case_management
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+if [ -f "$SCRIPT_DIR/.env" ]; then
+  set -o allexport
+  source "$SCRIPT_DIR/.env"
+  set +o allexport
+fi
+
 CONTAINER_NAME="${CONTAINER_NAME:-matrics-odoo16-1}"
 DB_NAME="${DB_NAME:-icomply_dev}"
 DB_HOST="${DB_HOST:-pgbouncer}"

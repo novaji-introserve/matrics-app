@@ -6,6 +6,7 @@ etc/sessions/
 etc/filestore/
 fastapi/logs/
 fastapi/.env
+.env
 seatunnel/logs/
 apache-seatunnel-2.3.12.tar.gz
 *.pyc
