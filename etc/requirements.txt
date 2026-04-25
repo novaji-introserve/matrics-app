@@ -43,7 +43,6 @@ zope.interface
 # --- Database ---
 asyncpg
 aiosqlite
-cx_Oracle
 google-cloud-bigquery
 ibm_db
 mysql-connector-python
