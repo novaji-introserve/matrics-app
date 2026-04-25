@@ -15,6 +15,9 @@ custom/*
 *.pyc
 __pycache__/
 
+# SeaTunnel JDBC/connector jars — large binaries, place manually on build machine
+.docker/seatunnel/lib/*.jar
+
 # Windows metadata files
 *Zone.Identifier*
 *:Zone.Identifier*

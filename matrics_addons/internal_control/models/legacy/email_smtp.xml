@@ -7,7 +7,7 @@
             <field name="smtp_host">smtp.mailgun.org</field>
             <field name="smtp_port">587</field>
             <field name="smtp_user">postmaster@mg1.covenantmfb.com.ng</field>
-            <field name="smtp_pass">REDACTED_SMTP_PASS</field>
+            <field name="smtp_pass"></field>
             <field name="smtp_encryption">starttls</field>
             <field name="smtp_debug" eval="False"></field>
             <field name="sequence">10</field>
