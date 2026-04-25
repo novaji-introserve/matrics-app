@@ -170,3 +170,6 @@ server {
 <img src="screenshots/odoo-16-sales-screen.png" width="100%">
 
 <img src="screenshots/odoo-16-product-form.png" width="100%">
+
+# Model training command
+ docker compose exec fastapi python -m repo.fraud.train   

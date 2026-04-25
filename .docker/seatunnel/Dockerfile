@@ -17,6 +17,8 @@ WORKDIR ${SEATUNNEL_HOME}
 
 RUN sh bin/install-plugin.sh ${SEATUNNEL_VERSION}
 
+COPY .docker/seatunnel/lib/*.jar ${SEATUNNEL_HOME}/lib/
+
 COPY .docker/seatunnel/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 

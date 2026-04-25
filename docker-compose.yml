@@ -94,7 +94,7 @@ services:
     volumes:
       - ./fastapi:/app
       - ./custom:/app/custom
-      - /home/jonathan/projects/fraud_detection:/training-data:ro
+      #- /home/jonathan/projects/fraud_detection:/training-data:ro
     ports:
       - "8001:8000"
     env_file:

@@ -14,3 +14,7 @@ custom/*
 !custom/.gitkeep
 *.pyc
 __pycache__/
+
+# Windows metadata files
+*Zone.Identifier*
+*:Zone.Identifier*
