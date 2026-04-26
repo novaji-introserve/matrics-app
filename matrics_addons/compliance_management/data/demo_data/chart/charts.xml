@@ -185,7 +185,7 @@
             <field name="navigation_domain">[]</field>
             <field name="apply_dashboard_date_filter" eval="True"/>
             <field name="navigation_date_field">create_date</field>
-            <field name="target_model_id" ref="case_management.model_case_manager"/>
+            <field name="target_model_id" model="ir.model" search="[('model', '=', 'case.manager')]"/>
         </record>
 
         <record id="demo_chart_cases_by_exceptions" model="res.dashboard.charts">
@@ -220,7 +220,7 @@
             <field name="navigation_domain">[]</field>
             <field name="apply_dashboard_date_filter" eval="True"/>
             <field name="navigation_date_field">create_date</field>
-            <field name="target_model_id" ref="case_management.model_case_manager"/>
+            <field name="target_model_id" model="ir.model" search="[('model', '=', 'case.manager')]"/>
         </record>
     </data>
 </odoo>
