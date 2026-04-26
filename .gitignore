@@ -1,7 +1,6 @@
 postgresql/
 etc/odoo-server.log
-etc/addons/
-addons/
+/addons/
 etc/sessions/
 etc/filestore/
 fastapi/logs/
