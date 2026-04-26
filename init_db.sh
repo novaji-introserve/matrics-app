@@ -25,9 +25,9 @@ DB_PASSWORD="${DB_PASSWORD:-odoo16@2022}"
 ODOO_CONF="${ODOO_CONF:-/etc/odoo/odoo.conf}"
 
 if [ "$#" -eq 0 ]; then
-  MODULES="base"
+  MODULES="base,web,fpg_redis_session,queue_job,ro_cache_redis"
 else
-  MODULES="base,$(IFS=,; echo "$*")"
+  MODULES="base,web,fpg_redis_session,queue_job,ro_cache_redis,$(IFS=,; echo "$*")"
 fi
 
 echo "==> Creating database '$DB_NAME' on PostgreSQL (direct, bypassing pgbouncer)..."
