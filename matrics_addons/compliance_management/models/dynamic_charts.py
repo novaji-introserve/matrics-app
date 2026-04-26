@@ -1011,6 +1011,13 @@ class ResCharts(models.Model):
                                 f"Available fields: {', '.join(column_names)}"
                             )
                     cr.execute("RESET statement_timeout")
+                except psycopg2.errors.UndefinedTable as e:
+                    # During a fresh install some tables may not exist yet.
+                    # Skip validation rather than blocking the install.
+                    cr.rollback()
+                    _logger.warning(
+                        "Chart query validation skipped — table not yet created: %s", e
+                    )
                 except psycopg2.errors.SyntaxError as e:
                     cr.rollback()
                     raise exceptions.ValidationError(f"SQL syntax error: {e}")
