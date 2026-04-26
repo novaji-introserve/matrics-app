@@ -132,8 +132,8 @@
         "views/customer_screening.xml",
         'views/transaction_screening_history.xml',
         "views/change_data_capture.xml",
-        "views/employee.xml",
         "views/menu_actions.xml",
+        "views/employee.xml",
     ],
     # only loaded in demonstration mode
     "demo": [
