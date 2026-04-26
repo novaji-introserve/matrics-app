@@ -12,8 +12,14 @@ class ResPartner(models.Model):
     @api.constrains("name")
     def _check_ref(self):
         for partner in self.filtered("name"):
-            domain = [("id", "!=", partner.id),("name", "=ilike", partner.name),]
-
+            # Skip partners linked to internal users (e.g. Administrator, Public User)
+            if partner.user_ids:
+                continue
+            domain = [
+                ("id", "!=", partner.id),
+                ("name", "=ilike", partner.name),
+                ("user_ids", "=", False),
+            ]
             other = self.search(domain)
-            if other :
-                raise ValidationError(_("This Name Already Exist For to partner '%s'")% other[0].display_name)
+            if other:
+                raise ValidationError(_("This Name Already Exist For to partner '%s'") % other[0].display_name)
