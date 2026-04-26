@@ -1313,7 +1313,7 @@ class CSVProcessor:
                 
             elif field_type in ('float', 'monetary'):
                 error_msg = f'Invalid number for field {field_name}'
-                self.cr.execute(f"""
+                self.cr.execute(rf"""
                     UPDATE {quoted_temp_table}
                     SET odoo_status = 'error',
                         odoo_error = %s
