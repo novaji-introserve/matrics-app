@@ -210,9 +210,6 @@ yarg
 zeep
 zipp
 
-# --- AI / ML ---
-jpype1
-
 # --- Jupyter / IPython (dev tooling) ---
 ipython
 jupyter_client
