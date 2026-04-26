@@ -1,0 +1,150 @@
+<?xml version="1.0"?>
+<odoo>
+	<record id="view_module_staff_recruitment_form" model="ir.ui.view">
+			<field name="name">staff.recruitment.form</field>
+			<field name="model">staff.recruitment</field>
+			<field name="arch" type="xml">
+				<form string="Employee Recruitment">
+					<header>
+						<button name="action_confirm" string="Confirm"
+						type="object" attrs="{'invisible':[('state','!=','approve')]}" class="btn-primary" groups="employee_recruitment_app.hr_staff_req_manager_id"/>
+						<button name="action_approve" string="Approve"
+						type="object" states="draft" class="btn-primary"/>
+						<button name="action_cancel" string="Cancel"
+						type="object" class="btn-primary" attrs="{'invisible':[('state','=','cancel')]}"/>
+						<button name="action_draft" string="Set to Draft"
+						type="object" states="approve" attrs="{'invisible':('state','=','cancel')}" class="btn-primary" groups="employee_recruitment_app.hr_staff_req_manager_id" />
+						<field name="state" widget="statusbar" statusbar_visible="draft,approve,confirm,cancel"/>
+					</header>
+					<sheet>
+						<div class="oe_button_box">
+						 <button name="action_application" class="oe_stat_button" icon="fa-user" type="object" help="Total number of applications">
+							<div class="o_field_widget o_stat_info">
+								<field name="count" nolabel="1" readonly="1"/>
+								<span class="o_stat_text">Applications</span>
+							</div>
+						</button>
+						</div>
+
+
+						<h2><field name="sequence" readonly="1"/></h2>
+
+
+						<group>
+							<group>
+								<field name="applicant_id"/>
+								<field name="department_id"/>
+								<field name="operation_id"/>
+								<field name="experience" widget='radio'/>
+								 <label for="exper_start_date" string="From" attrs="{'invisible':['|',('experience','=','fresh'),('experience','!=','exp')]}"/>
+									<div>
+									<div class="o_row o_row_readonly o_hr_staff_dates">
+										<field name="exper_start_date" class="oe_inline" attrs="{'required':[('experience','=','exp')], 'invisible':['|',('experience','=', 'fresh'),('experience','!=','exp')]}"/>
+
+										<span class="oe_inline"
+											attrs="{'invisible':['|',('experience','=','fresh'),('experience','!=','exp')]}">
+											To
+										</span>
+
+										<field name="exper_end_date" class="oe_inline"  attrs="{'required':[('experience','=','exp')], 'invisible':['|',('experience','=', 'fresh'),('experience','!=','exp')]}"/>
+									</div>
+									</div>
+								<field name="experience_year" attrs="{'invisible':['|',('experience','=','fresh'),('experience','!=','exp')]}"/>
+
+							 </group>
+							 <group >
+								 <field name="date"/>
+								 <field name="schedule_id"/>
+								  <field  name="job_id"/>
+								  <field name="quantity"/>
+							</group>
+						</group>
+						<group>
+							<group string="Department">
+							<field name="department_text" nolabel="1"/>
+							</group>
+						</group>
+					</sheet>
+					<div class="oe_chatter">
+						<field name="message_follower_ids" widget="mail_followers" help="Follow this Employee recruitment process to automatically track the events associated to users of this team."/>
+						<field name="message_ids" widget="mail_thread"/>
+					</div>
+				</form>
+			</field>
+		</record>
+
+
+
+	<record id="view_staff_recruitment_tree" model="ir.ui.view">
+	   <field name="name">staff.recruitment.tree</field>
+	   <field name="model">staff.recruitment</field>
+	   <field name="priority">2</field>
+	   <field name="arch" type="xml">
+			<tree string="Employee Recruitment">
+				<field name="sequence"/>
+				<field name="applicant_id"/>
+				<field  name="department_id"/>
+				<field name="operation_id"/>
+				<field name="date"/>
+				 <field name='schedule_id'/>
+				  <field  name="job_id"/>
+				  <field name="quantity"/>
+			</tree>
+	   </field>
+	</record>
+
+	<record id="staff_recuitment_view_search" model="ir.ui.view">
+		<field name="name">staff.recuitment.search</field>
+		<field name="model">staff.recruitment</field>
+		<field name="arch" type="xml">
+			<search string="employee recruitment">
+				<field name="state"/>
+			<group expand="0" string="Group By">
+					<filter name="groupby_job" string="Job" domain="[]" context="{'group_by':'job_id'}"
+						help="Group Wise Job"/>
+			</group>
+			<filter name="fil_by_manager" string="Approved Applicants" domain="[('state','=','approve')]"
+					help="Show all Approved Applications" />
+			<filter name="fil_by_manager_new" string="Fresher" domain="[('experience','=','fresh'),'|',('state','=','approve'),('state','=','confirm')]"
+					help="Show all Fresher Approved Applications" />
+			<filter name="fil_by_manager_old" string="Experience" domain="[('experience','=','exp'),'|',('state','=','approve'),('state','=','confirm')]"
+					help="Show all Experience Approved Applications" />
+			</search>
+
+		</field>
+	</record>
+
+	<record id="staff_req_action" model="ir.actions.act_window">
+		  <field name="name">New Employee Recruitment</field>
+		  <field name="type">ir.actions.act_window</field>
+		  <field name="res_model">staff.recruitment</field>
+		  <field name="domain">[('state','=','draft')]</field>
+		  <field name="view_mode">tree,form,search</field>
+		  <field name="help" type="html">
+			   <p class="oe_view_nocontent_create"> </p>
+			   <p></p>
+		  </field>
+	</record>
+
+	<record id="staff_recuitment_action" model="ir.actions.act_window">
+		  <field name="name">Approved Employee Recruitment</field>
+		  <field name="type">ir.actions.act_window</field>
+		  <field name="res_model">staff.recruitment</field>
+		  <field name="domain">['|',('state','=','approve'),('state','=','confirm')]</field>
+		  <field name="view_mode">tree,form,search</field>
+		  <field name="help" type="html">
+			   <p class="oe_view_nocontent_create"> </p>
+			   <p></p>
+		  </field>
+	</record>
+
+
+	<menuitem  id="sub_menu_recuitment" parent="hr_recruitment.menu_hr_recruitment_root" name="Employee Recruitment" sequence="20"/>
+
+	<menuitem action="staff_req_action" id="menu_employee_req" parent="sub_menu_recuitment" name="New Employee Recruitment" groups="employee_recruitment_app.hr_staff_req_user_id" sequence="29" />
+
+	<menuitem action="staff_recuitment_action" id="menu_employee_req_id" parent="sub_menu_recuitment" name="Aproved Employee Recruitment" groups="employee_recruitment_app.hr_staff_req_manager_id" sequence="30"/>
+
+
+</odoo>
+

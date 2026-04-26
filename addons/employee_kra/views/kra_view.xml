@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!--kra.question.section -->
+    <record id="view_kra_question_section_tree" model="ir.ui.view">
+        <field name="name">kra.question.section.tree</field>
+        <field name="model">kra.question.section</field>
+        <field name="arch" type="xml">
+            <tree string="KRA Question Section">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="description"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_kra_question_section_form" model="ir.ui.view">
+        <field name="name">kra.question.section.form</field>
+        <field name="model">kra.question.section</field>
+        <field name="arch" type="xml">
+            <form string="KRA Question Section">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="sequence"/>
+                        <field name="description"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_kra_question_section" model="ir.actions.act_window">
+        <field name="name">KRA Question Section</field>
+        <field name="res_model">kra.question.section</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Create a KRA Question Section to evaluate your employees.
+            </p>
+        </field>
+    </record>
+        
+    <!--HR KRA (KRA configuration) -->
+    <record id="view_kra_tree" model="ir.ui.view">
+        <field name="name">hr.kra.tree</field>
+        <field name="model">hr.kra</field>
+        <field name="arch" type="xml">
+            <tree string="KRA">
+                <field name="name" />
+                <field name="kra_question_ids" />
+            </tree>
+        </field>
+    </record>
+    <record id="view_kra_form" model="ir.ui.view">
+        <field name="name">hr.kra.form</field>
+        <field name="model">hr.kra</field>
+        <field name="arch" type="xml">
+            <form string="HR KRA">
+                <sheet>
+                    <group>
+                        <field name="name" />
+                    </group>
+                    <notebook>
+                        <page string="KRA Questions">
+                            <field name="kra_question_ids" widget="section_and_note_one2many">
+                                <tree string="KRA Questions" editable="bottom">
+                                    <control> 
+                                        <create string="Add a line"/>
+                                        <create string="Add a section" context="{'default_display_type': 'line_section'}"/>
+                                    </control>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="display_type" invisible="1"/>
+                                    <field name="name" widget="section_and_note"/>
+                                    <field name="description"/>
+                                    <field name="section_id"/>
+                                    <field name="hint"/>
+                                    <field name="weightage"/>
+                                </tree>
+                                <form string="KRA Questions">
+                                    <group col="4">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="name" />
+                                        <field name="description" />
+                                        <field name="section_id"/>
+                                        <field name="hint" />
+                                        <field name="weightage" />
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_kra_configuration" model="ir.actions.act_window">
+        <field name="name">HR KRA</field>
+        <field name="res_model">hr.kra</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a KRA tempalates with proper questions and valuation to evaluate your employees.<br/>Just Create tempates here and assignt it to the Job positions directly.
+            </p>
+        </field>
+    </record>
+
+    <!--Employee KRA  -->
+    <record id="view_employee_kra_tree" model="ir.ui.view">
+        <field name="name">employee.kra.tree</field>
+        <field name="model">employee.kra</field>
+        <field name="arch" type="xml">
+            <tree string="Employee KRA">
+                <field name="name" />
+                <field name="quarterly" />
+                <field name="year" />
+                <field name="employee_id" />
+                <field name="kra_question_ids" />
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_employee_kra_form" model="ir.ui.view">
+        <field name="name">employee.kra.form</field>
+        <field name="model">employee.kra</field>
+        <field name="arch" type="xml">
+            <form string="Employee KRA">
+                <header>
+                    <button name="action_submit" class="oe_highlight" type="object" string="Submit To Supervisor" states="draft" />
+                    <button name="action_done" class="oe_highlight" type="object" string="Done" states="submit" groups="hr.group_hr_user" />
+                    <button name="action_cancel" type="object" string="Cancel" states="draft,submit" />
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <group col="4">
+                        <field name="name" colspan="2" attrs="{'readonly': [('state', '=', 'done')]}" />
+                        <field name="quarterly" attrs="{'readonly': [('state', '=', 'done')]}" />
+                        <field name="year" colspan="2" attrs="{'readonly': [('state', '=', 'done')]}" />
+                        <field name="employee_id" colspan="2" attrs="{'readonly': [('state', '=', 'done')]}" />
+                        <field name="kra_id" colspan="2" />
+                    </group>
+                    <notebook>
+                        <page string="KRA Questions">
+                            <field name="kra_question_ids" attrs="{'readonly': [('state', '=', 'done')]}" widget="section_and_note_one2many">
+                                <tree string="KRA Questions" editable="bottom">
+                                    <control> 
+                                        <create string="Add a line"/>
+                                        <create string="Add a section" context="{'default_display_type': 'line_section'}"/>
+                                    </control>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name" widget="section_and_note"/>
+                                    <field name="display_type" invisible="1"/>
+                                    <field name="description" />
+                                    <field name="section_id"/>
+                                    <field name="employee_id" invisible="1"/>
+                                    <field name="hint" />
+                                    <field name="weightage" />
+                                    <field name="employee_rating" />
+                                    <field name="employee_remark" />
+                                    <field name="manager_rating" attrs="{'readonly': [('is_hr_manager','=',False)]}"/>
+                                    <field name="manager_remark" attrs="{'readonly': [('is_hr_manager','=',False)]}"/>
+                                    <field name="is_hr_manager" invisible="1"/>
+                                    <field name="final_score" sum="Final Score" />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_employee_kra" model="ir.actions.act_window">
+        <field name="name">Employee KRA</field>
+        <field name="res_model">employee.kra</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a KRA, the first step of a Employee evaluation.
+            </p><p>
+                Your next actions should to ask employee to fill rating from their side and submit to supervisor for review.
+            </p><p>
+                Note that once a KRA bubmited to manager, Manger will able o review it from Review KRA menu.
+            </p>
+        </field>
+    </record>
+
+    <record id="view_employee_kra_form_review" model="ir.ui.view">
+        <field name="name">employee.kra.form</field>
+        <field name="model">employee.kra</field>
+        <field name="arch" type="xml">
+            <form string="Employee KRA Review">
+                <header>
+                    <button name="action_submit" class="oe_highlight" type="object" string="Submit To Supervisor" states="draft" />
+                    <button name="action_done" class="oe_highlight" type="object" string="Done" states="submit"/>
+                    <button name="action_cancel" type="object" string="Cancel" states="draft,submit"/>
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <group col="4">
+                        <field name="name" colspan="2" attrs="{'readonly': [('state', '=', 'done')]}" />
+                        <field name="quarterly" />
+                        <field name="year" colspan="2" attrs="{'readonly': [('state', '=', 'done')]}" />
+                        <field name="employee_id" colspan="2" attrs="{'readonly': [('state', '=', 'done')]}" />
+                        <field name="kra_id" colspan="2" />
+                    </group>
+                    <notebook>
+                        <page string="KRA Questions">
+                            <field name="kra_question_ids" attrs="{'readonly': [('state', '=', 'done')]}" widget="section_and_note_one2many">
+                                <tree string="KRA Questions" editable="bottom">
+                                    <control> 
+                                        <create string="Add a line"/>
+                                        <create string="Add a section" context="{'default_display_type': 'line_section'}"/>
+                                    </control>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="display_type" invisible="1"/>
+                                    <field name="name" widget="section_and_note"/>
+                                    <field name="description"/>
+                                    <field name="section_id"/>
+                                    <field name="hint"/>
+                                    <field name="weightage" />
+                                    <field name="employee_rating" readonly="1"/>
+                                    <field name="employee_remark" readonly="1"/>
+                                    <field name="manager_rating"/>
+                                    <field name="manager_remark"/>
+                                    <field name="final_score" sum="Final Score" />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_employee_kra_review" model="ir.actions.act_window">
+        <field name="name">Employee KRA to Review</field>
+        <field name="res_model">employee.kra</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', '=', 'submit'),('employee_id.parent_id.user_id', 'in', [uid])]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Review KRA of employees for whome you are responsible.
+            </p><p>
+                Here records will be shown to the responsible managers of related employees. Manager have to review record and click to done.
+            </p>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window.view" id="action_employee_kra_review_tree">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_employee_kra_tree"/>
+        <field name="act_window_id" ref="action_employee_kra_review"/>
+    </record>
+
+    <record model="ir.actions.act_window.view" id="action_employee_kra_review_form">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_employee_kra_form_review"/>
+        <field name="act_window_id" ref="action_employee_kra_review"/>
+    </record>
+
+    <!-- Hr Employee -->
+    <record model="ir.ui.view" id="view_employee_inherit_form_view">
+        <field name="name">hr.employee inherit</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="priority" eval="20"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='hr_settings']//field[@name='job_id']" position="after">
+                <field name="kra_id"/>
+                <field name="employee_code"/>
+            </xpath>
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                <button name="action_kra_tree_view" type="object" lass="oe_stat_button" icon="fa-key">
+                    <field string="KRA" name="kra_count" widget="statinfo"/>
+                </button>
+                <button class="oe_inline oe_stat_button" type="object" name="action_value_rating_tree_view" icon="fa-line-chart">
+                    <field string="Value Ratings" name="value_rating_count" widget="statinfo" />
+                </button>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="action_employee_inherit" model="ir.actions.act_window">
+        <field name="name">Employee</field>
+        <field name="res_model">hr.employee</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+    <!-- Hr job -->
+    <record model="ir.ui.view" id="view_hr_job_inherit_form_view">
+        <field name="name">hr job inherit</field>
+        <field name="model">hr.job</field>
+        <field name="inherit_id" ref="hr.view_hr_job_form" />
+        <field name="priority" eval="20" />
+        <field name="arch" type="xml">
+            <field name="department_id" position="after">
+                <field name="kra_id" />
+            </field>
+        </field>
+    </record>
+
+    <record id="action_job_inherit_menu" model="ir.actions.act_window">
+        <field name="name">Job</field>
+        <field name="res_model">hr.job</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Analysis report views -->
+    <record id="view_employee_kra_question_pivot" model="ir.ui.view">
+        <field name="name">employee.kra.question.pivot</field>
+        <field name="model">employee.kra.question</field>
+        <field name="arch" type="xml">
+            <pivot string="KRA Analysis" disable_linking="True">
+                <field name="employee_id" type="row" />
+                <field name="kra_question_id" type="row" />
+                <field name="create_date" interval="quarter" type="col" />
+                <field name="create_date" interval="year" type="col" />
+                <field name="employee_rating" type="measure" />
+                <field name="manager_rating" type="measure" />
+                <field name="final_score" type="measure" />
+            </pivot>
+        </field>
+    </record>
+    <record id="view_employee_kra_question_graph" model="ir.ui.view">
+        <field name="name">employee.kra.question.graph</field>
+        <field name="model">employee.kra.question</field>
+        <field name="arch" type="xml">
+            <graph string="KRA Analysis" sample="1" stacked="True">
+                <field name="employee_id" type="row" />
+                <field name="kra_question_id" type="row" />
+                <field name="create_date" interval="quarter" type="col" />
+                <field name="create_date" interval="year" type="col" />
+                <field name="employee_rating" type="measure" />
+                <field name="manager_rating" type="measure" />
+                <field name="final_score" type="measure" />
+            </graph>
+        </field>
+    </record>
+    <record id="view_employee_kra_question_search" model="ir.ui.view">
+        <field name="name">employee.kra.question.search</field>
+        <field name="model">employee.kra.question</field>
+        <field name="arch" type="xml">
+            <search string="KRA Analysis">
+                <field name="employee_id" />
+                <field name="kra_question_id" />
+                <field name="employee_kra_id" />
+                <filter string="KRA" help="KRA" name="kra" domain="[('employee_id.user_id','=',uid)]" />
+                <group expand="1" string="Group By">
+                    <filter string="Employee" name="Employee" context="{'group_by':'employee_id'}" />
+                    <filter string="Month" name="Month" context="{'group_by':'create_date:month'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_employee_kra_question_report_all" model="ir.actions.act_window">
+        <field name="name">KRA Analysis</field>
+        <field name="res_model">employee.kra.question</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="view_ids" eval="[(5, 0, 0),(0, 0, {'view_mode': 'pivot', 'view_id': ref('view_employee_kra_question_pivot')}), (0, 0, {'view_mode': 'graph', 'view_id': ref('view_employee_kra_question_graph')})]" />
+        <field name="search_view_id" ref="view_employee_kra_question_search" />
+    </record>
+
+</odoo>

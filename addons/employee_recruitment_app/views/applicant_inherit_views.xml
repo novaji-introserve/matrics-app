@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="view_hr_applicant_form_inherite" model="ir.ui.view">
+			<field name="name">view.hr.applicant.form.id</field>
+			<field name="model">hr.applicant</field>
+			<field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='name']" position="after">
+					<group>
+						<div>
+							<field name="exist_new_employee" widget='radio' options="{'horizontal':true}"/>
+						</div>
+                    </group>
+				</xpath>
+
+				<xpath expr="//field[@name='partner_name']" position="attributes">
+					 <attribute name="attrs">{'invisible':[('exist_new_employee','=', 'existing')]}</attribute>
+				</xpath>
+
+				<xpath expr="//label[@for='partner_name']" position="attributes">
+					 <attribute name="attrs">{'invisible':[('exist_new_employee','=', 'existing')]}</attribute>
+				</xpath>
+
+				<xpath expr="//field[@name='partner_name']" position="after">
+					 <field name="employees_id" attrs="{'invisible':[('exist_new_employee','=', 'new')]}"/>
+				</xpath>
+
+				<xpath expr="//label[@for='partner_name']" position="after">
+					 <label for="employees_id" attrs="{'invisible':[('exist_new_employee','=', 'new')]}"/>
+				</xpath>	
+					
+				<!-- partner_id field -->
+				<xpath expr="//field[@name='email_from']" position="before">
+					<field name="partner_id"/>
+				</xpath>
+
+				<!-- person_reference field -->
+				<xpath expr="//field[@name='source_id']" position="after">
+					<field name="person_reference"/>
+				</xpath>
+
+			</field>
+		</record>
+</odoo>

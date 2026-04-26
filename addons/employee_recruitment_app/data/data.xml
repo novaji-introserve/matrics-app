@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+   <record id="seq_new_quotation" model="ir.sequence">
+            <field name="name">Employee Recruitment</field>
+            <field name="code">staff.recruitment</field>
+            <field name="prefix">ER- </field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        
+        
+</odoo>
+

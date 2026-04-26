@@ -1,0 +1,146 @@
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+    <meta name="description" content="Store sessions in Redis instead of the file system to increase Odoo performance.">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+        h1 {
+            font-size: 24px;
+        }
+        h2 {
+            font-size: 16px;
+        }
+        h1, h2, .fpg-body {
+            font-family: "Roboto";
+        }
+        .fpg-container {
+            color:#272727;
+        }
+        .fpg-section-caption, .fpg-section-text {
+            font-weight: 600;
+        }
+        .fpg-section-caption {
+            font-size: 18px;
+        }
+        .fpg-section-text {
+            font-size: 16px;
+            color:#646464;
+            line-height: 26px;
+        }
+    </style>
+
+</head>
+
+<section class="oe_container">
+    <section class="oe_container">
+        <div class="mt-3">
+            <h1 class="text-center" style="color:#000">
+                Redis Session
+            </h1>
+            <h2 class="mt-3 text-center">
+                <p>Store sessions in Redis instead of the file system to increase Odoo performance.</p>
+            </h2>
+        </div>
+    </section>
+
+    <section class="oe_container fpg-container">
+        <div class="card">
+            <div class="card-body row">
+                <div class="col-8">
+                    <p class="d-inline mt-2 fpg-section-caption">Why Redis?</p>
+                    <p class="mt-2 fpg-section-text">
+                        Redis (Remote Dictionary Server) is a fast, open-source, in-memory data structure store that serves a variety of use cases for enhancing the performance, scalability, and reliability 
+                        of applications. Here are some reasons why use Redis:
+                    </p>
+                    <div class="fpg-section-text">
+                        <ol>
+                            <li>
+                                High Performance and Low Latency:
+                                <ul>
+                                    <li>Redis stores data in memory rather than on disk, leading to extremely fast read and write operations.</li>
+                                    <li>With sub-millisecond response times, Redis can handle high throughput and is often used in caching to minimize latency in applications.</li>
+                                </ul>
+                            </li>
+                            <li>
+                                Caching:
+                                <ul>
+                                    <li>Redis is commonly used as a caching layer to reduce database load. Frequently accessed data, like user sessions.</li>
+                                    <li>It also supports automatic data expiration, which means data can expire after a certain time, freeing up memory and keeping the cache fresh.</li>
+                                </ul>
+                            </li>
+                            <li>
+                                Persistence Options:
+                                <ul>
+                                    <li>Although Redis is primarily an in-memory database, it can be configured for persistence. You can save snapshots of the data periodically (RDB snapshots) or log every write (AOF logs), allowing data recovery after a crash.</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <p class="d-inline fpg-section-caption">
+                    Configuration
+                </p>
+                <div class="mt-2 fpg-section-text">
+                    <ol>
+                        <li>
+                            Install and configure Redis:
+                            <ul>
+                                <li>sudo apt update</li>
+                                <li>apt install redis</li>
+                                <li>systemctl enable redis-server</li>
+                                <li>systemctl start redis-server</li>
+                                <li>redis-cli, CHECK REDIS</li>
+                                <li>keys *, SHOW SESSIONS</li>
+                            </ul>
+                        </li>
+                        <li>
+                            Install Redis Session module:
+                            <ul>
+                                <li>Python redis library: python3 -m pip install redis</li>
+                                <li>Install Redis Session from Odoo applications</li>
+                            </ul>
+                        </li>
+                        <li>
+                            Configure Redis Session module in your odoo.conf file:
+                            <ul>
+                                <li>server_wide_modules = base,web,fpg_redis_session</li>
+                                <li>redis_enable = True or False</li>
+                                <li>redis_host = localhost or YOUR REDIS SERVER</li>
+                                <li>redis_port = 6379 or YOUR REDIS PORT</li>
+                                <li>redis_db_index = False or 0 IT's THE SAME or DB INDEX</li>
+                                <li>redis_prefix = session or OTHER WORD</li>
+                                <li>redis_session_expiration = 604800, DEFAULT 7 DAYS (60 * 60 * 24 * 7)</li>
+                                <li>redis_session_expiration_anon = 86400, DEFAULT 24 HOURS (60 * 60 * 24)</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <p class="d-inline fpg-section-caption">
+                    Help and Support
+                </p>
+                <div class="mt-2 fpg-section-text">
+                    <p>
+                        Mail Contact: <a href="mailto:odooapps24@gmail.com">odooapps24@gmail.com</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</section>

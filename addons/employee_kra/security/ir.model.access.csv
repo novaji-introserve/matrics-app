@@ -1,0 +1,29 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_job_user,Hr job user access,model_hr_job,base.group_user,1,1,0,0
+access_employee_kra_user,Employee kra user access,model_employee_kra,base.group_user,1,1,0,0
+access_employee_kra_question_user,Employee kra question user access,model_employee_kra_question,base.group_user,1,1,0,0
+access_hr_kra_user,kra user access,model_hr_kra,base.group_user,1,1,0,0
+access_kra_question_user,Kra question user access,model_kra_question,base.group_user,1,1,0,0
+access_employee_year,employee year user access,model_employee_year,base.group_user,1,0,0,0
+access_kra_question_section_employee,Question Section Employee,model_kra_question_section,base.group_user,1,1,0,0
+,,,,,,,
+access_hr_job_officer,Hr job user access manager,model_hr_job,hr.group_hr_user,1,1,1,0
+access_employee_kra_officer,Employee kra user access manager,model_employee_kra,hr.group_hr_user,1,1,1,0
+access_employee_kra_question_officer,Employee kra question manager access ,model_employee_kra_question,hr.group_hr_user,1,1,1,0
+access_hr_kra_officer,kra manager access,model_hr_kra,hr.group_hr_user,1,1,1,0
+access_kra_question_officer,Kra question manager access,model_kra_question,hr.group_hr_user,1,1,1,0
+access_employee_year_officer,employee year user access,model_employee_year,hr.group_hr_user,1,1,1,0
+access_kra_question_section_officer,Question Section Officer,model_kra_question_section,hr.group_hr_user,1,1,1,0
+,,,,,,,
+access_hr_job_manager,Hr job user access manager,model_hr_job,hr.group_hr_manager,1,1,1,1
+access_employee_kra_manager,Employee kra user access manager,model_employee_kra,hr.group_hr_manager,1,1,1,1
+access_employee_kra_question_manager,Employee kra question manager access ,model_employee_kra_question,hr.group_hr_manager,1,1,1,1
+access_hr_kra_manager,kra manager access,model_hr_kra,hr.group_hr_manager,1,1,1,1
+access_kra_question_manager,Kra question manager access,model_kra_question,hr.group_hr_manager,1,1,1,1
+access_employee_year_manager,employee year user access,model_employee_year,hr.group_hr_manager,1,1,1,1
+access_kra_question_section_manager,Question Section Manager,model_kra_question_section,hr.group_hr_manager,1,1,1,1
+access_kra_wizard,access_kra_wizard,model_kra_wizard,base.group_user,1,1,1,1
+,,,,,,,
+access_employee_value_rating_user,Value rating user access,model_value_rating,base.group_user,1,1,0,0
+access_employee_value_rating_officer,Value rating officer access,model_value_rating,hr.group_hr_user,1,1,1,0
+access_employee_value_rating_manager,Value rating Manager access,model_value_rating,hr.group_hr_manager,1,1,1,1

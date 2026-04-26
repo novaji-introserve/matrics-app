@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- code -->
+        <record id="view_move_partner_contract_form" model="ir.ui.view">
+            <field name="name">view_move_partner_contract_form</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="model">account.move</field>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('oe_title')]" position="after">
+                    <group attrs="{'invisible':[('use_contract', '=', 'no')]}">
+                        <field name="use_contract" invisible="True"/>
+                        <label for="contract_id"/>
+                        <div class="o_row">
+                            <span>
+                                <field name="contract_id"
+                                       attrs="{'required':[('use_contract', '=', 'required')]}"/>
+                            </span>
+                            <button type="object" name="apply_contract"
+                                    attrs="{'invisible':['|', ('contract_id', '=', False)]}"
+                                    states="draft"
+                                    class="btn btn-primary"
+                                    help="Apply Contract"
+                                    confirm="Please confirm that you want to apply contract details">
+                                <span>Apply</span>
+                            </button>
+                        </div>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

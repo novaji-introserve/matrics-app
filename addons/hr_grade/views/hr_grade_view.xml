@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_form_view" model="ir.ui.view">
+        <field name="name">hr.employee.form</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="priority" eval="30"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='job_id']" position="before">
+                <field name="grade_id"/>
+            </xpath>
+        </field>
+    </record>
+    <!--
+    <record id="view_hr_employee_grade_filter" model="ir.ui.view">
+        <field name="name">hr.employee.grade.filter</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[last()]" position="before">
+                <filter name="grade" string="Grade" domain="[]" context="{'group_by':'grade_id'}"/>
+            </xpath>
+        </field>
+    </record>
+    -->
+    <record id="view_grade_tree" model="ir.ui.view">
+        <field name="name">hr.grade.tree</field>
+        <field name="model">hr.grade</field>
+        <field name="arch" type="xml">
+            <tree string="Grade">
+                <field name="name" />
+            </tree>
+        </field>
+    </record>
+    <!--
+    <record id="view_grade_form" model="ir.ui.view">
+        <field name="name">hr.grade.form</field>
+        <field name="model">hr.grade</field>
+        <field name="arch" type="xml">
+            <form string="Grade">
+                <group col="4">
+                    <field name="name" />
+                </group>
+                <group colspan="4">
+                    <separator string="Job" />
+                    <field name="hr_job_ids" widget="many2many" nolabel="1" colspan="4">
+                        <field name="name"/>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+    -->
+    <!--
+    <record id="view_hr_grade_filter" model="ir.ui.view">
+        <field name="name">hr.grade.filter</field>
+        <field name="model">hr.grade</field>
+        <field name="arch" type="xml">
+             <search string="Search Grade">
+                <group expand="0" string="Group By...">
+                    <filter name="Is Above Manager" string="Is Above Manager" domain="[]" context="{'group_by':'is_above_manager'}"/>
+                </group>
+           </search>
+        </field>
+    </record>
+    -->
+    <record model="ir.actions.act_window" id="action_hr_grade">
+        <field name="name">Grade</field>
+        <field name="res_model">hr.grade</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Click to define a new Grade.</p>
+        </field>
+    </record>
+    <menuitem id="menu_hr_grade" action="action_hr_grade" parent="hr.menu_human_resources_configuration" sequence="13" groups="hr.group_hr_manager"/>
+</odoo>
