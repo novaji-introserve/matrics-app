@@ -31,10 +31,10 @@ else
 fi
 
 echo "==> Creating database '$DB_NAME' on PostgreSQL (direct, bypassing pgbouncer)..."
-docker exec "$DB_CONTAINER" psql -U "$DB_USER" -tc \
+docker exec -e PGPASSWORD="$DB_PASSWORD" "$DB_CONTAINER" psql -U "$DB_USER" -d postgres -tc \
   "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'" \
   | grep -q 1 && echo "    Database already exists, skipping creation." || \
-  docker exec "$DB_CONTAINER" psql -U "$DB_USER" -c "CREATE DATABASE \"$DB_NAME\";"
+  docker exec -e PGPASSWORD="$DB_PASSWORD" "$DB_CONTAINER" psql -U "$DB_USER" -d postgres -c "CREATE DATABASE \"$DB_NAME\";"
 
 echo "==> Initialising Odoo with modules: $MODULES ..."
 docker exec -it "$CONTAINER_NAME" bash -lc \
