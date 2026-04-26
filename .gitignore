@@ -10,6 +10,9 @@ seatunnel/jobs/
 apache-seatunnel-2.3.12.tar.gz
 custom/*
 !custom/.gitkeep
+!custom/addons/
+custom/addons/*
+!custom/addons/.gitkeep
 *.pyc
 __pycache__/
 .vscode/
