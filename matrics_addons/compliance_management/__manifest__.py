@@ -69,7 +69,8 @@
         "views/adverse_media_keywords.xml",
         "views/pep_source.xml",
         # "data/schedules/queue_job_config.xml",
-        "data/demo_data/score/fcra_score.xml",    
+        "data/demo_data/score/fcra_score.xml",
+        'data/resource_uri_data.xml',
         "data/data.xml",
         "data/demo_data/risk_assessment/category.xml",
         "data/demo_data/risk_assessment/risk_universe.xml",
@@ -121,7 +122,6 @@
         'data/demo_data/stat/compliance_stats.xml',
         'data/demo_data/chart/charts.xml',
         'data/settings.xml',
-        'data/resource_uri_data.xml',
         'data/demo_data/plan/risk_plan.xml',
         'data/demo_data/plan/jurisdiction_plan.xml',
        
