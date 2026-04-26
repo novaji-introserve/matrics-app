@@ -23,8 +23,29 @@ else
   MODULES="$(IFS=,; echo "$*")"
 fi
 
+INSTALL_MODULES=""
+UPDATE_MODULES=""
+
+for module in ${MODULES//,/ }; do
+  state=$(docker compose -f "$SCRIPT_DIR/docker-compose.yml" exec -T db \
+    psql -U "$DB_USER" -d "$DB_NAME" -tAc \
+    "SELECT state FROM ir_module_module WHERE name='$module' LIMIT 1;" 2>/dev/null | tr -d '[:space:]')
+  if [ "$state" = "installed" ]; then
+    UPDATE_MODULES="${UPDATE_MODULES:+$UPDATE_MODULES,}$module"
+  else
+    INSTALL_MODULES="${INSTALL_MODULES:+$INSTALL_MODULES,}$module"
+  fi
+done
+
+ODOO_FLAGS=""
+[ -n "$INSTALL_MODULES" ] && ODOO_FLAGS="$ODOO_FLAGS -i $INSTALL_MODULES"
+[ -n "$UPDATE_MODULES"  ] && ODOO_FLAGS="$ODOO_FLAGS -u $UPDATE_MODULES"
+
+echo "Installing: ${INSTALL_MODULES:-none}"
+echo "Updating:   ${UPDATE_MODULES:-none}"
+
 docker compose -f "$SCRIPT_DIR/docker-compose.yml" exec odoo16 \
-  /usr/bin/odoo -d "$DB_NAME" -u "$MODULES" \
+  /usr/bin/odoo -d "$DB_NAME" $ODOO_FLAGS \
   --db_host="$DB_HOST" --db_port="$DB_PORT" \
   --db_user="$DB_USER" --db_password="$DB_PASSWORD" \
   --stop-after-init
