@@ -970,6 +970,13 @@ class ResCharts(models.Model):
                     )
                     
                     if not success:
+                        if "does not exist" in (error_msg or ""):
+                            # Table not yet created during fresh install — skip.
+                            _logger.warning(
+                                "Chart query validation skipped — table not yet created: %s",
+                                error_msg,
+                            )
+                            continue
                         raise exceptions.ValidationError(f"Query execution failed: {error_msg}")
                         
                     # Convert results to dict format for validation
