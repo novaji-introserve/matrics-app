@@ -12,6 +12,7 @@ custom/*
 !custom/.gitkeep
 *.pyc
 __pycache__/
+.vscode/
 
 # SeaTunnel JDBC/connector jars — large binaries, place manually on build machine
 .docker/seatunnel/lib/*.jar
