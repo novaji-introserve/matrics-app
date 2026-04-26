@@ -44,7 +44,6 @@ zope.interface
 asyncpg
 aiosqlite
 google-cloud-bigquery
-ibm_db
 mysql-connector-python
 oracledb
 psycopg2-binary
