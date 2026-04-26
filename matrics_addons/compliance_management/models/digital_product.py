@@ -80,29 +80,64 @@ class PartnerDigitalProductView(models.Model):
     def init(self):
         """Create a lightweight SQL view backed by channel subscriptions."""
         tools.drop_view_if_exists(self.env.cr, self._table)
-        self.env.cr.execute(f"""
-            CREATE OR REPLACE VIEW {self._table} AS (
-                SELECT
-                    MIN(ccs.id) AS id,
-                    ccs.partner_id,
-                    ccs.customer_id,
-                    NULL::varchar AS customer_segment,
-                    MAX(CASE WHEN ddc.code = 'ussd' THEN ccs.value END) AS ussd,
-                    MAX(CASE WHEN ddc.code = 'onebank' THEN ccs.value END) AS onebank,
-                    MAX(CASE WHEN ddc.code = 'carded_customer' THEN ccs.value END) AS carded_customer,
-                    MAX(CASE WHEN ddc.code = 'alt_bank' THEN ccs.value END) AS alt_bank,
-                    MAX(CASE WHEN ddc.code = 'sterling_pro' THEN ccs.value END) AS sterling_pro,
-                    MAX(CASE WHEN ddc.code = 'banca' THEN ccs.value END) AS banca,
-                    MAX(CASE WHEN ddc.code = 'doubble' THEN ccs.value END) AS doubble,
-                    MAX(CASE WHEN ddc.code = 'specta' THEN ccs.value END) AS specta,
-                    MAX(CASE WHEN ddc.code = 'switch' THEN ccs.value END) AS switch
-                FROM customer_channel_subscription ccs
-                JOIN digital_delivery_channel ddc
-                    ON ddc.id = ccs.channel_id
-                WHERE ccs.partner_id IS NOT NULL
-                GROUP BY ccs.partner_id, ccs.customer_id
+
+        self.env.cr.execute("""
+            SELECT EXISTS (
+                SELECT 1 FROM information_schema.tables
+                WHERE table_name = 'customer_channel_subscription'
+            ) AND EXISTS (
+                SELECT 1 FROM information_schema.tables
+                WHERE table_name = 'digital_delivery_channel'
             )
         """)
+        tables_ready = self.env.cr.fetchone()[0]
+
+        if tables_ready:
+            self.env.cr.execute(f"""
+                CREATE OR REPLACE VIEW {self._table} AS (
+                    SELECT
+                        MIN(ccs.id) AS id,
+                        ccs.partner_id,
+                        ccs.customer_id,
+                        NULL::varchar AS customer_segment,
+                        MAX(CASE WHEN ddc.code = 'ussd' THEN ccs.value END) AS ussd,
+                        MAX(CASE WHEN ddc.code = 'onebank' THEN ccs.value END) AS onebank,
+                        MAX(CASE WHEN ddc.code = 'carded_customer' THEN ccs.value END) AS carded_customer,
+                        MAX(CASE WHEN ddc.code = 'alt_bank' THEN ccs.value END) AS alt_bank,
+                        MAX(CASE WHEN ddc.code = 'sterling_pro' THEN ccs.value END) AS sterling_pro,
+                        MAX(CASE WHEN ddc.code = 'banca' THEN ccs.value END) AS banca,
+                        MAX(CASE WHEN ddc.code = 'doubble' THEN ccs.value END) AS doubble,
+                        MAX(CASE WHEN ddc.code = 'specta' THEN ccs.value END) AS specta,
+                        MAX(CASE WHEN ddc.code = 'switch' THEN ccs.value END) AS switch
+                    FROM customer_channel_subscription ccs
+                    JOIN digital_delivery_channel ddc
+                        ON ddc.id = ccs.channel_id
+                    WHERE ccs.partner_id IS NOT NULL
+                    GROUP BY ccs.partner_id, ccs.customer_id
+                )
+            """)
+        else:
+            # Stub view during fresh install — replaced on next module update
+            # once the underlying tables have been created.
+            self.env.cr.execute(f"""
+                CREATE VIEW {self._table} AS (
+                    SELECT
+                        NULL::integer AS id,
+                        NULL::integer AS partner_id,
+                        NULL::integer AS customer_id,
+                        NULL::varchar AS customer_segment,
+                        NULL::varchar AS ussd,
+                        NULL::varchar AS onebank,
+                        NULL::varchar AS carded_customer,
+                        NULL::varchar AS alt_bank,
+                        NULL::varchar AS sterling_pro,
+                        NULL::varchar AS banca,
+                        NULL::varchar AS doubble,
+                        NULL::varchar AS specta,
+                        NULL::varchar AS switch
+                    WHERE false
+                )
+            """)
 
 
    
