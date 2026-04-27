@@ -78,7 +78,7 @@
                              To learn how to  define  your cron string go to https://crontab.guru/
                             </div>
                         </page>
-                        <page string="Receipients">
+                        <page string="Recipients">
                             <group>
                                 <group class="">
                                     <field name="specific_email_recipients" widget="many2many_tags" />
@@ -97,6 +97,23 @@
                                 </group>
                             </group>
                         </page>
+                        <!-- <page string="Advanced Settings">
+                            <group string="Initialization Strategy Details">
+                                <div class="o_form_field">
+                                    <h4>Initialization Strategy Guide:</h4>
+                                    <ul style="margin-left: 20px;">
+                                        <li><strong>Current Year Only (2025):</strong> Process only records from 2025 onwards. Best for new banking systems or when you only care about recent data.</li>
+                                        <li><strong>Full Historical Data:</strong> Process all available historical data. Use with caution - may take a long time and create many signatures.</li>
+                                        <li><strong>Last 6 Months:</strong> Process data from the last 6 months. Good balance between coverage and performance.</li>
+                                        <li><strong>Last 12 Months:</strong> Process data from the last 12 months. More comprehensive historical coverage.</li>
+                                        <li><strong>Custom Period:</strong> Specify your own period in months. Flexible option for specific requirements.</li>
+                                    </ul>
+                                    <br/>
+                                    <h4>Processing Window:</h4>
+                                    <p>After initialization, the system will only look back this many hours for new records. Default is 72 hours (3 days) which provides good coverage while maintaining performance.</p>
+                                </div>
+                            </group>
+                        </page> -->
                     </notebook>
                 </sheet>
                 <!-- Add the chatter here -->

@@ -278,9 +278,9 @@ class Compliance(http.Controller):
         
         if is_co:
             cco = True
-            _logger.info(
-                f"CO user {request.env.user.id} accessing dynamic SQL with CCO privileges"
-            )
+            # _logger.info(
+            #     f"CO user {request.env.user.id} accessing dynamic SQL with CCO privileges"
+            # )
             
         lower_query = sql_query.lower()
         table = None
@@ -331,7 +331,7 @@ class Compliance(http.Controller):
             else:
                 domain = additional_filters
                 
-        _logger.info(f"Final domain: {domain}")
+        # _logger.info(f"Final domain: {domain}")
         return {"table": table, "domain": domain}
 
     def format_number(self, result_value):

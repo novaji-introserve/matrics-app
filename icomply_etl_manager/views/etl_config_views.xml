@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ETL Source Table Tree View - Simplified -->
+    <record id="view_etl_source_table_tree" model="ir.ui.view">
+        <field name="name">etl.source.table.tree</field>
+        <field name="model">etl.source.table</field>
+        <field name="arch" type="xml">
+            <tree string="ETL Tables">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="source_connection_id"/>
+                <field name="target_connection_id"/>
+                <field name="category_id"/>
+                <field name="full_sync_enabled" widget="boolean_toggle"/>
+                <field name="incremental_sync_enabled" widget="boolean_toggle"/>
+                <field name="last_full_sync_time"/>
+                <field name="last_incremental_sync"/>
+                <field name="last_sync_status" decoration-success="last_sync_status == 'success'" 
+                       decoration-danger="last_sync_status == 'failed'" 
+                       decoration-warning="last_sync_status == 'running'"/>
+                <field name="total_records_synced"/>
+                <field name="estimated_record_count"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ETL Source Table Form View - Simplified -->
+    <record id="view_etl_source_table_form" model="ir.ui.view">
+        <field name="name">etl.source.table.form</field>
+        <field name="model">etl.source.table</field>
+        <field name="arch" type="xml">
+            <form string="ETL Table Configuration">
+                <header>
+                    <button name="action_test_connections" 
+                            string="Test Connections" 
+                            type="object" 
+                            class="btn-secondary"/>
+                    <button name="action_sync_table_full" 
+                            string="Full Sync Now" 
+                            type="object" 
+                            class="oe_highlight"
+                            attrs="{'invisible': [('full_sync_enabled', '=', False)]}"
+                            confirm="Run full sync for this table now?"/>
+                    <button name="action_sync_table_incremental" 
+                            string="Incremental Sync Now" 
+                            type="object" 
+                            class="btn-info"
+                            attrs="{'invisible': [('incremental_sync_enabled', '=', False)]}"
+                            confirm="Run incremental sync now?"/>
+                    <button name="action_estimate_record_count" 
+                            string="Estimate Records" 
+                            type="object" 
+                            class="btn-secondary"/>
+                    <field name="last_sync_status" widget="statusbar" 
+                           statusbar_colors='{"success":"green","failed":"red","running":"blue"}'/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button"/>
+                        </button>
+                        <div class="oe_stat_button">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="total_records_synced"/>
+                                </span>
+                                <span class="o_stat_text">Records Synced</span>
+                            </div>
+                        </div>
+                        <div class="oe_stat_button">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="estimated_record_count"/>
+                                </span>
+                                <span class="o_stat_text">Estimated Count</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="e.g., customer_master"/></h1>
+                    </div>
+                    
+                    <!-- Connection Configuration -->
+                    <group string="Database Connections">
+                        <group>
+                            <field name="source_connection_id" options="{'no_create': True}"/>
+                            <field name="source_table_name" placeholder="e.g., tbl_customer"/>
+                        </group>
+                        <group>
+                            <field name="target_connection_id" options="{'no_create': True}"/>
+                            <field name="target_table_name" placeholder="e.g., res_partner"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group string="Basic Configuration">
+                            <field name="primary_key_unique" required="1"/>
+                            <field name="batch_size"/>
+                            <field name="category_id"/>
+                        </group>
+                        <group string="Status">
+                            <field name="job_status" readonly="1"/>
+                            <field name="last_sync_message" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <!-- Sync Configuration -->
+                    <group string="Sync Configuration">
+                        <group string="Full Sync Settings">
+                            <field name="full_sync_enabled"/>
+                            <field name="full_sync_frequency_id" 
+                                   attrs="{'invisible': [('full_sync_enabled', '=', False)]}"
+                                   options="{'no_create': True}"/>
+                        </group>
+                        <group string="Incremental Sync Settings">
+                            <field name="incremental_sync_enabled"/>
+                            <field name="incremental_frequency_minutes" 
+                                   attrs="{'invisible': [('incremental_sync_enabled', '=', False)]}"/>
+                            <field name="incremental_date_column" 
+                                   attrs="{'invisible': [('incremental_sync_enabled', '=', False)]}"
+                                   placeholder="e.g., CreateDate, UpdateDate"/>
+                        </group>
+                    </group>
+                    
+                    <!-- Sync Times -->
+                    <group string="Sync Status">
+                        <group>
+                            <field name="last_full_sync_time" readonly="1"/>
+                            <field name="last_incremental_sync" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="job_uuid" readonly="1" attrs="{'invisible': [('job_uuid', '=', False)]}"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Column Mappings">
+                            <div class="alert alert-info" role="alert">
+                                <strong>Important:</strong> The Primary Key field above must be mapped below to a target column.
+                            </div>
+                            <field name="mapping_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="source_column"/>
+                                    <field name="target_column"/>
+                                    <field name="mapping_type"/>
+                                    <field name="lookup_table" 
+                                        attrs="{'invisible': [('mapping_type', '!=', 'lookup')],
+                                                'required': [('mapping_type', '=', 'lookup')]}"/>
+                                    <field name="lookup_key" 
+                                        attrs="{'invisible': [('mapping_type', '!=', 'lookup')],
+                                                'required': [('mapping_type', '=', 'lookup')]}"/>
+                                    <field name="lookup_value" 
+                                        attrs="{'invisible': [('mapping_type', '!=', 'lookup')],
+                                                'required': [('mapping_type', '=', 'lookup')]}"/>
+                                    <field name="active" widget="boolean_toggle"/>
+                                </tree>
+                            </field>
+                        </page>
+                        
+                            <page string="Dependencies">
+                                <field name="dependency_ids" 
+                                    widget="many2many_tags"
+                                    domain="[('id', '!=', id)]"
+                                    options="{'no_create': True, 'no_create_edit': True}"/>
+                                <div class="alert alert-info" role="alert">
+                                    <strong>Note:</strong> Dependencies will be processed before this table.
+                                </div>
+                            </page>
+                        
+                        <page string="Sync Logs">
+                            <field name="sync_log_ids">
+                                <tree>
+                                    <field name="create_date"/>
+                                    <field name="sync_type"/>
+                                    <field name="status" decoration-success="status == 'success'" 
+                                           decoration-danger="status == 'failed'" 
+                                           decoration-warning="status == 'running'"/>
+                                    <field name="total_records"/>
+                                    <field name="new_records"/>
+                                    <field name="updated_records"/>
+                                    <field name="duration_seconds"/>
+                                    <field name="error_message"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- ETL Source Table Search View -->
+    <record id="view_etl_source_table_search" model="ir.ui.view">
+        <field name="name">etl.source.table.search</field>
+        <field name="model">etl.source.table</field>
+        <field name="arch" type="xml">
+            <search string="Search ETL Tables">
+                <field name="name"/>
+                <field name="source_table_name"/>
+                <field name="target_table_name"/>
+                <field name="source_connection_id"/>
+                <field name="target_connection_id"/>
+                <field name="category_id"/>
+                <separator/>
+                <filter string="Full Sync Enabled" name="full_sync_enabled" domain="[('full_sync_enabled', '=', True)]"/>
+                <filter string="Incremental Sync Enabled" name="incremental_sync_enabled" domain="[('incremental_sync_enabled', '=', True)]"/>
+                <separator/>
+                <filter string="Success" name="status_success" domain="[('last_sync_status', '=', 'success')]"/>
+                <filter string="Failed" name="status_failed" domain="[('last_sync_status', '=', 'failed')]"/>
+                <filter string="Running" name="status_running" domain="[('last_sync_status', '=', 'running')]"/>
+                <separator/>
+                <filter string="Master Data" name="category_master" domain="[('category_id.code', '=', 'master')]"/>
+                <filter string="Customer Data" name="category_customer" domain="[('category_id.code', '=', 'customer')]"/>
+                <filter string="Transaction Data" name="category_transaction" domain="[('category_id.code', '=', 'transaction')]"/>
+                
+                <group expand="0" string="Group By">
+                    <filter string="Source Connection" name="group_source_connection" context="{'group_by': 'source_connection_id'}"/>
+                    <filter string="Target Connection" name="group_target_connection" context="{'group_by': 'target_connection_id'}"/>
+                    <filter string="Category" name="group_category" context="{'group_by': 'category_id'}"/>
+                    <filter string="Last Sync Status" name="group_status" context="{'group_by': 'last_sync_status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_etl_source_table" model="ir.actions.act_window">
+        <field name="name">ETL Tables</field>
+        <field name="res_model">etl.source.table</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_etl_source_table_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first ETL table configuration!
+            </p>
+            <p>
+                Define source and target database connections, configure sync types,
+                and set up column mappings.
+            </p>
+        </field>
+    </record>
+
+    <!-- ETL Category Views -->
+    <record id="view_etl_category_tree" model="ir.ui.view">
+        <field name="name">etl.category.tree</field>
+        <field name="model">etl.category</field>
+        <field name="arch" type="xml">
+            <tree string="ETL Categories">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_etl_category_form" model="ir.ui.view">
+        <field name="name">etl.category.form</field>
+        <field name="model">etl.category</field>
+        <field name="arch" type="xml">
+            <form string="ETL Category">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="sequence"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_etl_category" model="ir.actions.act_window">
+        <field name="name">Categories</field>
+        <field name="res_model">etl.category</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- ETL Frequency Views -->
+    <record id="view_etl_frequency_tree" model="ir.ui.view">
+        <field name="name">etl.frequency.tree</field>
+        <field name="model">etl.frequency</field>
+        <field name="arch" type="xml">
+            <tree string="ETL Frequencies">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="interval_number"/>
+                <field name="interval_type"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_etl_frequency_form" model="ir.ui.view">
+        <field name="name">etl.frequency.form</field>
+        <field name="model">etl.frequency</field>
+        <field name="arch" type="xml">
+            <form string="ETL Frequency">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="interval_number"/>
+                        <field name="interval_type"/>
+                        <field name="sequence"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_etl_frequency" model="ir.actions.act_window">
+        <field name="name">Frequencies</field>
+        <field name="res_model">etl.frequency</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

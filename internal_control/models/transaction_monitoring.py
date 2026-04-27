@@ -13,6 +13,21 @@ class TransactionMonitoring(models.Model):
          "Transaction already exists. Value must be unique!"),
     ] 
 
+    def init(self):
+        """Automatically setup transaction triggers when model initializes"""
+        super().init()
+        try:
+            # Check if triggers already exist to avoid recreating them
+            if not self._verify_transaction_triggers():
+                _logger.info("Transaction triggers not found, setting up production system...")
+                self._setup_transaction_indexes()
+                self._setup_transaction_triggers()
+                _logger.info("Transaction production system initialized automatically")
+        except Exception as e:
+            _logger.warning(f"Auto-setup failed, manual setup may be required: {str(e)}")
+            # Don't raise the exception to prevent module loading failure
+            pass
+
     # id = fields.Integer(string="id", readonly=True)
     refno = fields.Char(string="Ref Number", readonly=True, index=True)
     valuedate = fields.Char(string="Value Date", readonly=True, index=True)
@@ -25,9 +40,18 @@ class TransactionMonitoring(models.Model):
                               string='Dept. Code', index=True)
     status = fields.Many2one(comodel_name='res.transaction.status',
                               string='Trans. Status', index=True)
-    tran_channel = fields.Char(string="Transaction Channel", readonly=True, index=True)
+    tran_channel = fields.Many2one(comodel_name='res_transaction_channel', string="Transaction Channel", readonly=True, index=True)
     request_id = fields.Char(string="Request ID", readonly=True, index=True)
     trans_id = fields.Char(string="Transaction ID", readonly=True, index=True)
+
+    account_group = fields.Char(string="Account Group", index=True)
+    transaction_mode = fields.Char(string="Transaction Mode", index=True)
+    parent_ledger_id = fields.Char(string="Parent Ledger ID", index=True)
+    sub_general_ledger_code = fields.Char(string="Sub General Ledger Code", index=True)
+    source_branch_code = fields.Char(string="Source Branch Code", index=True)
+    posted_by = fields.Char(string="Posted By", index=True)
+    initiated_by = fields.Char(string="Initiated By", index=True)
+    account_name = fields.Char(string="Account Name", index=True)
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -156,58 +180,36 @@ class TransactionMonitoring(models.Model):
             return [('date_created', '>=', start_date), ('date_created', '<=', today)]
         raise ValidationError(_("Unsupported reporting period: %s") % period_key)
 
-    def _filter_account_length_10(self, domain):
-        """Helper method to filter records with account number length of 10"""
+    def _filter_customer_accounts(self, domain):
+        """
+        Flexible method to filter customer accounts based on bank structure
+        This method can be configured for different bank requirements
+        """
         records = self.env['res.customer.transaction'].search(domain)
-        return records.filtered(lambda r: len(str(r.account_id.name)) == 10)
+        
+        # Method 1: Length-based filtering
+        # return records.filtered(lambda r: len(str(r.account_id.name)) == 10)
+        
+        # Method 2: Length + customer_id based filtering
+        return records.filtered(lambda r: 
+            len(str(r.account_id.name)) == 10 and 
+            r.customer_id is not None
+        )
     
-    def _filter_account_length_14(self, domain):
-        """Helper method to filter records with account number length of 14"""
+    def _filter_internal_accounts(self, domain):
+        """
+        Flexible method to filter internal accounts based on bank structure
+        This method can be configured for different bank requirements
+        """
         records = self.env['res.customer.transaction'].search(domain)
-        # print(records)
-        return records.filtered(lambda r: len(str(r.account_id.name)) == 14)
 
-    def open_all_transactions_today(self):
-        today = fields.Date.today()
-        return self._open_transaction_monitoring_action(
-            _('All Transactions - Today'),
-            [('date_created', '=', today)],
-        )
+        # Method 1: Length-based filtering
+        # return records.filtered(lambda r: len(str(r.account_id.name)) == 14)
 
-    def open_awaiting_review_today(self):
-        return self._open_transaction_monitoring_action(
-            _('Awaiting Review - Today'),
-            [('state', '=', 'new')] + self._get_period_domain('today'),
-        )
-
-    def open_reviewed_today(self):
-        return self._open_transaction_monitoring_action(
-            _('Reviewed - Today'),
-            [('state', '=', 'done')] + self._get_period_domain('today'),
-        )
-
-    def open_awaiting_review_last_week(self):
-        return self._open_transaction_monitoring_action(
-            _('Awaiting Review - Last 1 Week'),
-            [('state', '=', 'new')] + self._get_period_domain('week'),
-        )
-
-    def open_reviewed_last_week(self):
-        return self._open_transaction_monitoring_action(
-            _('Reviewed - Last 1 Week'),
-            [('state', '=', 'done')] + self._get_period_domain('week'),
-        )
-
-    def open_awaiting_review_last_month(self):
-        return self._open_transaction_monitoring_action(
-            _('Awaiting Review - Last 1 Month'),
-            [('state', '=', 'new')] + self._get_period_domain('month'),
-        )
-
-    def open_reviewed_last_month(self):
-        return self._open_transaction_monitoring_action(
-            _('Reviewed - Last 1 Month'),
-            [('state', '=', 'done')] + self._get_period_domain('month'),
+        # Method 2: Length + customer_id based filtering
+        return records.filtered(lambda r:
+            len(str(r.account_id.name)) > 10 and
+            r.customer_id is None
         )
         
 
@@ -225,7 +227,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
 
    
         
@@ -254,7 +256,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
 
         return {
             'name': _('All Foreign Transactions - Today '),
@@ -285,7 +287,7 @@ class TransactionMonitoring(models.Model):
         domain.extend(self._check_cco_and_get_branch_domain())
 
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
         
         return {
             'name': _('All NGN Transactions - Last 7 Days '),
@@ -312,7 +314,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
 
         return {
             'name': _('All Foreign Transactions - Last 7 Days '),
@@ -338,7 +340,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
         
         return {
             'name': _('NGN Transactions Awaiting Review - Today'),
@@ -365,7 +367,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
         
         return {
             'name': _('Foreign Transactions Awaiting Review - Today'),
@@ -393,7 +395,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
         
         return {
             'name': _('NGN Transactions Awaiting Review - Last 7 Day'),
@@ -420,7 +422,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
         
         return {
             'name': _('Foreign Transactions Awaiting Review - Last 7 Day'),
@@ -446,7 +448,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
         
         return {
             'name': _('NGN Reviewed Transactions - Today'),
@@ -473,7 +475,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
         
         return {
             'name': _('Foreign Reviewed Transactions- Today'),
@@ -501,7 +503,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
         
         return {
             'name': _('NGN Reviewed Transactions - Last 7 Days'),
@@ -528,7 +530,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_10(domain)
+        filtered_records = self._filter_customer_accounts(domain)
         
         return {
             'name': _('Foreign Reviewed Transactions - Last 7 Days'),
@@ -554,7 +556,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
 
         
         
@@ -581,7 +583,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
         
         return {
             'name': _('All Foreign Internal Transactions - Today '),
@@ -609,7 +611,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
         
         return {
             'name': _('All NGN Internal Transactions - Last 7 Days'),
@@ -636,7 +638,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
         
         return {
             'name': _('All Foreign Internal Transactions - Last 7 Days'),
@@ -661,7 +663,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
         
         return {
             'name': _('Internal NGN Transactions Awaiting Review - Today'),
@@ -686,7 +688,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
         
         return {
             'name': _('Internal Foreign Transactions Awaiting Review - Today'),
@@ -714,7 +716,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
         
         return {
             'name': _('Internal NGN Transactions Awaiting Review - Last 7 Days'),
@@ -742,7 +744,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
         
         return {
             'name': _('Internal Foreign Transactions Awaiting Review - Last 7 Days'),
@@ -768,7 +770,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
         
         return {
             'name': _('Internal NGN Transactions Reviewed - Today'),
@@ -793,7 +795,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
         
         return {
             'name': _('Internal Foreign Transactions Reviewed - Today'),
@@ -822,7 +824,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
         
         return {
             'name': _('Internal NGN Transactions Reviewed - Last 7 Days'),
@@ -851,7 +853,7 @@ class TransactionMonitoring(models.Model):
         
         domain.extend(self._check_cco_and_get_branch_domain())
         
-        filtered_records = self._filter_account_length_14(domain)
+        filtered_records = self._filter_internal_accounts(domain)
         
         return {
             'name': _('Internal Foreign Transactions Reviewed - Last 7 Days'),
@@ -900,9 +902,17 @@ class TransactionMonitoring(models.Model):
             raise
 
 
-    def action_screen(self):
-        super().action_screen()
+    @api.model
+    def action_screen(self, rules=None):
         '''
         Apply additional logic here if needed
         This method is called when the screen action is triggered.
-        '''             
+        '''
+        # Only call super if there are records to process (avoids ensure_one() on empty set)
+        records = self.search([])
+        for record in records:
+            try:
+                super(TransactionMonitoring, record).action_screen(rules=rules)
+            except Exception as e:
+                _logger.error(f"Error screening transaction {record.id}: {str(e)}")
+                continue

@@ -337,6 +337,9 @@ class CustomerEDD(models.Model):
         compute='_compute_button_visibility',
         store=False
     )
+    
+    max_risk_score = fields.Float(string='Maximum Risk Score', compute='_compute_max_risk_score', store=False)
+
 
     @api.depends('status', 'create_uid', 'approving_officer_id', 'responsible_id', 'is_officer_notified')
     def _compute_button_visibility(self):
@@ -1145,17 +1148,19 @@ class CustomerEDD(models.Model):
     def _inverse_risk_score(self):
         for record in self:
             # Convert to float first to ensure it's a number
+            max_risk_score = float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold'))
+            min_risk_score = float(self.env['res.compliance.settings'].get_setting('minimum_risk_threshold'))
             try:
                 value = float(record.risk_score)
                 # Cap the value at 25
-                if value > 9:
-                    record.risk_score = 9.0
+                if value > max_risk_score:
+                    record.risk_score = max_risk_score
                 # Ensure it's not below minimum
-                elif value < 0.5:
-                    record.risk_score = 0.5
+                elif value < min_risk_score:
+                    record.risk_score = min_risk_score
             except (ValueError, TypeError):
                 # If conversion fails, set a default value
-                record.risk_score = 1.0
+                record.risk_score = min_risk_score
 
     def action_download_pdf(self):
         self.ensure_one()
@@ -1750,6 +1755,15 @@ class CustomerEDD(models.Model):
                         'message': str(e)
                     }
                 }
+    
+    @api.depends('customer_type')
+    def _compute_max_risk_score(self):
+        """Compute the maximum risk score to use for slider widget"""
+        for record in self:
+            if record.customer_type:
+                record.max_risk_score = float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold'))
+            else:
+                record.max_risk_score = 10 
 
 
 class EDDRrejectWizard(models.TransientModel):
@@ -1762,3 +1776,5 @@ class EDDRrejectWizard(models.TransientModel):
     def action_confirm_reject(self):
         self.edd_id.action_reject(self.reject_reason)
         return {'type': 'ir.actions.act_window_close'}
+
+     # Default maximum value

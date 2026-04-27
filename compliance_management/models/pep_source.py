@@ -57,7 +57,7 @@ class PEPSource(models.Model):
                 'state': 'pending',
                 'priority': 15 if self.is_opensanctions else 10,
                 'batch_size': 500,  # Default batch size
-                'api_limit': 1000  # Default API limit
+                'api_limit': 500  # Max allowed by OpenSanctions API
             })
             
             # Show the created job

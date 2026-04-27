@@ -123,13 +123,12 @@
         <field name="inherit_id" ref="compliance_management.compliance_transaction_tree"/>
         <field name="model">res.customer.transaction</field>
         <field name="arch" type="xml">
-            <!-- <xpath expr="//button[@name='action_create']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath> -->
-           
-
+            <!-- Disable create and delete operations -->
             <xpath expr="//tree" position="attributes">
                 <attribute name="default_order">valuedate desc</attribute>
+                <attribute name="create">false</attribute>
+                <attribute name="delete">false</attribute>
+                <attribute name="edit">false</attribute>
                 <!-- <attribute name="limit">80</attribute> -->
             </xpath>
 
@@ -137,7 +136,7 @@
              <field name="refno" />
              </xpath>
 
-            <xpath expr="//field[@name='date_created']" position="after">
+            <xpath expr="//field[@name='state']" position="after">
                 <field name="valuedate" string="Value Date" optional="show"/>
                 <field name="actualdate" string="Actual Date" optional="hide"/>
                 <field name="userid" optional="hide"/>

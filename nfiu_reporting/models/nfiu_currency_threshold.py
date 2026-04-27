@@ -5,7 +5,16 @@ class NFIUCurrencyThreshold(models.Model):
     _name = 'nfiu.currency.threshold'
     _description = 'Currency Threshold'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-        
+
+    _sql_constraints = [
+        ('unique_currency_customer_type', 'UNIQUE(currency_id, customer_type)',
+         'A threshold for this currency and customer type already exists.'),
+    ]
+
+    customer_type = fields.Selection(
+        [('individual', 'Individual'), ('corporate', 'Corporate')],
+        string='Customer Type', required=True, default='individual', tracking=True,
+    )
     threshold = fields.Float(string='Threshold Limit', digits=(10,2),help='Limit that must be reported to NFIU',required=True, tracking=True)
     description = fields.Text(string='Description')
     def set_domain_currency(self):

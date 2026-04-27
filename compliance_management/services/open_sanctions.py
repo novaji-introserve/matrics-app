@@ -501,6 +501,10 @@ class OpenSanctions:
             response = requests.get(url, headers=headers, params=params, timeout=self.timeout)
             
             # Check response
+            if response.status_code == 422:
+                # 422 means the offset/query is out of range — end of dataset, not a real error
+                _logger.info(f"API returned 422 (end of dataset reached) — stopping pagination")
+                return {'status': 'end_of_results', 'results': [], 'total': 0}
             if response.status_code != 200:
                 _logger.error(f"API request failed: {response.status_code}")
                 return {

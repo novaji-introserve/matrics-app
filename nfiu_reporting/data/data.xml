@@ -86,6 +86,115 @@
             <field name="role">E</field>
             <field name="start_date">2020-01-01</field>
         </record>
+        <!-- ============================================================
+             NFIU CURRENCY THRESHOLDS
+             Source: CBN/NFIU AML/CFT Regulations
+             NGN: ₦5M individual / ₦10M corporate (ML Act 2022)
+             Foreign: USD/GBP/EUR/CAD $10,000 equivalent; CNY ¥50,000
+             ============================================================ -->
+
+        <!-- NGN -->
+        <record id="nfiu_threshold_ngn_individual" model="nfiu.currency.threshold">
+            <field name="currency_id" ref="base.NGN"/>
+            <field name="customer_type">individual</field>
+            <field name="threshold">5000000.00</field>
+            <field name="shortname">NG</field>
+            <field name="description">CBN/NFIU mandated CTR threshold for individual customers in NGN (ML Prevention Act 2022)</field>
+        </record>
+
+        <record id="nfiu_threshold_ngn_corporate" model="nfiu.currency.threshold">
+            <field name="currency_id" ref="base.NGN"/>
+            <field name="customer_type">corporate</field>
+            <field name="threshold">10000000.00</field>
+            <field name="shortname">NG</field>
+            <field name="description">CBN/NFIU mandated CTR threshold for corporate customers in NGN (ML Prevention Act 2022)</field>
+        </record>
+
+        <!-- USD -->
+        <record id="nfiu_threshold_usd_individual" model="nfiu.currency.threshold">
+            <field name="currency_id" ref="base.USD"/>
+            <field name="customer_type">individual</field>
+            <field name="threshold">10000.00</field>
+            <field name="shortname">US</field>
+            <field name="description">NFIU CTR threshold for individual customers transacting in USD</field>
+        </record>
+
+        <record id="nfiu_threshold_usd_corporate" model="nfiu.currency.threshold">
+            <field name="currency_id" ref="base.USD"/>
+            <field name="customer_type">corporate</field>
+            <field name="threshold">10000.00</field>
+            <field name="shortname">US</field>
+            <field name="description">NFIU CTR threshold for corporate customers transacting in USD</field>
+        </record>
+
+        <!-- GBP -->
+        <record id="nfiu_threshold_gbp_individual" model="nfiu.currency.threshold">
+            <field name="currency_id" ref="base.GBP"/>
+            <field name="customer_type">individual</field>
+            <field name="threshold">10000.00</field>
+            <field name="shortname">GB</field>
+            <field name="description">NFIU CTR threshold for individual customers transacting in GBP</field>
+        </record>
+
+        <record id="nfiu_threshold_gbp_corporate" model="nfiu.currency.threshold">
+            <field name="currency_id" ref="base.GBP"/>
+            <field name="customer_type">corporate</field>
+            <field name="threshold">10000.00</field>
+            <field name="shortname">GB</field>
+            <field name="description">NFIU CTR threshold for corporate customers transacting in GBP</field>
+        </record>
+
+        <!-- EUR -->
+        <record id="nfiu_threshold_eur_individual" model="nfiu.currency.threshold">
+            <field name="currency_id" ref="base.EUR"/>
+            <field name="customer_type">individual</field>
+            <field name="threshold">10000.00</field>
+            <field name="shortname">EU</field>
+            <field name="description">NFIU CTR threshold for individual customers transacting in EUR</field>
+        </record>
+
+        <record id="nfiu_threshold_eur_corporate" model="nfiu.currency.threshold">
+            <field name="currency_id" ref="base.EUR"/>
+            <field name="customer_type">corporate</field>
+            <field name="threshold">10000.00</field>
+            <field name="shortname">EU</field>
+            <field name="description">NFIU CTR threshold for corporate customers transacting in EUR</field>
+        </record>
+
+        <!-- CAD -->
+        <record id="nfiu_threshold_cad_individual" model="nfiu.currency.threshold">
+            <field name="currency_id" ref="base.CAD"/>
+            <field name="customer_type">individual</field>
+            <field name="threshold">10000.00</field>
+            <field name="shortname">CA</field>
+            <field name="description">NFIU CTR threshold for individual customers transacting in CAD</field>
+        </record>
+
+        <record id="nfiu_threshold_cad_corporate" model="nfiu.currency.threshold">
+            <field name="currency_id" ref="base.CAD"/>
+            <field name="customer_type">corporate</field>
+            <field name="threshold">10000.00</field>
+            <field name="shortname">CA</field>
+            <field name="description">NFIU CTR threshold for corporate customers transacting in CAD</field>
+        </record>
+
+        <!-- CNY -->
+        <record id="nfiu_threshold_cny_individual" model="nfiu.currency.threshold">
+            <field name="currency_id" ref="base.CNY"/>
+            <field name="customer_type">individual</field>
+            <field name="threshold">50000.00</field>
+            <field name="shortname">CN</field>
+            <field name="description">NFIU CTR threshold for individual customers transacting in CNY</field>
+        </record>
+
+        <record id="nfiu_threshold_cny_corporate" model="nfiu.currency.threshold">
+            <field name="currency_id" ref="base.CNY"/>
+            <field name="customer_type">corporate</field>
+            <field name="threshold">100000.00</field>
+            <field name="shortname">CN</field>
+            <field name="description">NFIU CTR threshold for corporate customers transacting in CNY</field>
+        </record>
+
         <!--
         <record id="nfiu_report_1" model="nfiu.report">
             <field name="name">Sample Report/CTR</field>

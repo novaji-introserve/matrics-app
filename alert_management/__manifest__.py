@@ -46,12 +46,14 @@
         'views/frequency_view.xml',
         'views/mail_template.xml',
         'views/sql_view.xml', 
+        'views/email_template_config_views.xml',
 
         # demo data
 
         'data/hr/hr_dpt.xml',
-        'data/hr/hr_job.xml',
-        'data/alert.xml',
+        # 'data/hr/hr_job.xml',
+        # 'data/alert.xml',
+        # 'data/alert_delivery_method_data.xml',
         # 'data/hr/hr_employee.xml',
         # 'data/users.xml',
 

@@ -38,6 +38,21 @@ from . import res_glclasslv3
 from . import res_mandatepicts
 from . import res_reactivation
 from . import bankgl
-from . import sql_panel
+from . import bi_sql_enhanced
+from . import res_transaction_channel
+from . import customer_account_status
+from . import active_lien
 # from .legacy import sync_script 
+
+
+from . import imal_company
+from . import imal_branch
+from . import imal_account
+from . import imal_customer
+from . import imal_customer_address
+from . import imal_ctsspcond
+from . import imal_general_ledger
+from . import imal_users
+from . import imal_transaction
+from . import imal_dof_transaction
 

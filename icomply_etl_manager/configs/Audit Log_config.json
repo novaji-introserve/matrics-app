@@ -1,0 +1,183 @@
+{
+  "name": "Audit Log",
+  "source_connection_id": 5,
+  "target_connection_id": 3,
+  "source_table_name": "audit_log",
+  "target_table_name": "res_audit_trail",
+  "primary_key_unique": "id",
+  "batch_size": 5000,
+  "incremental_date_column": null,
+  "dependencies": [],
+  "mappings": [
+    {
+      "source_column": "id",
+      "target_column": "source_id",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "new_values_json",
+      "target_column": "newvalue",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "old_values_json",
+      "target_column": "oldvalue",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "user_id",
+      "target_column": "user_id",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "source_ip",
+      "target_column": "source_ip",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "branch_name",
+      "target_column": "branch_name",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "branch_code",
+      "target_column": "branch_code",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "audit_module_accessed",
+      "target_column": "audit_module_accessed",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "action_status",
+      "target_column": "action_status",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "action",
+      "target_column": "action",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "audit_id",
+      "target_column": "audit_id",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "account_number",
+      "target_column": "account_number",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "account_name",
+      "target_column": "account_name",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "customer_type",
+      "target_column": "customer_type",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "customer_name",
+      "target_column": "customer_name",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "customer_id",
+      "target_column": "customer_id",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "access_type",
+      "target_column": "access_type",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "user_activity_type",
+      "target_column": "user_activity_type",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "session_id",
+      "target_column": "session_id",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "role_id",
+      "target_column": "role_id",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "role",
+      "target_column": "role",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "full_name",
+      "target_column": "full_name",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "user_name",
+      "target_column": "user_name",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "reason_for_restriction",
+      "target_column": "reason_for_restriction",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "authorization_details",
+      "target_column": "authorization_details",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "affected_columns",
+      "target_column": "affected_columns",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "request_type",
+      "target_column": "request_type",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "inputter",
+      "target_column": "inputter",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "initiator_branch_code",
+      "target_column": "initiator_branch_code",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "authorizer",
+      "target_column": "authorizer",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "initiator",
+      "target_column": "initiator",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "approver_branch_code",
+      "target_column": "approver_branch_code",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "approver",
+      "target_column": "approver",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "currency_code",
+      "target_column": "currency_code",
+      "mapping_type": "direct"
+    }
+  ]
+}

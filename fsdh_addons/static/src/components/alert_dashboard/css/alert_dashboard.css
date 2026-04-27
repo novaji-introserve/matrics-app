@@ -1,0 +1,57 @@
+/* Alert Dashboard: dynamic cards like Compliance (one card per statistic) */
+.o_alert_dashboard {
+    background-color: #f8f9fa;
+}
+
+/* Bigger header bar and less gap to cards */
+.o_alert_dashboard_header {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    min-height: 6rem;
+}
+
+.o_alert_dashboard_title {
+    font-size: 1.65rem;
+}
+
+.o_alert_dashboard_content {
+    padding: 0.75rem 1rem 1rem 1rem;
+}
+
+.o_alert_dashboard .card-container {
+    width: 100%;
+}
+
+.o_alert_dashboard_card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.12) !important;
+    transform: translateY(-2px);
+}
+
+.o_alert_dashboard_card:focus {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+}
+
+/* Chart section (below cards, like Compliance dashboard) */
+.o_alert_dashboard_chart_card {
+    min-height: 320px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.o_alert_dashboard_chart_wrap {
+    width: 100%;
+    height: 380px;
+}
+
+.o_alert_dashboard_chart_empty {
+    width: 100%;
+    height: 320px;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 0.5rem;
+}
+
+.o_alert_dashboard_canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+}

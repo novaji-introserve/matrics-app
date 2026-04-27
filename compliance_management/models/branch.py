@@ -16,7 +16,7 @@ class Branch(models.Model):
     co_code = fields.Char(string="Co-Code")
     users = fields.Many2many(
        'res.users', 'res_branch_users_rel', 'branch_id', 'user_id', required=False)
-    region = fields.Char(string="Region Name", required=False)
+    region = fields.Char(string="Region Name", required=False,index=True)
     region_id = fields.Many2one(comodel_name='res.partner.region', string='Region')
     zone = fields.Char(string="Zone", required=False)
     address = fields.Char(string="Branch Address", required=False)
@@ -59,4 +59,6 @@ class Branch(models.Model):
         ])
 
         return result
+    
+    
         

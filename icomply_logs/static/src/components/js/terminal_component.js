@@ -24,7 +24,6 @@ export class IComplyTerminalComponent extends Component {
             showTimestamp: true,
             showLevel: true,
             isPaused: false,
-            filePosition: 0,
             connectionStatus: 'disconnected',
             lastUpdateTime: null,
             pendingLogsCount: 0,
@@ -68,19 +67,18 @@ export class IComplyTerminalComponent extends Component {
             }
 
             if (this.hasTerminalService) {
-                // Initialize the profile session
+                // Initialize the profile session (loads logs + subscribes to WebSocket)
                 await this.terminal.initProfile(this.profileId);
                 
                 // Get existing logs
                 this.state.logs = this.terminal.getLogs(this.profileId) || [];
                 console.log(`Loaded ${this.state.logs.length} existing logs for profile ${this.profileId}`);
 
-                // Register log listener
+                // Register log listener for real-time updates
                 this.unsubscribe = this.terminal.onLog(this.profileId, this.handleNewLog.bind(this));
                 
                 const status = this.terminal.getStatus(this.profileId);
                 this.state.isPaused = status.paused;
-                this.state.filePosition = status.filePosition;
                 this.state.profileInfo = status.profileInfo;
                 
                 // Apply profile settings
@@ -149,7 +147,7 @@ export class IComplyTerminalComponent extends Component {
 
         const processingKeywords = [
             'processing', 'loading', 'analyzing', 'progress', 'running',
-            'executing', 'starting', 'initializing', 'polling', 'fetching'
+            'executing', 'starting', 'initializing', 'fetching'
         ];
 
         const completionKeywords = [
@@ -187,6 +185,8 @@ export class IComplyTerminalComponent extends Component {
     handleNewLog(message, type, timestamp, level) {
         this.addLocalLog(message, type, timestamp, level, this.state.isPaused);
         
+        this.state.lastUpdateTime = new Date();
+        
         if (this.state.isPaused) {
             this.state.pendingLogsCount++;
         }
@@ -207,7 +207,6 @@ export class IComplyTerminalComponent extends Component {
                     const result = await this.terminal.clearLogFile(this.profileId);
                     if (result.success) {
                         this.state.logs = [];
-                        this.state.filePosition = 0;
                     }
                 }
             } catch (error) {
@@ -226,6 +225,7 @@ export class IComplyTerminalComponent extends Component {
             }
             
             this.state.connectionStatus = 'connected';
+            this.state.lastUpdateTime = new Date();
             this.addLocalLog(`Refreshed with ${this.state.logs.length} total logs`, 'success');
             this.scrollToBottom();
         } catch (error) {
@@ -248,14 +248,6 @@ export class IComplyTerminalComponent extends Component {
                 this.addLocalLog(`Display resumed - ${count} logs accumulated`, 'success');
                 this.scrollToBottom();
             }
-        }
-    }
-
-    resetFilePosition() {
-        this.state.filePosition = 0;
-        
-        if (this.hasTerminalService && this.terminal.resetFilePosition) {
-            this.terminal.resetFilePosition(this.profileId);
         }
     }
 
@@ -324,7 +316,7 @@ export class IComplyTerminalComponent extends Component {
 
     get connectionStatusInfo() {
         const statusMap = {
-            'connected': { text: 'Connected', class: 'text-success', icon: '●' },
+            'connected': { text: 'Connected (WebSocket)', class: 'text-success', icon: '●' },
             'connecting': { text: 'Connecting...', class: 'text-warning', icon: '◐' },
             'disconnected': { text: 'Disconnected', class: 'text-danger', icon: '●' }
         };
@@ -351,31 +343,23 @@ export class IComplyTerminalComponent extends Component {
         return this.state.profileInfo?.log_file_path || 'N/A';
     }
 
-    async pollNow() {
-        if (this.hasTerminalService && this.terminal.pollNow) {
-            await this.terminal.pollNow(this.profileId);
-        }
-        this.addLocalLog('Manual poll completed', 'info');
-    }
-
     async backToProfiles() {
-    try {
-        this.env.services.action.doAction({
-            type: 'ir.actions.act_window',
-            res_model: 'icomply.log.profile',
-            name: 'Log Profiles',
-            view_mode: 'tree,form',
-            views: [[false, 'list'], [false, 'form']],
-            target: 'current',
-        });
-    } catch (error) {
-        console.error('Error navigating to profiles:', error);
-        // Fallback: just close the terminal
-        this.env.services.action.doAction({
-            type: 'ir.actions.act_window_close'
-        });
+        try {
+            this.env.services.action.doAction({
+                type: 'ir.actions.act_window',
+                res_model: 'icomply.log.profile',
+                name: 'Log Profiles',
+                view_mode: 'tree,form',
+                views: [[false, 'list'], [false, 'form']],
+                target: 'current',
+            });
+        } catch (error) {
+            console.error('Error navigating to profiles:', error);
+            this.env.services.action.doAction({
+                type: 'ir.actions.act_window_close'
+            });
+        }
     }
-}
 
     cleanup() {
         if (this.unsubscribe) {
@@ -401,7 +385,7 @@ IComplyTerminalComponent.props = {
     action: { type: Object, optional: true },
     actionId: { type: [Number, String], optional: true },
     className: { type: String, optional: true },
-    "*": true,  // Allow any additional props passed by Odoo's action system
+    "*": true,
 };
 
 registry.category("actions").add("icomply_terminal", IComplyTerminalComponent);

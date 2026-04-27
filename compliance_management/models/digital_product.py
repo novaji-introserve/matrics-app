@@ -14,10 +14,6 @@ _logger = logging.getLogger(__name__)
 
 class CustomerDigitalProduct(models.Model):
     _name = 'customer.digital.product'
-    _sql_constraints = [
-        ('uniq_customer_id', 'unique(customer_id)',
-         "Customer already exists. Customer must be unique!"),
-    ]
 
     customer_id = fields.Text(string='Customer ID',
                               index=True, readonly=True)  # customer,
@@ -25,15 +21,10 @@ class CustomerDigitalProduct(models.Model):
     customer_segment = fields.Char(
         string='Customer Segment', readonly=True)
     ussd = fields.Char(string='Uses USSD', index=True, readonly=True)
-    onebank = fields.Char(string='Uses One Bank', index=True, readonly=True)
     carded_customer = fields.Char(
         string='Has A Card', index=True, readonly=True)
     alt_bank = fields.Char(string='Is On Alt Bank', readonly=True)
-    sterling_pro = fields.Char(string='Has Sterling Pro', readonly=True)
-    banca = fields.Char(string='Has Banca', readonly=True)
-    doubble = fields.Char(string='Has Doubble', readonly=True)
-    specta = fields.Char(string='Has Specta', readonly=True)
-    switch = fields.Char(string='Has Switch', readonly=True)
+    
 
   
     def init(self):
@@ -959,7 +950,7 @@ class DigitalDeliveryChannel(models.Model):
             }
         }
     
-    
+
 
 class CustomerChannelSubscription(models.Model):
     """Optimized subscription model for large datasets"""

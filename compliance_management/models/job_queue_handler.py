@@ -113,8 +113,6 @@ class OpenSanctionsJobQueue(models.Model):
             params = self.env['ir.config_parameter'].sudo()
             self.batch_size = int(params.get_param('compliance_management.import_batch_size', '500'))
             
-            if self.source_id.use_api and self.job_type in ['api', 'both']:
-                self.api_limit = 1000  # Default API limit
 
     def name_get(self):
         result = []

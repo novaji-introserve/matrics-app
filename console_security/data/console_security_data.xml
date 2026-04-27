@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Enable/Disable Console Security -->
+        <record id="console_security_enabled" model="ir.config_parameter">
+            <field name="key">console_security.enabled</field>
+            <field name="value">True</field>
+        </record>
+        
+        <!-- Protection Mode: off, logging, protection -->
+        <record id="console_security_mode" model="ir.config_parameter">
+            <field name="key">console_security.mode</field>
+            <field name="value">protection</field>
+        </record>
+        
+        <!-- Debug Key for Developers (change this!) -->
+        <record id="console_security_debug_key" model="ir.config_parameter">
+            <field name="key">console_security.debug_key</field>
+            <field name="value">CONSOLE_DEBUG_{system_random}</field>
+        </record>
+
+        <!-- Support group xml id allowed to see technical errors (defaults to your Tech Support group) -->
+        <record id="console_security_support_group" model="ir.config_parameter">
+            <field name="key">console_security.support_group</field>
+            <field name="value">compliance_management.group_tech_support</field>
+        </record>
+    </data>
+</odoo>
+
+
+
+

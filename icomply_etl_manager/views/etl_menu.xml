@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main Menu -->
+    <menuitem id="menu_etl_root"
+        name="ETL Manager"
+        sequence="100"
+        web_icon="icomply_etl_manager,static/src/img/etl.png"/>
+        
+    <!-- ETL Dashboard Menu -->
+    <menuitem id="menu_etl_dashboard"
+              name="Dashboard"
+              parent="menu_etl_root"
+              action="action_etl_dashboard"
+              sequence="1"/>
+              
+    <!-- System Status Dashboard ETL Menu -->
+    <menuitem id="menu_etl_system_status"
+              name="System Status"
+              parent="menu_etl_root"
+              action="action_etl_system_status_dashboard"
+              sequence="2"/>
+              
+    <!-- Configuration Menu -->
+    <menuitem id="menu_etl_configuration"
+        name="Configuration"
+        parent="menu_etl_root"
+        sequence="10"/>
+        
+    <!-- Database Connections -->
+    <menuitem id="menu_etl_database_connections"
+        name="Database Connections"
+        parent="menu_etl_configuration"
+        action="action_etl_database_connection"
+        sequence="5"/>
+        
+    <!-- ETL Tables -->
+    <menuitem id="menu_etl_tables"
+        name="ETL Tables"
+        parent="menu_etl_configuration"
+        action="action_etl_source_table"
+        sequence="10"/>
+        
+    <!-- Categories -->
+    <menuitem id="menu_etl_category"
+        name="Categories"
+        parent="menu_etl_configuration"
+        action="action_etl_category"
+        sequence="20"/>
+        
+    <!-- Frequencies -->
+    <menuitem id="menu_etl_frequency"
+        name="Frequencies"
+        parent="menu_etl_configuration"
+        action="action_etl_frequency"
+        sequence="30"/>
+        
+    <!-- Monitoring Menu -->
+    <menuitem id="menu_etl_monitoring"
+        name="Monitoring"
+        parent="menu_etl_root"
+        sequence="20"/>
+        
+    <!-- Sync Logs -->
+    <menuitem id="menu_etl_logs"
+        name="Sync Logs"
+        parent="menu_etl_monitoring"
+        action="action_etl_sync_log"
+        sequence="10"/>
+</odoo>

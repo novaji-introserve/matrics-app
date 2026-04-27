@@ -342,8 +342,8 @@ class Statistic(models.Model):
         remote_addr = self.env.context.get('remote_addr', 'Unknown IP')
         
         # Log all SQL query attempts for security auditing
-        _logger.info(f"SQL Query Attempt - {user_info} from {remote_addr}")
-        _logger.info(f"Query Content: {sql_query[:200]}{'...' if len(sql_query) > 200 else ''}")
+        # _logger.info(f"SQL Query Attempt - {user_info} from {remote_addr}")
+        # _logger.info(f"Query Content: {sql_query[:200]}{'...' if len(sql_query) > 200 else ''}")
             
         try:
             # Clean and normalize the query
@@ -412,8 +412,8 @@ class Statistic(models.Model):
             query_lower = original_query.lower()
             
             # Log successful validation
-            _logger.info(f"SQL Query Validated Successfully - {user_info}")
-            _logger.info(f"Final Query: {original_query}")
+            # _logger.info(f"SQL Query Validated Successfully - {user_info}")
+            # _logger.info(f"Final Query: {original_query}")
             
             return original_query, query_lower
             
@@ -487,6 +487,7 @@ class Statistic(models.Model):
                 vals = dict(vals, val=self._execute_query_and_get_value(original_query, query))
             except Exception as e:
                 raise ValidationError(f"Invalid SQL query:\n{str(e)}")
+
         return super(Statistic, self).write(vals)
 
     def action_run_statistic(self):
@@ -518,4 +519,3 @@ class Statistic(models.Model):
                 "next": {"type": "ir.actions.client", "tag": "reload"},
             },
         }
-            

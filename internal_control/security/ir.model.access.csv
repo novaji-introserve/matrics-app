@@ -1,6 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_res_internal_control_account_monitoring,access_res_internal_control_account_monitoring,internal_control.model_res_internal_control_account_monitoring,base.group_user,1,1,1,1
-access_res_internal_control_fraud_monitoring,access_res_internal_control_fraud_monitoring,internal_control.model_res_internal_control_fraud_monitoring,base.group_user,1,1,1,1
+access_res_internal_control_account_monitoring,access res internal control account monitoring,internal_control.model_res_internal_control_account_monitoring,base.group_user,1,1,1,1
+access_res_internal_control_fraud_monitoring,access res internal control fraud monitoring,internal_control.model_res_internal_control_fraud_monitoring,base.group_user,1,1,1,1
 access_process_category_rules,access process category rules,internal_control.model_process_category,base.group_user,1,1,1,1
 access_process_rules,access process rules,internal_control.model_process,base.group_user,1,1,1,1
 access_res_partner_town,access res partner town,internal_control.model_res_partner_town,base.group_user,1,1,1,1
@@ -18,6 +18,18 @@ access_res_mandatepicts,access res mandatepicts,internal_control.model_res_manda
 access_res_reactivation,access res reactivation,internal_control.model_res_reactivation,base.group_user,1,1,1,1
 access_bankgl,access bankgl,internal_control.model_res_bankgl,base.group_user,1,1,1,1
 access_bank_product,access bank product,internal_control.model_res_bank_product,base.group_user,1,1,1,1
-
-
-
+access_res_transaction_channel,access res transaction channel,internal_control.model_res_transaction_channel,base.group_user,1,1,1,1
+access_res_partner_account_status,access res partner account status,internal_control.model_res_partner_account_status,base.group_user,1,1,1,1
+access_res_active_lien,access res active lien,internal_control.model_res_active_lien,base.group_user,1,1,1,1
+access_res_branchtype,access res branchtype,internal_control.model_res_branchtype,base.group_user,1,1,1,1
+access_res_imal_users,access res imal users,internal_control.model_res_imal_users,base.group_user,1,1,1,1
+access_res_imal_dof_customer_transaction,access res imal dof customer transaction,internal_control.model_res_imal_dof_customer_transaction,base.group_user,1,1,1,1
+access_res_imal_customer_transaction,access res imal customer transaction,internal_control.model_res_imal_customer_transaction,base.group_user,1,1,1,1
+access_res_imal_general_ledger,access res imal general ledger,internal_control.model_res_imal_general_ledger,base.group_user,1,1,1,1
+access_res_imal_customer,access res imal customer,internal_control.model_res_imal_customer,base.group_user,1,1,1,1
+access_res_imal_ctsspcond,access res imal ctsspcond,internal_control.model_res_imal_ctsspcond,base.group_user,1,1,1,1
+access_res_imal_customer_address,access res imal customer address,internal_control.model_res_imal_customer_address,base.group_user,1,1,1,1
+access_res_imal_branches,access res imal branches,internal_control.model_res_imal_branches,base.group_user,1,1,1,1
+access_res_imal_account,access res imal account,internal_control.model_res_imal_account,base.group_user,1,1,1,1
+access_res_imal_companies,access res imal companies,internal_control.model_res_imal_companies,base.group_user,1,1,1,1
+access_res_transaction_screening_rule,access res transaction screening rule,internal_control.model_res_transaction_screening_rule,base.group_user,1,1,1,1

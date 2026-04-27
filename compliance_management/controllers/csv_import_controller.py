@@ -852,13 +852,37 @@ class CSVImportController(http.Controller):
         """Get available models for import directly from ir.model"""
         try:
             self._send_message("Fetching available models from database...", "info")
+
+            # WHITELISTED MODELS: Only allow specific screening list models for import
+            # This restricts the upload functionality to only sanctioned/screening list models
+            allowed_models = [
+                "res.partner.greylist",      # Grey List - Suspicious entities
+                "res.partner.watchlist",     # Watch List - Entities under monitoring
+                "res.pep",                   # Politically Exposed Persons
+                "pep.list",                  # PEP List - Additional PEP data
+                "res.partner.blacklist",     # Black List - Sanctioned/banned entities
+            ]
+
+            # Build domain with whitelist filter
             domain = [
                 ("transient", "=", False),
-                ("model", "not ilike", "ir.%"),
-                ("model", "not ilike", "base.%"),
-                ("model", "not ilike", "bus.%"),
-                ("model", "not ilike", "base_%"),
+                ("model", "in", allowed_models),  # Only allow whitelisted models
             ]
+
+            # PREVIOUS IMPLEMENTATION (COMMENTED OUT):
+            # The code below allowed ALL non-system models to be imported, which exposed
+            # too many internal models to users. This has been restricted to only screening
+            # list models for security and user experience improvements.
+            #
+            # domain = [
+            #     ("transient", "=", False),
+            #     ("model", "not ilike", "ir.%"),      # Excluded infrastructure models
+            #     ("model", "not ilike", "base.%"),    # Excluded base system models
+            #     ("model", "not ilike", "bus.%"),     # Excluded bus/messaging models
+            #     ("model", "not ilike", "base_%"),    # Excluded base-prefixed models
+            # ]
+
+            # Apply search term filter if provided
             if search_term:
                 domain += [
                     "|",
@@ -1527,13 +1551,20 @@ class CSVImportController(http.Controller):
                     
                     # Use threading to avoid blocking the response for large files
                     import threading
-                    
+
+                    # Capture request-bound values now — request is a thread-local
+                    # proxy and will be "unbound" inside the new thread.
+                    _bg_registry = request.env.registry
+                    _bg_uid = request.env.uid
+                    _bg_context = dict(request.env.context)
+
                     def process_import():
                         """Process import in background thread"""
                         try:
-                            # Create a new cursor for the background processing
-                            with request.env.registry.cursor() as bg_cr:
-                                bg_env = api.Environment(bg_cr, request.env.uid, request.env.context)
+                            import time
+                            time.sleep(0.5)  # Wait for HTTP request to commit import_log record
+                            with _bg_registry.cursor() as bg_cr:
+                                bg_env = api.Environment(bg_cr, _bg_uid, _bg_context)
                                 bg_import_log = bg_env["import.log"].sudo().browse(import_log_id)
                                 result = bg_import_log.process_file()
                                 bg_cr.commit()
@@ -1544,7 +1575,7 @@ class CSVImportController(http.Controller):
                                 else:
                                     _logger.warning(f"Import {import_log_id} completed with warnings: {result.get('message', 'No message')}")
                         except Exception as bg_e:
-                            _logger.error(f"Error in background import processing: {str(bg_e)}")
+                            _logger.exception(f"Error in background import processing: {str(bg_e)}")
                     
                     # Start background processing
                     thread = threading.Thread(target=process_import)

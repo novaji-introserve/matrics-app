@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Simplified Sync Log Tree View -->
+    <record id="view_etl_sync_log_tree" model="ir.ui.view">
+        <field name="name">etl.sync.log.tree</field>
+        <field name="model">etl.sync.log</field>
+        <field name="arch" type="xml">
+            <tree string="ETL Sync Logs" create="false" edit="false">
+                <field name="create_date" string="Date"/>
+                <field name="table_id"/>
+                <field name="sync_type" decoration-info="sync_type == 'incremental'" 
+                       decoration-primary="sync_type == 'full'"/>
+                <field name="start_time"/>
+                <field name="end_time"/>
+                <field name="duration_seconds" string="Duration (s)"/>
+                <field name="status" decoration-success="status == 'success'" 
+                       decoration-danger="status == 'failed'" 
+                       decoration-warning="status == 'running'"/>
+                <field name="total_records" string="Total"/>
+                <field name="new_records" string="New"/>
+                <field name="updated_records" string="Updated"/>
+                <field name="error_message"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Simplified Sync Log Form View -->
+    <record id="view_etl_sync_log_form" model="ir.ui.view">
+        <field name="name">etl.sync.log.form</field>
+        <field name="model">etl.sync.log</field>
+        <field name="arch" type="xml">
+            <form string="ETL Sync Log" create="false" edit="false">
+                <header>
+                    <field name="status" widget="statusbar" 
+                           statusbar_colors='{"success":"green","failed":"red","running":"blue"}'/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <div class="oe_stat_button">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="duration_seconds"/>
+                                </span>
+                                <span class="o_stat_text">Duration (s)</span>
+                            </div>
+                        </div>
+                        <div class="oe_stat_button">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="total_records"/>
+                                </span>
+                                <span class="o_stat_text">Total Records</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <group>
+                        <group string="Basic Information">
+                            <field name="table_id" readonly="1"/>
+                            <field name="sync_type" readonly="1"/>
+                            <field name="start_time" readonly="1"/>
+                            <field name="end_time" readonly="1"/>
+                            <field name="duration_seconds" readonly="1"/>
+                        </group>
+                        <group string="Record Statistics">
+                            <field name="total_records" readonly="1"/>
+                            <field name="new_records" readonly="1"/>
+                            <field name="updated_records" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Error Information" attrs="{'invisible': [('status', '!=', 'failed')]}">
+                        <field name="error_message" readonly="1" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Simplified Sync Log Search View -->
+    <record id="view_etl_sync_log_search" model="ir.ui.view">
+        <field name="name">etl.sync.log.search</field>
+        <field name="model">etl.sync.log</field>
+        <field name="arch" type="xml">
+            <search string="Search ETL Sync Logs">
+                <field name="table_id"/>
+                <field name="sync_type"/>
+                <field name="status"/>
+                <field name="start_time"/>
+                <separator/>
+                <filter string="Full Sync" name="full_sync" domain="[('sync_type', '=', 'full')]"/>
+                <filter string="Incremental Sync" name="incremental_sync" domain="[('sync_type', '=', 'incremental')]"/>
+                <separator/>
+                <filter string="Success" name="status_success" domain="[('status', '=', 'success')]"/>
+                <filter string="Failed" name="status_failed" domain="[('status', '=', 'failed')]"/>
+                <filter string="Running" name="status_running" domain="[('status', '=', 'running')]"/>
+                <separator/>
+                <filter string="Today" name="today" 
+                        domain="[('start_time', '>=', (context_today()).strftime('%Y-%m-%d 00:00:00'))]"/>
+                <filter string="Last 7 Days" name="last_7_days" 
+                        domain="[('start_time', '>=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d 00:00:00'))]"/>
+                <separator/>
+                <filter string="With Errors" name="with_errors" domain="[('error_message', '!=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Table" name="group_table" context="{'group_by': 'table_id'}"/>
+                    <filter string="Sync Type" name="group_sync_type" context="{'group_by': 'sync_type'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'start_time:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Simplified Sync Log Action -->
+    <record id="action_etl_sync_log" model="ir.actions.act_window">
+        <field name="name">ETL Sync Logs</field>
+        <field name="res_model">etl.sync.log</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_etl_sync_log_search"/>
+        <field name="context">{'search_default_last_7_days': 1, 'search_default_group_table': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No sync logs found
+            </p>
+            <p>
+                Sync logs will appear here when ETL processes are run.
+            </p>
+        </field>
+    </record>
+</odoo>

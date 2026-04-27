@@ -155,12 +155,14 @@
                 <!-- <attribute name="invisible">1</attribute> -->
             </xpath>
 
+         
             <xpath expr="//field[@name='street']" position="after">
-                <field name="region_id" invisible="0" />
+                <field name="region_id" attrs="{'invisible': ['|', ('region_id', '=', False), ('region_id', '=', '')]}" readonly="1"/>
             </xpath>
 
-            <xpath expr="//field[@name='region_id']" position="after">
-                <field name="state_residence" invisible="0" />
+
+            <xpath expr="//field[@name='title']" position="after">
+                <field name="state_residence" attrs="{'invisible': ['|', ('state_residence', '=', False), ('state_residence', '=', '')]}" />
             </xpath>
 
             <xpath expr="//field[@name='function']" position="replace">
@@ -172,7 +174,7 @@
                 <attribute name="invisible">1</attribute>
             </xpath>
 
-            <xpath expr="//field[@name='type']" position="attributes">
+            <xpath expr="//field[@name='lang']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
 
@@ -183,6 +185,7 @@
             <xpath expr="//field[@name='company_reg_date']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
+         
 
 
             <xpath expr="//form//field[@name='street2']" position="attributes">
@@ -210,7 +213,12 @@
             </xpath>
 
             <xpath expr="//div[@class='o_address_format']" position="after">
-                <field name="street" invisible="0" readonly="1"/>
+                <field name="address"  attrs="{'invisible': [('address', '=', False)]}" readonly="1"/>
+
+            </xpath>
+
+            <xpath expr="//div[@class='o_address_format']" position="after">
+                <field name="street"  attrs="{'invisible': [('street', '=', False)]}" readonly="1"/>
 
             </xpath>
 
@@ -225,7 +233,7 @@
 
             <!-- Hide identification_type_id -->
             <xpath expr="//field[@name='identification_type_id']" position="attributes">
-                <attribute name="invisible">1</attribute>
+                <attribute name="readonly">1</attribute>
             </xpath>
 
             <!-- Hide identification_expiry_date -->
@@ -273,8 +281,8 @@
             <!--  -->
 
             <xpath expr="//field[@name='vat']" position="attributes">
-                <!-- <attribute name="readonly">1</attribute> -->
-                <attribute name="invisible">1</attribute>
+                <attribute name="readonly">1</attribute>
+                <!-- <attribute name="invisible">0</attribute> -->
             </xpath>
 
 
@@ -299,14 +307,21 @@
                 <field name="formatted_phone" readonly="1"/>
             </xpath>
 
-            <xpath expr="//field[@name='vat']" position="replace">
+
+            <xpath expr="//div[@class='o_address_format']" position="after">
                 <field name="customer_industry_id" readonly="1"/>
             </xpath>
 
 
             <xpath expr="//field[@name='title']" position="attributes">
                 <attribute name="readonly">1</attribute>
+                <attribute name="attrs">{'invisible': [('title', '=', False)]}</attribute>
             </xpath>
+
+            <xpath expr="//field[@name='title']" position="after">
+                <field name="customer_title" readonly="1"  attrs="{'invisible': [('customer_title', '=', False)]}"/>
+            </xpath>
+
             <xpath expr="//field[@id='individual']" position="attributes">
                 <attribute name="readonly">1</attribute>
             </xpath>
@@ -390,7 +405,8 @@
                     <field name="name" filter_domain="['|', '|', '|', ('display_name', 'ilike', self), ('name', 'ilike', self), ('firstname', 'ilike', self), ('lastname', 'ilike', self)]"/>
                     <field name="parent_id" domain="[('is_company', '=', True)]" operator="child_of"/>
                     <field name="email" filter_domain="[('email', 'ilike', self)]"/>
-                    <field name="phone" filter_domain="['|', ('phone', 'ilike', self), ('mobile', 'ilike', self)]"/>
+                    <field name="phone" filter_domain="['|','|', ('phone', 'ilike', self), ('mobile', 'ilike', self),('customer_phone', 'ilike', self),]"/>
+                    <field name="customer_id" filter_domain="[('customer_id', '=', self)]"/>
                     <field name="category_id" string="Tag" operator="child_of"/>
                     <field name="customer_id" filter_domain="[('customer_id', 'ilike', self)]"/>
                     <field name="identity_verification"/>

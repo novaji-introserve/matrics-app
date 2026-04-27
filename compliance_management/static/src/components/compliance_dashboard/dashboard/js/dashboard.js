@@ -330,9 +330,13 @@ export class ComplianceDashboard extends Component {
   async handleRefreshNotification(notification) {
     logDebug("Received notification:", notification);
 
-    if (notification.type === 'refresh' && this.refreshModels.includes(notification.model)) {
+    // Accept cron snapshot refresh (no model) OR model-triggered refresh
+    const isCronRefresh = notification.type === 'refresh' && !notification.model;
+    const isModelRefresh = notification.type === 'refresh' && this.refreshModels.includes(notification.model);
+
+    if (isCronRefresh || isModelRefresh) {
       await this.serverCache.invalidateCache();
-      
+
       try {
         await this.filterByDate(true);
       } catch (error) {

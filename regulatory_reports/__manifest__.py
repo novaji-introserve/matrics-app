@@ -32,7 +32,14 @@
         'security/ir.model.access.csv',
         'views/report.xml',
         'views/menuitems.xml',
+        'data/report_entity_data.xml',
+        'data/report_items_demo_data.xml',
+        'data/report_template_data.xml',
+        'data/report_template_items_data.xml',
     ],
-    'demo': [],
+    # only loaded in demonstration mode
+    'demo': [
+        'demo/demo.xml',
+    ],
     'license': 'LGPL-3',
 }

@@ -1,0 +1,23 @@
+{
+  "name": "customer_data",
+  "source_connection_id": 1,
+  "target_connection_id": 2,
+  "source_table_name": "customers",
+  "target_table_name": "res_partner",
+  "primary_key_unique": "customer_id",
+  "batch_size": 1000,
+  "incremental_date_column": "last_updated",
+  "dependencies": [],
+  "mappings": [
+    {
+      "source_column": "customer_id",
+      "target_column": "ref",
+      "mapping_type": "direct"
+    },
+    {
+      "source_column": "customer_name",
+      "target_column": "name",
+      "mapping_type": "direct"
+    }
+  ]
+}

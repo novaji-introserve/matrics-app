@@ -838,8 +838,8 @@ class ResCharts(models.Model):
         remote_addr = self.env.context.get('remote_addr', 'Unknown IP')
         
         # Log all SQL query attempts for security auditing
-        _logger.info(f"Chart SQL Query Attempt - {user_info} from {remote_addr}")
-        _logger.info(f"Query Content: {sql_query[:200]}{'...' if len(sql_query) > 200 else ''}")
+        # _logger.info(f"Chart SQL Query Attempt - {user_info} from {remote_addr}")
+        # _logger.info(f"Query Content: {sql_query[:200]}{'...' if len(sql_query) > 200 else ''}")
             
         try:
             # Clean and normalize the query
@@ -906,8 +906,8 @@ class ResCharts(models.Model):
                 raise
             
             # Log successful validation
-            _logger.info(f"Chart SQL Query Validated Successfully - {user_info}")
-            _logger.info(f"Final Query: {original_query}")
+            # _logger.info(f"Chart SQL Query Validated Successfully - {user_info}")
+            # _logger.info(f"Final Query: {original_query}")
             
             return original_query, original_query.lower()
             
@@ -968,10 +968,13 @@ class ResCharts(models.Model):
                     if original_query.endswith(";"):
                         original_query = original_query[:-1]
                     
+                    # Wrap query with LIMIT 0 to ensure instantaneous execution for validation only
+                    validation_query = f"SELECT * FROM ({original_query}) AS _val_query LIMIT 0"
+                    
                     # Use secure query execution
                     security_service = SecurityService()
                     success, results, error_msg = security_service.secure_execute_query(
-                        cr, original_query, timeout=120000
+                        cr, validation_query, timeout=120000
                     )
 
                     if not success:
@@ -981,14 +984,13 @@ class ResCharts(models.Model):
                             return
                         raise exceptions.ValidationError(f"Query execution failed: {error_msg}")
                         
-                    # Convert results to dict format for validation
-                    if results and cr.description:
+                    # Extract column names from psycopg2 description
+                    if cr.description:
                         column_names = [desc[0] for desc in cr.description]
-                        dict_results = [dict(zip(column_names, row)) for row in results] if results else []
                     else:
-                        dict_results = []
-                    if dict_results and chart.x_axis_field and chart.y_axis_field:
-                        column_names = list(dict_results[0].keys())
+                        column_names = []
+                        
+                    if column_names and chart.x_axis_field and chart.y_axis_field:
                         if (
                             chart.x_axis_field not in column_names
                             and "." in chart.x_axis_field

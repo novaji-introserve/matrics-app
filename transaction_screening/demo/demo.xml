@@ -1,30 +1,682 @@
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
-    <data>
-<!--
-          <record id="object0" model="transaction_screening.transaction_screening">
-            <field name="name">Object 0</field>
-            <field name="value">0</field>
-          </record>
+    <data noupdate="1">
 
-          <record id="object1" model="transaction_screening.transaction_screening">
-            <field name="name">Object 1</field>
-            <field name="value">10</field>
-          </record>
+        <!-- ============================================================
+             AML CONFIGURATION — one record per currency.
+             CTR threshold is no longer stored here; it is always read
+             from nfiu.currency.threshold by currency + customer type.
+             These records control velocity, structuring window/count,
+             anomaly z-score, dormant detection, and composite weights.
+             ============================================================ -->
 
-          <record id="object2" model="transaction_screening.transaction_screening">
-            <field name="name">Object 2</field>
-            <field name="value">20</field>
-          </record>
+        <record id="aml_config_ngn" model="res.aml.config">
+            <field name="name">AML Config — NGN</field>
+            <field name="currency_id" ref="base.NGN"/>
+            <field name="active">True</field>
+            <!-- Velocity -->
+            <field name="velocity_window_hours">24</field>
+            <field name="velocity_max_count">10</field>
+            <field name="velocity_max_amount">10000000.00</field>
+            <!-- Structuring -->
+            <field name="structuring_window_hours">72</field>
+            <field name="structuring_min_count">3</field>
+            <field name="structuring_approach_pct">80.0</field>
+            <!-- Anomaly -->
+            <field name="anomaly_zscore_threshold">3.0</field>
+            <field name="anomaly_min_history">10</field>
+            <!-- Dormant -->
+            <field name="dormant_enabled">True</field>
+            <field name="dormant_min_days">180</field>
+            <!-- Weights (must sum to 1.0) -->
+            <field name="velocity_risk_weight">0.30</field>
+            <field name="structuring_risk_weight">0.35</field>
+            <field name="anomaly_risk_weight">0.25</field>
+            <field name="dormant_risk_weight">0.10</field>
+        </record>
 
-          <record id="object3" model="transaction_screening.transaction_screening">
-            <field name="name">Object 3</field>
-            <field name="value">30</field>
-          </record>
+        <record id="aml_config_usd" model="res.aml.config">
+            <field name="name">AML Config — USD</field>
+            <field name="currency_id" ref="base.USD"/>
+            <field name="active">True</field>
+            <field name="velocity_window_hours">24</field>
+            <field name="velocity_max_count">10</field>
+            <field name="velocity_max_amount">20000.00</field>
+            <field name="structuring_window_hours">72</field>
+            <field name="structuring_min_count">3</field>
+            <field name="structuring_approach_pct">80.0</field>
+            <field name="anomaly_zscore_threshold">3.0</field>
+            <field name="anomaly_min_history">10</field>
+            <field name="dormant_enabled">True</field>
+            <field name="dormant_min_days">180</field>
+            <field name="velocity_risk_weight">0.30</field>
+            <field name="structuring_risk_weight">0.35</field>
+            <field name="anomaly_risk_weight">0.25</field>
+            <field name="dormant_risk_weight">0.10</field>
+        </record>
 
-          <record id="object4" model="transaction_screening.transaction_screening">
-            <field name="name">Object 4</field>
-            <field name="value">40</field>
-          </record>
--->
+        <record id="aml_config_gbp" model="res.aml.config">
+            <field name="name">AML Config — GBP</field>
+            <field name="currency_id" ref="base.GBP"/>
+            <field name="active">True</field>
+            <field name="velocity_window_hours">24</field>
+            <field name="velocity_max_count">10</field>
+            <field name="velocity_max_amount">20000.00</field>
+            <field name="structuring_window_hours">72</field>
+            <field name="structuring_min_count">3</field>
+            <field name="structuring_approach_pct">80.0</field>
+            <field name="anomaly_zscore_threshold">3.0</field>
+            <field name="anomaly_min_history">10</field>
+            <field name="dormant_enabled">True</field>
+            <field name="dormant_min_days">180</field>
+            <field name="velocity_risk_weight">0.30</field>
+            <field name="structuring_risk_weight">0.35</field>
+            <field name="anomaly_risk_weight">0.25</field>
+            <field name="dormant_risk_weight">0.10</field>
+        </record>
+
+        <record id="aml_config_eur" model="res.aml.config">
+            <field name="name">AML Config — EUR</field>
+            <field name="currency_id" ref="base.EUR"/>
+            <field name="active">True</field>
+            <field name="velocity_window_hours">24</field>
+            <field name="velocity_max_count">10</field>
+            <field name="velocity_max_amount">20000.00</field>
+            <field name="structuring_window_hours">72</field>
+            <field name="structuring_min_count">3</field>
+            <field name="structuring_approach_pct">80.0</field>
+            <field name="anomaly_zscore_threshold">3.0</field>
+            <field name="anomaly_min_history">10</field>
+            <field name="dormant_enabled">True</field>
+            <field name="dormant_min_days">180</field>
+            <field name="velocity_risk_weight">0.30</field>
+            <field name="structuring_risk_weight">0.35</field>
+            <field name="anomaly_risk_weight">0.25</field>
+            <field name="dormant_risk_weight">0.10</field>
+        </record>
+
+        <record id="aml_config_cad" model="res.aml.config">
+            <field name="name">AML Config — CAD</field>
+            <field name="currency_id" ref="base.CAD"/>
+            <field name="active">True</field>
+            <field name="velocity_window_hours">24</field>
+            <field name="velocity_max_count">10</field>
+            <field name="velocity_max_amount">20000.00</field>
+            <field name="structuring_window_hours">72</field>
+            <field name="structuring_min_count">3</field>
+            <field name="structuring_approach_pct">80.0</field>
+            <field name="anomaly_zscore_threshold">3.0</field>
+            <field name="anomaly_min_history">10</field>
+            <field name="dormant_enabled">True</field>
+            <field name="dormant_min_days">180</field>
+            <field name="velocity_risk_weight">0.30</field>
+            <field name="structuring_risk_weight">0.35</field>
+            <field name="anomaly_risk_weight">0.25</field>
+            <field name="dormant_risk_weight">0.10</field>
+        </record>
+
+        <record id="aml_config_cny" model="res.aml.config">
+            <field name="name">AML Config — CNY</field>
+            <field name="currency_id" ref="base.CNY"/>
+            <field name="active">True</field>
+            <field name="velocity_window_hours">24</field>
+            <field name="velocity_max_count">10</field>
+            <field name="velocity_max_amount">100000.00</field>
+            <field name="structuring_window_hours">72</field>
+            <field name="structuring_min_count">3</field>
+            <field name="structuring_approach_pct">80.0</field>
+            <field name="anomaly_zscore_threshold">3.0</field>
+            <field name="anomaly_min_history">10</field>
+            <field name="dormant_enabled">True</field>
+            <field name="dormant_min_days">180</field>
+            <field name="velocity_risk_weight">0.30</field>
+            <field name="structuring_risk_weight">0.35</field>
+            <field name="anomaly_risk_weight">0.25</field>
+            <field name="dormant_risk_weight">0.10</field>
+        </record>
+
+        <!-- ============================================================
+             1. DEMO CUSTOMERS
+             Three partners covering low / high / corporate risk tiers.
+             Individual is explicitly high risk so Rule 3 can fire.
+             ============================================================ -->
+
+        <record id="demo_aml_partner_retail" model="res.partner">
+            <field name="name">Demo — Retail Customer (Tier 1 KYC)</field>
+            <field name="internal_category">customer</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="phone">+2348012340001</field>
+            <field name="email">demo.retail@aml-test.invalid</field>
+            <field name="risk_level">low</field>
+            <field name="comment">AML demo — low-tier retail. Normal txns ≈ ₦18,500 avg.</field>
+        </record>
+
+        <record id="demo_aml_partner_individual" model="res.partner">
+            <field name="name">Demo — Mid-Tier Individual (High Risk)</field>
+            <field name="internal_category">customer</field>
+            <field name="active">True</field>
+            <field name="origin">demo</field>
+            <field name="phone">+2348012340002</field>
+            <field name="email">demo.individual@aml-test.invalid</field>
+            <!-- HIGH — required for Rule 3 to fire -->
+            <field name="risk_level">high</field>
+            <field name="comment">AML demo — high risk individual. Triggers Rule 3 on any txn above ₦200k.</field>
+        </record>
+
+        <record id="demo_aml_partner_corporate" model="res.partner">
+            <field name="name">Demo — Corporate Account (Ltd)</field>
+            <field name="internal_category">customer</field>
+            <field name="is_company">True</field>
+            <field name="origin">demo</field>
+            <field name="active">True</field>
+            <field name="phone">+2348012340003</field>
+            <field name="email">demo.corporate@aml-test.invalid</field>
+            <field name="risk_level">medium</field>
+            <field name="comment">AML demo — corporate. Three large same-day txns trigger Rule 2.</field>
+        </record>
+
+
+        <!-- ============================================================
+             2. DEMO TRANSACTIONS
+             Nine transactions — each group designed to fire a specific rule.
+
+             Retail     → Rule 1 (USD), Rule 4 (near-threshold), Rule 5 (mid-range)
+             Individual → Rule 3 (high risk customer), Rule 5 (mid-range)
+             Corporate  → Rule 2 (repeated large same day)
+             ============================================================ -->
+
+        <!-- ── Retail customer ──────────────────────────────────────── -->
+
+        <!--
+            TRIGGERS: Rule 5 — Mid-Range Transaction Review
+            ₦55,000 falls squarely in the 10,000–100,000 band.
+        -->
+        <record id="demo_txn_retail_1" model="res.customer.transaction">
+            <field name="name">DEMO/TXN/R001</field>
+            <field name="customer_id" ref="demo_aml_partner_retail"/>
+            <field name="amount">55000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created">2025-01-10 09:15:00</field>
+            <field name="state">new</field>
+            <field name="narration">
+                Demo: ₦55,000 airtime/utility credit.
+                FIRES Rule 5 — mid-range band (₦10,000–₦100,000).
+            </field>
+        </record>
+
+        <!--
+            TRIGGERS: Rule 4 — Transaction Just Below Reporting Threshold
+            ₦965,000 sits in the 900,000–999,999 danger zone.
+        -->
+        <record id="demo_txn_retail_2" model="res.customer.transaction">
+            <field name="name">DEMO/TXN/R002</field>
+            <field name="customer_id" ref="demo_aml_partner_retail"/>
+            <field name="amount">965000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created">2025-01-11 14:22:00</field>
+            <field name="state">new</field>
+            <field name="narration">
+                Demo: ₦965,000 cash deposit — deliberately kept just below the
+                ₦1,000,000 reporting threshold.
+                FIRES Rule 4 — near-threshold structuring indicator.
+            </field>
+        </record>
+
+        <!--
+            TRIGGERS: Rule 1 — USD Transactions Above $1000
+            $4,500 USD credit. currency field = 'USD', transaction_type = 'C'.
+        -->
+        <record id="demo_txn_retail_3" model="res.customer.transaction">
+            <field name="name">DEMO/TXN/R003</field>
+            <field name="customer_id" ref="demo_aml_partner_retail"/>
+            <field name="amount">4500.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">USD</field>
+            <field name="date_created">2025-01-12 11:05:00</field>
+            <field name="state">new</field>
+            <field name="narration">
+                Demo: $4,500 USD inbound wire transfer.
+                FIRES Rule 1 — USD credit above $1,000, candidate for FIU reporting.
+            </field>
+        </record>
+
+
+        <!-- ── Mid-tier individual (high risk) ─────────────────────── -->
+
+        <!--
+            TRIGGERS: Rule 5 — Mid-Range Transaction Review only.
+            ₦50,000 is in the 10,000–100,000 band.
+            Rule 3 does NOT fire — amount must be > 200,000 for Rule 3.
+        -->
+        <record id="demo_txn_individual_1" model="res.customer.transaction">
+            <field name="name">DEMO/TXN/I001</field>
+            <field name="customer_id" ref="demo_aml_partner_individual"/>
+            <field name="amount">50000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created">2025-01-08 10:00:00</field>
+            <field name="state">new</field>
+            <field name="narration">
+                Demo: ₦50,000 transfer — high risk customer, mid-range amount.
+                FIRES Rule 5 — mid-range band (₦10,000–₦100,000).
+            </field>
+        </record>
+
+        <!--
+            TRIGGERS: Rule 3 — High Risk Customer Large Transaction
+            Customer is rated high risk AND amount ₦350,000 > ₦200,000.
+            Both conditions met — fires immediately.
+        -->
+        <record id="demo_txn_individual_2" model="res.customer.transaction">
+            <field name="name">DEMO/TXN/I002</field>
+            <field name="customer_id" ref="demo_aml_partner_individual"/>
+            <field name="amount">350000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created">2025-01-09 13:10:00</field>
+            <field name="state">new</field>
+            <field name="narration">
+                Demo: ₦350,000 transfer from a high risk customer.
+                FIRES Rule 3 — high risk customer with transaction above ₦200,000.
+            </field>
+        </record>
+
+        <!--
+            TRIGGERS: Rule 3 — High Risk Customer Large Transaction
+                      Rule 4 — Transaction Just Below Reporting Threshold
+            ₦920,000 is in the danger zone (900k–999k) AND the customer
+            is high risk with amount > 200k — two rules fire simultaneously.
+        -->
+        <record id="demo_txn_individual_3" model="res.customer.transaction">
+            <field name="name">DEMO/TXN/I003</field>
+            <field name="customer_id" ref="demo_aml_partner_individual"/>
+            <field name="amount">920000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created">2025-01-13 16:45:00</field>
+            <field name="state">new</field>
+            <field name="narration">
+                Demo: ₦920,000 from a high risk customer, deliberately kept below ₦1M.
+                FIRES Rule 3 — high risk customer above ₦200k.
+                FIRES Rule 4 — near-threshold danger zone (₦900k–₦999k).
+            </field>
+        </record>
+
+
+        <!-- ── Corporate account — Rule 2 (structuring) ─────────────── -->
+        <!--
+            Three transactions from the same customer on the SAME DATE
+            (2025-01-14), each above ₦500,000.
+            Rule 2 checks: COUNT(*) >= 2 OTHER transactions from same customer,
+            same day, above ₦500,000. By the time C003 is screened,
+            C001 and C002 already exist → COUNT = 2 → MATCHES.
+
+            C001 screened alone  → 0 others → no match yet
+            C002 screened        → 1 other  → no match yet
+            C003 screened        → 2 others → FIRES Rule 2
+        -->
+        <record id="demo_txn_corporate_1" model="res.customer.transaction">
+            <field name="name">DEMO/TXN/C001</field>
+            <field name="customer_id" ref="demo_aml_partner_corporate"/>
+            <field name="amount">600000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created">2025-01-14 09:00:00</field>
+            <field name="state">new</field>
+            <field name="narration">
+                Demo: vendor payment 1/3 — ₦600,000.
+                Part of same-day repeated large transaction pattern.
+            </field>
+        </record>
+
+        <record id="demo_txn_corporate_2" model="res.customer.transaction">
+            <field name="name">DEMO/TXN/C002</field>
+            <field name="customer_id" ref="demo_aml_partner_corporate"/>
+            <field name="amount">750000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created">2025-01-14 11:30:00</field>
+            <field name="state">new</field>
+            <field name="narration">
+                Demo: vendor payment 2/3 — ₦750,000.
+                Part of same-day repeated large transaction pattern.
+            </field>
+        </record>
+
+        <!--
+            TRIGGERS: Rule 2 — Repeated Large Transactions Same Day
+            At this point C001 (₦600k) and C002 (₦750k) already exist
+            for the same customer on the same date — COUNT = 2, threshold met.
+        -->
+        <record id="demo_txn_corporate_3" model="res.customer.transaction">
+            <field name="name">DEMO/TXN/C003</field>
+            <field name="customer_id" ref="demo_aml_partner_corporate"/>
+            <field name="amount">820000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created">2025-01-14 14:00:00</field>
+            <field name="state">new</field>
+            <field name="narration">
+                Demo: vendor payment 3/3 — ₦820,000.
+                FIRES Rule 2 — 3rd large transaction (all above ₦500,000)
+                from same customer on same day. Possible structuring attempt.
+            </field>
+        </record>
+
+
+        <!-- ============================================================
+             AML DETECTION DEMO DATA
+             Four customers — each designed to fire exactly one AML check.
+
+             VELOCITY    → demo_aml_velocity_partner
+             STRUCTURING → demo_aml_structuring_partner
+             DORMANT     → demo_aml_dormant_partner
+             ANOMALY     → demo_aml_anomaly_partner
+
+             NOTE on ANOMALY ordering:
+               The outlier (DEMO/AML/ANO/000) is created FIRST so it gets
+               a lower DB id. multi_screen uses _order='id desc', so the
+               10 baseline transactions (higher ids) are screened first,
+               building the customer profile. The outlier is screened last
+               and triggers the anomaly flag.
+             ============================================================ -->
+
+        <!-- ── Partners ──────────────────────────────────────────────── -->
+
+        <record id="demo_aml_velocity_partner" model="res.partner">
+            <field name="name">Demo — AML Velocity Customer</field>
+            <field name="internal_category">customer</field>
+            <field name="origin">demo</field>
+            <field name="active">True</field>
+            <field name="risk_level">low</field>
+            <field name="email">demo.velocity@aml-test.invalid</field>
+        </record>
+
+        <record id="demo_aml_structuring_partner" model="res.partner">
+            <field name="name">Demo — AML Structuring Customer</field>
+            <field name="internal_category">customer</field>
+            <field name="origin">demo</field>
+            <field name="active">True</field>
+            <field name="risk_level">low</field>
+            <field name="email">demo.structuring@aml-test.invalid</field>
+        </record>
+
+        <record id="demo_aml_dormant_partner" model="res.partner">
+            <field name="name">Demo — AML Dormant Account Customer</field>
+            <field name="internal_category">customer</field>
+            <field name="origin">demo</field>
+            <field name="active">True</field>
+            <field name="risk_level">low</field>
+            <field name="email">demo.dormant@aml-test.invalid</field>
+        </record>
+
+        <record id="demo_aml_anomaly_partner" model="res.partner">
+            <field name="name">Demo — AML Anomaly Customer</field>
+            <field name="internal_category">customer</field>
+            <field name="origin">demo</field>
+            <field name="active">True</field>
+            <field name="risk_level">low</field>
+            <field name="email">demo.anomaly@aml-test.invalid</field>
+        </record>
+
+        <!-- ============================================================
+             VELOCITY — 3 transactions totalling ₦12M within 2 hours.
+             Config default: max_amount=10M, window=24h.
+             Each transaction alone would not trigger; the combined total
+             of ₦12M exceeds the ₦10M velocity_max_amount threshold.
+             All three fire the flag when screened.
+             ============================================================ -->
+
+        <record id="demo_aml_vel_1" model="res.customer.transaction">
+            <field name="name">DEMO/AML/VEL/001</field>
+            <field name="customer_id" ref="demo_aml_velocity_partner"/>
+            <field name="amount">4000000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created" eval="(datetime.now() - timedelta(hours=2)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="state">new</field>
+            <field name="narration">Demo: AML velocity — 1st of 3 large same-day transactions. Total ₦12M exceeds ₦10M velocity threshold.</field>
+        </record>
+
+        <record id="demo_aml_vel_2" model="res.customer.transaction">
+            <field name="name">DEMO/AML/VEL/002</field>
+            <field name="customer_id" ref="demo_aml_velocity_partner"/>
+            <field name="amount">4000000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created" eval="(datetime.now() - timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="state">new</field>
+            <field name="narration">Demo: AML velocity — 2nd of 3 large same-day transactions.</field>
+        </record>
+
+        <record id="demo_aml_vel_3" model="res.customer.transaction">
+            <field name="name">DEMO/AML/VEL/003</field>
+            <field name="customer_id" ref="demo_aml_velocity_partner"/>
+            <field name="amount">4000000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created" eval="(datetime.now() - timedelta(minutes=30)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="state">new</field>
+            <field name="narration">Demo: AML velocity — 3rd of 3. Combined ₦12M fires VELOCITY flag.</field>
+        </record>
+
+        <!-- ============================================================
+             STRUCTURING — 4 sub-threshold transactions within 48 hours.
+             Config default: CTR=₦5M, approach_pct=80% (limit=₦4M),
+             min_count=3, window=72h.
+             Each transaction is ₦1.2M (below ₦5M CTR threshold).
+             Total = ₦4.8M which exceeds the ₦4M approach limit.
+             Count = 4 exceeds min_count = 3.
+             FIRES STRUCTURING on the 3rd and 4th transactions.
+             ============================================================ -->
+
+        <record id="demo_aml_str_1" model="res.customer.transaction">
+            <field name="name">DEMO/AML/STR/001</field>
+            <field name="customer_id" ref="demo_aml_structuring_partner"/>
+            <field name="amount">1200000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created" eval="(datetime.now() - timedelta(hours=48)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="state">new</field>
+            <field name="narration">Demo: AML structuring — 1st of 4 sub-threshold deposits. ₦1.2M each, total approaches CTR threshold.</field>
+        </record>
+
+        <record id="demo_aml_str_2" model="res.customer.transaction">
+            <field name="name">DEMO/AML/STR/002</field>
+            <field name="customer_id" ref="demo_aml_structuring_partner"/>
+            <field name="amount">1200000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created" eval="(datetime.now() - timedelta(hours=32)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="state">new</field>
+            <field name="narration">Demo: AML structuring — 2nd of 4 sub-threshold deposits.</field>
+        </record>
+
+        <record id="demo_aml_str_3" model="res.customer.transaction">
+            <field name="name">DEMO/AML/STR/003</field>
+            <field name="customer_id" ref="demo_aml_structuring_partner"/>
+            <field name="amount">1200000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created" eval="(datetime.now() - timedelta(hours=16)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="state">new</field>
+            <field name="narration">Demo: AML structuring — 3rd deposit. Count=3, total=₦3.6M. Approaching ₦4M limit — fires STRUCTURING.</field>
+        </record>
+
+        <record id="demo_aml_str_4" model="res.customer.transaction">
+            <field name="name">DEMO/AML/STR/004</field>
+            <field name="customer_id" ref="demo_aml_structuring_partner"/>
+            <field name="amount">1200000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created" eval="(datetime.now() - timedelta(hours=2)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="state">new</field>
+            <field name="narration">Demo: AML structuring — 4th deposit. Total ₦4.8M — STRUCTURING confirmed.</field>
+        </record>
+
+        <!-- ============================================================
+             DORMANT — account inactive for ~900 days, then reactivated.
+             Config default: dormant_min_days=180.
+             last transaction: 2023-10-01 → reactivation: 2026-04-15
+             Days dormant = ~927 days → well above 180-day threshold.
+             FIRES DORMANT on the reactivation transaction.
+             ============================================================ -->
+
+        <record id="demo_aml_dor_old" model="res.customer.transaction">
+            <field name="name">DEMO/AML/DOR/OLD</field>
+            <field name="customer_id" ref="demo_aml_dormant_partner"/>
+            <field name="amount">50000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created">2023-10-01 10:00:00</field>
+            <field name="state">done</field>
+            <field name="narration">Demo: Last transaction before long dormancy period (2023-10-01).</field>
+        </record>
+
+        <record id="demo_aml_dor_reactivation" model="res.customer.transaction">
+            <field name="name">DEMO/AML/DOR/001</field>
+            <field name="customer_id" ref="demo_aml_dormant_partner"/>
+            <field name="amount">2500000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created">2026-04-15 09:30:00</field>
+            <field name="state">new</field>
+            <field name="narration">Demo: Reactivation after ~927 days dormancy. FIRES DORMANT — last transaction was 2023-10-01.</field>
+        </record>
+
+        <!-- ============================================================
+             ANOMALY — outlier created FIRST (lowest id), 10 baselines after.
+             multi_screen processes id desc → baselines screened first,
+             building the profile (mean ~₦10,000, stddev ~₦1,600).
+             Outlier ₦800,000 → Z-score ≈ 494 >> threshold of 3.0.
+             FIRES ANOMALY on DEMO/AML/ANO/000 (the outlier).
+             ============================================================ -->
+
+        <!-- Outlier — lowest id → screened LAST -->
+        <record id="demo_aml_ano_outlier" model="res.customer.transaction">
+            <field name="name">DEMO/AML/ANO/000</field>
+            <field name="customer_id" ref="demo_aml_anomaly_partner"/>
+            <field name="amount">800000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created">2026-04-10 11:00:00</field>
+            <field name="state">new</field>
+            <field name="narration">Demo: ₦800,000 outlier. Z-score ~494 vs customer baseline of ~₦10,000. FIRES ANOMALY.</field>
+        </record>
+
+        <!-- 10 baseline transactions — higher ids → screened FIRST, build profile -->
+        <record id="demo_aml_ano_b01" model="res.customer.transaction">
+            <field name="name">DEMO/AML/ANO/001</field>
+            <field name="customer_id" ref="demo_aml_anomaly_partner"/>
+            <field name="amount">7000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created">2025-06-01 09:00:00</field>
+            <field name="state">done</field>
+            <field name="narration">Demo: AML anomaly baseline 1/10.</field>
+        </record>
+
+        <record id="demo_aml_ano_b02" model="res.customer.transaction">
+            <field name="name">DEMO/AML/ANO/002</field>
+            <field name="customer_id" ref="demo_aml_anomaly_partner"/>
+            <field name="amount">8000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created">2025-07-01 09:00:00</field>
+            <field name="state">done</field>
+            <field name="narration">Demo: AML anomaly baseline 2/10.</field>
+        </record>
+
+        <record id="demo_aml_ano_b03" model="res.customer.transaction">
+            <field name="name">DEMO/AML/ANO/003</field>
+            <field name="customer_id" ref="demo_aml_anomaly_partner"/>
+            <field name="amount">9000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created">2025-07-15 09:00:00</field>
+            <field name="state">done</field>
+            <field name="narration">Demo: AML anomaly baseline 3/10.</field>
+        </record>
+
+        <record id="demo_aml_ano_b04" model="res.customer.transaction">
+            <field name="name">DEMO/AML/ANO/004</field>
+            <field name="customer_id" ref="demo_aml_anomaly_partner"/>
+            <field name="amount">10000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created">2025-08-01 09:00:00</field>
+            <field name="state">done</field>
+            <field name="narration">Demo: AML anomaly baseline 4/10.</field>
+        </record>
+
+        <record id="demo_aml_ano_b05" model="res.customer.transaction">
+            <field name="name">DEMO/AML/ANO/005</field>
+            <field name="customer_id" ref="demo_aml_anomaly_partner"/>
+            <field name="amount">11000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created">2025-08-15 09:00:00</field>
+            <field name="state">done</field>
+            <field name="narration">Demo: AML anomaly baseline 5/10.</field>
+        </record>
+
+        <record id="demo_aml_ano_b06" model="res.customer.transaction">
+            <field name="name">DEMO/AML/ANO/006</field>
+            <field name="customer_id" ref="demo_aml_anomaly_partner"/>
+            <field name="amount">12000.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created">2025-09-01 09:00:00</field>
+            <field name="state">done</field>
+            <field name="narration">Demo: AML anomaly baseline 6/10.</field>
+        </record>
+
+        <record id="demo_aml_ano_b07" model="res.customer.transaction">
+            <field name="name">DEMO/AML/ANO/007</field>
+            <field name="customer_id" ref="demo_aml_anomaly_partner"/>
+            <field name="amount">9500.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created">2025-09-15 09:00:00</field>
+            <field name="state">done</field>
+            <field name="narration">Demo: AML anomaly baseline 7/10.</field>
+        </record>
+
+        <record id="demo_aml_ano_b08" model="res.customer.transaction">
+            <field name="name">DEMO/AML/ANO/008</field>
+            <field name="customer_id" ref="demo_aml_anomaly_partner"/>
+            <field name="amount">10500.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created">2025-10-01 09:00:00</field>
+            <field name="state">done</field>
+            <field name="narration">Demo: AML anomaly baseline 8/10.</field>
+        </record>
+
+        <record id="demo_aml_ano_b09" model="res.customer.transaction">
+            <field name="name">DEMO/AML/ANO/009</field>
+            <field name="customer_id" ref="demo_aml_anomaly_partner"/>
+            <field name="amount">8500.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created">2025-10-15 09:00:00</field>
+            <field name="state">done</field>
+            <field name="narration">Demo: AML anomaly baseline 9/10.</field>
+        </record>
+
+        <record id="demo_aml_ano_b10" model="res.customer.transaction">
+            <field name="name">DEMO/AML/ANO/010</field>
+            <field name="customer_id" ref="demo_aml_anomaly_partner"/>
+            <field name="amount">11500.00</field>
+            <field name="transaction_type">C</field>
+            <field name="currency">NGN</field>
+            <field name="date_created">2025-11-01 09:00:00</field>
+            <field name="state">done</field>
+            <field name="narration">Demo: AML anomaly baseline 10/10. Profile: mean≈₦9,700, stddev≈₦1,602.</field>
+        </record>
+
     </data>
 </odoo>

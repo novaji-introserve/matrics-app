@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Example statistic: total alert history count. Use as template or run Compute to see value. -->
+        <record id="alert_stat_total_alerts" model="alert.stat">
+            <field name="name">Total Alerts</field>
+            <field name="code">total_alerts</field>
+            <field name="scope">branch</field>
+            <field name="sql_query">SELECT COUNT(*) FROM alert_history</field>
+        </record>
+    </data>
+</odoo>

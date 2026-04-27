@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="id_Birth_Certificate" model="res.identification.type">
+            <field name="name">Birth Certificate</field>
+            <field name="code">Birth Certificate</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="id_ComRegNo" model="res.identification.type">
+            <field name="name">Com. Reg. No.</field>
+            <field name="code">Com. Reg. No.</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="id_Driving_Licence" model="res.identification.type">
+            <field name="name">Driving Licence</field>
+            <field name="code">Driving Licence</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="id_MRTCD" model="res.identification.type">
+            <field name="name">Machine Read Trav Doc MRTCD</field>
+            <field name="code">Machine Read Trav Doc MRTCD</field>
+            <field name="active">True</field>
+        </record>
+        <record id="id_NIN" model="res.identification.type">
+            <field name="name">NIN</field>
+            <field name="code">NIN</field>
+            <field name="active">True</field>
+        </record>
+        <record id="id_NYSC" model="res.identification.type">
+            <field name="name">NYSC</field>
+            <field name="code">NYSC</field>
+            <field name="active">True</field>
+        </record>
+        <record id="id_Other_ID" model="res.identification.type">
+            <field name="name">Other ID</field>
+            <field name="code">Other ID</field>
+            <field name="active">True</field>
+        </record>
+        <record id="id_Passport" model="res.identification.type">
+            <field name="name">Passport No.</field>
+            <field name="code">Passport No.</field>
+            <field name="active">True</field>
+        </record>
+        <record id="StaffIDCARD" model="res.identification.type">
+            <field name="name">Staff IDCARD</field>
+            <field name="code">Staff IDCARD</field>
+            <field name="active">True</field>
+        </record>
+        <record id="VotersCard" model="res.identification.type">
+            <field name="name">Voters Card</field>
+            <field name="code">Voters Card</field>
+            <field name="active">True</field>
+        </record>
+        <record id="WorkIdentity" model="res.identification.type">
+            <field name="name">Work Identity</field>
+            <field name="code">Work Identity</field>
+            <field name="active">True</field>
+        </record>
+
+        
+
+      
+
+    </data>
+</odoo>

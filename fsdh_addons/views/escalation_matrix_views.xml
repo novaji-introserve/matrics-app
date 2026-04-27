@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <!-- ── FORM VIEW ─────────────────────────────────────────────── -->
+  <record id="view_escalation_matrix_form" model="ir.ui.view">
+    <field name="name">fsdh.escalation.matrix.form</field>
+    <field name="model">fsdh.escalation.matrix</field>
+    <field name="arch" type="xml">
+      <form string="Escalation Matrix">
+        <sheet>
+          <group>
+            <field name="subsidiary_id"/>
+          </group>
+          <notebook>
+            <page string="Escalation Steps">
+              <field name="step_ids">
+                <tree editable="bottom">
+                  <field name="sequence" string="Level #"/>
+                  <field name="level_label" string="Label" readonly="1"/>
+                  <field name="tat_id" string="TAT (Time to Escalate)"/>
+                  <field name="recipient_user_id" string="Recipient" domain="[('groups_id', 'in', [parent.subsidiary_id])]" options="{'no_create': True}"/>
+                  <field name="recipient_email" string="Email" readonly="1"/>
+                </tree>
+              </field>
+            </page>
+          </notebook>
+        </sheet>
+        <div class="oe_chatter">
+          <field name="message_follower_ids"/>
+          <field name="activity_ids"/>
+          <field name="message_ids"/>
+        </div>
+      </form>
+    </field>
+  </record>
+
+  <!-- ── TREE VIEW ─────────────────────────────────────────────── -->
+  <record id="view_escalation_matrix_tree" model="ir.ui.view">
+    <field name="name">fsdh.escalation.matrix.tree</field>
+    <field name="model">fsdh.escalation.matrix</field>
+    <field name="arch" type="xml">
+      <tree string="Escalation Matrices">
+        <field name="subsidiary_id" string="Subsidiary"/>
+        <field name="step_ids" widget="many2many_tags" string="Steps" readonly="1"/>
+      </tree>
+    </field>
+  </record>
+
+  <!-- ── ACTION ────────────────────────────────────────────────── -->
+  <record id="action_escalation_matrix" model="ir.actions.act_window">
+    <field name="name">Escalation Matrices</field>
+    <field name="res_model">fsdh.escalation.matrix</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+
+  <!-- ── INJECT Default Escalation Matrix into alert.group form ── -->
+  <record id="view_alert_group_form_escalation_matrix" model="ir.ui.view">
+    <field name="name">alert.group.form.escalation.matrix</field>
+    <field name="model">alert.group</field>
+    <field name="inherit_id" ref="alert_management.view_alert_group_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='tag']/.." position="after">
+        <group class="w-75">
+          <field name="escalation_matrix_id" string="Default Escalation Matrix" options="{'no_create': True}"/>
+        </group>
+      </xpath>
+    </field>
+  </record>
+
+  <!-- ── INJECT Escalation Matrix + Test button into alert.rules form ── -->
+  <record id="view_alert_rules_form_escalation_matrix" model="ir.ui.view">
+    <field name="name">alert.rules.form.escalation.matrix</field>
+    <field name="model">alert.rules</field>
+    <field name="inherit_id" ref="alert_management.view_alert_rules_form"/>
+    <field name="arch" type="xml">
+
+      <!-- TEST BUTTON: comment out this xpath to disable after testing is done -->
+      <xpath expr="//header" position="inside">
+        <button name="action_test_escalation_matrix" string="Test Escalation Matrix" type="object" class="btn-warning" icon="fa-bolt" attrs="{'invisible': [('escalation_matrix_id', '=', False)]}" confirm="This will force-escalate ALL pending alerts for this matrix immediately, bypassing TAT. Continue?"/>
+      </xpath>
+
+      <!-- Read-only matrix label below Alert Group in the Recipients tab -->
+      <xpath expr="//field[@name='alert_id']/.." position="after">
+        <group>
+          <field name="escalation_matrix_id" string="Escalation Matrix" readonly="1" options="{'no_open': False}"/>
+        </group>
+      </xpath>
+
+    </field>
+  </record>
+
+  <!-- ── INJECT Escalation Status section into alert.history form ─ -->
+  <record id="view_alert_history_form_escalation" model="ir.ui.view">
+    <field name="name">alert.history.form.escalation</field>
+    <field name="model">alert.history</field>
+    <field name="inherit_id" ref="alert_management.view_alert_history_form"/>
+    <field name="arch" type="xml">
+      <!-- Target the grandparent of date_created (the DATE INFORMATION group) and inject after it -->
+      <xpath expr="//field[@name='date_created']/../.." position="after">
+        <group string="ESCALATION STATUS">
+          <group>
+            <field name="escalation_matrix_id" string="Escalation Matrix" readonly="1"/>
+            <field name="current_escalation_step" string="Current Level" readonly="1"/>
+          </group>
+          <group>
+            <field name="last_escalation_dt" string="Last Escalated" readonly="1"/>
+            <field name="escalation_complete" string="Escalation Complete" readonly="1"/>
+          </group>
+        </group>
+      </xpath>
+    </field>
+  </record>
+
+  <!-- ── Hide first line owner and second line owner fields from alert rules form view ─ -->
+  
+  <record id="view_alert_rules_form_hide_owners" model="ir.ui.view">
+    <field name="name">alert.rules.form.hide.owners</field>
+    <field name="model">alert.rules</field>
+    <field name="inherit_id" ref="alert_management.view_alert_rules_form"/>
+    <field name="priority">99</field>
+    <field name="arch" type="xml">
+
+      <!-- Hide First Line Owner field -->
+      <xpath expr="//field[@name='first_owner']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+
+      <!-- Hide Second Line Owner field -->
+      <xpath expr="//field[@name='second_owner']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+
+    </field>
+  </record>
+
+</odoo>

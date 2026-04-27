@@ -1,0 +1,14 @@
+{
+  "customer_data": {
+    "frequency_hours": 24,
+    "sync_type": "full",
+    "last_run": null,
+    "next_run": null
+  },
+  "product_catalog": {
+    "frequency_hours": 168,
+    "sync_type": "full",
+    "last_run": null,
+    "next_run": null
+  }
+}

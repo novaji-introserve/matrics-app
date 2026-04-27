@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_etl_source_table_user,etl.source.table.user,model_etl_source_table,base.group_user,1,1,1,1
+access_etl_database_connection_user,etl.database.connection.user,model_etl_database_connection,base.group_user,1,1,1,1
+access_etl_category_user,etl.category.user,model_etl_category,base.group_user,1,1,1,1
+access_etl_frequency_user,etl.frequency.user,model_etl_frequency,base.group_user,1,1,1,1
+access_etl_column_mapping_user,etl.column.mapping.user,model_etl_column_mapping,base.group_user,1,1,1,1
+access_etl_sync_log_user,etl.sync.log.user,model_etl_sync_log,base.group_user,1,1,1,1
+access_etl_manager_user,etl.manager.user,model_etl_manager,base.group_user,1,0,0,0
+access_etl_processor_user,etl.processor.user,model_etl_processor,base.group_user,1,0,0,0
+access_etl_database_adapter_factory_user,etl.database.adapter.factory.user,model_etl_database_adapter_factory,base.group_user,1,0,0,0
+access_fdw_sync_watermark_user,fdw.sync.watermark.user,model_fdw_sync_watermark,base.group_user,1,1,1,1

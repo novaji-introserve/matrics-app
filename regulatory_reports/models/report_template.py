@@ -24,7 +24,7 @@ class ReportTemplate(models.Model):
     report_type = fields.Selection(
         string='Report Type',
         selection=[
-            ('xls', 'Excel'),
+            ('xls', 'Excel (.xlsx)'),
             ('pdf', 'PDF'),
             ('csv', 'CSV'),
             ('docx', 'Word Document'),

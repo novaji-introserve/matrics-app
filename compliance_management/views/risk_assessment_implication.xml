@@ -1,0 +1,104 @@
+<odoo>
+    <!-- Tree View -->
+    <record id="view_risk_assessment_implication_tree" model="ir.ui.view">
+        <field name="name">risk.assessment.implication.tree</field>
+        <field name="model">risk.assessment.implication</field>
+        <field name="arch" type="xml">
+            <tree string="Risk Implications" decoration-muted="state == 'inactive' or not active">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="severity" widget="badge"
+                       decoration-success="severity == 'low'"
+                       decoration-warning="severity == 'medium'"
+                       decoration-danger="severity == 'high'"/>
+                <field name="state"/>
+                <field name="active" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+   
+
+    <!-- Search View -->
+    <record id="view_risk_assessment_implication_search" model="ir.ui.view">
+        <field name="name">risk.assessment.implication.search</field>
+        <field name="model">risk.assessment.implication</field>
+        <field name="arch" type="xml">
+            <search string="Search Implications">
+                <field name="name" string="Implication" filter_domain="[('name','ilike',self)]"/>
+                <field name="code" string="Code" filter_domain="[('code','ilike',self)]"/>
+                <field name="description" string="Description" filter_domain="[('description','ilike',self)]"/>
+                <filter name="filter_active" string="Active" domain="[('state','=','active')]"/>
+                <filter name="filter_inactive" string="Inactive" domain="[('state','=','inactive')]"/>
+                <separator/>
+                <filter name="severity_low" string="Low" domain="[('severity','=','low')]"/>
+                <filter name="severity_medium" string="Medium" domain="[('severity','=','medium')]"/>
+                <filter name="severity_high" string="High" domain="[('severity','=','high')]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="State" context="{'group_by':'state'}"/>
+                    <filter name="group_severity" string="Severity" context="{'group_by':'severity'}"/>
+                    <filter name="group_active" string="Archived" context="{'group_by':'active'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_risk_assessment_implication_form" model="ir.ui.view">
+    <field name="name">risk.assessment.implication.form</field>
+    <field name="model">risk.assessment.implication</field>
+    <field name="arch" type="xml">
+        <form string="Risk Implication">
+            <header>
+                <button name="action_set_active" type="object" string="Set Active"
+                        class="btn btn-success" 
+                        attrs="{'invisible': [('state', '=', 'active')]}"/>
+                <button name="action_set_inactive" type="object" string="Set Inactive"
+                        class="btn btn-secondary"
+                        attrs="{'invisible': [('state', '=', 'inactive')]}"/>
+                <field name="state" widget="statusbar" statusbar_visible="active,inactive"/>
+            </header>
+            <sheet>
+                
+                <!--  Simple, labeled, schema-safe -->
+                <group>
+                    <group>
+                        <field name="code" placeholder="e.g. IMP-FINE"/>
+                        <field name="name" placeholder="e.g. Civil Monetary Penalties"/>
+                    </group>
+                    <group>
+                        <field name="severity"/>
+                        <field name="state"/>
+                    </group>
+                    <group>
+                        <field name="active"/>
+                    </group>
+                </group>
+
+                <label for="description" string="Description"/>
+                <field name="description"
+                       placeholder="Describe impact: financial, legal, operational, reputational..."
+                       nolabel="1"/>
+            </sheet>
+
+            <div class="oe_chatter">
+                <field name="message_follower_ids" widget="mail_followers"/>
+                <field name="activity_ids" widget="mail_activity"/>
+                <field name="message_ids" widget="mail_thread"/>
+            </div>
+        </form>
+    </field>
+</record>
+
+    <!-- Action -->
+    <record id="action_risk_assessment_implication" model="ir.actions.act_window">
+        <field name="name">Risk Implications</field>
+        <field name="res_model">risk.assessment.implication</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_risk_assessment_implication_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define FCRA risk implications.</p>
+            <p>Examples: civil penalties, criminal liability, loss of license, reputational damage.</p>
+        </field>
+    </record>
+</odoo>

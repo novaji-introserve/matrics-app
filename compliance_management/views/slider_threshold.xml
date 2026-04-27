@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<record id="fcra_slider_threshold_tree" model="ir.ui.view">
+    <field name="name">fcra.slider.threshold.tree</field>
+    <field name="model">res.slider.threshold</field>
+    <field name="arch" type="xml">
+        <tree string="Risk Assessment slider_thresholds" create="false" delete="false">
+             <field name="name" />
+            <field name="threshold"/>
+            
+        </tree>
+    </field>
+</record>
+
+<record id="fcra_slider_threshold_form" model="ir.ui.view">
+    <field name="name">fcra.slider.threshold.form</field>
+    <field name="model">res.slider.threshold</field>
+    <field name="arch" type="xml">
+        <form string="Risk Assessment slider_threshold">
+            <sheet>
+                 <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                <group>
+                    <group>
+                        <field name="threshold"/>
+                    </group>
+                    
+                </group>
+            </sheet>
+             <div class="oe_chatter">
+                <field name="message_follower_ids" widget="mail_followers"/>
+                <field name="activity_ids" widget="mail_activity"/>
+                <field name="message_ids" widget="mail_thread"/>
+            </div>
+        </form>
+    </field>
+</record>
+</odoo>

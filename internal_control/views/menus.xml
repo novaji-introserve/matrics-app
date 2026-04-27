@@ -55,25 +55,41 @@
 
     <!-- Customers -->
     <menuitem
-        id="menu_customer_recent"
-        name="Recently Opened"
+        id="menu_customer"
+        name="Customers"
         parent="menu_customer_management"
-        sequence="10"
+        sequence="5"
+    />
+
+    <menuitem
+        id="menu_customers_all"
+        name="All Customers"
+        parent="menu_customer"
+        action="action_customers_all"
+        sequence="5"
     />
 
     <menuitem
         id="menu_customer_today"
         name="Today"
-        parent="menu_customer_recent"
-        action="action_open_customers_today"
+        parent="menu_customer"
+        action="action_customers_today"
         sequence="10"
     />
 
     <menuitem
         id="menu_customer_last_7days"
         name="Last 7 Days"
-        parent="menu_customer_recent"
-        action="action_open_customers_last_7days"
+        parent="menu_customer"
+        action="action_customers_last_7days"
+        sequence="15"
+    />
+
+    <menuitem
+        id="menu_customers_last_30days"
+        name="Last 30 Days"
+        parent="menu_customer"
+        action="action_customers_last_30days"
         sequence="20"
     />
 
@@ -81,7 +97,7 @@
         id="menu_account"
         name="Accounts"
         parent="menu_customer_management"
-        sequence="20"
+        sequence="10"
     />
 
     <menuitem
@@ -204,37 +220,6 @@
         <field name="sequence">15</field>
     </record>
 
-    <!-- Transaction items parked for review.
-    <menuitem id="menu_internal_control_transactions_report_root" name="Reporting" parent="menu_transaction_monitoring_root" sequence="40"/>
-    <menuitem id="menu_internal_control_transactions_report" name="Reports" parent="menu_internal_control_transactions_report_root" action="bi_sql_editor.action_bi_sql_view" sequence="10"/>
-    <menuitem id="menu_customers_all_transactions_today_ngn" name="Customer Today NGN" parent="menu_transaction_monitoring_root" action="action_customers_all_transactions_today_ngn" sequence="10"/>
-    <menuitem id="menu_customers_all_transactions_today_other" name="Customer Today Other" parent="menu_transaction_monitoring_root" action="action_customers_all_transactions_today_other" sequence="20"/>
-    <menuitem id="menu_customers_all_transactions_7days_ngn" name="Customer Last 7 Days NGN" parent="menu_transaction_monitoring_root" action="action_customers_all_transactions_7days_ngn" sequence="30"/>
-    <menuitem id="menu_customers_all_transactions_7days_other" name="Customer Last 7 Days Other" parent="menu_transaction_monitoring_root" action="action_customers_all_transactions_7days_other" sequence="40"/>
-    <menuitem id="menu_internal_all_transactions_today_ngn" name="Internal Today NGN" parent="menu_transaction_monitoring_root" action="action_internal_all_transactions_today_ngn" sequence="50"/>
-    <menuitem id="menu_internal_all_transactions_today_other" name="Internal Today Other" parent="menu_transaction_monitoring_root" action="action_internal_all_transactions_today_other" sequence="60"/>
-    <menuitem id="menu_internal_all_transactions_7days_ngn" name="Internal Last 7 Days NGN" parent="menu_transaction_monitoring_root" action="action_internal_all_transactions_7days_ngn" sequence="70"/>
-    <menuitem id="menu_internal_all_transactions_7days_other" name="Internal Last 7 Days Other" parent="menu_transaction_monitoring_root" action="action_internal_all_transactions_7days_other" sequence="80"/>
-    <menuitem id="menu_awaiting_review" name="Awaiting Review" parent="menu_transaction_monitoring_root" sequence="20"/>
-    <menuitem id="menu_customers_awaiting_review_today_ngn" name="Customer Today NGN" parent="menu_awaiting_review" action="action_customers_awaiting_review_today_ngn" sequence="10"/>
-    <menuitem id="menu_customers_awaiting_review_today_other" name="Customer Today Other" parent="menu_awaiting_review" action="action_customers_awaiting_review_today_other" sequence="20"/>
-    <menuitem id="menu_customers_awaiting_review_7days_ngn" name="Customer Last 7 Days NGN" parent="menu_awaiting_review" action="action_customers_awaiting_review_7days_ngn" sequence="30"/>
-    <menuitem id="menu_customers_awaiting_review_7days_other" name="Customer Last 7 Days Other" parent="menu_awaiting_review" action="action_customers_awaiting_review_7days_other" sequence="40"/>
-    <menuitem id="menu_internal_awaiting_review_today_ngn" name="Internal Today NGN" parent="menu_awaiting_review" action="action_internal_awaiting_review_today_ngn" sequence="50"/>
-    <menuitem id="menu_internal_awaiting_review_today_other" name="Internal Today Other" parent="menu_awaiting_review" action="action_internal_awaiting_review_today_other" sequence="60"/>
-    <menuitem id="menu_internal_awaiting_review_7days_ngn" name="Internal Last 7 Days NGN" parent="menu_awaiting_review" action="action_internal_awaiting_review_7days_ngn" sequence="70"/>
-    <menuitem id="menu_internal_awaiting_review_7days_other" name="Internal Last 7 Days Other" parent="menu_awaiting_review" action="action_internal_awaiting_review_7days_other" sequence="80"/>
-    <menuitem id="menu_reviewed" name="Reviewed" parent="menu_transaction_monitoring_root" sequence="30"/>
-    <menuitem id="menu_customers_reviewed_today_ngn" name="Customer Today NGN" parent="menu_reviewed" action="action_customers_reviewed_today_ngn" sequence="10"/>
-    <menuitem id="menu_customers_reviewed_today_other" name="Customer Today Other" parent="menu_reviewed" action="action_customers_reviewed_today_other" sequence="20"/>
-    <menuitem id="menu_customers_reviewed_7days_ngn" name="Customer Last 7 Days NGN" parent="menu_reviewed" action="action_customers_reviewed_7days_ngn" sequence="30"/>
-    <menuitem id="menu_customers_reviewed_7days_other" name="Customer Last 7 Days Other" parent="menu_reviewed" action="action_customers_reviewed_7days_other" sequence="40"/>
-    <menuitem id="menu_internal_reviewed_today_ngn" name="Internal Today NGN" parent="menu_reviewed" action="action_internal_reviewed_today_ngn" sequence="50"/>
-    <menuitem id="menu_internal_reviewed_today_other" name="Internal Today Other" parent="menu_reviewed" action="action_internal_reviewed_today_other" sequence="60"/>
-    <menuitem id="menu_internal_reviewed_7days_ngn" name="Internal Last 7 Days NGN" parent="menu_reviewed" action="action_internal_reviewed_7days_ngn" sequence="70"/>
-    <menuitem id="menu_internal_reviewed_7days_other" name="Internal Last 7 Days Other" parent="menu_reviewed" action="action_internal_reviewed_7days_other" sequence="80"/>
-    -->
-
     <!-- Alerts -->
     <menuitem
         id="menu_internal_control_alert_rules_monitoring"
@@ -274,6 +259,15 @@
         parent="menu_internal_control_configuration_screening"
         action="compliance_management.action_list_transaction_screening_rule"
         sequence="10"
+    />
+
+    <menuitem
+        id="menu_res_transaction_channel"
+        name="Transaction Channels"
+        parent="menu_internal_control_configurations"
+        groups="compliance_management.group_compliance_chief_compliance_officer"
+        action="action_res_transaction_channel"
+        sequence="25"
     />
 
     <menuitem

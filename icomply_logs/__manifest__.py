@@ -20,6 +20,9 @@
     'data': [
         'security/groups.xml',
         'security/ir.model.access.csv',
+        
+        'data/log_monitor.xml',
+
         'views/menu_views.xml',
         'views/log_views.xml'
     ],

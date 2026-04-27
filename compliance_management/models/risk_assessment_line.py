@@ -3,7 +3,7 @@
 from odoo import models, fields, api, _
 import logging
 # CONTROL_EFFECTIVENESS_MAX_SCORE = 25
-
+from odoo.exceptions import ValidationError
 _logger = logging.getLogger(__name__)
 
 
@@ -23,6 +23,8 @@ class RiskAssessmentLine(models.Model):
     inherent_risk_score = fields.Float(
         string='Inherent Risk Score', required=True, tracking=True)
     existing_controls = fields.Many2many("risk.assessment.control", "res_risk_assessment_line_risk_assessment_control_rel", tracking=True)
+    # control_effectiveness_score = fields.Float(
+    #     string='Control Effectiveness Score', tracking=True,readonly="True")
     control_effectiveness_score = fields.Float(
         string='Control Effectiveness Score', tracking=True)
     residual_risk_probability = fields.Float(
@@ -47,6 +49,11 @@ class RiskAssessmentLine(models.Model):
     
     active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     
+    max_risk_score = fields.Float(string='Maximum Risk Score', compute='_compute_max_risk_score', store=False)
+    
+    risk_level = fields.Char(string='Risk Level', compute='_compute_risk_level', store=False)
+
+    
     def init(self):
         """
         Override init() to drop constraint if exists.
@@ -61,6 +68,17 @@ class RiskAssessmentLine(models.Model):
                 DROP CONSTRAINT res_risk_assessment_line_uniq_risk_assessment_line_name
             """)
         super().init()
+
+    @api.model
+    def create(self, vals):
+        record = super(RiskAssessmentLine, self).create(vals)
+        record.update_aggregate_risk_score()
+        return record
+
+    def write(self, vals):
+        record = super(RiskAssessmentLine, self).write(vals)
+        self.update_aggregate_risk_score()
+        return record
 
     @api.depends('inherent_risk_score', 'control_effectiveness_score', 'residual_risk_impact','residual_risk_score','residual_risk_probability','residual_risk_score')
     def _compute_risk_score(self):
@@ -81,7 +99,7 @@ class RiskAssessmentLine(models.Model):
             inherent_score = record.inherent_risk_score or 0  # Handle None/False values
             
             # Ensure we don't have negative values if control score > max
-            record.residual_risk_impact = inherent_score * (1 - (control_effectiveness_score / max_score))
+            record.residual_risk_impact = float(inherent_score * (1 - (control_effectiveness_score / max_score)))
             _logger.info(f"Residual risk impact score is {record.residual_risk_impact}")
 
 
@@ -97,9 +115,9 @@ class RiskAssessmentLine(models.Model):
     
     def get_control_effectiveness_max_score(self):
         """Get the maximum score for control effectiveness from model"""
-        max_score = self.env['res.fcra.score'].search([], limit=1).max_score or 9
+        max_score = float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold'))
 
-        return float(max_score)
+        return (max_score)
     
 
     def _compute_risk_probability(self, control_effectiveness_score):
@@ -112,3 +130,9 @@ class RiskAssessmentLine(models.Model):
 
     def _compute_residual_risk_score(self, probability, impact):
         return (probability/100) * impact
+
+    def update_aggregate_risk_score(self):
+        risk_assessment_id = self.risk_assessment_id.id
+        self.env.cr.execute('update res_risk_assessment set risk_rating = (SELECT avg(residual_risk_score) FROM res_risk_assessment_line WHERE risk_assessment_id = %s) where id =%s',
+                            (risk_assessment_id, risk_assessment_id))
+        

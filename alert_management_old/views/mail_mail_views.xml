@@ -1,0 +1,27 @@
+<odoo>
+    <!-- Form View Inherit -->
+    <record id="view_mail_mail_form_inherit" model="ir.ui.view">
+        <field name="name">mail.mail.form.inherit</field>
+        <field name="model">mail.mail</field>
+        <field name="inherit_id" ref="mail.view_mail_form" />
+        <field name="arch" type="xml">
+            <!-- Example: Add a new field to the form view -->
+            <xpath expr="//group" position="inside">
+                <field name="custom_field" />
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Tree View Inherit -->
+    <record id="view_mail_mail_tree_inherit" model="ir.ui.view">
+        <field name="name">mail.mail.tree.inherit</field>
+        <field name="model">mail.mail</field>
+        <field name="inherit_id" ref="mail.view_mail_tree" />
+        <field name="arch" type="xml">
+            <!-- Example: Add a new column in the list view -->
+            <xpath expr="//tree" position="inside">
+                <field name="custom_field" />
+            </xpath>
+        </field>
+    </record>
+</odoo>

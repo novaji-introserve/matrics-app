@@ -1,5 +1,5 @@
 from odoo import _, api, fields, models
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 import xml.etree.ElementTree as ET
 from lxml import etree
 import base64
@@ -17,6 +17,9 @@ class SuspiciousTransactionHistory(models.Model):
     customer_id = fields.Many2one(
         comodel_name='res.partner', string='Customer', related='transaction_id.customer_id',
         ondelete='cascade', index=True)
+    rule_id = fields.Many2one(
+        'res.transaction.screening.rule', string='Triggered By Rule',
+        ondelete='set null', index=True)
     date_reported = fields.Datetime(
         string='Date Reported', default=fields.Datetime.now)
     reported_by = fields.Many2one(
@@ -38,17 +41,47 @@ class SuspiciousTransactionHistory(models.Model):
 
 class Case(models.Model):
     _inherit = 'case.manager'
-    
+
+    close_outcome = fields.Selection(
+        selection=[
+            ('confirmed', 'Confirmed Suspicious — Report to NFIU'),
+            ('cleared',   'Cleared — No Further Action'),
+        ],
+        string='Investigation Outcome',
+        tracking=True,
+        help='Required when closing a case that is linked to a transaction. '
+             'Determines how the transaction is updated after closure.',
+    )
+
     @api.model_create_multi
     def create(self, vals_list):
-        result = super(Case, self).create(vals_list)
-        for vals in vals_list:
-            if 'transaction_id' in vals and vals['transaction_id']:
-                transaction = self.env['res.customer.transaction'].browse(vals['transaction_id'])
-                if transaction:
-                    transaction.write({
-                        'state': 'awaiting_approval',  })
+        result = super().create(vals_list)
+        for case in result:
+            if case.transaction_id:
+                case.transaction_id.write({'state': 'awaiting_approval'})
         return result
+
+    def action_close_case(self):
+        for case in self:
+            if case.transaction_id and not case.close_outcome:
+                raise UserError(
+                    'Please select an Investigation Outcome before closing '
+                    'a case that is linked to a transaction.'
+                )
+        res = super().action_close_case()
+        for case in self:
+            tx = case.transaction_id
+            if not tx:
+                continue
+            if case.close_outcome == 'confirmed':
+                tx.write({'state': 'suspicious'})
+            elif case.close_outcome == 'cleared':
+                tx.write({
+                    'state': 'done',
+                    'report_nfiu': False,
+                    'suspicious_transaction': False,
+                })
+        return res
 
 
 class TransactionScreeningRule(models.Model):
@@ -60,9 +93,9 @@ class NFIUTransaction(models.Model):
     _inherit = 'res.customer.transaction'
 
     report_id = fields.Many2one(
-        'nfiu.report', string='Report', required=True, ondelete='cascade')
+        'nfiu.report', string='Report', ondelete='set null')
     transaction_number = fields.Char(
-        string='Transaction Number', required=True, size=50)
+        string='Transaction Number', size=50)
     internal_ref_number = fields.Char(
         string='Internal Reference Number', size=50)
     transaction_location = fields.Char(string='Transaction Location', size=255)
@@ -81,11 +114,11 @@ class NFIUTransaction(models.Model):
         ('E', 'Electronic Transfer'),
         ('k', 'Other'),
         ('T', 'Wire Transfer'),
-    ], string='Transaction Mode Code', required=True, default='E')
+    ], string='Transaction Mode Code', default='E')
 
     transmode_comment = fields.Char(string='Transaction Mode Comment', size=50)
     amount_local = fields.Float(
-        string='Amount (Local Currency)', digits=(10, 2), required=True)
+        string='Amount (Local Currency)', digits=(10, 2))
     from_person_id = fields.Many2one('res.partner', string='From Person')
     '''
     # From party details
@@ -153,18 +186,22 @@ class NFIUTransaction(models.Model):
     date_transaction = fields.Datetime(
         string='Transaction Date', required=True, compute=_compute_date)
 
-    def action_mark_as_suspicious(self):
+    def action_mark_as_suspicious(self, rule=None):
         for record in self:
-            self.env['nfiu.suspicious.transaction.hist'].create({
-                'transaction_id': record.id,
-                'name': record.name,
-                'comments': record.comments,
-                'reported_by': self.env.user.id,
-            })
+            if not record.suspicious_transaction:
+                vals = {
+                    'transaction_id': record.id,
+                    'name': record.name,
+                    'comments': record.comments,
+                    'reported_by': self.env.user.id,
+                }
+                if rule:
+                    vals['rule_id'] = rule.id
+                self.env['nfiu.suspicious.transaction.hist'].create(vals)
+            record.report_fiu()
             record.write({
                 'suspicious_transaction': True,
                 'state': 'suspicious',
-                'report_nfiu': True,
             })
 
     def action_unmark_as_suspicious(self):
@@ -172,16 +209,19 @@ class NFIUTransaction(models.Model):
             record.write({
                 'suspicious_transaction': False,
                 'state': 'new',
+                'report_nfiu': False,
             })
-            
+
     def action_mark_unusual(self):
         for record in self:
+            record.report_fiu()
             record.write({
                 'suspicious_transaction': False,
                 'state': 'unusual',
             })
 
     def report_fiu(self):
+
         self.write({
             'report_nfiu': True,
             'transaction_number': self.name,

@@ -19,3 +19,11 @@ class CustomerRegion(models.Model):
     risk_rating = fields.Float(string='Risk Score', digits=(10,2),related='risk_assessment.risk_rating')
     active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
     
+    
+class ResCurrency(models.Model):
+    _inherit = 'res.currency'
+    _sql_constraints = [
+        ('uniq_currency_code', 'unique(code)',
+         "Currency Code already exists. Value must be unique!"),
+    ]
+    code = fields.Char(string="Currency Code")

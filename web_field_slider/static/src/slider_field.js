@@ -90,6 +90,26 @@ export class SliderField extends Component {
         this.props.update(normalizedValue);
     }
 
+    // Resolves a field reference if it's a field name, otherwise treats it as a static value
+    resolveFieldReference(value, defaultVal) {
+        if (!value) {
+            return defaultVal;
+        }
+
+        // Try to check if it's a field name
+        if (typeof value === "string" && this.props.record && this.props.record.data) {
+            if (value in this.props.record.data) {
+                const fieldValue = this.props.record.data[value];
+                return fieldValue !== undefined && fieldValue !== false ?
+                    parseFloat(fieldValue) || defaultVal : defaultVal;
+            }
+        }
+
+        // If not a field name, try to parse as number
+        const parsed = parseFloat(value);
+        return isNaN(parsed) ? defaultVal : parsed;
+    }
+
     get fieldType() {
         return this.props.type || "float";
     }

@@ -1031,7 +1031,7 @@ class CustomerScreeningAlert(models.Model):
         'res.users',  # Assuming you are linking to the res.users model
         'sanction_screening_alert_officers',
         string="Officer(s) Responsible",
-        tracking=True,
+        tracking=True,required=True
     )
     active = fields.Boolean(default=True, tracking=True)
     

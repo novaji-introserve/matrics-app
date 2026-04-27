@@ -5,6 +5,7 @@
         <field name="name">Case Management: Case Creation Alert</field>
         <field name="model_id" ref="model_case_manager"/>
         <field name="subject">New Case Alert</field>
+        <field name="email_from">{{ (user.company_id.email_formatted or user.email_formatted or 'noreply@example.com') }}</field>
         <field name="auto_delete" eval="False"/>
         <field name="body_html" type="html">
             <div style="padding: 15px; background-color: #FFFFFF; font-family: Arial, sans-serif; margin: 0; border: none; color: #000000;">

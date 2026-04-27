@@ -27,7 +27,7 @@ class AdverseMedia(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     partner_id = fields.Many2one(
-        'res.partner', string='Partner', tracking=True, required=True, index=True, ondelete='cascade',domain="[('origin', 'in', ['demo', 'test', 'prod'])]")
+        'res.partner', string='Partner', tracking=True, required=True, index=True, ondelete='cascade')
     partner_risk_score = fields.Float(
         related='partner_id.risk_score', tracking=True, string="Risk Score")
     partner_risk_level = fields.Char(
@@ -106,9 +106,8 @@ class AdverseMedia(models.Model):
                 raise ValidationError(
                     "At least one keyword is required for media screening")
 
-            # query_parts = [partner_name] + keywords
-            query = [partner_name]
-            # query = ' OR '.join(f'"{term}"' for term in query_parts)
+            keyword_clause = ' OR '.join(f'"{k}"' for k in keywords)
+            query = f'"{partner_name}" AND ({keyword_clause})'
             _logger.info(
                 f"Generated search query for partner {partner_name}: {query}")
             return query
@@ -122,6 +121,7 @@ class AdverseMedia(models.Model):
         """Fetch news articles from NewsAPI with enhanced error handling"""
         api_key = os.getenv("NewsApiKey")
         api_url = os.getenv("NewsApiUrl")
+
 
         if not api_key:
             _logger.error(
@@ -137,11 +137,7 @@ class AdverseMedia(models.Model):
 
         try:
             to_date = datetime.now()
-            # from_date = self.last_scan_date or (to_date - timedelta(years=3))
-            from_date = self.last_scan_date or (
-                to_date - relativedelta(days=30))
-
-            # from_date = self.last_scan_date or to_date
+            from_date = self.last_scan_date or (to_date - relativedelta(days=30))
 
             params = {
                 'q': self._prepare_search_query(),
@@ -157,6 +153,7 @@ class AdverseMedia(models.Model):
 
             try:
                 response = requests.get(api_url, params=params, timeout=10)
+                
                 response.raise_for_status()
 
                 data = response.json()
@@ -184,6 +181,7 @@ class AdverseMedia(models.Model):
             _logger.error(
                 f"Unexpected error in _fetch_news_articles: {str(e)}", exc_info=True)
             raise UserError(f"Failed to fetch news articles: {str(e)}")
+
 
     def _calculate_risk_score(self, article, matched_keywords):
         """Calculate risk score based on matched keywords with error handling"""
@@ -405,11 +403,17 @@ class AdverseMedia(models.Model):
                             # Process article
                             article_text = f"{article_title} {article.get('description', '')} {article.get('content', '')}"
 
+                            # NewsAPI already filtered by partner name + keywords in the query,
+                            # so every returned article is a confirmed match.
+                            # Check visible text first; fall back to all query keywords
+                            # because NewsAPI truncates content to ~200 chars.
                             matched_keywords = [
-                                f"{k.name}"
+                                k.name
                                 for k in record.keyword_id
-                                if record.partner_id.name.lower() in article_text.lower() and k.name.lower() in article_text.lower()
+                                if k.name.lower() in article_text.lower()
                             ]
+                            if not matched_keywords:
+                                matched_keywords = [k.name for k in record.keyword_id]
 
                             _logger.info(
                                 f"Matched keywords for  {matched_keywords}' :{article_title}'")
