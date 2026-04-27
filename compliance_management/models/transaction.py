@@ -316,7 +316,7 @@ class Transaction(models.Model):
                 matched_rule = rule  
 
                 if rule.transaction_flag == 'suspicious':
-                    self.action_mark_as_suspicious()
+                    self.action_mark_as_suspicious(rule=rule)
                     _logger.info(
                         "[action_screen] tx=%s marked SUSPICIOUS by rule='%s'",
                         self.name, rule.name

@@ -99,9 +99,13 @@ multi_screen()
                     if matched AND rule.transaction_flag == 'suspicious':
                         action_mark_as_suspicious()    [nfiu_reporting]
                             ├── creates nfiu.suspicious.transaction.hist record
-                            └── writes: suspicious_transaction=True
-                                        state='suspicious'
-                                        report_nfiu=True
+                            ├── calls report_fiu()  → report_nfiu=True, transaction_number=name
+                            └── writes: suspicious_transaction=True, state='suspicious'
+
+                    if matched AND rule.transaction_flag == 'unusual':
+                        action_mark_unusual()          [nfiu_reporting]
+                            ├── calls report_fiu()  → report_nfiu=True, transaction_number=name
+                            └── writes: suspicious_transaction=False, state='unusual'
 ```
 
 ### The `transaction_flag` field
@@ -112,8 +116,8 @@ multi_screen()
 transaction_flag = Selection(['unusual', 'suspicious'])
 ```
 
-- **suspicious** → calls `action_mark_as_suspicious()`, creates history, sets `report_nfiu=True`
-- **unusual** → calls `action_mark_unusual()`, sets `state='unusual'` only (no NFIU history)
+- **suspicious** → calls `action_mark_as_suspicious()`, creates history record, sets `report_nfiu=True`
+- **unusual** → calls `action_mark_unusual()`, sets `report_nfiu=True` and `state='unusual'` (no history record created)
 
 This means the screening rule itself controls whether a match results in an NFIU flagging.
 Setting a rule to `transaction_flag='suspicious'` automatically creates NFIU audit records.
@@ -157,10 +161,100 @@ new
  │   (case created)                            │
  └─ case linked                 → awaiting_approval
                                                │
-                                  report included in NFIU XML
+                                  (case closed manually)
                                                │
-                                              done
+                                           no auto-transition ← see gap below
+                                               │
+                                      manually mark done → done
 ```
+
+---
+
+## Transactions Under Investigation — `report_nfiu` Behaviour
+
+### Why a transaction under investigation can show `report_nfiu = False`
+
+`report_nfiu` is only set to `True` by `report_fiu()`, which is called from
+`action_mark_as_suspicious()` and `action_mark_unusual()`. A transaction moves
+to `state='awaiting_approval'` whenever **any case is created linked to it**,
+even if the transaction was never flagged as suspicious.
+
+This means two scenarios produce `awaiting_approval`:
+
+| Path | `report_nfiu` | Included in NFIU XML? |
+|------|:---:|:---:|
+| Screened → suspicious rule matched → case created | **True** | **Yes** |
+| Case created manually on any transaction (e.g. unusual, or ad-hoc) | **False** | **No** |
+
+If you see `report_nfiu = False` on a transaction in `awaiting_approval`, it
+means a case was opened on that transaction without the screening rules first
+flagging it as suspicious. The transaction will **not** appear in a generated
+NFIU XML report until `report_nfiu` is set to `True` manually on that record
+(edit the transaction form and tick the **Report to NFIU** checkbox).
+
+### Will an under-investigation transaction still appear in NFIU XML?
+
+Yes — as long as `report_nfiu = True`. The XML generator queries:
+
+```python
+domain = [('report_nfiu', '=', True), ...]
+```
+
+It does **not** filter by state. A transaction in `awaiting_approval` with
+`report_nfiu = True` will be included in the next report. The state only
+controls the UI workflow; `report_nfiu` is the sole flag that controls NFIU
+inclusion.
+
+---
+
+## What Happens After a Case is Closed
+
+When an officer closes a case (`action_close_case`), only the **case record** is
+updated (`case_status = 'closed'`). The linked transaction is **not touched**.
+Specifically:
+
+| Field | After case closure |
+|-------|-------------------|
+| `transaction.state` | Stays `awaiting_approval` — does **not** auto-advance |
+| `transaction.report_nfiu` | Unchanged (stays True or False) |
+| `transaction.suspicious_transaction` | Unchanged |
+
+### Why this matters
+
+After closing a case the transaction will be stuck in `awaiting_approval`
+indefinitely unless the officer manually updates it. This is a current gap in
+the workflow.
+
+### What the officer should do after closing a case
+
+Depending on the investigation outcome:
+
+**Outcome: transaction confirmed suspicious — include in NFIU report**
+1. Close the case with remarks.
+2. On the transaction, ensure `report_nfiu = True` (should already be True if
+   it came through the screening flow).
+3. Generate the NFIU report — the transaction will appear in the XML.
+4. After the NFIU report is submitted, manually set `state = done` on the
+   transaction.
+
+**Outcome: transaction cleared — not suspicious**
+1. Close the case with remarks.
+2. On the transaction, click **Unmark as Suspicious** — this sets
+   `suspicious_transaction = False`, `state = new`, `report_nfiu = False`.
+3. The transaction is now excluded from future NFIU reports.
+
+**Outcome: case created on non-suspicious transaction (manual case)**
+1. Close the case with remarks.
+2. Manually mark the transaction state to `done` if review is complete.
+3. `report_nfiu` remains `False`; transaction will not appear in NFIU XML.
+
+### Current gap — no automatic state transition on case closure
+
+`case_management_v2.action_close_case()` does not call back into
+`nfiu_transaction`. If you want the transaction to auto-advance when a case is
+closed, a `write` override or a `post_close` hook would need to be added to
+`Case.action_close_case()` in `nfiu_transaction.py`. That change has not been
+made — the current behaviour is fully manual after case closure.
 
 ---
 

@@ -119,15 +119,17 @@ class Transaction(models.Model):
     def _check_velocity(self, config):
         """Flag if customer has too many or too large transactions within the velocity window."""
         window_start = fields.Datetime.now() - timedelta(hours=config.velocity_window_hours)
-        domain = [
-            ('customer_id', '=', self.customer_id.id),
-            ('date_created', '>=', window_start),
-            ('id', '!=', self.id),
-            ('state', 'not in', ['cancelled', 'rejected']),
-        ]
-        recent = self.env['res.customer.transaction'].search(domain)
-        count = len(recent) + 1
-        total = sum(t.amount for t in recent) + (self.amount or 0.0)
+        self.env.cr.execute("""
+            SELECT COUNT(*), COALESCE(SUM(amount), 0)
+            FROM res_customer_transaction
+            WHERE customer_id = %s
+              AND date_created >= %s
+              AND id != %s
+              AND state NOT IN ('cancelled', 'rejected')
+        """, (self.customer_id.id, window_start, self.id))
+        count_prev, total_prev = self.env.cr.fetchone()
+        count = count_prev + 1
+        total = total_prev + (self.amount or 0.0)
 
         if count > config.velocity_max_count or total > config.velocity_max_amount:
             count_ratio = count / config.velocity_max_count if config.velocity_max_count else 1
@@ -146,8 +148,9 @@ class Transaction(models.Model):
 
     def _check_structuring(self, config):
         """Detect structuring: multiple sub-CTR-threshold transactions whose total approaches the threshold."""
-        # Pull NFIU-mandated threshold by currency + customer type (individual vs corporate)
-        status_value = self.customer_id.customer_status.customer_status
+        status_value = getattr(self.customer_id.customer_status, 'customer_status', None)
+        if not status_value:
+            return 0.0
         customer_type = self.env['customer.type.config'].get_customer_type(status_value)
         nfiu_threshold = self.env['nfiu.currency.threshold'].search([
             ('currency_id', '=', self.currency_id.id),
@@ -163,16 +166,18 @@ class Transaction(models.Model):
             return 0.0
 
         window_start = fields.Datetime.now() - timedelta(hours=config.structuring_window_hours)
-        domain = [
-            ('customer_id', '=', self.customer_id.id),
-            ('date_created', '>=', window_start),
-            ('amount', '<', threshold),
-            ('id', '!=', self.id),
-            ('state', 'not in', ['cancelled', 'rejected']),
-        ]
-        sub_threshold = self.env['res.customer.transaction'].search(domain)
-        count = len(sub_threshold) + 1
-        total = sum(t.amount for t in sub_threshold) + amount
+        self.env.cr.execute("""
+            SELECT COUNT(*), COALESCE(SUM(amount), 0)
+            FROM res_customer_transaction
+            WHERE customer_id = %s
+              AND date_created >= %s
+              AND amount < %s
+              AND id != %s
+              AND state NOT IN ('cancelled', 'rejected')
+        """, (self.customer_id.id, window_start, threshold, self.id))
+        count_prev, total_prev = self.env.cr.fetchone()
+        count = count_prev + 1
+        total = total_prev + amount
 
         approach_limit = threshold * (config.structuring_approach_pct / 100.0)
         if count >= config.structuring_min_count and total >= approach_limit:
