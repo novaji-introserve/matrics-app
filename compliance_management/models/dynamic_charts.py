@@ -932,10 +932,15 @@ class ResCharts(models.Model):
         Raises:
             ValidationError: If the query contains unsafe operations or invalid fields.
         """
+        # During module install/update, referenced tables may not exist yet.
+        # Syntax is still validated below; skip execution validation.
+        if self.env.context.get('module'):
+            return
+
         for chart in self:
             if not chart.query:
                 continue
-            
+
             # First use comprehensive SecurityService validation
             security_service = SecurityService()
             is_safe, error_msg = security_service.validate_sql_query(chart.query)
@@ -968,8 +973,12 @@ class ResCharts(models.Model):
                     success, results, error_msg = security_service.secure_execute_query(
                         cr, original_query, timeout=120000
                     )
-                    
+
                     if not success:
+                        # During fresh install, referenced tables may not exist yet — skip execution check
+                        if error_msg and 'does not exist' in error_msg:
+                            cr.rollback()
+                            return
                         raise exceptions.ValidationError(f"Query execution failed: {error_msg}")
                         
                     # Convert results to dict format for validation

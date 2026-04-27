@@ -1,0 +1,25 @@
+2026-03-31T22:25:46.548+0100	INFO	risk-processor/main.go:118	Risk processor starting with optimized settings	{"version": "1.0.0", "cpu_cores": 4, "gomaxprocs": 4, "worker_count": 4, "workers_per_batch": 0, "batch_size": 50, "db_pool_max": 20, "db_pool_min": 5, "dry_run": false, "optimization_note": "Configured for maximum parallelism on 16-core server"}
+2026-03-31T22:25:46.606+0100	INFO	database/connection.go:80	Database connection established	{"host": "localhost", "port": 5432, "database": "test3", "pool_size": 20}
+2026-03-31T22:25:46.606+0100	INFO	risk-processor/main.go:193	Redis caching enabled	{"host": "localhost", "port": 6379, "db_name": "test3"}
+2026-03-31T22:25:46.622+0100	INFO	cache/redis_cache_.go:404	Connected to Redis successfully	{"host": "localhost", "port": 6379, "db_name": "test3"}
+2026-03-31T22:25:46.623+0100	INFO	risk-processor/main.go:218	Risk processor initialized with Redis caching	{"db_name": "test3", "cache_prefix": "test3"}
+2026-03-31T22:25:46.623+0100	INFO	risk-processor/main.go:244	Initializing cache for optimal performance...
+2026-03-31T22:25:46.623+0100	INFO	application/risk_processor.go:196	Initializing MV-based calculator cache (using materialized views)...
+2026-03-31T22:25:46.623+0100	INFO	services/mv_risk_calculator.go:128	Initializing materialized view-based risk calculator cache...
+2026-03-31T22:25:46.630+0100	INFO	services/mv_risk_calculator.go:176	Loading risk universes into cache...
+2026-03-31T22:25:46.640+0100	INFO	services/mv_risk_calculator.go:196	Risk universes loaded into cache	{"universe_count": 4}
+2026-03-31T22:25:46.640+0100	INFO	services/mv_risk_calculator.go:203	Loading ALL materialized view metadata from risk_analysis table...
+2026-03-31T22:25:46.645+0100	WARN	services/mv_risk_calculator.go:261	No materialized views found in risk_analysis table or no matching universes!
+2026-03-31T22:25:46.645+0100	INFO	services/mv_risk_calculator.go:264	Materialized view discovery complete	{"mvs_with_universe": 0, "mvs_without_universe": 1, "total_mvs_in_risk_analysis": 1}
+2026-03-31T22:25:46.647+0100	INFO	services/mv_risk_calculator.go:425	Loaded risk plans from database	{"count": 7}
+2026-03-31T22:25:46.647+0100	INFO	services/mv_risk_calculator.go:278	Loading composite plan metadata...
+2026-03-31T22:25:46.649+0100	INFO	services/mv_risk_calculator.go:328	Composite plan metadata loaded	{"plan_count": 0}
+2026-03-31T22:25:46.649+0100	INFO	services/mv_risk_calculator.go:341	Cache initialization summary	{"composite_plans_by_code": 0, "risk_plans": 7, "universes": 4}
+2026-03-31T22:25:46.649+0100	INFO	services/mv_risk_calculator.go:350	Initialized new customer monitoring (detects customers with NULL risk_level/risk_score)
+2026-03-31T22:25:46.649+0100	INFO	services/mv_risk_calculator.go:352	Materialized view-based calculator cache initialized successfully	{"low_threshold": 3.9, "medium_threshold": 6.9, "max_threshold": 9, "aggregation": "sum", "composite_aggregation": "avg", "universes": 4, "materialized_views": 0, "risk_plans": 7, "performance_note": "Using pre-computed MVs - 10x faster than functions!"}
+2026-03-31T22:25:46.650+0100	INFO	application/risk_processor.go:203	Starting new customer monitor for priority processing...
+2026-03-31T22:25:46.650+0100	INFO	services/mv_risk_calculator.go:1743	Starting new customer monitor	{"poll_interval": "10s"}
+2026-03-31T22:25:46.667+0100	INFO	cache/redis_cache_.go:166	Loaded processed customers from Redis	{"count": 111, "db": "test3"}
+2026-03-31T22:25:46.667+0100	INFO	risk-processor/main.go:258	Starting in MONITOR mode	{"poll_interval_seconds": 60, "poll_interval_human": "1m0s", "mode": "Continuous monitoring for MV refresh"}
+2026-03-31T22:25:46.667+0100	INFO	application/mv_refresh_monitor.go:74	Starting materialized view refresh monitor	{"polling_interval": "1m0s", "db_name": "test3"}
+2026-03-31T22:25:46.667+0100	INFO	risk-processor/main.go:319	Monitor running... Press Ctrl+C to stop

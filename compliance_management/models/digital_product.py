@@ -79,6 +79,14 @@ class PartnerDigitalProductView(models.Model):
     
     def init(self):
         """Create a lightweight SQL view backed by channel subscriptions."""
+        # Guard against fresh-install ordering: dependency tables may not exist yet
+        self.env.cr.execute("""
+            SELECT COUNT(*) FROM information_schema.tables
+            WHERE table_schema = 'public'
+            AND table_name IN ('customer_channel_subscription', 'digital_delivery_channel')
+        """)
+        if self.env.cr.fetchone()[0] < 2:
+            return
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute(f"""
             CREATE OR REPLACE VIEW {self._table} AS (

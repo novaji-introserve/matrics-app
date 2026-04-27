@@ -24,7 +24,8 @@
         'views/settings.xml',
         'data/sequence/case_sequence.xml',
         'data/emails/case_template.xml',
-        'data/schedules/case_schedules.xml'
+        'data/schedules/case_schedules.xml',
+        'data/charts.xml'
     ],
     # only loaded in demonstration mode
     'demo': [],

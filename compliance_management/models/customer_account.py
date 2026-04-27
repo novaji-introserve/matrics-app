@@ -224,13 +224,6 @@ class CustomerAccount(models.Model):
         # Create index on res_partner_account (only if it doesn't exist)
         self.env.cr.execute(
             "CREATE INDEX IF NOT EXISTS res_partner_account_id_idx ON res_partner_account (id)")
-        self.env.cr.execute(
-            """
-                CREATE INDEX IF NOT EXISTS res_customer_transaction_account_date_type_idx
-                ON res_customer_transaction (account_id, date_created, transaction_type)
-                WHERE account_id IS NOT NULL AND date_created IS NOT NULL
-            """
-        )
 
         # Check if the trigger exists
         self.env.cr.execute("""
