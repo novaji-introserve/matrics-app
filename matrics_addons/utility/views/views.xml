@@ -1,0 +1,55 @@
+<odoo>
+
+<!-- views/menu_views.xml -->
+<odoo>
+    <!-- Parent Menu -->
+    <menuitem id="menu_process_management" name="MATRICS Utility" sequence="6" />
+
+    <!-- Action for
+    Process Category -->
+    <record id="action_process_category" model="ir.actions.act_window">
+      <field name="name">Process Categories</field>
+      <field name="res_model">process.category</field>
+      <field name="view_mode">tree,form</field>
+      <field name="target">current</field>
+    </record>
+
+    <!-- Action for SLA Severity -->
+    <record id="action_sla_severity" model="ir.actions.act_window">
+      <field name="name">SLA Severities</field>
+      <field name="res_model">sla.severity</field>
+      <field name="view_mode">tree,form</field>
+      <field name="target">current</field>
+    </record>
+
+    <!-- Action for Process -->
+    <record id="action_process" model="ir.actions.act_window">
+      <field name="name">Processes</field>
+      <field name="res_model">process</field>
+      <field name="view_mode">tree,form</field>
+      <field name="target">current</field>
+    </record>
+
+    <!-- Process Category Menu -->
+    <menuitem id="menu_process_category" 
+              name="Process Categories" 
+              parent="menu_process_management" 
+              action="action_process_category" 
+              sequence="20" />
+
+    <!-- SLA Severity Menu -->
+    <menuitem id="menu_sla_severity" 
+              name="SLA Severities" 
+              parent="menu_process_management" 
+              action="action_sla_severity" 
+              sequence="30" />
+
+    <!-- Process Menu -->
+    <menuitem id="menu_process" 
+              name="Processes" 
+              parent="menu_process_management" 
+              action="action_process" 
+              sequence="40" />
+</odoo>
+
+</odoo>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<record id="view_partner_screening_result_tree" model="ir.ui.view">
+    <field name="name">res.partner.screening.result.tree</field>
+    <field name="model">res.partner.screening.result</field>
+    <field name="arch" type="xml">
+        <tree create="false" delete="false" string="Screening Results" decoration-warning="state=='pending'" decoration-success="state=='confirmed'" decoration-muted="state=='dismissed'">
+            <field name="create_date" string="Screening Date"/>
+            <field name="partner_id"/>
+            <field name="list_type"/>
+            <field name="risk_score"/>
+            <field name="risk_level"/>
+            <field name="state"/>
+            <field name="active"/>
+            <field name="reviewed_by_id"/>
+            <field name="review_date"/>
+        </tree>
+    </field>
+</record>
+
+<record id="view_partner_screening_result_form" model="ir.ui.view">
+    <field name="name">res.partner.screening.result.form</field>
+    <field name="model">res.partner.screening.result</field>
+    <field name="arch" type="xml">
+        <form create="false" string="Screening Result">
+            <header>
+                <button name="action_confirm" string="Confirm Match" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'pending')]}"/>
+                <button name="action_dismiss" string="Dismiss" type="object" class="btn-secondary" attrs="{'invisible': [('state', '!=', 'pending')]}"/>
+                <field name="state" widget="statusbar" statusbar_visible="pending,confirmed,dismissed"/>
+            </header>
+            <sheet>
+                <group>
+                    <group>
+                        <field name="partner_id"/>
+                        <field name="list_type"/>
+                        <field name="match_id"/>
+                        <field name="active"/>
+                    </group>
+                    <group>
+                        <field name="risk_score"/>
+                        <field name="risk_level"/>
+                        <field name="create_date" string="Screening Date"/>
+                        <field name="reviewed_by_id"/>
+                        <field name="review_date"/>
+                    </group>
+                </group>
+                <notebook>
+                    <page string="Notes">
+                        <field name="notes" placeholder="Add review notes here..."/>
+                    </page>
+                </notebook>
+            </sheet>
+            <div class="oe_chatter">
+                <!-- <field name="message_follower_ids" widget="mail_followers"/> -->
+                <field name="activity_ids" widget="mail_activity"/>
+                <field name="message_ids" widget="mail_thread"/>
+            </div>
+        </form>
+    </field>
+</record>
+
+<!-- Sanction Screening Alerts -->
+<!-- Tree View -->
+<record id="view_sc_alert_tree" model="ir.ui.view">
+    <field name="name">res.partner.screening.alert.tree</field>
+    <field name="model">res.partner.screening.alert</field>
+    <field name="arch" type="xml">
+        <tree string="Sanction Screening Alert">
+            <field name="sanction_alert_officers" widget="many2many_tags" />
+        </tree>
+    </field>
+</record>
+
+<!-- Form View -->
+<record id="view_sc_alert_form" model="ir.ui.view">
+    <field name="name">res.partner.screening.alert.form</field>
+    <field name="model">res.partner.screening.alert</field>
+    <field name="arch" type="xml">
+        <form string="Sanction Screening Alert Officers">
+            <sheet>
+
+                <group>
+
+                    <field name="sanction_alert_officers" widget="many2many_tags" help="Officer(s) to get alerted for new Sanction Screening matches"/>
+                </group>
+                <group>
+                    <field name="active" widget="boolean_toggle"/>
+                </group>
+            </sheet>
+            <div class="oe_chatter">
+                <field name="activity_ids" widget="mail_activity"/>
+                <field name="message_ids" widget="mail_thread"/>
+            </div>
+        </form>
+    </field>
+</record>
+
+
+
+
+<record id="view_partner_screening_result_search" model="ir.ui.view">
+    <field name="name">res.partner.screening.result.search</field>
+    <field name="model">res.partner.screening.result</field>
+    <field name="arch" type="xml">
+        <search string="Search Screening Results">
+            <field name="partner_id"/>
+            <field name="list_type"/>
+            <field name="state"/>
+            <field name="reviewed_by_id"/>
+            <separator/>
+            <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+            <filter string="Inactive" name="inactive" domain="[('active', '=', False)]"/>
+            <separator/>
+            <filter string="Pending" name="pending" domain="[('state', '=', 'pending')]"/>
+            <filter string="Confirmed" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+            <filter string="Dismissed" name="dismissed" domain="[('state', '=', 'dismissed')]"/>
+            <separator/>
+            <filter string="PEP List" name="pep" domain="[('list_type', '=', 'pep')]"/>
+            <filter string="Watchlist" name="watchlist" domain="[('list_type', '=', 'watchlist')]"/>
+            <filter string="Sanction List" name="sanction" domain="[('list_type', '=', 'sanction')]"/>
+            <filter string="Global PEP" name="global_pep" domain="[('list_type', '=', 'global_pep')]"/>
+            <filter string="Blacklist" name="blacklist" domain="[('list_type', '=', 'blacklist')]"/>
+            <filter string="FEP List" name="fep" domain="[('list_type', '=', 'fep')]"/>
+            <group expand="0" string="Group By">
+                <filter string="Customer" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                <filter string="List Type" name="group_list_type" context="{'group_by': 'list_type'}"/>
+                <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                <filter string="Reviewer" name="group_reviewer" context="{'group_by': 'reviewed_by_id'}"/>
+                <filter string="Review Date" name="group_review_date" context="{'group_by': 'review_date:month'}"/>
+                <filter string="Screening Date" name="group_create_date" context="{'group_by': 'create_date:month'}"/>
+            </group>
+        </search>
+    </field>
+</record>
+
+    
+    
+
+</odoo>

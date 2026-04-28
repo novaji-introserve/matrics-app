@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+   
+    <!-- Customize Employee icon-->
+    <menuitem
+        id="hr.menu_hr_root" 
+        name="Personnel" 
+        web_icon="alert_management,static/description/icon-employee.png" 
+        groups="hr.group_hr_manager,hr.group_hr_user,base.group_user" 
+        sequence="200"/>
+    <!-- Main Menu -->
+    <menuitem web_icon="alert_management,static/description/icon-alert.png" id="menu_alert_management_main"  name="Alerts" action="action_alert_dashboard" sequence="-400"/>
+
+
+    <!-- Alert Monitoring -->
+
+    <menuitem
+        id="menu_alert_dashboard"
+        name="Monitoring"
+        parent="menu_alert_management_main"
+        action="action_alert_dashboard"
+        sequence="0"
+    />
+
+    <menuitem 
+        id="menu_alert_history" name="History" 
+        parent="menu_alert_management_main"
+        action="action_alert_history_status" 
+        sequence="1" 
+        groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_chief_compliance_officer"
+        />
+    <menuitem 
+        id="menu_alert_user_history" name="My Alert" 
+        parent="menu_alert_management_main"
+        action="action_alert_history_individual" 
+        sequence="2" 
+        />
+    
+     <!-- Configurations -->
+    <menuitem id="menu_alert_management_configurations"
+        name="Configurations"
+        parent="menu_alert_management_main"
+        sequence="3"
+    />
+        <!-- groups="compliance_management.group_tech_support" -->
+
+    <menuitem id="menu_internal_ctrl_alert_monitoring"
+              name="Internal Control"
+              parent="menu_alert_management_configurations"
+              sequence="1"/>
+
+    <menuitem id="menu_alert_management_alert_frequency" 
+        name="Alert Frequency" 
+        parent="menu_internal_ctrl_alert_monitoring" 
+        action="action_alert_frequency" 
+        sequence="1"
+    />
+
+
+    <menuitem id="menu_alert_management_alert_group" 
+        name="Alert Groups" 
+        parent="menu_internal_ctrl_alert_monitoring" 
+        action="action_alert_group" 
+        sequence="2"
+    />
+
+    <menuitem id="menu_control_officer"
+        name="Control Officer"
+        parent="menu_internal_ctrl_alert_monitoring" 
+        action="action_control_officer"
+        sequence="3" 
+    />
+
+   <menuitem id="process_sql" 
+        name="SQL Queries" 
+        parent="menu_internal_ctrl_alert_monitoring" 
+        action="action_process_sql" 
+        sequence="4" 
+    />
+
+    <menuitem 
+        id="menu_alert_management_alert_rules_monitoring" 
+        name="Alert Rules" 
+        parent="menu_internal_ctrl_alert_monitoring" 
+        action="action_alert_rules" 
+        sequence="10"
+        />
+
+</odoo>

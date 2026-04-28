@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Action for All Cases with tree view first -->
+    <record id="action_case_manager" model="ir.actions.act_window">
+        <field name="name">All Cases</field>
+        <field name="res_model">case.manager</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[
+            '|', '|',
+            ('create_uid', '=', uid),
+            ('officer_responsible', '=', uid),
+            ('supervisors', 'in', [uid])
+        ]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first case
+            </p>
+            <p>
+                Cases help you track and manage exceptions or issues that require attention.
+            </p>
+        </field>
+    </record>
+
+    <!-- Action for Create New Case - Using Dialog -->
+    <record id="action_create_case" model="ir.actions.act_window">
+        <field name="name">Create Case</field>
+        <field name="res_model">case.manager</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>        <!-- This opens in a dialog -->
+        <field name="context">{'default_case_status': 'open'}</field>
+        <field name="view_id" ref="view_case_manager_form"/>
+    </record>
+
+   
+
+    <!-- Add method to save and view -->
+    <record id="model_case_manager_save_and_view" model="ir.model">
+        <field name="name">case.manager</field>
+        <field name="model">case.manager</field>
+    </record>
+
+    <!-- Update Menu Structure -->
+    <menuitem id="menu_case_management_root" name="Cases" web_icon="case_management,static/description/icon.png" sequence="10"/>
+
+    <!-- Case Menu -->
+    <menuitem id="menu_case_management" name="Cases" parent="menu_case_management_root" sequence="10"/>
+
+    <!-- Dashboard Menu -->
+    <menuitem id="menu_case_dashboard" name="Dashboard" parent="menu_case_management" action="action_case_dashboard" sequence="5"/>
+
+    <!-- Create Case Menu - Now opening in a dialog -->
+    <menuitem id="menu_create_case" name="Create Case" parent="menu_case_management" action="action_create_case" sequence="10"/>
+
+    <!-- All Cases Menu -->
+    <menuitem id="menu_all_cases" name="All Cases" parent="menu_case_management" action="action_case_manager" sequence="20"/>
+</odoo>

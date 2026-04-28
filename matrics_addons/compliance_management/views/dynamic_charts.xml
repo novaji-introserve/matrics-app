@@ -1,0 +1,143 @@
+<odoo>
+    <data>
+        <!-- Preserve the existing tree view with minimal changes -->
+        <record model="ir.ui.view" id="res_charts_tree">
+            <field name="name">res.dashboard.charts.tree</field>
+            <field name="model">res.dashboard.charts</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="display_order" optional="show"/>
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="scope"/>
+                    <field name="chart_type"/>
+                    <field name="is_visible"/>
+                    <field name="last_execution_status" optional="show" widget="badge" 
+                           decoration-success="last_execution_status == 'success'" 
+                           decoration-danger="last_execution_status == 'error'"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record model="ir.ui.view" id="res_charts_form">
+            <field name="name">res.dashboard.charts.form</field>
+            <field name="model">res.dashboard.charts</field>
+            <field name="arch" type="xml">
+                <form string="Dynamic Chart">
+                    <header>
+                        <button name="action_test_query" string="Test Query" type="object" class="btn-primary"/>
+                        <button name="action_run_query" string="Run Query" type="object" class="btn-secondary"/>
+                        <field name="state" widget="statusbar" options="{'clickable':'1'}" />
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="name" placeholder="Chart Name"/></h1>
+                        </div>
+                        <notebook>
+                            <page string="Overview">
+                                <group>
+                                    <group string="Chart Identification">
+                                        <field name="code"/>
+                                        <field name="scope"/>
+                                        <field name="chart_type"/>
+                                        <field name="display_order"/>
+                                        <field name="column"/>
+                                        <field name="is_visible"/>
+                                    </group>
+                                    <group string="Control Settings">
+                                        <field name="refresh_mode"/>
+                                        <field name="cache_ttl_minutes" attrs="{'invisible': [('refresh_mode', '=', 'live')]}"/>
+                                        <field name="color_scheme"/>
+                                        <field name="target_model_id" options="{'no_create': True}"/>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group string="Chart Definition">
+                                        <field name="display_summary"/>
+                                        <field name="description"/>
+                                    </group>
+                                    <group string="Data Mapping">
+                                        <field name="x_axis_field"/>
+                                        <field name="y_axis_field"/>
+                                        <field name="navigation_value_field"/>
+                                        <field name="navigation_filter_field"/>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group string="Dashboard Filters">
+                                        <field name="branch_filter"/>
+                                        <field name="branch_field" attrs="{'invisible': [('branch_filter', '=', False)], 'required': [('branch_filter', '=', True)]}"/>
+                                        <field name="date_filter"/>
+                                        <field name="date_field" attrs="{'required': [('date_filter', '=', True)]}"/>
+                                    </group>
+                                    <group string="Execution Audit">
+                                        <field name="last_execution_time" readonly="1"/>
+                                        <field name="last_execution_status" readonly="1" widget="badge"
+                                               decoration-success="last_execution_status == 'success'"
+                                               decoration-danger="last_execution_status == 'error'"/>
+                                        <field name="last_error_message" readonly="1"
+                                               attrs="{'invisible': [('last_error_message', '=', False)]}"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="SQL Query">
+                                <field name="query" widget="ace" placeholder="SELECT column_1 as label, column_2 as value FROM table"/>
+                                <div class="mt-3 text-muted">
+                                    <p>Enter a valid SQL query that returns at least two columns: one for labels (X-axis) and one for values (Y-axis).</p>
+                                    <p>If the query requires date filtering, specify the date field in the Overview page.</p>
+                                    <p class="text-danger">Note: Only SELECT queries are allowed. DDL and DML operations are prohibited.</p>
+                                </div>
+                            </page>
+                            <page string="Navigation">
+                                <group>
+                                    <group string="Drill-Down Controls">
+                                        <field name="navigation_domain" placeholder="[('field', '=', value)]"/>
+                                        <field name="domain_field_id" options="{'no_create': True}" context="{'ir_model_id': target_model_id}"/>
+                                        <field name="domain_filter"/>
+                                    </group>
+                                    <group string="Dashboard Context Propagation">
+                                        <field name="apply_dashboard_date_filter"/>
+                                        <field name="navigation_date_field" attrs="{'required': [('apply_dashboard_date_filter', '=', True)]}"/>
+                                        <field name="apply_dashboard_branch_filter"/>
+                                        <field name="navigation_branch_field" attrs="{'required': [('apply_dashboard_branch_filter', '=', True)]}"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Cache Audit">
+                                <group>
+                                    <group string="Cache Evidence">
+                                        <field name="cache_computed_at" readonly="1"/>
+                                        <field name="cache_expires_at" readonly="1"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Cached Payload">
+                                <field name="cached_payload" readonly="1" widget="ace" nolabel="1"
+                                       placeholder="No cached payload available yet..."/>
+                            </page>
+                            <page string="Advanced Settings" groups="base.group_system">
+                                <group string="Administrative Controls">
+                                    <field name="active"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="res_charts_action" model="ir.actions.act_window">
+            <field name="name">Dashboard Charts</field>
+            <field name="res_model">res.dashboard.charts</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="res_charts_tree"/>
+        </record>
+    </data>
+</odoo>

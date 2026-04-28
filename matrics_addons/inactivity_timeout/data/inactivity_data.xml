@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Default Inactivity Timeout (in seconds) -->
+        <record id="inactivity_timeout_param" model="ir.config_parameter">
+            <field name="key">inactivity_timeout.timeout</field>
+            <field name="value">300</field>
+            <!-- <field name="description">Total inactivity time before logout (in seconds)</field> -->
+        </record>
+
+        <!-- Default Warning Timeout (in seconds) -->
+        <record id="inactivity_warning_param" model="ir.config_parameter">
+            <field name="key">inactivity_timeout.warning</field>
+            <field name="value">60</field>
+            <!-- <field name="description">Warning time before logout (in seconds)</field> -->
+        </record>
+    </data>
+</odoo>

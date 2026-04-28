@@ -1,0 +1,45 @@
+<odoo>
+    <data>
+
+
+    <record id="email_template_share_document_" model="mail.template">
+        <field name="name">Share Rulebook Regulatory Document</field>
+        <!-- Using the safe get pattern with curly braces syntax -->
+        <field name="email_from">{{object.data().get('email_from', '')}}</field>
+        <field name="email_cc">{{object.data().get('email_cc', '')}}</field>
+        <field name="email_to">{{object.data().get('email_to', '')}}</field>
+        <field name="subject">{{object.data().get('subject', 'Rulebook Document')}}</field>
+        <field name="model_id" ref="rule_book.model_rulebook_title"/>
+        <field name="description">Share Regulatory Document</field>
+
+        <field name="body_html" type="html">
+            <div style="background-color: #ffffff; margin: 40px auto; padding: 20px; max-width: 600px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border: 1px solid #e0e0e0;">
+                <div style="text-align: center; padding: 10px 0;">
+                    <img src="https://www.boi.ng/wp-content/uploads/2024/10/boi-logo.svg" alt="Bank of Industry logo" style="max-width: 100px;" />
+                </div>
+
+                <div style="padding: 20px;">
+                    <p style="font-size: 16px; color: #333333; line-height: 1.6;">
+                        <t t-out="object.data().get('body_html', '')"/>
+                    </p>
+
+                    <p style="font-size: 16px; color: #333333; line-height: 1.6;">
+                        <strong style="color: #004225;">Date and Time Entry:</strong>
+                        <t t-out="object.data().get('datetime', '')"/>
+                    </p>
+                </div>
+
+                <p style="font-size: 16px; color: #333333; line-height: 1.6;">Best Regards.</p>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #999999;">
+                <p style="margin: 0;">...transforming Nigeria's industrial sector. </p>
+                <p style="margin: 0;">&amp;copy; <t t-out="object.data().get('current_year', '')"/>
+ Bank of Industry. All rights reserved.</p>
+            </div>
+        </field>
+        <field name="auto_delete" eval="False" />
+    </record>
+
+</data>
+</odoo>

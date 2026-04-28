@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Exception Category Views -->
+    <record id="view_exception_category_form" model="ir.ui.view">
+        <field name="name">exception.category.form</field>
+        <field name="model">exception.category.</field>
+        <field name="arch" type="xml">
+            <form string="Exception Category">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="description"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_exception_category_tree" model="ir.ui.view">
+        <field name="name">exception.category.tree</field>
+        <field name="model">exception.category.</field>
+        <field name="arch" type="xml">
+            <tree string="Exception Categories">
+                <field name="name"/>
+                <field name="description"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_exception_category_search" model="ir.ui.view">
+        <field name="name">exception.category.search</field>
+        <field name="model">exception.category.</field>
+        <field name="arch" type="xml">
+            <search string="Search Exception Categories">
+                <field name="name"/>
+                <field name="description"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Exception Process Views -->
+    <record id="view_exception_process_form" model="ir.ui.view">
+        <field name="name">exception.process.form</field>
+        <field name="model">exception.process.</field>
+        <field name="arch" type="xml">
+            <form string="Exception Process">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="type_id" options="{'no_create': True}"/>
+                        <field name="description"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_exception_process_tree" model="ir.ui.view">
+        <field name="name">exception.process.tree</field>
+        <field name="model">exception.process.</field>
+        <field name="arch" type="xml">
+            <tree string="Exception Processes">
+                <field name="name"/>
+                <field name="type_id"/>
+                <field name="description"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_exception_process_search" model="ir.ui.view">
+        <field name="name">exception.process.search</field>
+        <field name="model">exception.process.</field>
+        <field name="arch" type="xml">
+            <search string="Search Exception Processes">
+                <field name="name"/>
+                <field name="type_id"/>
+                <field name="description"/>
+                <group expand="0" string="Group By">
+                    <filter string="Category" name="group_by_category" context="{'group_by': 'type_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    
+
+    
+</odoo>

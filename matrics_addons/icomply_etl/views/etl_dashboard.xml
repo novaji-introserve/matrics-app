@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ETL Dashboard View -->
+    <record id="view_etl_dashboard" model="ir.ui.view">
+        <field name="name">etl.dashboard</field>
+        <field name="model">etl.source.table</field>
+        <field name="arch" type="xml">
+            <kanban class="oe_background_grey o_kanban_dashboard" create="0">
+                <field name="name"/>
+                <field name="category_id"/>
+                <field name="last_sync_status"/>
+                <field name="total_records_synced"/>
+                <field name="last_sync_time"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <strong><field name="name"/></strong>
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="float-right badge badge-pill" t-attf-class="badge-#{record.last_sync_status.raw_value == 'success' ? 'success' : 'danger'}">
+                                            <field name="last_sync_status"/>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-6">
+                                        Category: <field name="category_id"/>
+                                    </div>
+                                    <div class="col-6">
+                                        Records: <field name="total_records_synced"/>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-12">
+                                        Last Sync: <field name="last_sync_time"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Dashboard Action -->
+    <record id="action_etl_dashboard" model="ir.actions.act_window">
+        <field name="name">ETL Dashboard</field>
+        <field name="res_model">etl.source.table</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_id" ref="view_etl_dashboard"/>
+        <field name="context">{'search_default_group_category': 1}</field>
+    </record>
+</odoo>

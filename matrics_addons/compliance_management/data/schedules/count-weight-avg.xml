@@ -1,0 +1,13 @@
+<odoo>
+    <record id="cron_update_risk_score_aggregation" model="ir.cron">
+        <field name="name">Account Risk Score Aggregation</field>
+        <field name="model_id" ref="compliance_management.model_res_partner_account"/>
+        <field name="interval_number">6</field>
+        <field name="interval_type">hours</field>
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="False"/>
+        <field name="state">code</field>
+        <field name="code">model.compute_aggregate_risk_scores()</field>
+        <field name="active" eval="False"/>
+    </record>
+</odoo>

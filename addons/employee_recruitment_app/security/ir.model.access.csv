@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+staff_recruitment,staff_recruitment,employee_recruitment_app.model_staff_recruitment,,1,1,1,1

@@ -1,0 +1,234 @@
+.ib-dashboard-shell {
+    height: 100vh;
+    min-height: 100vh;
+    padding: 24px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background:
+        radial-gradient(circle at top left, rgba(14, 165, 233, 0.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(15, 118, 110, 0.12), transparent 22%),
+        linear-gradient(180deg, #f8fafc 0%, #eef4fb 100%);
+}
+
+.ib-dashboard-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    padding: 21px 24px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 56%, #0f766e 100%);
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+    color: #f8fafc;
+}
+
+.ib-dashboard-hero__eyebrow {
+    display: inline-block;
+    margin-bottom: 8px;
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(248, 250, 252, 0.74);
+}
+
+.ib-dashboard-hero__title {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.05;
+    color: #ffffff;
+}
+
+.ib-dashboard-hero__subtitle {
+    max-width: 560px;
+    margin: 9px 0 0;
+    font-size: 11px;
+    color: rgba(248, 250, 252, 0.82);
+}
+
+.ib-dashboard-controls {
+    min-width: 220px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+.ib-dashboard-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(248, 250, 252, 0.78);
+    min-width: 150px;
+}
+
+.ib-dashboard-filter span {
+    color: inherit;
+}
+
+.ib-dashboard-filter .form-select {
+    min-width: 0;
+    min-height: 46px;
+    border-radius: 7px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+}
+
+.ib-dashboard-filter .form-select option {
+    color: #0f172a;
+}
+
+.ib-dashboard-meta,
+.ib-dashboard-stats,
+.ib-dashboard-grid {
+    margin-top: 22px;
+}
+
+.ib-dashboard-meta {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.ib-dashboard-meta__card,
+.ib-dashboard-panel {
+    border: 1px solid rgba(37, 99, 235, 0.08);
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.ib-dashboard-meta__card {
+    padding: 18px 20px;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.84);
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+}
+
+.ib-dashboard-meta__label,
+.ib-dashboard-stat__label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #64748b;
+}
+
+.ib-dashboard-meta__card strong {
+    display: block;
+    margin-top: 10px;
+    font-size: 18px;
+    color: #0f172a;
+}
+
+.ib-dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.ib-dashboard-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+    margin-bottom: 5rem;
+}
+
+.ib-dashboard-panel {
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.06);
+}
+
+.ib-dashboard-panel--loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    grid-column: 1 / -1;
+}
+
+.ib-dashboard-panel__header h2 {
+    margin: 0;
+    font-size: 22px;
+    color: #0f172a;
+}
+
+.ib-dashboard-panel__header p {
+    margin: 8px 0 0;
+    max-width: 720px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #64748b;
+}
+
+.ib-dashboard-panel__body {
+    margin-top: 18px;
+    min-height: 63px;
+    height: auto;
+    overflow: visible;
+    padding: 0 0 16px;
+}
+
+.alert-dashboard-chart-shell {
+    position: relative;
+    width: 100%;
+    min-width: 720px;
+    height: 18vh;
+    min-height: 140px;
+}
+
+.alert-dashboard-chart {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+@media (max-width: 1200px) {
+    .ib-dashboard-stats {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 992px) {
+    .ib-dashboard-hero,
+    .ib-dashboard-grid {
+        grid-template-columns: 1fr;
+        display: grid;
+    }
+
+    .ib-dashboard-meta {
+        grid-template-columns: 1fr;
+    }
+
+    .ib-dashboard-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .alert-dashboard-chart-shell {
+        min-width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .ib-dashboard-shell {
+        padding: 14px;
+    }
+
+    .ib-dashboard-hero {
+        padding: 22px 20px;
+    }
+
+    .ib-dashboard-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .ib-dashboard-filter,
+    .ib-dashboard-stats,
+    .ib-dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!-- Main Import Form Template -->
+    <t t-name="compliance_management.ImportForm" owl="1">
+        <div class="vh-100 overflow-auto bg-muted"
+                style="width: 100%; height: 100%; overflow: auto; border: 1px solid #ccc; background-color: #f9f9f9; margin-bottom: 15px;">
+            <div class="dashboard-container p-10 bg-gray-50" style="margin-bottom: 60px;">
+                <div
+                    class="d-flex bg-white rounded shadow p-4 justify-content-between align-items-center"
+                    style="position: sticky; top: 0; z-index: 100; background-color: white;">
+
+                    <div class="lead fw-bold">
+                        <div t-if="env.services.user">
+                            <h2 class="mb-0">Hi, <span t-esc="env.services.user.name" /></h2>
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <h2 class="mb-0 px-2 py-1 text-sm">CSV Data Import</h2>
+                    </div>
+                </div>
+                <div class=" csv-container">
+                    <!-- Upload Section -->
+                    <div class=" csv-card">
+                        <!-- Error Message Banner -->
+                        <div t-if=" state.errorMessage" style=" background-color: #fee2e2; border-left: 4px solid #ef4444; color: #b91c1c; padding: 1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <i class=" fa fa-exclamation-circle" style=" margin-right: 0.5rem;"></i>
+                                <span t-esc=" state.errorMessage"></span>
+                            </div>
+                            <button style=" padding: 0.25rem 0.5rem; border: 1px solid #ef4444; color: #ef4444; border-radius: 0.25rem; background: none; cursor: pointer;"
+                                    t-on-click=" ()=> state.errorMessage = null">
+                                Dismiss
+                            </button>
+                        </div>
+                        
+                        <form>
+                            <!-- Category/Model Selection -->
+                            <div class="csv-form-group">
+                                <label class="csv-form-label" for="model-selector">Target Table</label>
+                                <div class="csv-search-container">
+                                    <input t-ref="modelSearch"
+                                        t-on-input="onModelSearch"
+                                        type="text"
+                                        class="csv-search-input"
+                                        placeholder="Search tables..." />
+                                    <button class="csv-search-button" 
+                                            type="button" 
+                                            t-on-click="searchModels">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                                <select t-ref="modelSelector" 
+                                        id="model-selector" 
+                                        class="csv-select" 
+                                        t-on-change="onModelChanged">
+                                    <option value="">Select a table...</option>
+                                    <t t-foreach="state.filteredModels" t-as="model" t-key="model.id">
+                                        <option t-att-value="model.id" 
+                                                t-att-selected="state.selectedModel and state.selectedModel.id === model.id">
+                                            <t t-esc="model.name" /> (<t t-esc="model.model_name" />)
+                                        </option>
+                                    </t>
+                                </select>
+                                <small t-if="state.selectedModel" 
+                                    class="csv-help-text" 
+                                    style="display: block; margin-top: 8px; padding: 8px; background-color: #fff; border-left: 3px solid #3b82f6; font-weight: 500;">
+                                    <t t-if="state.selectedModel.description">
+                                        <t t-esc="state.selectedModel.description" />
+                                    </t>
+                                    <t t-else="">
+                                        Import data into <strong t-esc="state.selectedModel.name" />. Please make sure your file has the required fields.
+                                    </t>
+                                </small>
+                            </div>
+
+                            <!-- File Upload -->
+                            <div class="csv-form-group">
+                                <label class="csv-form-label" for="file">CSV File (max 2GB)</label>
+                                <div class="csv-file-container">
+                                    <input t-ref="fileInput"
+                                        type="file"
+                                        id="file"
+                                        accept=".csv, .xlsx, .xls"
+                                        class="csv-file-input"
+                                        t-on-change="onFileChanged" />
+                                    <span id="file-name" 
+                                        t-ref="fileName" 
+                                        class="csv-file-label">No file selected</span>
+                                </div>
+                                <p class="csv-help-text">Supported formats: CSV, Excel (.xlsx, .xls) files up to 2GB</p>
+                            </div>
+                            
+                            <!-- Delete Mode Option -->
+                            <div t-if="state.selectedModel" class="csv-form-group">
+                                <!-- <div class="csv-checkbox-container"> -->
+                                <div class="form-check">
+                                    <input type="checkbox"
+                                        class="form-check-input"
+                                        id="delete-mode"
+                                        t-att-checked="state.deleteMode"
+                                        t-on-change="onDeleteModeChange" />
+                                    <label class="form-check-label" for="delete-mode">Delete Mode (delete records with matching identifiers)</label>
+                                </div>
+                                <p t-if="state.deleteMode" class="csv-help-text">
+                                    ⚠️ <strong>Warning:</strong> This will permanently delete records in the database 
+                                    that match the unique identifiers in your file. This action cannot be undone.
+                                </p>
+                            </div>
+                            
+                            <!-- Unique Identifier Selection for Delete Mode -->
+                            <div t-if="state.deleteMode" class="csv-form-group">
+                                <label class="csv-form-label" for="unique-identifier">Unique Identifier Field</label>
+                                <div t-if="state.loadingColumns" class="csv-spinner-container">
+                                    <div class="csv-spinner"></div>
+                                    <span>Loading columns...</span>
+                                </div>
+                                <select t-else="" 
+                                        id="unique-identifier" 
+                                        class="csv-select" 
+                                        t-on-change="onUniqueIdentifierChange"
+                                        t-att-disabled="state.tableColumns.length === 0">
+                                    <option value="">Select a field...</option>
+                                    <t t-foreach="state.tableColumns" t-as="column" t-key="column.name">
+                                        <option t-att-value="column.name">
+                                            <t t-esc="column.string" /> (<t t-esc="column.name" />)
+                                        </option>
+                                    </t>
+                                </select>
+                                <p class="csv-help-text">Select the field that uniquely identifies records to be deleted</p>
+                            </div>
+
+                            <!-- Upload Progress -->
+                            <div t-if="state.isUploading" class="csv-progress">
+                                <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
+                                    <div class="csv-spinner"></div>
+                                    <p id="progress-text" t-ref="progressText" style="color: #6b7280; font-size: 0.875rem; margin: 0;">
+                                        Uploading... <t t-esc="state.uploadProgress" />% 
+                                        (<t t-esc="state.uploadedSize" /> of <t t-esc="state.totalSize" />) 
+                                        at <t t-esc="state.uploadSpeed" />
+                                    </p>
+                                </div>
+                                <div class="csv-progress-bar-container">
+                                    <div class="csv-progress-bar" t-att-style="'width: ' + state.uploadProgress + '%'"></div>
+                                </div>
+                            </div>
+
+                            <!-- Warning Banner -->
+                            <div class="csv-form-group" style="max-width: 650px; margin-left: auto; margin-right: auto;">
+                                <button type="button" 
+                                        class="csv-toggle-link" 
+                                        t-on-click="toggleWarning">
+                                    <i class="fa fa-exclamation-triangle" style="margin-right: 0.5rem;"></i> 
+                                    <t t-if="state.showWarning">Hide</t>
+                                    <t t-else="">Show</t>
+                                    Important Upload Guidance
+                                </button>
+                                <div t-if="state.showWarning" class="csv-alert csv-alert-yellow mt-4">
+                                    <p class="csv-alert-title">Important Upload Guidance</p>
+                                    <p>⚠️ Please ensure your CSV/Excel file has headers that match the fields of the selected model. 
+                                    The import will try to map columns automatically based on field names and labels, but exact matches work best.</p>
+                                    <p>⚠️ Required fields must be included in your file. The import will fail if required fields are missing.</p>
+                                </div>
+                            </div>
+
+                            <!-- Template Downloads Section -->
+                            <div class="csv-form-group" style="max-width: 650px; margin-left: auto; margin-right: auto;">
+                                <button type="button" 
+                                        class="csv-toggle-link blue" 
+                                        t-on-click="toggleTemplates">
+                                    <i class="fa fa-download" style="margin-right: 0.5rem;"></i> 
+                                    <t t-if="state.showTemplates">Hide</t>
+                                    <t t-else="">Show</t>
+                                    Template Downloads
+                                </button>
+                                <div t-if="state.showTemplates" class="csv-alert csv-alert-blue mt-4">
+                                    <div class="csv-checkbox-container">
+                                        <p class="csv-alert-title">Download Templates</p>
+                                        <div style="display: flex; align-items: center;">
+                                            <input type="checkbox"
+                                                class="csv-checkbox"
+                                                id="select-all-templates"
+                                                t-ref="selectAllTemplates"
+                                                t-on-change="onSelectAllTemplates" />
+                                            <label for="select-all-templates">Select All</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="csv-checkbox-group">
+                                        <t t-foreach="state.models" t-as="model" t-key="model.id">
+                                            <div class="csv-checkbox-item">
+                                                <input type="checkbox"
+                                                    class="csv-checkbox"
+                                                    t-att-id="'template-' + model.id"
+                                                    t-att-data-model-id="model.id"
+                                                    t-att-data-model-name="model.name"
+                                                    t-att-checked="state.selectedTemplates.includes(model.id)"
+                                                    t-on-change="(ev) => this.onTemplateCheckboxChange(model.id, ev)" />
+                                                <label t-att-for="'template-' + model.id">
+                                                    <t t-esc="model.name" />
+                                                </label>
+                                            </div>
+                                        </t>
+                                    </div>
+
+                                    <button id="download-templates" 
+                                            class="csv-button" 
+                                            style="margin-top: 1rem;" 
+                                            t-on-click="onDownloadTemplates" 
+                                            t-att-disabled="state.selectedTemplates.length === 0 || state.processingFiles">
+                                        <t t-if="state.processingFiles">
+                                            <i class="fa fa-spinner fa-spin" style="margin-right: 0.5rem;"></i> Processing...
+                                        </t>
+                                        <t t-elif="state.selectedTemplates.length === 0">
+                                            Select templates to download
+                                        </t>
+                                        <t t-elif="state.selectedTemplates.length === state.models.length">
+                                            Download All Templates
+                                        </t>
+                                        <t t-else="">
+                                            Download Selected Templates (<t t-esc="state.selectedTemplates.length" />)
+                                        </t>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="csv-form-group">
+                                <button type="button" 
+                                        class="csv-button csv-button-full" 
+                                        t-on-click="onUpload" 
+                                        t-att-disabled="!state.selectedFile || !state.selectedModel || state.isUploading">
+                                    <t t-if="state.isUploading">
+                                        <i class="fa fa-spinner fa-spin" style="margin-right: 0.5rem;"></i> Uploading...
+                                    </t>
+                                    <t t-else="">
+                                        <i class="fa fa-upload" style="margin-right: 0.5rem;"></i> Upload
+                                    </t>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Upload Status Modal -->
+                    <div t-if="state.showModal" class="csv-modal-backdrop">
+                        <div class="csv-modal">
+                            <div style="text-align: center;">
+                                <div style="display: flex; justify-content: center; margin-bottom: 1rem;">
+                                    <t t-if="state.modalType === 'success'">
+                                        <i class="fa fa-check-circle" style="font-size: 4rem; color: #10b981;"></i>
+                                    </t>
+                                    <t t-else="">
+                                        <i class="fa fa-exclamation-triangle" style="font-size: 4rem; color: #ef4444;"></i>
+                                    </t>
+                                </div>
+                                <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;" t-esc="state.modalTitle"></h2>
+                                <p style="color: #6b7280; margin-bottom: 1rem;" t-esc="state.modalMessage"></p>
+                                <button class="csv-button" 
+                                        t-on-click="closeModal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Terminal Component -->
+                <div class="terminal-log-container">
+                    <TerminalComponent />
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- Terminal Component Template -->
+    <t t-name="compliance_management.Terminal" owl="1">
+        <div class="terminal-container">
+            <div class="terminal-header">
+                <div class="terminal-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polyline points="4 17 10 11 4 5"></polyline>
+                        <line x1="12" y1="19" x2="20" y2="19"></line>
+                    </svg>
+                    Import Process Log
+                    <span t-if="state.isProcessing" class="processing-spinner">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                            height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="2" x2="12" y2="6"></line>
+                            <line x1="12" y1="18" x2="12" y2="22"></line>
+                            <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+                            <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+                            <line x1="2" y1="12" x2="6" y2="12"></line>
+                            <line x1="18" y1="12" x2="22" y2="12"></line>
+                            <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+                            <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+                        </svg>
+                    </span>
+                </div>
+                <div>
+                    <button style="color: #e0e0e0; background: none; border: none; padding: 0; cursor: pointer;" t-on-click="toggleFilterPanel">
+                        <i class="fa fa-filter"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div t-ref="terminalBody" class="terminal-body">
+                <t t-foreach="state.logs" t-as="log" t-key="log_index">
+                    <div t-if="isLogVisible(log)" class="log-entry">
+                        <span class="log-timestamp"><t t-esc="log.timestamp"/></span>
+                        <!-- Use SVG icons instead of Font Awesome -->
+                        <t t-if="log.type === 'error'">
+                            <svg class="log-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="15" y1="9" x2="9" y2="15"/>
+                                <line x1="9" y1="9" x2="15" y2="15"/>
+                            </svg>
+                        </t>
+                        <t t-elif="log.type === 'success'">
+                            <svg class="log-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M8 12l2 2 4-4"/>
+                            </svg>
+                        </t>
+                        <t t-elif="log.type === 'warning'">
+                            <svg class="log-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                                <line x1="12" y1="9" x2="12" y2="13"/>
+                                <line x1="12" y1="17" x2="12.01" y2="17"/>
+                            </svg>
+                        </t>
+                        <t t-else="">
+                            <svg class="log-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="16" x2="12" y2="12"/>
+                                <line x1="12" y1="8" x2="12.01" y2="8"/>
+                            </svg>
+                        </t>
+                        <span t-att-class="'log-message log-type-' + log.type"><t t-esc="log.message"/></span>
+                    </div>
+                </t>
+            </div>
+            
+            <div class="terminal-footer">
+                <span t-ref="logCount">
+                    <t t-if="state.searchText || !areAllSeveritiesEnabled">
+                        <t t-esc="visibleLogsCount"/> of <t t-esc="state.logs.length"/> messages
+                    </t>
+                    <t t-else="">
+                        <t t-esc="state.logs.length"/> messages
+                    </t>
+                </span>
+                <button class="clear-button" t-on-click="clearLogs">Clear</button>
+            </div>
+
+            <!-- Error Summary -->
+            <div t-if="hasErrors" class="error-summary">
+                <div style="display: flex; gap: 0.5rem; align-items: center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span>Some errors occurred during the import process. Please review the logs above.</span>
+                </div>
+            </div>
+            
+            <div t-ref="filterPanel" t-att-class="'terminal-filter-panel ' + (state.showFilterPanel ? '' : 'hidden')">
+                <div style="margin-bottom: 0.75rem;">
+                    <input t-ref="filterInput" 
+                           type="text" 
+                           class="filter-input" 
+                           placeholder="Filter messages..." 
+                           t-on-input="onFilterInput"/>
+                </div>
+                <div class="filter-severity">
+                    <div class="severity-option">
+                        <input style="margin-right: 0.5rem; background-color: #1e1e1e; border: 1px solid #404040;" 
+                               type="checkbox" 
+                               id="severity-info" 
+                               t-att-checked="state.enabledSeverities.info"
+                               t-on-change="() => this.toggleSeverity('info')"/>
+                        <label style="display: flex; align-items: center; color: white;" for="severity-info">
+                            <svg class="log-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" style="margin-right: 0.25rem;">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="16" x2="12" y2="12"/>
+                                <line x1="12" y1="8" x2="12.01" y2="8"/>
+                            </svg>
+                            Info
+                        </label>
+                    </div>
+                    <div class="severity-option">
+                        <input style="margin-right: 0.5rem; background-color: #1e1e1e; border: 1px solid #404040;" 
+                               type="checkbox" 
+                               id="severity-success" 
+                               t-att-checked="state.enabledSeverities.success"
+                               t-on-change="() => this.toggleSeverity('success')"/>
+                        <label style="display: flex; align-items: center; color: white;" for="severity-success">
+                            <svg class="log-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" style="margin-right: 0.25rem;">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M8 12l2 2 4-4"/>
+                            </svg>
+                            Success
+                        </label>
+                    </div>
+                    <div class="severity-option">
+                        <input style="margin-right: 0.5rem; background-color: #1e1e1e; border: 1px solid #404040;" 
+                               type="checkbox" 
+                               id="severity-warning" 
+                               t-att-checked="state.enabledSeverities.warning"
+                               t-on-change="() => this.toggleSeverity('warning')"/>
+                        <label style="display: flex; align-items: center; color: white;" for="severity-warning">
+                            <svg class="log-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" style="margin-right: 0.25rem;">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                                <line x1="12" y1="9" x2="12" y2="13"/>
+                                <line x1="12" y1="17" x2="12.01" y2="17"/>
+                            </svg>
+                            Warning
+                        </label>
+                    </div>
+                    <div class="severity-option">
+                        <input style="margin-right: 0.5rem; background-color: #1e1e1e; border: 1px solid #404040;" 
+                               type="checkbox" 
+                               id="severity-error" 
+                               t-att-checked="state.enabledSeverities.error"
+                               t-on-change="() => this.toggleSeverity('error')"/>
+                        <label style="display: flex; align-items: center; color: white;" for="severity-error">
+                            <svg class="log-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" style="margin-right: 0.25rem;">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="15" y1="9" x2="9" y2="15"/>
+                                <line x1="9" y1="9" x2="15" y2="15"/>
+                            </svg>
+                            Error
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

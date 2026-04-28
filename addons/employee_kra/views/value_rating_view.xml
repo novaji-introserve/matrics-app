@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_value_rating_tree" model="ir.ui.view">
+        <field name="name">value.rating.tree</field>
+        <field name="model">value.rating</field>
+        <field name="arch" type="xml">
+            <tree string="Value Rating">
+                <field name="employee_id" />
+                <field name="employee_code" />
+                <field name="designation" />
+                <field name="score_leader" />
+                <field name="total_avg" />
+            </tree>
+        </field>
+    </record>
+    <record id="view_value_rating_form" model="ir.ui.view">
+        <field name="name">value.rating.form</field>
+        <field name="model">value.rating</field>
+        <field name="arch" type="xml">
+            <form string="Value Rating">
+                <header>
+                    <button name="action_done" class="oe_highlight" type="object" string="Done"  attrs="{'invisible':['|',('is_manager','=',False),('state','!=','draft')]}" />
+                    <button name="action_cancel" type="object" string="Cancel" attrs="{'invisible':['|',('is_manager','=',False),('state','!=','draft')]}" />
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <group col="2">
+                        <group>
+                            <field name="employee_id" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="designation"/>
+                            <field name="month" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="total_avg" />
+                            <field name="is_manager" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="employee_code"/>
+                            <field name="appraiser_id"/>
+                            <field name="year" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="score_leader" />
+                        </group>
+                    </group>
+                    <group col="2">
+                        <group String="Approach To Work">
+                            <field name="sys_process" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="follow_instr" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="flexible" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="plan" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                        </group>
+                        <group string="Technical Skills">
+                            <field name="job_knowledge" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="skill" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="learn_skill" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                        </group>
+                        <group string="Quality Of work">
+                            <field name="accuracy" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="reliability" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="cust_sati" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                        </group>
+                        <group string="Handling Targets">
+                            <field name="work_comple" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="pressure" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="handling" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                        </group>
+                        <group string="Interpersonal Skills">
+                            <field name="relationship" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="prob_solv" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="dec_mak" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="time_mng" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                        </group>
+                        <group string="Communication Skills">
+                            <field name="express" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="share_know" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                        </group>
+                        <group string="Development">
+                            <field name="seeks" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="open_ideas" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                        </group>
+                        <group string="Personality">
+                            <field name="enthu" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="trust" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                        </group>
+                        <group string="Code of Conduct">
+                            <field name="ettiquttes" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="punctuality" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="descipline" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="attendance" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                        </group>
+                        <group string="Leadership">
+                            <field name="team_work" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="team_build" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="strategy" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                            <field name="participation" attrs="{'readonly':['|',('is_manager','=',False),('state','=','done')]}" />
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_employee_value_rating" model="ir.actions.act_window">
+        <field name="name">Employee Value Rating</field>
+        <field name="res_model">value.rating</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a Value ratings for employees.
+            </p>
+        </field>
+    </record>
+
+    <!-- Analysis views -->
+    <record id="view_employee_value_rating_pivot" model="ir.ui.view">
+        <field name="name">value.rating.pivot</field>
+        <field name="model">value.rating</field>
+        <field name="arch" type="xml">
+            <pivot string="Value Rating Analysis" disable_linking="True">
+                <field name="employee_id" type="row" />
+                <field name="year" type="col" />
+                <field name="month" type="col" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_employee_value_rating_graph" model="ir.ui.view">
+        <field name="name">value.rating.graph</field>
+        <field name="model">value.rating</field>
+        <field name="arch" type="xml">
+            <graph string="Value Rating Analysis" sample="1" stacked="True">
+                <field name="employee_id" type="row" />
+                <field name="month" type="col" />
+                <field name="year" type="col" />
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_employee_value_rating_analysis" model="ir.actions.act_window">
+        <field name="name">Value Rating Analysis</field>
+        <field name="res_model">value.rating</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="view_ids" eval="[(5, 0, 0),(0, 0, {'view_mode': 'pivot', 'view_id': ref('view_employee_value_rating_pivot')}), (0, 0, {'view_mode': 'graph', 'view_id': ref('view_employee_value_rating_graph')})]" />
+    </record>
+
+</odoo>

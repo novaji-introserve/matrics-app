@@ -1,0 +1,323 @@
+<odoo>
+    <record id="risk_plan_line_ids_view_tree" model="ir.ui.view">
+        <field name="name">risk_plan_line_ids.view.tree</field>
+        <field name="model">res.partner.risk.plan.line</field>
+        <field name="arch" type="xml">
+            <tree string="Risk Analysis Lines" create="False" edit="False" delete="False">
+                <field name="plan_line_id" />
+                <field name="partner_id" />
+                <field name="risk_score" />
+                <field name="create_date" optional="hide" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_partner_risk_plan_line_form" model="ir.ui.view">
+        <field name="name">res.partner.risk.plan.line.form</field>
+        <field name="model">res.partner.risk.plan.line</field>
+        <field name="arch" type="xml">
+            <form string="Risk Analysis Line" create="False" edit="False" delete="False">
+                <sheet>
+                    <group>
+                        <field name="plan_line_id" readonly="1" />
+                        <field name="partner_id" readonly="1" />
+                        <field name="risk_score" readonly="1" />
+                        <field name="create_date" readonly="1" />
+                        <field name="write_date" readonly="1" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_partner_risk_plan_line_search" model="ir.ui.view">
+        <field name="name">res.partner.risk.plan.line.search</field>
+        <field name="model">res.partner.risk.plan.line</field>
+        <field name="arch" type="xml">
+            <search string="Customer Risk Rules">
+                <field name="plan_line_id" string="Plan Line" />
+                <field name="partner_id" string="Customer" />
+                <field name="risk_score" />
+                <filter name="group_plan_line_id" string="Plan Line" context="{'group_by': 'plan_line_id'}" />
+                <filter name="group_partner_id" string="Customer" context="{'group_by': 'partner_id'}" />
+            </search>
+        </field>
+    </record>
+
+    <record id="action_partner_risk_plan_line" model="ir.actions.act_window">
+        <field name="name">Customer Risk Rules</field>
+        <field name="res_model">res.partner.risk.plan.line</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="risk_plan_line_ids_view_tree" />
+        <field name="search_view_id" ref="view_partner_risk_plan_line_search" />
+        <field name="context">{'search_default_group_plan_line_id': 1, 'search_default_group_partner_id': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Risk analysis lines are generated from customer risk rules.
+            </p>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="partner_inherit_form_view">
+        <field name="name">compliance.customer.form.view</field>
+        <field name="model">res.partner</field>
+        <field name="priority">1500</field>
+        <field name="inherit_id" ref="base.view_partner_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='vat']" position="after">
+                <field name="sector_id" />
+                <field name="region_id" />
+                <field name="registration_date" />
+                <field name="company_reg_date" />
+            </xpath>
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="internal_category" />
+            </xpath>
+            <xpath expr="//page[@name='contact_addresses']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+            <xpath expr="//page[@name='sales_purchases']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//page[@name='contact_addresses']" position="before">
+                <page name='compliance' string="Personal Information" autofocus="autofocus">
+                    <group>
+                        <group string="Personal Information" name="personal" priority="1">
+                            <field name="firstname" />
+                            <field name="lastname" />
+                            <field name="middlename" />
+                            <field name="othername" />
+                            <field name="dob" />
+                            <field name="education_level_id" />
+                            <field name="gender" invisible="1" />
+                            <field name="formatted_gender" />
+                            <field name="town" />
+                            <field name="internal_category" invisible="1" />
+                        </group>
+                        <group string="Identification" name="identification">
+                            <field name="customer_id" />
+                            <field name="branch_id" />
+                            <field name="account_officer_id" />
+                            <field name="bvn" />
+                            <field name="nin" />
+                            <field name="identification_number" invisible="1" />
+                            <field name="identification_type_id" />
+                            <field name="identification_expiry_date" />
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+
+            <xpath expr="//page[@name='contact_addresses']" position="before">
+                <page name="identity_verification_details" string="Identity Verification">
+                    <group>
+                        <group string="Verification Status">
+                            <field name="bvn_verified" readonly="1" widget="boolean_toggle"/>
+                            <field name="nin_verified" readonly="1" widget="boolean_toggle"/>
+                            <field name="address_verified" readonly="1" widget="boolean_toggle"/>
+                            <field name="phone_verified" readonly="1" widget="boolean_toggle"/>
+                            <field name="age_verified" readonly="1" widget="boolean_toggle"/>
+                        </group>
+                        <group string="Verification Audit">
+                            <field name="identity_verification" readonly="1" widget="badge" decoration-warning="identity_verification == 'pending'" decoration-info="identity_verification == 'processing'" decoration-success="identity_verification == 'done'"/>
+                            <field name="verification_date" readonly="1"/>
+                            <field name="verification_reference_id" readonly="1"/>
+                        </group>
+                    </group>
+                </page>
+
+                <page name='accounts' string="Accounts">
+                    <field name="account_ids" context="{'default_customer_id': active_id}" />
+                </page>
+
+                <page name="digital_products" string="Channels">
+                    <!-- Simplified view without problematic fields -->
+
+                    <field name="channel_subscription_ids"
+                        context="{'default_customer_id': customer_id}" domain="[]">
+                        <tree editable="bottom" create="false" delete="false">
+                            <field name="channel_id" />
+                            <field name="value" />
+                        </tree>
+                    </field>
+                </page>
+
+
+                <page name="risk_composite" string="Composition Risk Analysis"
+                    attrs="{'invisible': [('composite_risk_score', '&lt;=', 0)]}">
+                    <div class="alert alert-info" role="alert" name="composition_tips">
+                        Composition-based risk analysis is used to calculate the risk score based on
+                        multiple factors and their weights. The composite risk score is calculated
+                        based on the weighted average of the individual risk scores from the
+                        composite plan lines. The customer's risk score is then calculated based on
+                        the
+                        composite risk score and the risk assessment plans.
+                    </div>
+                    <separator string="Composite Risk Score" class="mt16" />
+                    <p>
+                        <field name="composite_risk_score" class="oe_inline" readonly="1"
+                            nolabel="1" />
+                    </p>
+
+
+                    <!-- Add this new section -->
+                    <separator string="Composition-based Risk Analysis Lines" class="mt16" />
+                    <field name="composite_plan_line_ids" readonly="1">
+                        <tree editable="bottom" create="false" delete="false">
+                            <field name="name" />
+                            <field name="universe_id" />
+                            <field name="subject_id" />
+                            <field name="matched" />
+                            <field name="risk_score" />
+                            <field name="universe_weight_percentage" />
+                            <!-- <field name="weighted_score" /> -->
+
+                        </tree>
+                    </field>
+                </page>
+
+
+                <page name='plans' string="Risk Analysis">
+                    <div class="alert alert-info" role="alert" name="plan_tips">
+                        Plan-based risk analysis is used to calculate the risk score based on
+                        predefined plans and their computed risk score. The resulting risk score is
+                        calculated based on
+                        the weighted average or maximum (depending on system configuration) of the
+                        individual risk scores from the risk assessment
+                        plans.The customer's risk score is then calculated based on the
+                        composite risk score and the risk assessment plans
+                    </div>
+                    <field name="risk_plan_line_ids" readonly="1"
+                        context="{'default_partner_id': active_id}" />
+                </page>
+
+                <page name='risk_assessment' string="Risk Assessment">
+                    <div class="alert alert-info" role="alert" name="risk_assessment_tips">
+                        A dedicated Risk Assessment can be conducted for a Customer. The resulting
+                        risk score overrides the EDD and Risk Plan items computed for the Customer</div>
+                    <field name="risk_assessment_ids" readonly="1"
+                        view_ref="compliance_customer_risk_assessment_tree"
+                        context="{'default_partner_id': active_id}" />
+                </page>
+
+                <page name="due_diligence" string="Due Diligence"
+                    attrs="{'invisible' : [('internal_category', '!=', 'vendor')]}">
+                    <group>
+                        <group>
+                            <field name="anti_bribery" filename="anti_bribery_file_name" />
+                            <field name="anti_bribery_file_name" invisible="1" />
+                            <field name="whistle_blowing" filename="whistle_blowing_file_name" />
+                            <field name="whistle_blowing_file_name" invisible="1" />
+                        </group>
+                        <group>
+                            <field name="data_protection" filename="data_protection_file_name" />
+                            <field name="data_protection_file_name" invisible="1" />
+                            <field name="anti_money_laundering"
+                                filename="anti_money_laundering_file_name" />
+                            <field name="anti_money_laundering_file_name" invisible="1" />
+                        </group>
+                    </group>
+
+                </page>
+                <page name='sanction_screening' string="Sanction Screening">
+                    <group>
+                        <group name="pep" string="PEP Screening">
+                            <field name="is_pep" attrs="{'readonly': True}" />
+                            <field name="global_pep" attrs="{'readonly': True}" />
+                            <field name="global_pep_id" attrs="{'readonly': True}" />
+                        </group>
+                        <group name="other" string="Others">
+                            <field name="is_fep" attrs="{'readonly': True}" />
+                            <field name="is_blacklist" attrs="{'readonly': True}" />
+                            <field name="is_watchlist" attrs="{'readonly': True}" />
+                            <field name="likely_sanction" attrs="{'readonly': True}" />
+                            <field name="is_greylist" attrs="{'readonly': True}" />
+                        </group>
+                    </group>
+                </page>
+
+            </xpath>
+
+            <!-- Add EDD Page to Customer Form -->
+            <xpath expr="//page[@name='contact_addresses']" position="before">
+
+
+                <!-- <notebook position="inside"> -->
+                <page string="EDD" name="edd_record">
+                    <field name="edd_ids" nolabel="1"
+                        context="{'form_view_ref': 'compliance_management.edd_form_view'}">
+                        <tree string="EDD Record" create="False" edit="False" delete="False">
+                            <field name="name" />
+                            <field name="status" />
+                            <field name="customer_id" />
+                            <field name="responsible_id" />
+                            <field name="user_id" />
+                            <field name="approved_by" />
+                            <field name="date_approved" />
+                            <field name="risk_score" />
+                            <field name="account_status" />
+                            <field name="documentation_status" />
+                        </tree>
+                    </field>
+                </page>
+
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="open_customers" model="ir.actions.server">
+        <field name="name">Open Customers</field>
+        <field name="model_id" ref="model_res_partner" />
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.open_customers()</field>
+    </record>
+    <record id="open_vendors" model="ir.actions.server">
+        <field name="name">Open Vendors</field>
+        <field name="model_id" ref="model_res_partner" />
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.open_vendors()</field>
+    </record>
+    <record id="open_partners" model="ir.actions.server">
+        <field name="name">Open Partners</field>
+        <field name="model_id" ref="model_res_partner" />
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.open_partners()</field>
+    </record>
+    <record id="open_respondents" model="ir.actions.server">
+        <field name="name">Open Respondents</field>
+        <field name="model_id" ref="model_res_partner" />
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.open_respondents()</field>
+    </record>
+    <record id="open_correspondents" model="ir.actions.server">
+        <field name="name">Open Correspondents</field>
+        <field name="model_id" ref="model_res_partner" />
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.open_correspondents()</field>
+    </record>
+
+    <record id="open_corporate_customers" model="ir.actions.server">
+        <field name="name">Open Corporate Customers</field>
+        <field name="model_id" ref="model_res_partner" />
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">
+action = {
+    'name': 'Corporate Customers',
+    'type': 'ir.actions.act_window',
+    'res_model': 'res.partner',
+    'view_mode': 'tree,form',
+    'domain': [('internal_category', '=', 'customer'), ('origin', 'in', ['demo', 'test', 'prod']), ('is_company', '=', True)],
+    'context': {'search_default_group_branch': 1},
+}
+        </field>
+    </record>
+</odoo>

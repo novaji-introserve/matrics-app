@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="kra_report_employee_document">
+        <t t-call="web.internal_layout">
+            <t t-set="doc" t-value="doc.with_context({'lang':doc.employee_id.user_id.partner_id.lang})"/>
+            <div class="page" style="font-size:12px !important; padding:0">
+                <div class="oe_structure"/>
+                
+                <div class="row mt32 mb32">
+                    <table class="table table-condensed" style="border-top:1px solid black;border-bottom:1px solid black; padding:0; margin:0 0 5 0">
+                        <tbody>
+                            <tr>
+                                <td style="border: none; width: 500; padding-top:5;">
+                                    <strong>KRA Month</strong>
+                                    <span t-att-style="style" t-esc="doc.name" />
+                                </td>
+                                <td style="border: none; width: 500; padding-top:5;">
+                                    <strong>Year</strong>
+                                    <span t-att-style="style" t-esc="doc.year.name" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: none; width: 500; padding-top:5;">
+                                    <strong>Employee</strong>
+                                    <span t-att-style="style" t-esc="doc.employee_id.name" />
+                                </td>
+                                <td style="border: none; width: 500; padding-top:5;">
+                                    <strong>KRA</strong>
+                                    <span t-att-style="style" t-esc="doc.kra_id.name" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class='text-center'>
+                    <strong>KRA Questions</strong>
+                </div>
+                <table t-if="doc.kra_question_ids" class="table table-sm o_main_table">
+                    <thead>
+                        <tr>
+                            <th style="width:10%;">Question</th>
+                            <th style="width:15%;">Description</th>
+                            <th style="width:5%;">Hint</th>
+                            <th style="width:10%;">Weightage</th>
+                            <th style="width:15%;">Employee Rating</th>
+                            <th style="width:5%;">Employee Remark</th>
+                            <th style="width:15%;">Manager Rating</th>
+                            <th style="width:5%;">Manager Remark</th>
+                            <th style="width:15%;">Final Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="doc.kra_question_ids" t-as="l" t-att-class="'bg-200 font-weight-bold o_line_section' if l.display_type == 'line_section' else ''">
+                            <t t-if="not l.display_type">
+                                <td>
+                                    <span t-field="l.name" />
+                                </td>
+                                <td>
+                                    <span t-field="l.description" />
+                                </td>
+                                <td>
+                                    <span t-field="l.hint" />
+                                </td>
+                                <td>
+                                    <span t-field="l.weightage" />
+                                </td>
+                                <td>
+                                    <span t-field="l.employee_rating" />
+                                </td>
+                                <td>
+                                    <span t-field="l.employee_remark" />
+                                </td>
+                                <td>
+                                    <span t-field="l.manager_rating" />
+                                </td>
+                                <td>
+                                    <span t-field="l.manager_remark" />
+                                </td>
+                                <td>
+                                    <span t-field="l.final_score" />
+                                </td>
+                            </t>
+                            <t t-if="l.display_type == 'line_section'">
+                                <td colspan="99">
+                                    <span t-field="l.name"/>
+                                </td>
+                            </t>
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </template>
+
+    <template id="kra_report_employee">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="employee_kra.kra_report_employee_document" t-lang="doc.employee_id.user_id.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <record id="report_kra_employee" model="ir.actions.report">
+        <field name="name">Employee KRA</field>
+        <field name="model">employee.kra</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">employee_kra.kra_report_employee</field>
+        <field name="report_file">employee_kra.kra_report_employee</field>
+        <field name="binding_model_id" ref="employee_kra.model_employee_kra"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>

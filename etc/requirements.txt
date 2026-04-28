@@ -1,0 +1,234 @@
+# Merged requirements — single source of truth for all matrics_addons modules
+# Installed automatically at odoo16 startup via entrypoint.sh -> pip install -r /etc/odoo/requirements.txt
+# Sources: regulatory_reports, etl_manager, rule_book, rule_book_api,
+#          compliance_management, compliance_management/resources,
+#          compliance_management/resources/scripts
+
+# --- Infrastructure ---
+setuptools==80.9.0
+gevent
+gevent-websocket
+greenlet==0.4.17; python_version > '3.7' and python_version <= '3.9'
+
+# --- Web / HTTP ---
+aiosmtplib
+anyio
+async-timeout
+certifi
+chardet
+charset-normalizer
+dnspython
+grpcio
+h11
+httpcore
+httpx
+hyperlink
+idna==2.10
+requests==2.26.0
+requests-file
+requests-toolbelt
+sniffio
+starlette
+tornado
+Twisted
+urllib3==1.26.5
+uvicorn
+watchdog
+websocket-client
+websockets
+whitenoise
+zope.event
+zope.interface
+
+# --- Database ---
+asyncpg
+aiosqlite
+google-cloud-bigquery
+mysql-connector-python
+oracledb
+psycopg2-binary
+pymssql
+pymysql
+pyodbc
+scikit-learn
+snowflake-connector-python
+SQLAlchemy
+tortoise-orm
+pypika-tortoise
+
+# --- Cache ---
+redis
+hiredis
+
+# --- Odoo / ERP ---
+Babel==2.9.1
+click-odoo
+ebaysdk==2.1.5
+num2words==0.5.9
+odoo_connect
+ofxparse==0.19; python_version <= '3.9'
+ofxparse==0.21; python_version > '3.9'
+polib==1.1.0
+python-stdnum==1.16
+vobject==0.9.6.1
+
+# --- Data processing ---
+backoff
+Jinja2
+lxml==4.6.5; python_version <= '3.10'
+lxml==4.9.2; python_version > '3.10'
+numpy
+odfpy
+openpyxl
+pandas
+python-dateutil==2.8.2
+pytz
+pytzdata
+six
+tabula-py
+xlrd==1.2.0; python_version >= '3.8'
+XlsxWriter==1.1.2
+xlwt==1.3.*
+zeep==4.0.0
+sqlparse
+
+# --- Document / PDF ---
+pdf2image
+Pillow==9.0.1; python_version <= '3.10'
+Pillow==9.4.0; python_version > '3.10'
+PyMuPDF
+PyPDF2==1.26.0; python_version <= '3.10'
+PyPDF2==2.12.1; python_version > '3.10'
+pytesseract
+qrcode==6.1
+reportlab==3.5.59; python_version <= '3.10'
+reportlab==3.6.12; python_version > '3.10'
+
+# --- Security / Auth ---
+bcrypt
+cryptography==3.4.8
+ecdsa
+itsdangerous
+passlib==1.7.4
+pycparser
+PyJWT
+PyNaCl
+pyOpenSSL==20.0.1
+python-jose
+rsa
+
+# --- Serialization / Validation ---
+annotated-types
+attrs
+dotty-dict
+et_xmlfile
+fastjsonschema
+jsonschema
+jsonschema-specifications
+Markdown
+MarkupSafe==1.1.1; python_version <= '3.10'
+MarkupSafe==2.1.2; python_version > '3.10'
+openapi-spec-validator
+pydantic
+pydantic-settings
+pydantic_core
+pyparsing
+referencing
+rpds-py
+stone
+texttable
+tomli
+typing_extensions
+tzdata
+Werkzeug
+
+# --- Utilities ---
+appdirs
+beautifulsoup4
+bleach
+blinker
+bs4
+build
+cached-property
+cffi
+click
+colorama
+constantly
+crashtest
+decorator==4.4.2
+defusedxml
+distro
+docopt
+docutils==0.16
+dropbox
+email_validator
+exceptiongroup
+Faker
+filelock
+freezegun==0.3.15; python_version >= '3.8'
+hashids
+hfilesize
+hupper
+importlib_metadata
+incremental
+inflection
+iniconfig
+iso8601
+isodate
+libsass==0.20.1
+lml
+mock
+ollama
+outcome
+packaging
+paramiko
+passlib
+pendulum
+platformdirs
+ply
+psutil==5.8.0; python_version <= '3.10'
+psutil==5.9.4; python_version > '3.10'
+pydot==1.4.2
+pyexcel
+pyexcel-io
+pypng
+pyserial==3.5
+python-dotenv
+# python-ldap==3.4.0  # requires libldap2-dev + python dev headers; install manually if LDAP auth is needed
+python-magic
+python-multipart
+pyusb==1.0.2; python_version <= '3.10'
+pyusb==1.2.1; python_version > '3.10'
+schedule
+sortedcontainers
+soupsieve
+tldextract
+virtualenv
+wcwidth
+webencodings
+yarg
+zeep
+zipp
+
+# --- Jupyter / IPython (dev tooling) ---
+ipython
+jupyter_client
+jupyter_core
+jupyterlab_pygments
+matplotlib-inline
+mistune
+nbclient
+nbconvert
+nbformat
+pandocfilters
+tinycss2
+traitlets
+
+# --- Testing ---
+pytest
+pytest-asyncio
+pytest-tornasync
+pytest-trio
+pytest-twisted
+pluggy
+trio

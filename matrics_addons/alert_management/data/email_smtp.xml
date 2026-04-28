@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="outgoing_mail" model="ir.mail_server">
+            <field name="name">Email Server</field>
+            <field name="smtp_host">smtp.mailgun.org</field>
+            <field name="smtp_port">587</field>
+            <field name="smtp_user">ChangeUsername@mycompany.com</field>
+            <field name="smtp_pass">ChangePassword</field>
+            <field name="smtp_encryption">starttls</field>
+            <field name="smtp_debug" eval="False"></field>
+            <field name="sequence">10</field>
+            <field name="active">True</field>
+        </record>
+
+        <!-- Set the Outgoing Mail Server as Default -->
+        <record id="default_outgoing_mail_server" model="ir.config_parameter">
+            <field name="key">mail.server</field>
+            <field name="value">outgoing_mail</field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,4 @@
+- Updated documentation style to match generic_condition module
+- Added badges and improved README structure
+- Created changelog files in proper directory
+- Updated module name and summary for clarity

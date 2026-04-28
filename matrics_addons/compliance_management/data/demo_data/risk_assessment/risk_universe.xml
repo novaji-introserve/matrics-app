@@ -1,0 +1,53 @@
+<odoo>
+ <!-- Risk Universe -->
+    <record id="compliance_inst_fc_risk_univ_21" model="res.risk.universe">
+        <field name="name">Jurisdiction</field>
+        <field name="code">jurisdiction</field>
+        <field name="weight_percentage">10</field>
+    </record>
+    <record id="compliance_inst_fc_risk_univ_22" model="res.risk.universe">
+        <field name="name">Products And Services</field>
+        <field name="code">products_and_services</field>
+        <field name="weight_percentage">30</field>
+    </record>
+    <record id="compliance_inst_fc_risk_univ_23" model="res.risk.universe">
+        <field name="name">Delivery Channels</field>
+        <field name="code">delivery_channels</field>
+        <field name="weight_percentage">25</field>
+    </record>
+    <record id="compliance_inst_fc_risk_univ_24" model="res.risk.universe">
+        <field name="name">Customer Types</field>
+        <field name="code">customer_types</field>
+        <field name="weight_percentage">35</field>
+    </record>
+    <record id="compliance_inst_fc_risk_univ_25" model="res.risk.universe">
+        <field name="name">Transaction Behavior</field>
+        <field name="code">transaction_behavior</field>
+    </record>
+    <record id="compliance_inst_fc_risk_univ_26" model="res.risk.universe">
+        <field name="name">Compliance History</field>
+        <field name="code">compliance_history</field>
+    </record>
+    <record id="compliance_inst_fc_risk_univ_27" model="res.risk.universe">
+        <field name="name">Data Quality</field>
+        <field name="code">data_quality</field>
+    </record>
+
+    <record id="compliance_inst_fc_risk_subj_107" model="res.risk.subject">
+        <field name="name">Trade Transactions</field>
+        <field name="code">trade_transactions</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_25"/>
+    </record>
+    <record id="compliance_inst_fc_risk_subj_108" model="res.risk.subject">
+        <field name="name">Account Activity</field>
+        <field name="code">account_activity</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_25"/>
+    </record>
+     <record id="compliance_inst_fc_risk_subj_109" model="res.risk.subject">
+        <field name="name">Payment Transactions</field>
+        <field name="code">payment_transactions</field>
+        <field name="universe_id" ref="compliance_inst_fc_risk_univ_25"/>
+    </record>
+
+
+</odoo>

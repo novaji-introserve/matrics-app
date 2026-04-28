@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="compliance_transaction_tree" model="ir.ui.view">
+        <field name="name">res_cust_transaction_tree</field>
+        <field name="model">res.customer.transaction</field>
+        <field name="arch" type="xml">
+            <tree string="Transactions" create="false">
+                <header>
+                    <button name="done" class="oe_highlight" type="object" string="Mark Reviewed" groups="compliance_management.group_compliance_branch_control_officer" confirm="All selected transactions will be marked as done.This process cannot be reversed. Are you sure?" />
+                </header>
+                <field name="name" string="Reference Number" />
+                <field name="customer_id" optional="show" />
+                <field name="account_id" optional="show"/>
+                <field name="branch_id" optional="show"/>
+                <field name="currency" optional="show" />
+                <field name="amount" optional="show"/>
+                <field name="transaction_type" optional="show"/>
+                <field name="total_rules" string="Exceptions" optional="show"/>
+                <field name="likely_fraud" widget="boolean_toggle" readonly="1" optional="show"/>
+                <field name="risk_level" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('low')" />
+                <field name="state" widget="badge" decoration-warning="state in ('new')" decoration-success="state in ('done')" />
+                <field name="date_created" optional="show"/>
+                <field name="show_create_case_button" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+    <!-- Transaction Form -->
+    <record id="compliance_transaction_form" model="ir.ui.view">
+        <field name="name">Transaction Form</field>
+        <field name="model">res.customer.transaction</field>
+        <field name="arch" type="xml">
+            <form create="false">
+                <header>
+                    <field name="show_create_case_button" invisible="1"/>
+                    <field name="show_create_case" invisible="1"/>
+
+                    <button name="action_screen" class="btn-info" type="object" string="Run Risk Analysis" groups="compliance_management.group_compliance_compliance_risk_manager,compliance_management.group_compliance_transaction_monitoring_team" confirm="Run screening rules. All transaction screening rules will be applied. The first exception found will flagged. Are you sure?" />
+                    <button name="done" class="btn-info" type="object" string="Mark Reviewed" groups="compliance_management.group_compliance_branch_control_officer,compliance_management.group_compliance_transaction_monitoring_team" confirm="All selected transactions will be marked as done.This process cannot be reversed. Are you sure?" attrs="{'invisible': [('state', 'in',['done'])]}" />
+
+
+                    <button name="action_create_case" class="btn-info" string="Create Case" type="object" attrs="{'invisible': [('show_create_case_button', '=', False)]}"/>
+
+                    <button name="action_create_transaction_case" class="btn-info" string="Create Case" type="object" attrs="{'invisible': ['|', ('id', '=', False), ('show_create_case', '=', False)]}"/>
+
+
+                    <field name="state" widget="statusbar" statusbar_visible="new,done" clickable="True" />
+
+
+                </header>
+                <sheet string="Transaction">
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="get_risk_level" icon="fa-thermometer-0">
+                            <span>Risk <field string="Risk Level" name="risk_level" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('low')" />
+                            </span>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="get_risk_score" icon="fa-star">
+                            <field string="Risk Score" name="risk_score" widget="statinfo"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" readonly="1" />
+                        </h1>
+                    </div>
+                    <div class="oe_title">
+                        <label for="amount" class="oe_edit_only" />
+                        <h1>
+                            <field name="amount" readonly="1" />
+                        </h1>
+                    </div>
+
+                    <notebook colspan="4">
+                        <page name='details' string="Transaction Details" autofocus="autofocus">
+                            <group>
+                                <group>
+
+                                    <field name="customer_id" readonly="1" />
+                                    <field name="account_id" readonly="1" />
+
+                                </group>
+                                <group>
+                                    <field name="currency" readonly="1" />
+                                    <field name="branch_id" readonly="1" />
+                                    <field name="likely_fraud" widget="boolean_toggle" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="transaction_type" readonly="1" />
+                                    <field name="date_created" string="Transaction Date" readonly="1" />
+
+                                </group>
+                            </group>
+                        </page>
+                        <page name='internal_notes' string="Narration">
+                            <field name="narration" readonly="0" />
+                        </page>
+
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" />
+                    <field name="activity_ids" />
+                    <field name="message_ids" />
+                </div>
+            </form>
+        </field>
+    </record>
+    <record id="view_customer_trans_search" model="ir.ui.view">
+        <field name="name">Customer Transaction Search</field>
+        <field name="model">res.customer.transaction</field>
+        <field name="priority" eval="10" />
+        <field name="arch" type="xml">
+            <search string="Search Transaction">
+                <field name="name" />
+                <field name="customer_id" />
+                <separator />
+                <filter string="Today's Transactions" name="today_records" domain="[('date_created', '=', context_today().strftime('%Y-%m-%d'))]" />
+                <filter string="Yesterday's Transactions" name="yesterday_records" domain="[('date_created', '&gt;=', (context_today() - relativedelta(days=1)).strftime('%Y-%m-%d')), ('date_created', '&lt;=', (context_today() - relativedelta(days=1)).strftime('%Y-%m-%d'))]" />
+                <filter string="This Week's Transactions" name="this_week_records" domain="[('date_created', '&gt;=', context_today().strftime('%Y-%m-01')), ('date_created', '&lt;=', context_today().strftime('%Y-%m-%d'))]" />
+                <filter string="Internal Transactions" name="internal_transactions" domain="['|', ('account_id.ledger_type_id.name', '=', 'Internal'), ('account_id.account_type', '=', 'Internal')]" />
+
+
+                <filter string="High Risk/ To Review" name="state_new" domain="[('state', '=', 'new'),('risk_level','=','high')]" />
+                <filter string="Medium Risk/ To Review" name="state_new" domain="[('state', '=', 'new'),('risk_level','=','medium')]" />
+                <filter string="Low Risk/ To Review" name="state_new" domain="[('state', '=', 'new'),('risk_level','=','low')]" />
+                <filter string="Reviewed" name="state_done" domain="[('state', '=', 'done')]" />
+                <filter string="High Risk / Reviewed" name="risk_level_high" domain="[('risk_level', '=', 'high'),('state', '=', 'done')]" />
+                <filter string="Medium Risk / Reviewed" name="risk_level_medium" domain="[('risk_level', '=', 'medium'),('state', '=', 'done')]" />
+                <filter string="Low Risk / Reviewed" name="risk_level_low" domain="[('risk_level', '=', 'low'),('state', '=', 'done')]" />
+                <separator />
+                <group expand="0" name="group_by" string="Group By">
+                    <filter name="group_branch" string="Branch" domain="[]" context="{'group_by' : 'branch_id'}" />
+                    <filter name="group_customer" string="Customer" domain="[]" context="{'group_by' : 'customer_id'}" />
+                    <filter name="group_currency" string="Currency" context="{'group_by': 'currency'}" />
+                    <filter name="group_tran_type" string="Transaction Type" context="{'group_by': 'transaction_type'}" />
+                    <filter name="group_state" string="Review Status" context="{'group_by': 'state'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="open_transactions" model="ir.actions.server">
+        <field name="name">Open Transactions To Review</field>
+        <field name="model_id" ref="model_res_customer_transaction" />
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.open_transactions()</field>
+    </record>
+    <record id="open_transactions_done" model="ir.actions.server">
+        <field name="name">Open Transactions Done</field>
+        <field name="model_id" ref="model_res_customer_transaction" />
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.open_transactions_done()</field>
+    </record>
+    <record id="open_transactions_all" model="ir.actions.server">
+        <field name="name">Open All Transactions</field>
+        <field name="model_id" ref="model_res_customer_transaction" />
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">action = model.open_transactions_all()</field>
+    </record>
+    <record model="ir.actions.server" id="action_done">
+        <field name="name">Mark Done</field>
+        <field name="model_id" ref="model_res_customer_transaction"/>
+        <field name="binding_model_id" ref="model_res_customer_transaction"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = records.done()
+        </field>
+    </record>
+    <record model="ir.actions.server" id="action_multi_screen">
+        <field name="name">Run Analysis</field>
+        <field name="model_id" ref="model_res_customer_transaction"/>
+        <field name="binding_model_id" ref="model_res_customer_transaction"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = records.multi_screen()
+        </field>
+    </record>
+</odoo>

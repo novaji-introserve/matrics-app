@@ -1,0 +1,198 @@
+#version: '2'
+services:
+  db:
+    image: postgres:15
+    user: root
+    networks:
+      - odoo-net
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${ODOO_USER}
+      - POSTGRES_PASSWORD=${ODOO_PASSWORD}
+      - POSTGRES_DB=postgres
+    restart: always             # run as a service
+    command: >
+      postgres
+        -c shared_buffers=2GB
+        -c effective_cache_size=8GB
+        -c work_mem=32MB
+        -c maintenance_work_mem=512MB
+        -c max_connections=100
+        -c checkpoint_completion_target=0.9
+        -c wal_buffers=64MB
+        -c random_page_cost=1.1
+    volumes:
+        - ${STORAGE_PATH}/postgresql:/var/lib/postgresql/data
+        - ./custom:/custom
+
+  pgbouncer:
+    build:
+      context: .
+      dockerfile: .docker/pgbouncer/Dockerfile
+    container_name: pgbouncer
+    restart: unless-stopped
+    depends_on:
+      - db
+    networks:
+      - odoo-net
+    ports:
+      - "5433:5433"
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 2gb --maxmemory-policy allkeys-lru
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - ${STORAGE_PATH}/redis:/data
+    networks:
+      - odoo-net
+
+  odoo16:
+    image: odoo:16
+    user: root
+    networks:
+      - odoo-net
+    depends_on:
+      - db
+      - redis
+      - pgbouncer
+    ports:
+      - "${ODOO_PORT}:8069"
+      - "${ODOO_GEVENT_PORT}:8072" # gevent port for longpolling/websocket traffic
+      - "8073:8073" # custom compliance_management websocket server
+    tty: true
+    command: --
+    environment:
+      - HOST=pgbouncer
+      - PORT=5433
+      - USER=${ODOO_USER}
+      - PASSWORD=${ODOO_PASSWORD}
+    volumes:
+      #- /etc/timezone:/etc/timezone:ro
+      #- /etc/localtime:/etc/localtime:ro
+      - ./entrypoint.sh:/entrypoint.sh   # if you want to install additional Python packages, uncomment this line!
+      - ./addons:/mnt/extra-addons
+      - ./matrics_addons:/mnt/matrics-addons
+      - ./custom:/mnt/custom
+      - ${STORAGE_PATH}/odoo16/lib:/usr/local/lib
+      - ${STORAGE_PATH}/odoo16/data:/root/.local/share/Odoo
+      - ./etc:/etc/odoo
+    restart: always
+
+  fastapi:
+    build:
+      context: .
+      dockerfile: .docker/fastapi/Dockerfile
+    container_name: fastapi
+    restart: unless-stopped
+    working_dir: /app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./fastapi:/app
+      - ./custom/fastapi:/app/custom
+      #- /home/jonathan/projects/fraud_detection:/training-data:ro
+    ports:
+      - "${FASTAPI_PORT}:8000"
+    env_file:
+      - ./fastapi/.env
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - db
+      - pgbouncer
+      - redis
+      - odoo16
+    networks:
+      - odoo-net
+
+  fastapi-rq-worker:
+    build:
+      context: .
+      dockerfile: .docker/fastapi/Dockerfile
+    restart: unless-stopped
+    working_dir: /app
+    command: python -m jobs.run_worker
+    volumes:
+      - ./fastapi:/app
+      - ./custom/fastapi:/app/custom
+    env_file:
+      - ./fastapi/.env
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PYTHONPATH=/app/custom:/app
+    depends_on:
+      - pgbouncer
+      - redis
+      - odoo16
+    networks:
+      - odoo-net
+    deploy:
+      replicas: 4
+
+  fastapi-rq-scheduler:
+    build:
+      context: .
+      dockerfile: .docker/fastapi/Dockerfile
+    container_name: fastapi-rq-scheduler
+    restart: unless-stopped
+    working_dir: /app
+    command: python -m jobs.run_scheduler
+    volumes:
+      - ./fastapi:/app
+      - ./custom/fastapi:/app/custom
+    env_file:
+      - ./fastapi/.env
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PYTHONPATH=/app/custom:/app
+    depends_on:
+      - db
+      - pgbouncer
+      - redis
+      - fastapi-rq-worker
+    networks:
+      - odoo-net
+
+  seatunnel:
+    build:
+      context: .
+      dockerfile: .docker/seatunnel/Dockerfile
+    container_name: seatunnel
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: 4G
+        reservations:
+          cpus: "2"
+          memory: 2G
+    environment:
+      - JAVA_TOOL_OPTIONS=-Xms1g -Xmx3g -XX:+UseG1GC -XX:MaxGCPauseMillis=100
+    ports:
+      - "5801:5801"   # Hazelcast cluster
+      - "9080:9080"   # REST API v2
+    volumes:
+      - ./seatunnel/config/hazelcast.yaml:/opt/seatunnel/config/hazelcast.yaml
+      - ./seatunnel/config/seatunnel.yaml:/opt/seatunnel/config/seatunnel.yaml
+      - ./seatunnel/jobs:/opt/seatunnel/jobs
+      - ./custom:/opt/seatunnel/custom
+      - ${STORAGE_PATH}/seatunnel/logs:/opt/seatunnel/logs
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - odoo-net
+
+
+networks:
+  odoo-net:
+    driver: bridge
+
+      # run as a service

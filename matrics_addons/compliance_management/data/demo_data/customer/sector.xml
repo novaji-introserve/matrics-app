@@ -1,0 +1,190 @@
+<odoo>
+<data noupdate="1">
+
+    <!-- Risk Assessment -->
+    <record id="res_risk_assessment_onboarding" model="res.risk.assessment">
+        <field name="name">Onboarding Risk Assessment</field>
+        <!--field name="code">onboarding</field-->
+        <field name="is_default">True</field>
+        <field name="risk_rating">3</field>
+        <!--field name="state">draft</field-->
+    </record>
+ <!--Sectors-->
+    <record id="compliance_customer_sector_1" model="res.partner.sector">
+        <field name="name">Act. Of Extraterritor. Org N Bodies</field>
+        <field name="code">act._of_extrat.</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_2" model="res.partner.sector">
+        <field name="name">Admin And Support Service Act.</field>
+        <field name="code">admin_and_suppo</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_3" model="res.partner.sector">
+        <field name="name">Agriculture</field>
+        <field name="code">agriculture</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_4" model="res.partner.sector">
+        <field name="name">Capital Market</field>
+        <field name="code">capital_market</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_5" model="res.partner.sector">
+        <field name="name">Construction</field>
+        <field name="code">construction</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_6" model="res.partner.sector">
+        <field name="name">Education</field>
+        <field name="code">education</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_7" model="res.partner.sector">
+        <field name="name">Not For Profit</field>
+        <field name="code">not_for_profit</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_8" model="res.partner.sector">
+        <field name="name">General</field>
+        <field name="code">general</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_9" model="res.partner.sector">
+        <field name="name">General Commerce</field>
+        <field name="code">general_commerc</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_10" model="res.partner.sector">
+        <field name="name">Government</field>
+        <field name="code">government</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_11" model="res.partner.sector">
+        <field name="name">Human Health And Social Work Act.</field>
+        <field name="code">human_health</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_12" model="res.partner.sector">
+        <field name="name">Information And Communication</field>
+        <field name="code">information.co</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_13" model="res.partner.sector">
+        <field name="name">Manufacturing</field>
+        <field name="code">manufacturing</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_14" model="res.partner.sector">
+        <field name="name">Mining And Quarrying</field>
+        <field name="code">mining_and_quar</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_15" model="res.partner.sector">
+        <field name="name">Oil And Gas</field>
+        <field name="code">oil_and_gas</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_16" model="res.partner.sector">
+        <field name="name">Power And Energy</field>
+        <field name="code">power_and_energ</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_17" model="res.partner.sector">
+        <field name="name">Prof Scientific And Tech Act.</field>
+        <field name="code">prof_scientifi</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_18" model="res.partner.sector">
+        <field name="name">Public Utilities</field>
+        <field name="code">public_utilitie</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_19" model="res.partner.sector">
+        <field name="name">Real Estate</field>
+        <field name="code">real_estate</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_20" model="res.partner.sector">
+        <field name="name">Transportation And Storage</field>
+        <field name="code">transportation</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_21" model="res.partner.sector">
+        <field name="name">Water Sup Sewag Wast Mgt N Rem Act</field>
+        <field name="code">water_sup_sewag</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_22" model="res.partner.sector">
+        <field name="name">Finance And Insurance</field>
+        <field name="code">finance_and_ins</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_23" model="res.partner.sector">
+        <field name="name">Arts Entertainment And Recreation</field>
+        <field name="code">arts_entertain</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_24" model="res.partner.sector">
+        <field name="name">Health</field>
+        <field name="code">health</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_25" model="res.partner.sector">
+        <field name="name">Renewable Energy</field>
+        <field name="code">renew_energy</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_26" model="res.partner.sector">
+        <field name="name">Residential Estates</field>
+        <field name="code">residential_est</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_27" model="res.partner.sector">
+        <field name="name">Oneforce Family</field>
+        <field name="code">oneforce_family</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_28" model="res.partner.sector">
+        <field name="name">Cooperative Cluster</field>
+        <field name="code">coperative_clus</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_29" model="res.partner.sector">
+        <field name="name">Cooperative Individuals</field>
+        <field name="code">cooperative_ind</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_30" model="res.partner.sector">
+        <field name="name">Fashion</field>
+        <field name="code">fashion</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_31" model="res.partner.sector">
+        <field name="name">State And Private Agencies</field>
+        <field name="code">state_private</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_32" model="res.partner.sector">
+        <field name="name">Value Chain</field>
+        <field name="code">value_chain</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_33" model="res.partner.sector">
+        <field name="name">Military And Paramilitary Services</field>
+        <field name="code">military_servic</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_34" model="res.partner.sector">
+        <field name="name">Oneforce Active</field>
+        <field name="code">oneforce_active</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+    <record id="compliance_customer_sector_35" model="res.partner.sector">
+        <field name="name">Oneforce Retired</field>
+        <field name="code">oneforce_rtd</field>
+        <field name="risk_assessment" ref="res_risk_assessment_onboarding"/>
+    </record>
+</data>
+
+</odoo>

@@ -1,0 +1,553 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data noupdate="1">
+        <record model="hr.kra" id="employee_kra_ase">
+            <field name="name">Assistant Software Engineer</field>
+        </record>
+
+        <record model="kra.question" id="ase_question1">
+             <field name="kra_id" ref="employee_kra.employee_kra_ase"/>
+             <field name="hint">Coding</field>
+             <field name="name">Quality Code to be produced Contribution to technical design</field>
+             <field name="description">Strictly adher to the Project Coding Standards</field>
+             <field name="weightage">40</field>
+             <field name="sequence">1</field>
+        </record>
+        <record model="kra.question" id="ase_question2">
+             <field name="kra_id" ref="employee_kra.employee_kra_ase"/>
+             <field name="hint">Testing &amp; Debugging</field>
+             <field name="name">Defect Free Project Delivery.No repeat defects reported from client.</field>
+             <field name="description">No of reviews done and defects found</field>
+             <field name="weightage">30</field>
+             <field name="sequence">2</field>
+        </record>
+        <record model="kra.question" id="ase_question3">
+             <field name="kra_id" ref="employee_kra.employee_kra_ase"/>
+             <field name="hint">Customer Satisfaction</field>
+             <field name="name">Improve on customer satisfaction </field>
+             <field name="description">If CSAT rating >=6, 100% achievement; rating is between 5-5.9, 75% achievement; rating is between 4-4.9, 50% achievement; Below 4- 0% achievement.
+                     '=1 complaint but low severity (met) >1 but repeated low severity (missed), >=1 high severity (missed)</field>
+             <field name="weightage">5</field>
+             <field name="sequence">3</field>
+        </record>
+         <record model="kra.question" id="ase_question4">
+             <field name="kra_id" ref="employee_kra.employee_kra_ase"/>
+             <field name="hint">Customer Escalation</field>
+             <field name="name">Complaints from customer for the candidate on attitude, behaviour, conduct and work quality while being onsite or offshore</field>
+             <field name="description"> 0/ =1 complaint but low severity (met) >1 but repeated low severity (missed), >=1 high severity (missed)</field>
+             <field name="weightage">5</field>
+             <field name="sequence">4</field>
+        </record>
+        <record model="kra.question" id="ase_question5">
+             <field name="kra_id" ref="employee_kra.employee_kra_ase"/>
+             <field name="hint">Techinical Training &amp; Knowledge Sharing</field>
+             <field name="name">Attending Trainings (Domain / Technical) Knowledge sharing with team members</field>
+             <field name="description">Attend at least 1 training/program each in domain, technical and soft skills</field>
+             <field name="weightage">20</field>
+             <field name="sequence">5</field>
+        </record>
+
+        <!--record model="hr.kra" id="employee_kra_tse">
+            <field name="name">Trainee Software Engineer</field>
+        </record>
+        <record model="kra.question" id="tse_question1">
+             <field name="kra_id" ref="employee_kra.employee_kra_tse"/>
+             <field name="hint">Coding</field>
+             <field name="name">Quality Code to be produced Contribution to technical design</field>
+             <field name="description">Strictly adher to the Project Coding Standards</field>
+             <field name="weightage">40</field>
+             <field name="sequence">1</field>
+        </record>
+        <record model="kra.question" id="tse_question2">
+             <field name="kra_id" ref="employee_kra.employee_kra_tse"/>
+             <field name="hint">Testing &amp; Debugging</field>
+             <field name="name">Defect Free Project Delivery.No repeat defects reported from client.</field>
+             <field name="description">No of reviews done and defects found</field>
+             <field name="weightage">40</field>
+             <field name="sequence">2</field>
+        </record>
+        <record model="kra.question" id="tse_question3">
+             <field name="kra_id" ref="employee_kra.employee_kra_tse"/>
+             <field name="hint">Techinical Training &amp; Knowledge Sharing</field>
+             <field name="name">Attending Trainings (Domain / Technical) Knowledge sharing with team members</field>
+             <field name="description">Attend at least 1 training/program each in domain, technical and soft skills</field>
+             <field name="weightage">20</field>
+             <field name="sequence">3</field>
+        </record-->
+
+        <record model="hr.kra" id="employee_kra_tl">
+            <field name="name">Team Leader</field>
+        </record>
+
+        <record model="kra.question" id="tl_question1">
+             <field name="kra_id" ref="employee_kra.employee_kra_tl"/>
+             <field name="hint">Operational Delivery</field>
+             <field name="name">Responsible for complete delivery that includes analysis, design, documentation, coding, debugging and unit &amp; system testing independently </field>
+             <field name="description">Project Output and Customer Feedback</field>
+             <field name="weightage">15</field>
+             <field name="sequence">1</field>
+        </record>
+        <record model="kra.question" id="tl_question2">
+             <field name="kra_id" ref="employee_kra.employee_kra_tl"/>
+             <field name="hint">Report Generation</field>
+             <field name="name">Timely submission of weekly reports, QMS/CMMi process documents (defect logging and estimation) and time entries at FGS and FLS</field>
+             <field name="description">0 non-compliance is surpassed, 2 instance=met >2 missed</field>
+             <field name="weightage">5</field>
+             <field name="sequence">2</field>
+        </record>
+        <record model="kra.question" id="tl_question3">
+             <field name="kra_id" ref="employee_kra.employee_kra_tl"/>
+             <field name="hint">People Management</field>
+             <field name="name">1-Monitoring and tracking the team KRAs on a periodic basis 2-Leave management 3-Team issues</field>
+             <field name="description">1) Ongoing monitoring and giving feedback on KRAs 2) Leave menagement for team member, no lickage in productivity, the overall team's leave should under defined SLA's
+                                        3) Handling team issues </field>
+             <field name="weightage">10</field>
+             <field name="sequence">3</field>
+        </record>
+        <record model="kra.question" id="tl_question4">
+             <field name="kra_id" ref="employee_kra.employee_kra_tl"/>
+             <field name="hint">On time project delivery</field>
+             <field name="name">Adherence to time lines of project</field>
+             <field name="description">On time project assignment Delivery. No deviation from committed timelines. Should be able to match with project delivery timelines.</field>
+             <field name="weightage">5</field>
+             <field name="sequence">4</field>
+        </record>
+        <record model="kra.question" id="tl_question5">
+             <field name="kra_id" ref="employee_kra.employee_kra_tl"/>
+             <field name="hint">Meeting quality standards</field>
+             <field name="name">Support in achieving Quality in Project</field>
+             <field name="description">On an average, in SQA review, there should >= 1 NC / SQA review</field>
+             <field name="weightage">10</field>
+             <field name="sequence">5</field>
+        </record>
+        <record model="kra.question" id="tl_question6">
+             <field name="kra_id" ref="employee_kra.employee_kra_tl"/>
+             <field name="hint">Project/Process improvement</field>
+             <field name="name">Giving process improvement suggestions, referrals, participating in quality quiz, bright ideas, employee survey etc.</field>
+             <field name="description">0-missed, =4 met > 4 surpassed</field>
+             <field name="weightage">10</field>
+             <field name="sequence">6</field>
+        </record>
+        <record model="kra.question" id="tl_question7">
+             <field name="kra_id" ref="employee_kra.employee_kra_tl"/>
+             <field name="hint">Customer Satisfaction</field>
+             <field name="name">Improve on customer satisfaction </field>
+             <field name="description">If CSAT rating >=6, 100% achievement; rating is between 5-5.9, 75% achievement; rating is between 4-4.9, 50% achievement; Below 4- 0% achievement.
+                     '=1 complaint but low severity (met) >1 but repeated low severity (missed), >=1 high severity (missed)</field>
+             <field name="weightage">15</field>
+             <field name="sequence">7</field>
+        </record>
+         <record model="kra.question" id="tl_question8">
+             <field name="kra_id" ref="employee_kra.employee_kra_tl"/>
+             <field name="hint">Customer Escalation</field>
+             <field name="name">DComplaints from customer for the candidate on attitude, behaviour, conduct and work quality while being onsite or offshore</field>
+             <field name="description"> 0/ =1 complaint but low severity (met) >1 but repeated low severity (missed), >=1 high severity (missed)</field>
+             <field name="weightage">10</field>
+             <field name="sequence">8</field>
+        </record>
+        <record model="kra.question" id="tl_question9">
+             <field name="kra_id" ref="employee_kra.employee_kra_tl"/>
+             <field name="hint">Organization level activities</field>
+             <field name="name">Participation in audits/SQA reviews/assessments/informal gatherings</field>
+             <field name="description">0-missed, &gt;0 and &lt;=3 met &gt;3 surpassed (instances to be counted)</field>
+             <field name="weightage">5</field>
+             <field name="sequence">9</field>
+        </record>
+        <record model="kra.question" id="tl_question10">
+             <field name="kra_id" ref="employee_kra.employee_kra_tl"/>
+             <field name="hint">Recruitment</field>
+             <field name="name">Participation in interviews</field>
+             <field name="description">Taking part in hiring process for team</field>
+             <field name="weightage">5</field>
+             <field name="sequence">10</field>
+        </record>
+        <record model="kra.question" id="tl_question11">
+             <field name="kra_id" ref="employee_kra.employee_kra_tl"/>
+             <field name="hint">Guiding team members</field>
+             <field name="name">Coaching and mentoring team members</field>
+             <field name="description">Help team in sharpening technical and interpersonal skills, mentoring them on their </field>
+             <field name="weightage">3</field>
+             <field name="sequence">11</field>
+        </record>
+        <record model="kra.question" id="tl_question12">
+             <field name="kra_id" ref="employee_kra.employee_kra_tl"/>
+             <field name="hint">Techinical Training</field>
+             <field name="name">Attending Trainings (Domain / Technical)</field>
+             <field name="description">Attend at least 1 training/program each in domain, technical and soft skills</field>
+             <field name="weightage">5</field>
+             <field name="sequence">12</field>
+        </record>
+        <record model="kra.question" id="tl_question13">
+             <field name="kra_id" ref="employee_kra.employee_kra_tl"/>
+             <field name="hint">Knowledge Sharing</field>
+             <field name="name">Practical knowledge/ skill in client-server, internet technologies, database administration skill set and its application</field>
+             <field name="description">Conducting at least 3 sessions for others in 6 months (&gt;=3, &lt;=2, 0)</field>
+             <field name="weightage">2</field>
+             <field name="sequence">13</field>
+        </record>
+        <record model="hr.kra" id="employee_kra_de">
+            <field name="name">Jr.Designer</field>
+        </record>
+        <record model="kra.question" id="de_question1">
+             <field name="kra_id" ref="employee_kra.employee_kra_de"/>
+             <field name="hint">Creativity</field>
+             <field name="name">Creative Design to be produced</field>
+             <field name="description">Fusing new ideas and design concepts</field>
+             <field name="weightage">15</field>
+             <field name="sequence">1</field>
+        </record>
+        <record model="kra.question" id="de_question2">
+             <field name="kra_id" ref="employee_kra.employee_kra_de"/>
+             <field name="hint">Design appeal</field>
+             <field name="name">Creating attractive design</field>
+             <field name="description">Minimum design revisions</field>
+             <field name="weightage">20</field>
+             <field name="sequence">2</field>
+        </record>
+        <record model="kra.question" id="de_question3">
+             <field name="kra_id" ref="employee_kra.employee_kra_de"/>
+             <field name="hint">Quality</field>
+             <field name="name">Producing quality design</field>
+             <field name="description">Quick loading optimized designs in appropiate format</field>
+             <field name="weightage">15</field>
+             <field name="sequence">3</field>
+        </record>
+        <record model="kra.question" id="de_question4">
+             <field name="kra_id" ref="employee_kra.employee_kra_de"/>
+             <field name="hint">On time project delivery</field>
+             <field name="name">Adherence to time lines of project. </field>
+             <field name="description">On time project assignment delivery.No deviation from committed timelines. Should be able to match with project deliver timelines.</field>
+             <field name="weightage">10</field>
+             <field name="sequence">4</field>
+        </record>
+        <record model="kra.question" id="de_question5">
+             <field name="kra_id" ref="employee_kra.employee_kra_de"/>
+             <field name="hint">Customer Satisfaction </field>
+             <field name="name">Improve on customer satisfaction</field>
+             <field name="description">If CSAT rating >=6, 100% achievement; rating is between 5-5.9, 75% achievement; rating is between 4-4.9, 50% achievement; Below 4- 0% achievement '=1 complaint but low severity (met) >1 but repeated low severity (missed), >=1 high severity (missed).</field>
+             <field name="weightage">10</field>
+             <field name="sequence">5</field>
+        </record>
+        <record model="kra.question" id="de_question6">
+             <field name="kra_id" ref="employee_kra.employee_kra_de"/>
+             <field name="hint">Customer Escalation </field>
+             <field name="name">Complaints from customer for the candidate on attitude,behaviour, conduct and work quality while being onsite or offshore </field>
+             <field name="description">0/ =1 complaint but low severity (met) >1 but repeated low severity (missed), >=1.</field>
+             <field name="weightage">10</field>
+             <field name="sequence">6</field>
+        </record>
+        <record model="kra.question" id="de_question7">
+             <field name="kra_id" ref="employee_kra.employee_kra_de"/>
+             <field name="hint">Customer Appreciation </field>
+             <field name="name">Appreciation mailsfrom customers/internal customers.</field>
+             <field name="description">Based on milestone and complexity of work Only substantial achievements to be counted not for daily routine work.1=major appreciation (met) >1 major appreciation surpassed (Either for self and/or team led).</field>
+             <field name="weightage">10</field>
+             <field name="sequence">7</field>
+        </record>
+        <record model="kra.question" id="de_question8">
+             <field name="kra_id" ref="employee_kra.employee_kra_de"/>
+             <field name="hint">Technical Training/ soft skill training </field>
+             <field name="name">Attending Trainings </field>
+             <field name="description">Attend at least 1 training/program each in domain, technical and soft skills.</field>
+             <field name="weightage">10</field>
+             <field name="sequence">8</field>
+        </record>
+        <record model="hr.kra" id="employee_kra_se">
+            <field name="name">Software Engineer</field>
+        </record>
+        <record model="kra.question" id="se_question1">
+             <field name="kra_id" ref="employee_kra.employee_kra_se"/>
+             <field name="hint">Coding</field>
+             <field name="name">Quality Code to be produced Contribution to technical design</field>
+             <field name="description">Strictly adher to the Project Coding Standards</field>
+             <field name="weightage">40</field>
+             <field name="sequence">1</field>
+        </record>
+        <record model="kra.question" id="se_question2">
+             <field name="kra_id" ref="employee_kra.employee_kra_se"/>
+             <field name="hint">Testing &amp; Debugging</field>
+             <field name="name">Defect Free Project Delivery.No repeat defects reported from client.</field>
+             <field name="description">No of reviews done and defects found</field>
+             <field name="weightage">30</field>
+             <field name="sequence">2</field>
+        </record>
+        <record model="kra.question" id="se_question3">
+             <field name="kra_id" ref="employee_kra.employee_kra_se"/>
+             <field name="hint">On time project delivery</field>
+             <field name="name">Producing quality design</field>
+             <field name="description">On time project assignment delivery. No deviation from committed timelines. Should be able to match with project delivery timelines.</field>
+             <field name="weightage">10</field>
+             <field name="sequence">3</field>
+        </record>
+        <record model="kra.question" id="se_question4">
+             <field name="kra_id" ref="employee_kra.employee_kra_se"/>
+             <field name="hint">Project/Process improvement</field>
+             <field name="name">Giving process improvement suggestions, referrals, participating in quality quiz, bright ideas, employee survey etc.</field>
+             <field name="description">0-missed, =4 met > 4 surpassed</field>
+             <field name="weightage">10</field>
+             <field name="sequence">4</field>
+        </record>
+        <record model="kra.question" id="se_question5">
+             <field name="kra_id" ref="employee_kra.employee_kra_se"/>
+             <field name="hint">Customer Satisfaction </field>
+             <field name="name">Improve on customer satisfaction</field>
+             <field name="description">If CSAT rating >=6, 100% achievement; rating is between 5-5.9, 75% achievement; rating is between 4-4.9, 50% achievement; Below 4- 0% achievement '=1 complaint but low severity (met) >1 but repeated low severity (missed), >=1 high severity (missed).</field>
+             <field name="weightage">10</field>
+             <field name="sequence">5</field>
+        </record>
+        <record model="kra.question" id="se_question6">
+             <field name="kra_id" ref="employee_kra.employee_kra_se"/>
+             <field name="hint">Customer Escalation </field>
+             <field name="name">Complaints from customer for the candidate on attitude,behaviour, conduct and work quality while being onsite or offshore </field>
+             <field name="description">0/ =1 complaint but low severity (met) >1 but repeated low severity (missed), >=1.</field>
+             <field name="weightage">2</field>
+             <field name="sequence">6</field>
+        </record>
+        <record model="kra.question" id="se_question7">
+             <field name="kra_id" ref="employee_kra.employee_kra_se"/>
+             <field name="hint">Customer Appreciation </field>
+             <field name="name">Appreciation mailsfrom customers/internal customers.</field>
+             <field name="description">Based on milestone and complexity of work Only substantial achievements to be counted not for daily routine work.1=major appreciation (met) >1 major appreciation surpassed (Either for self and/or team led).</field>
+             <field name="weightage">3</field>
+             <field name="sequence">7</field>
+        </record>
+        <record model="kra.question" id="se_question8">
+             <field name="kra_id" ref="employee_kra.employee_kra_se"/>
+             <field name="hint">TTechinical Training &amp; Knowledge Sharing</field>
+             <field name="name">Attending Trainings (Domain / Technical) Knowledge sharing with team members</field>
+             <field name="description">Attend at least 1 training/program each in domain, technical and soft skills</field>
+             <field name="weightage">5</field>
+             <field name="sequence">8</field>
+        </record>
+
+         <record model="hr.kra" id="employee_kra_sse">
+            <field name="name">Sr.Software Engineer</field>
+        </record>
+        <record model="kra.question" id="sse_question1">
+             <field name="kra_id" ref="employee_kra.employee_kra_sse"/>
+             <field name="hint">Coding</field>
+             <field name="name">Analyse and design code Contribution to technical design</field>
+             <field name="description">Strictly adher to the Project Coding Standards</field>
+             <field name="weightage">20</field>
+             <field name="sequence">1</field>
+        </record>
+        <record model="kra.question" id="sse_question2">
+             <field name="kra_id" ref="employee_kra.employee_kra_sse"/>
+             <field name="hint">Testing &amp; Debugging</field>
+             <field name="name">Defect Free Project Delivery.No repeat defects reported from client.</field>
+             <field name="description">No of reviews done and defects found</field>
+             <field name="weightage">20</field>
+             <field name="sequence">2</field>
+        </record>
+        <record model="kra.question" id="sse_question3">
+             <field name="kra_id" ref="employee_kra.employee_kra_sse"/>
+             <field name="hint">On time project delivery</field>
+             <field name="name">Producing quality design</field>
+             <field name="description">On time project assignment delivery. No deviation from committed timelines. Should be able to match with project delivery timelines.</field>
+             <field name="weightage">10</field>
+             <field name="sequence">3</field>
+        </record>
+        <record model="kra.question" id="sse_question4">
+             <field name="kra_id" ref="employee_kra.employee_kra_sse"/>
+             <field name="hint">Meeting quality standards</field>
+             <field name="name">Support in achieving Quality in Project</field>
+             <field name="description">On an average, in SQA review, there should >= 1 NC / SQA review</field>
+             <field name="weightage">5</field>
+             <field name="sequence">4</field>
+        </record>
+        <record model="kra.question" id="sse_question5">
+             <field name="kra_id" ref="employee_kra.employee_kra_sse"/>
+             <field name="hint">Project/Process improvement</field>
+             <field name="name">Giving process improvement suggestions, referrals, participating in quality quiz, bright ideas, employee survey etc.</field>
+             <field name="description">0-missed, =4 met > 4 surpassed</field>
+             <field name="weightage">5</field>
+             <field name="sequence">5</field>
+        </record>
+        <record model="kra.question" id="sse_question6">
+             <field name="kra_id" ref="employee_kra.employee_kra_sse"/>
+             <field name="hint">Customer Satisfaction </field>
+             <field name="name">Improve on customer satisfaction</field>
+             <field name="description">If CSAT rating >=6, 100% achievement; rating is between 5-5.9, 75% achievement; rating is between 4-4.9, 50% achievement; Below 4- 0% achievement '=1 complaint but low severity (met) >1 but repeated low severity (missed), >=1 high severity (missed).</field>
+             <field name="weightage">10</field>
+             <field name="sequence">6</field>
+        </record>
+        <record model="kra.question" id="sse_question7">
+             <field name="kra_id" ref="employee_kra.employee_kra_sse"/>
+             <field name="hint">Customer Escalation </field>
+             <field name="name">Complaints from customer for the candidate on attitude,behaviour, conduct and work quality while being onsite or offshore </field>
+             <field name="description">0/ =1 complaint but low severity (met) >1 but repeated low severity (missed), >=1.</field>
+             <field name="weightage">10</field>
+             <field name="sequence">7</field>
+        </record>
+        <record model="kra.question" id="sse_question8">
+             <field name="kra_id" ref="employee_kra.employee_kra_sse"/>
+             <field name="hint">Customer Appreciation </field>
+             <field name="name">Appreciation mailsfrom customers/internal customers.</field>
+             <field name="description">Based on milestone and complexity of work Only substantial achievements to be counted not for daily routine work.1=major appreciation (met) >1 major appreciation surpassed (Either for self and/or team led).</field>
+             <field name="weightage">10</field>
+             <field name="sequence">8</field>
+        </record>
+        <record model="kra.question" id="sse_question9">
+             <field name="kra_id" ref="employee_kra.employee_kra_sse"/>
+             <field name="hint">Coaching</field>
+             <field name="name">Supporting others peers or juniors</field>
+             <field name="description">Help Team in sharpening technical and interpersonal skills</field>
+             <field name="weightage">3</field>
+             <field name="sequence">9</field>
+        </record>
+        <record model="kra.question" id="sse_question10">
+             <field name="kra_id" ref="employee_kra.employee_kra_sse"/>
+             <field name="hint">Techinical Training</field>
+             <field name="name">Attending Trainings (Domain / Technical)</field>
+             <field name="description">Attend at least 1 training/program each in domain, technical and soft skills</field>
+             <field name="weightage">5</field>
+             <field name="sequence">10</field>
+        </record>
+        <record model="kra.question" id="sse_question11">
+             <field name="kra_id" ref="employee_kra.employee_kra_sse"/>
+             <field name="hint">Knowledge Sharing</field>
+             <field name="name">Product knowledge / Architecture knowledge</field>
+             <field name="description">Conducting at least 3 sessions for others in 6 months (&gt;=3, &lt;=2, 0)</field>
+             <field name="weightage">2</field>
+             <field name="sequence">11</field>
+        </record>
+
+         <record model="hr.kra" id="employee_kra_hr">
+            <field name="name">HR Executive</field>
+        </record>
+        <record model="kra.question" id="hr_question1">
+             <field name="kra_id" ref="employee_kra.employee_kra_hr"/>
+             <field name="hint">Induction &amp; Welcome Kit</field>
+             <field name="name">Planning, Presenting, &amp; Feedback, Breifing, facilities, employment procedures-like Acc opening, Id</field>
+             <field name="description">Strictly adhere to the HR Policies for Orientation</field>
+             <field name="weightage">10</field>
+             <field name="sequence">1</field>
+        </record>
+        <record model="kra.question" id="hr_question2">
+             <field name="kra_id" ref="employee_kra.employee_kra_hr"/>
+             <field name="hint">DataBase Entry</field>
+             <field name="name">Adding resumes to HRM as per experience, skill, location, Dept. wise etc.</field>
+             <field name="description">Any such activity should be documented and presented.</field>
+             <field name="weightage">8</field>
+             <field name="sequence">2</field>
+        </record>
+        <record model="kra.question" id="hr_question3">
+             <field name="kra_id" ref="employee_kra.employee_kra_hr"/>
+             <field name="hint">Conducting &amp; Coordinating Interviews</field>
+             <field name="name">Coordinating &amp; Conducting the scheduled interviews. Conducting &amp; Coordinating written &amp; machine tests.</field>
+             <field name="description">Efficiently handling the Interview process</field>
+             <field name="weightage">20</field>
+             <field name="sequence">3</field>
+        </record>
+        <record model="kra.question" id="hr_question4">
+             <field name="kra_id" ref="employee_kra.employee_kra_hr"/>
+             <field name="hint">Attendence Management</field>
+             <field name="name">Employee Attendance record reporting for the same to Head Office – To maintain office employee’s attendance record through reports and monthly reports to HR for the same.</field>
+             <field name="description">Employee Attendance record and reporting for the same to HR.</field>
+             <field name="weightage">12</field>
+             <field name="sequence">4</field>
+        </record>
+        <record model="kra.question" id="hr_question5">
+             <field name="kra_id" ref="employee_kra.employee_kra_hr"/>
+             <field name="hint">General Administration</field>
+             <field name="name">General Housekeeping facility management: – To ensure proper housekeeping arrangements and other facilities on day to day basis and co-ordination with the agencies for the same.  To ensure video conferencing arrangement as when required.
+                        General co-ordination &amp; correspondence  General co-ordination to all concern related to up keep and cleanliness of office and other facilities, bill verification &amp; processing to the A/c’s dept. for the same.</field>
+             <field name="description">General Housekeeping facility management. General co-ordination &amp; correspondence</field>
+             <field name="weightage">15</field>
+             <field name="sequence">5</field>
+        </record>
+        <record model="kra.question" id="hr_question6">
+             <field name="kra_id" ref="employee_kra.employee_kra_hr"/>
+             <field name="hint">Project reports</field>
+             <field name="name">Project   reports of unique projects with employees details.  Any other job assigned to the need of the Ongoing Project.</field>
+             <field name="description">Adhering to the standards of project, if assigned .</field>
+             <field name="weightage">25</field>
+             <field name="sequence">6</field>
+        </record>
+        <record model="kra.question" id="hr_question7">
+             <field name="kra_id" ref="employee_kra.employee_kra_hr"/>
+             <field name="hint">Techinical Training &amp; Knowledge Sharing</field>
+             <field name="name">Attending Trainings (Domain / Technical) Knowledge sharing with team members</field>
+             <field name="description">Attend at least 1 training/program each in domain, technical and soft skills</field>
+             <field name="weightage">5</field>
+             <field name="sequence">7</field>
+        </record>
+
+         <record model="hr.kra" id="employee_kra_nw">
+            <field name="name">Network Admin</field>
+        </record>
+        <record model="kra.question" id="nw_question1">
+             <field name="kra_id" ref="employee_kra.employee_kra_nw"/>
+             <field name="hint"></field>
+             <field name="name">Resolving User's problem on Local System, Assigning FTP sites to Developers for Uploading.</field>
+             <field name="description"></field>
+             <field name="weightage">15</field>
+             <field name="sequence">1</field>
+        </record>
+        <record model="kra.question" id="nw_question2">
+             <field name="kra_id" ref="employee_kra.employee_kra_nw"/>
+             <field name="hint"> Proxy Server Management</field>
+             <field name="name">Configuring and Managing Proxy Server.Block certain websites and configuring authentication to access them.</field>
+             <field name="description"></field>
+             <field name="weightage">10</field>
+             <field name="sequence">2</field>
+        </record>
+        <record model="kra.question" id="nw_question3">
+             <field name="kra_id" ref="employee_kra.employee_kra_nw"/>
+             <field name="hint">Local Server &amp; Network Management</field>
+             <field name="name">Responsible for complete User Management on Local Network,  Creating and Configuring SVN, Creating database Project Repositories, Managing Web server etc.</field>
+             <field name="description"></field>
+             <field name="weightage">15</field>
+             <field name="sequence">3</field>
+        </record>
+        <record model="kra.question" id="nw_question4">
+             <field name="kra_id" ref="employee_kra.employee_kra_nw"/>
+             <field name="hint">Local Server &amp; Network Management</field>
+             <field name="name">Configuring Linux, Windows and Mac Systems for Web Development, Flash, Design, iPhone, Android and Java Development. Troubleshooting and Resolving Hardware &amp; Network Problems.</field>
+             <field name="description"></field>
+             <field name="weightage">25</field>
+             <field name="sequence">4</field>
+        </record>
+        <record model="kra.question" id="nw_question5">
+             <field name="kra_id" ref="employee_kra.employee_kra_nw"/>
+             <field name="hint">Network and Infra Structure Upgradation Projects</field>
+             <field name="name">Technical Training</field>
+             <field name="description"></field>
+             <field name="weightage">5</field>
+             <field name="sequence">5</field>
+        </record>
+        <record model="kra.question" id="nw_question6">
+             <field name="kra_id" ref="employee_kra.employee_kra_nw"/>
+             <field name="hint">Network and Infra Structure Upgradation Projects</field>
+             <field name="name">Planning out and implementation of Procedures to enhance network security</field>
+             <field name="description"></field>
+             <field name="weightage">5</field>
+             <field name="sequence">6</field>
+        </record>
+        <record model="kra.question" id="nw_question7">
+             <field name="kra_id" ref="employee_kra.employee_kra_nw"/>
+             <field name="hint">Network and Infra Structure Upgradation Projects</field>
+             <field name="name">Developing scripts and procedures for fixing frequently occurring system issues</field>
+             <field name="description"></field>
+             <field name="weightage">10</field>
+             <field name="sequence">7</field>
+        </record>
+        <record model="kra.question" id="nw_question8">
+             <field name="kra_id" ref="employee_kra.employee_kra_nw"/>
+             <field name="hint">Network and Infra Structure Upgradation Projects</field>
+             <field name="name">Maintaining logs and process documentation of all components installed over server managed in house and live</field>
+             <field name="description"></field>
+             <field name="weightage">10</field>
+             <field name="sequence">8</field>
+        </record>
+        <record model="kra.question" id="nw_question9">
+             <field name="kra_id" ref="employee_kra.employee_kra_nw"/>
+             <field name="hint">Corporate Domain Management</field>
+             <field name="name">Setting up  Email accounts for all employees and managing accounts on employee.in and WIKI Doku.On time create/Block email accounts of employees.</field>
+             <field name="description"></field>
+             <field name="weightage">5</field>
+             <field name="sequence">9</field>
+        </record>
+   </data>
+</odoo>

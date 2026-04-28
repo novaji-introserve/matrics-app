@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <menuitem name="KRA" id="menu_employee_kra_root" sequence="10" web_icon="employee_kra,static/description/icon.png"/>
+    <menuitem id="menu_employee_kra_mothly_creation" parent="menu_employee_kra_root" name="Create KRA for Employee" sequence="20" groups="hr.group_hr_manager"/>
+
+    <!-- Wizard -->
+    <menuitem action="action_kra_report_wizard" id="menu_kra_report_wizard" sequence="10" name="Create KRA" parent="menu_employee_kra_mothly_creation" />
+
+    <!-- KRA menu -->
+    <menuitem id="menu_employee_kra_kra" parent="menu_employee_kra_root" name="KRA" sequence="1" />
+    <menuitem id="menu_employee_menu" action="action_employee_inherit" parent="menu_employee_kra_kra" name="Employee" sequence="10" groups="hr.group_hr_manager"/>
+    <menuitem id="menu_employee_kra_menu" action="action_employee_kra" parent="menu_employee_kra_kra" name="KRA" sequence="10"/>
+    <menuitem id="menu_employee_kra_review" action="action_employee_kra_review" parent="menu_employee_kra_kra" name="KRA to Review" sequence="25"/>
+
+    <!-- Analysis menu -->
+    <menuitem id="menu_employee_kra_analysis" parent="menu_employee_kra_root" name="Analysis" sequence="15" />
+    <menuitem action="action_employee_kra_question_report_all" id="menu_report_employee_kra_all" parent="menu_employee_kra_analysis" sequence="11" />
+
+    <!-- Value Rating -->
+    <menuitem id="menu_employee_value_rating_main_menu" parent="menu_employee_kra_root" name="Value Rating" sequence="12" /> 
+    <menuitem id="menu_employee_value_rating" action="action_employee_value_rating" parent="menu_employee_value_rating_main_menu" name="Value Rating" sequence="10" />
+    <menuitem action="action_employee_value_rating_analysis" id="menu_report_value_rating" parent="menu_employee_kra_analysis" sequence="12" />
+
+
+    <!-- Configuration menu -->
+    <menuitem id="menu_employee_kra_config" parent="menu_employee_kra_root" name="Configuration" sequence="30" groups="hr.group_hr_user" />
+    <menuitem id="menu_job_inherit_menu" action="action_job_inherit_menu" parent="menu_employee_kra_config" name="Job" sequence="10" />
+    <menuitem id="menu_employee_kra_conf_menu" action="action_kra_configuration" parent="menu_employee_kra_config" name="KRA" sequence="21" />
+    <menuitem id="menu_kra_question_section" action="action_kra_question_section" parent="menu_employee_kra_config" name="Question Section" sequence="31"/>
+
+</odoo>

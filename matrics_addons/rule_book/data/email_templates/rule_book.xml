@@ -1,0 +1,207 @@
+<odoo>
+    <data>
+        <!-- Email Template for Rulebook Due Dates -->
+        <!-- Email Template for Rulebook Due Date Notification -->
+        <record id="rulebook_due_date_notification_template" model="mail.template">
+            <field name="name">Rulebook Due Date Notification</field>
+            <field name="email_from">{{object.data()['email_from']}}</field>
+            <field name="email_cc">{{object.data()['email_cc']}}</field>
+            <field name="email_to">{{object.data()['email_to']}}</field>
+            <field name="subject">Reminder: Rulebook Due Date for {{object.data()['rulebook_name']}}</field>
+            <field name="model_id" ref="rule_book.model_rulebook" />
+            <field name="body_html" type="html">
+                <div
+                    style="background-color: #ffffff; margin: 40px auto; padding: 20px; max-width: 600px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border: 1px solid #e0e0e0;">
+                    <div style="text-align: center; padding: 10px 0;">
+                        <img src="http://icomply.novajii.com/rule_book/static/src/img/boi.jpeg"
+                            alt="Bank of Industry"
+                            style="max-width: 100px;" />
+                    </div>
+
+                    <div style="padding: 20px;">
+                        <p style="font-size: 16px; color: #333333; line-height: 1.6;"> Dear <strong
+                                style="color: #004225;">
+                                <t t-out="object.data()['first_line_escalation']" />
+                           </strong>
+                            ,
+                    </p>
+
+                        <div
+                            style="background-color: #f0fff0; padding: 20px; border-left: 5px solid #006400; border-radius: 5px; margin-bottom: 20px;">
+                            <p style="font-size: 16px; color: #333333; line-height: 1.6;"> This is a
+                                reminder that today is the due date for the regulatory action
+                                associated with the rulebook titled <strong style="color: #004225;">
+                                    <t t-out="object.data()['rulebook_name']" />
+                               </strong>. </p>
+                            <p style="font-size: 16px; color: #333333; line-height: 1.6;">
+                                <strong style="color: #004225;">Regulatory Agency:</strong>
+                                <t t-out="object.data()['regulatory_name']" />
+                           </p>
+                            <p style="font-size: 16px; color: #333333; line-height: 1.6;">
+                                <strong style="color: #004225;">Risk Category:</strong>
+                                <t t-out="object.data()['risk_category']" />
+                            </p>
+                        </div>
+
+                        <p style="font-size: 16px; color: #333333; line-height: 1.6;">
+                            You can check the full details of the rulebook by clicking the link
+                            below:
+                        </p>
+
+                        <p style="text-align: center;">
+                            <a t-attf-href="#{object.data()['record_link']}"
+                                style="display: inline-block; background-color: #FF0000; color: #FFFFFF; text-decoration: none; padding: 10px 20px; border-radius: 5px; margin-top: 20px; font-size: 16px;">View
+                                Rulebook Details</a>
+                        </p>
+                        <p style="font-size: 16px; color: #333333; line-height: 1.6;">You can upload
+                            the document at the following link: <a
+                                t-attf-href="#{object.data()['upload_link']}"
+                                style="display: inline-block;  color: #004225; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; text-align: center;">Submit
+                            Document</a>
+                        </p>
+
+
+                        <p style="font-size: 16px; color: #333333; line-height: 1.6;">Thank you.</p>
+                    </div>
+
+                    <div
+                        style="text-align: center; margin-top: 30px; font-size: 12px; color: #999999;">
+                        <p style="margin: 0;">...transforming Nigeria's industrial sector.</p>
+                        <p style="margin: 0;">&amp;copy; <t t-out="object.data()['current_year']"
+                            />
+                            Bank of Industry. All rights reserved.</p>
+                    </div>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False" />
+        </record>
+
+ 
+
+        <!-- First Line Escalation Template -->
+        <record id="email_template_first_line_escalation" model="mail.template">
+            <field name="name">First Line Escalation for Rulebook</field>
+            <field name="email_from">{{object.data()['email_from']}}</field>
+            <field name="email_cc">{{object.data()['email_cc']}}</field>
+            <field name="email_to">{{object.data()['email_to']}}</field>
+            <field name="subject">Escalation Due Date for {{object.data()['title']}}</field>
+            <field name="body_html" type="html">
+                <div
+                    style="background-color: #ffffff; margin: 40px auto; padding: 20px; max-width: 600px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border: 1px solid #e0e0e0;">
+                    <div style="text-align: center; padding: 10px 0;">
+                        <img src="http://icomply.novajii.com/rule_book/static/src/img/boi.jpeg"
+                            alt="Bank of Industry"
+                            style="max-width: 100px;" />
+                    </div>
+
+                    <div style="padding: 20px;">
+                        <p style="font-size: 16px; color: #333333; line-height: 1.6;">Dear <strong
+                                style="color: #004225;">
+                                <t t-out="object.data()['name']" />
+                            </strong>
+                            ,</p>
+
+                        <div
+                            style="background-color: #f0fff0; padding: 20px; border-left: 5px solid #006400; border-radius: 5px; margin-bottom: 20px;">
+                            <p style="font-size: 16px; color: #333333; line-height: 1.6;">The user
+                                has not yet uploaded the regulatory document for <strong
+                                    style="color: #004225;">
+                                    <t t-out="object.data()['title']" />
+                                </strong>
+                                .</p>
+                            <p style="font-size: 16px; color: #333333; line-height: 1.6;">
+                                <strong style="color: #004225;">Escalation Due Date:</strong>
+                                <t t-out="object.data()['due_date']" />
+                            </p>
+                        </div>
+
+                        <p style="font-size: 16px; color: #333333; line-height: 1.6;">You can check
+                            the regulatory details here: <a
+                                t-attf-href="#{object.data()['record_link']}"
+                                style="display: inline-block; color: #006400; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; text-align: center;">Check Details</a>
+                        </p>
+
+                        <p style="font-size: 16px; color: #333333; line-height: 1.6;">You can upload
+                            the document at the following link: <a
+                                t-attf-href="#{object.data()['upload_link']}"
+                                style="display: inline-block; background-color: #FF0000; color: #FFFFFF; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; text-align: center;">Submit Document</a>
+                        </p>
+
+                        <p style="font-size: 16px; color: #333333; line-height: 1.6;">Thank you.</p>
+                    </div>
+
+                    <div
+                        style="text-align: center; margin-top: 30px; font-size: 12px; color: #999999;">
+                        <p style="margin: 0;">...transforming Nigeria's industrial sector.</p>
+                        <p style="margin: 0;">&amp;copy; <t t-out="object.data()['current_year']"
+                              /> Bank of Industry. All rights reserved.</p>
+                    </div>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False" />
+        </record>
+
+
+        <!-- Internal Due Date Reminder -->
+        <record id="email_template_internal_due_date_" model="mail.template">
+            <field name="name">Internal Due Date Reminder for Rulebook</field>
+            <field name="email_from">{{object.data()['email_from']}}</field>
+            <field name="model_id" ref="rule_book.model_rulebook" />
+            <field name="email_cc">{{object.data()['email_from']}}</field>
+            <field name="email_to">{{object.data()['email_to']}}</field>
+            <field name="subject">Internal Due Date for {{object.data()['title']}}</field>
+            <field name="body_html" type="html">
+                <div
+                    style="font-family: Arial, sans-serif; background-color: #f0f8ff; margin: 0; padding: 0;">
+                    <div
+                        style="background-color: #ffffff; margin: 40px auto; padding: 20px; max-width: 600px; border: 1px solid #E0E0E0; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+                        <div style="text-align: center; padding: 10px 0;">
+                            <img src="http://icomply.novajii.com/rule_book/static/src/img/boi.jpeg"
+                                style="max-width: 150px;" />
+                        </div>
+                        <div style="padding: 20px;">
+                            <p style="font-size: 16px; color: #333333; line-height: 1.6;">Dear <strong style="color: #006400;">
+                                <t
+                                        t-out="object.data()['name']"></t><strong/>
+                            </strong></p>
+                            <div
+                                style="background-color: #f0fff0; padding: 15px; border-left: 5px solid #006400; border-radius: 5px; margin-bottom: 20px;">
+                                <p style="font-size: 16px; color: #333333; line-height: 1.6;">The
+                                    internal due date for submitting the document for <strong
+                                        style="color: #006400;">
+                                        <t
+                                            t-out="object.data()['title']"></t><strong />
+                                   </strong>
+                                    is approaching. The due date is <strong style="color: #006400;">
+                                        <t
+                                            t-out="object.data()['due_date']"></t><strong />
+                                   </strong>.</p>
+                                <p style="font-size: 16px; color: #333333; line-height: 1.6;">Please
+                                    ensure that the document is uploaded before the due date.</p>
+                            </div>
+                            <p style="font-size: 16px; color: #333333; line-height: 1.6;">You can
+                                upload the document here: <a
+                                    t-attf-href="#{object.data()['upload_link']}"
+                                   
+                                    style="display: inline-block; background-color: #FF0000; color: #FFFFFF; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; text-align: center;">Submit
+                                Document</a></p>
+                            <p style="font-size: 16px; color: #333333; line-height: 1.6;">Thank you.</p>
+                        </div>
+                        <div
+                            style="text-align: center; margin-top: 30px; font-size: 12px; color: #999999;">
+                            <p>&amp;copy; <t t-out="object.data()['current_year']"
+                                /> Bank of Industry.
+                            All rights reserved.</p>
+                        </div>
+                    </div>
+                </div>
+            </field>
+            <field name="auto_delete" eval="False" />
+        </record>
+
+    </data>
+</odoo>
+
+<!-- <p>This is a reminder that the rulebook <strong>${object.name}</strong> is due today.</p>
+<p>Internal Due Date: ${object.internal_due_date}</p>
+<p>Escalation Date: ${object.escalation_date}</p> -->

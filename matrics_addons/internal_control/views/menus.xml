@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_internal_control_shared_dashboard" model="ir.actions.client">
+        <field name="name">Dashboard</field>
+        <field name="tag">owl.compliance_dashboard_v3</field>
+        <field name="params">
+            {"dashboard_scope": "transaction_monitoring"}
+        </field>
+    </record>
+
+    <!-- Main navigation -->
+    <menuitem
+        id="menu_internal_control_main"
+        name="Transactions"
+        web_icon="internal_control,static/description/icon.png"
+        sequence="-800"
+    />
+
+    <menuitem
+        id="menu_internal_control_dashboard"
+        name="Dashboard"
+        parent="menu_internal_control_main"
+        action="action_internal_control_shared_dashboard"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_customer_management"
+        name="Customers"
+        parent="menu_internal_control_main"
+        sequence="20"
+    />
+
+    <menuitem
+        id="menu_transaction_monitoring_root"
+        name="Transactions"
+        parent="menu_internal_control_main"
+        sequence="30"
+    />
+
+    <menuitem
+        id="menu_internal_control_alert_monitoring"
+        name="Alerts"
+        parent="menu_internal_control_main"
+        sequence="40"
+    />
+
+    <menuitem
+        id="menu_internal_control_configurations"
+        name="Configuration"
+        parent="menu_internal_control_main"
+        groups="compliance_management.group_compliance_chief_compliance_officer"
+        sequence="50"
+    />
+
+    <!-- Customers -->
+    <menuitem
+        id="menu_customer_recent"
+        name="Recently Opened"
+        parent="menu_customer_management"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_customer_today"
+        name="Today"
+        parent="menu_customer_recent"
+        action="action_open_customers_today"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_customer_last_7days"
+        name="Last 7 Days"
+        parent="menu_customer_recent"
+        action="action_open_customers_last_7days"
+        sequence="20"
+    />
+
+    <menuitem
+        id="menu_account"
+        name="Accounts"
+        parent="menu_customer_management"
+        sequence="20"
+    />
+
+    <menuitem
+        id="menu_account_tier_1"
+        name="Tier 1"
+        parent="menu_account"
+        action="action_open_accounts_tier_1"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_account_tier_2"
+        name="Tier 2"
+        parent="menu_account"
+        action="action_open_accounts_tier_2"
+        sequence="20"
+    />
+
+    <menuitem
+        id="menu_account_tier_3"
+        name="Tier 3"
+        parent="menu_account"
+        action="action_open_accounts_tier_3"
+        sequence="30"
+    />
+
+    <!-- Transactions -->
+    <menuitem
+        id="menu_transactions_callover"
+        name="Callover"
+        parent="menu_transaction_monitoring_root"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_transactions_callover_today"
+        name="Today"
+        parent="menu_transactions_callover"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_transactions_callover_today_awaiting_review"
+        name="Awaiting Review"
+        parent="menu_transactions_callover_today"
+        action="action_awaiting_review_today"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_transactions_callover_today_reviewed"
+        name="Reviewed"
+        parent="menu_transactions_callover_today"
+        action="action_reviewed_today"
+        sequence="20"
+    />
+
+    <menuitem
+        id="menu_transactions_callover_week"
+        name="Last 1 Week"
+        parent="menu_transactions_callover"
+        sequence="20"
+    />
+
+    <menuitem
+        id="menu_transactions_callover_week_awaiting_review"
+        name="Awaiting Review"
+        parent="menu_transactions_callover_week"
+        action="action_awaiting_review_last_week"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_transactions_callover_week_reviewed"
+        name="Reviewed"
+        parent="menu_transactions_callover_week"
+        action="action_reviewed_last_week"
+        sequence="20"
+    />
+
+    <menuitem
+        id="menu_transactions_callover_month"
+        name="Last 1 Month"
+        parent="menu_transactions_callover"
+        sequence="30"
+    />
+
+    <menuitem
+        id="menu_transactions_callover_month_awaiting_review"
+        name="Awaiting Review"
+        parent="menu_transactions_callover_month"
+        action="action_awaiting_review_last_month"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_transactions_callover_month_reviewed"
+        name="Reviewed"
+        parent="menu_transactions_callover_month"
+        action="action_reviewed_last_month"
+        sequence="20"
+    />
+
+    <menuitem
+        id="menu_transactions_change_management"
+        name="Change Management"
+        parent="menu_transaction_monitoring_root"
+        sequence="20"
+    />
+
+    <menuitem
+        id="menu_transactions_screening"
+        name="Screening"
+        parent="menu_transaction_monitoring_root"
+        sequence="30"
+    />
+
+    <record id="compliance_management.menu_change_data_capture" model="ir.ui.menu">
+        <field name="parent_id" ref="compliance_management.menu_compliance_kyc"/>
+        <field name="sequence">15</field>
+    </record>
+
+    <!-- Transaction items parked for review.
+    <menuitem id="menu_internal_control_transactions_report_root" name="Reporting" parent="menu_transaction_monitoring_root" sequence="40"/>
+    <menuitem id="menu_internal_control_transactions_report" name="Reports" parent="menu_internal_control_transactions_report_root" action="bi_sql_editor.action_bi_sql_view" sequence="10"/>
+    <menuitem id="menu_customers_all_transactions_today_ngn" name="Customer Today NGN" parent="menu_transaction_monitoring_root" action="action_customers_all_transactions_today_ngn" sequence="10"/>
+    <menuitem id="menu_customers_all_transactions_today_other" name="Customer Today Other" parent="menu_transaction_monitoring_root" action="action_customers_all_transactions_today_other" sequence="20"/>
+    <menuitem id="menu_customers_all_transactions_7days_ngn" name="Customer Last 7 Days NGN" parent="menu_transaction_monitoring_root" action="action_customers_all_transactions_7days_ngn" sequence="30"/>
+    <menuitem id="menu_customers_all_transactions_7days_other" name="Customer Last 7 Days Other" parent="menu_transaction_monitoring_root" action="action_customers_all_transactions_7days_other" sequence="40"/>
+    <menuitem id="menu_internal_all_transactions_today_ngn" name="Internal Today NGN" parent="menu_transaction_monitoring_root" action="action_internal_all_transactions_today_ngn" sequence="50"/>
+    <menuitem id="menu_internal_all_transactions_today_other" name="Internal Today Other" parent="menu_transaction_monitoring_root" action="action_internal_all_transactions_today_other" sequence="60"/>
+    <menuitem id="menu_internal_all_transactions_7days_ngn" name="Internal Last 7 Days NGN" parent="menu_transaction_monitoring_root" action="action_internal_all_transactions_7days_ngn" sequence="70"/>
+    <menuitem id="menu_internal_all_transactions_7days_other" name="Internal Last 7 Days Other" parent="menu_transaction_monitoring_root" action="action_internal_all_transactions_7days_other" sequence="80"/>
+    <menuitem id="menu_awaiting_review" name="Awaiting Review" parent="menu_transaction_monitoring_root" sequence="20"/>
+    <menuitem id="menu_customers_awaiting_review_today_ngn" name="Customer Today NGN" parent="menu_awaiting_review" action="action_customers_awaiting_review_today_ngn" sequence="10"/>
+    <menuitem id="menu_customers_awaiting_review_today_other" name="Customer Today Other" parent="menu_awaiting_review" action="action_customers_awaiting_review_today_other" sequence="20"/>
+    <menuitem id="menu_customers_awaiting_review_7days_ngn" name="Customer Last 7 Days NGN" parent="menu_awaiting_review" action="action_customers_awaiting_review_7days_ngn" sequence="30"/>
+    <menuitem id="menu_customers_awaiting_review_7days_other" name="Customer Last 7 Days Other" parent="menu_awaiting_review" action="action_customers_awaiting_review_7days_other" sequence="40"/>
+    <menuitem id="menu_internal_awaiting_review_today_ngn" name="Internal Today NGN" parent="menu_awaiting_review" action="action_internal_awaiting_review_today_ngn" sequence="50"/>
+    <menuitem id="menu_internal_awaiting_review_today_other" name="Internal Today Other" parent="menu_awaiting_review" action="action_internal_awaiting_review_today_other" sequence="60"/>
+    <menuitem id="menu_internal_awaiting_review_7days_ngn" name="Internal Last 7 Days NGN" parent="menu_awaiting_review" action="action_internal_awaiting_review_7days_ngn" sequence="70"/>
+    <menuitem id="menu_internal_awaiting_review_7days_other" name="Internal Last 7 Days Other" parent="menu_awaiting_review" action="action_internal_awaiting_review_7days_other" sequence="80"/>
+    <menuitem id="menu_reviewed" name="Reviewed" parent="menu_transaction_monitoring_root" sequence="30"/>
+    <menuitem id="menu_customers_reviewed_today_ngn" name="Customer Today NGN" parent="menu_reviewed" action="action_customers_reviewed_today_ngn" sequence="10"/>
+    <menuitem id="menu_customers_reviewed_today_other" name="Customer Today Other" parent="menu_reviewed" action="action_customers_reviewed_today_other" sequence="20"/>
+    <menuitem id="menu_customers_reviewed_7days_ngn" name="Customer Last 7 Days NGN" parent="menu_reviewed" action="action_customers_reviewed_7days_ngn" sequence="30"/>
+    <menuitem id="menu_customers_reviewed_7days_other" name="Customer Last 7 Days Other" parent="menu_reviewed" action="action_customers_reviewed_7days_other" sequence="40"/>
+    <menuitem id="menu_internal_reviewed_today_ngn" name="Internal Today NGN" parent="menu_reviewed" action="action_internal_reviewed_today_ngn" sequence="50"/>
+    <menuitem id="menu_internal_reviewed_today_other" name="Internal Today Other" parent="menu_reviewed" action="action_internal_reviewed_today_other" sequence="60"/>
+    <menuitem id="menu_internal_reviewed_7days_ngn" name="Internal Last 7 Days NGN" parent="menu_reviewed" action="action_internal_reviewed_7days_ngn" sequence="70"/>
+    <menuitem id="menu_internal_reviewed_7days_other" name="Internal Last 7 Days Other" parent="menu_reviewed" action="action_internal_reviewed_7days_other" sequence="80"/>
+    -->
+
+    <!-- Alerts -->
+    <menuitem
+        id="menu_internal_control_alert_rules_monitoring"
+        name="Processes"
+        parent="menu_internal_control_alert_monitoring"
+        action="alert_management.action_alert_rules"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_alert_history"
+        name="Alert History"
+        parent="menu_internal_control_alert_monitoring"
+        action="alert_management.action_alert_history_status"
+        sequence="20"
+    />
+
+    <!-- Configuration -->
+    <menuitem
+        id="menu_user_profile"
+        name="Users"
+        parent="menu_internal_control_configurations"
+        action="base.action_res_users"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_internal_control_configuration_screening"
+        name="Transaction Controls"
+        parent="menu_internal_control_configurations"
+        sequence="20"
+    />
+
+    <menuitem
+        id="menu_internal_control_transaction_rules"
+        name="Rules"
+        parent="menu_internal_control_configuration_screening"
+        action="compliance_management.action_list_transaction_screening_rule"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_internal_control_cron_tree_parent"
+        name="Scheduled Actions"
+        parent="menu_internal_control_configurations"
+        action="action_ir_cron"
+        sequence="30"
+    />
+
+    <menuitem
+        id="sql_panel"
+        name="SQL Panel"
+        parent="menu_internal_control_configurations"
+        action="psql_query_execute.action_psql_query"
+        sequence="40"
+    />
+
+    <!-- Keep legacy compliance transaction menus out of the new sidebar. -->
+    <record id="compliance_management.menu_compliance_transactions_root" model="ir.ui.menu">
+        <field name="active">False</field>
+    </record>
+
+    <record id="compliance_management.menu_compliance_transaction_monitoring" model="ir.ui.menu">
+        <field name="active">False</field>
+    </record>
+
+    <record id="compliance_management.menu_compliance_kyc_transaction_screening" model="ir.ui.menu">
+        <field name="active">False</field>
+    </record>
+
+    <record id="compliance_management.menu_compliance_transaction_screening" model="ir.ui.menu">
+        <field name="active">False</field>
+    </record>
+
+    <record id="compliance_management.menu_compliance_transactions" model="ir.ui.menu">
+        <field name="active">False</field>
+    </record>
+
+    <record id="compliance_management.menu_compliance_transactions_done" model="ir.ui.menu">
+        <field name="active">False</field>
+    </record>
+
+    <record id="compliance_management.menu_compliance_transactions_all" model="ir.ui.menu">
+        <field name="active">False</field>
+    </record>
+
+    <record id="compliance_management.menu_compliance_internal_transactions" model="ir.ui.menu">
+        <field name="active">False</field>
+    </record>
+
+    <record id="compliance_management.menu_compliance_transaction_screening_rule" model="ir.ui.menu">
+        <field name="active">True</field>
+        <field name="parent_id" ref="menu_transactions_screening"/>
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="compliance_management.menu_compliance_transaction_screening_history" model="ir.ui.menu">
+        <field name="active">True</field>
+        <field name="parent_id" ref="menu_transactions_screening"/>
+        <field name="sequence">20</field>
+    </record>
+</odoo>

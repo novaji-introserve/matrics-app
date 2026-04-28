@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data>
+	<record id="hr_staff_req_user_id" model="res.groups">
+		<field name="name">Employee Recruitment User</field>
+		<field name="category_id" ref="base.module_category_hidden"/>
+	</record>
+
+	<record id="hr_staff_req_manager_id" model="res.groups">
+		<field name="name">Employee Recruitment Manager</field>
+		<field name="category_id" ref="base.module_category_hidden"/>
+	</record>
+</data>
+</odoo>

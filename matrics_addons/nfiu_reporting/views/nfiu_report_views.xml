@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <!-- NFIU Report Tree View -->
+    <record id="view_nfiu_report_tree" model="ir.ui.view">
+      <field name="name">nfiu.report.tree</field>
+      <field name="model">nfiu.report</field>
+      <field name="arch" type="xml">
+        <tree decoration-success="state=='validated'" decoration-warning="state=='generated'"
+          decoration-danger="state=='error'">
+          <field name="name" />
+          <field name="entity_id" />
+          <field name="report_type" />
+          <field name="report_code" string="NFIU Report Type" />
+          <field name="submission_date" />
+          <field name="date_from" />
+          <field name="date_to" />
+          <field name="currency_code_local" />
+          <field name="transaction_cnt" string="Transactions" />
+          <field name="state" widget="badge" decoration-danger="state == 'error'" decoration-warning="state in ['generated']" decoration-success="state in ['validated','submitted']" />
+          <button name="generate_xml" type="object" string="Generate XML" icon="fa-file-code-o"
+            attrs="{'invisible': [('state', 'not in', ['draft'])]}" />
+          <button name="validate_xml" type="object" string="Validate" icon="fa-check-circle"
+            attrs="{'invisible': [('state', 'not in', ['generated'])]}" />
+        </tree>
+      </field>
+    </record>
+
+    <!-- NFIU Report Form View -->
+    <record id="view_nfiu_report_form" model="ir.ui.view">
+      <field name="name">nfiu.report.form</field>
+      <field name="model">nfiu.report</field>
+      <field name="arch" type="xml">
+        <form>
+          <header>
+            <button name="generate_xml" type="object" string="Generate  Report" class="btn-info" />
+            <button name="set_generated" type="object" string="Set To Generated" class="btn-info"
+              attrs="{'invisible': [('state', 'in', ['generated'])]}" />
+            <button name="validate_xml" type="object" string="Validate Report Schema" class="btn-success"
+              attrs="{'invisible': [('state', 'not in', ['generated'])]}" />
+            <!-- <button name="action_submit" type="object" string="Submit Report" class="btn-warning"
+              attrs="{'invisible': [('state', '!=', 'validated')]}" /> -->
+            <button name="action_download_report" type="object" string="Download Report"
+              class="btn-info" attrs="{'invisible': [('state', '=', 'draft')]}" />
+            <field name="state" widget="statusbar"
+              statusbar_visible="draft,generated,validated,submitted" />
+          </header>
+          <sheet>
+            <div class="oe_title">
+              <label for="name" class="oe_edit_only" />
+              <h1>
+                <field name="name" placeholder="Report Name" />
+              </h1>
+              <label for="entity_id" class="oe_edit_only" />
+              <h2>
+                <field name="entity_id"/>
+              </h2>
+            </div>
+
+            <group string="Report Overview" col="4">
+              <group>
+                <field name="entity_id" />
+                <field name="report_code" string="NFIU Report Code" />
+                <field name="report_type" readonly="1" />
+                <field name="submission_code" />
+              </group>
+              <group>
+                <field name="submission_date" />
+                <field name="date_from" />
+                <field name="date_to" />
+                <field name="currency_code_local" />
+              </group>
+            </group>
+
+            <group string="Reporting Entity" col="4">
+              <group>
+                <field name="rentity_id" readonly="1" />
+                <field name="rentity_branch" readonly="1" />
+                <field name="entity_reference" readonly="1" />
+              </group>
+              <group>
+                <field name="fiu_ref_number" readonly="1" />
+                <field name="reporting_person_id" />
+                <field name="location_id" />
+              </group>
+            </group>
+
+            <group string="Narrative" col="2">
+              <field name="reason" placeholder="Reason for report..." nolabel="1" />
+              <field name="action" placeholder="Action taken..." nolabel="1" />
+            </group>
+
+            <notebook>
+              <!--
+              <page string="Transactions">
+                <field name="transaction_ids">
+                  <tree editable="bottom">
+                    <field name="transaction_number" />
+                    <field name="description" />
+                    <field name="date_transaction" />
+                    <field name="amount_local" />
+                    <field name="transmode_code" />
+                    <field name="from_person_id" />
+                    <field name="to_person_id" />
+                  </tree>
+                </field>
+              </page>
+               -->
+
+              <page string="Indicators">
+                <field name="indicator_ids" widget="many2many_tags" />
+              </page>
+
+              <page string="Generated XML" attrs="{'invisible': [('state', '=', 'draft')]}">
+                <group>
+                  <field name="xml_filename" />
+                  <field name="xml_file" filename="xml_filename" />
+                </group>
+                <field name="xml_content" widget="ace" options="{'mode': 'xml'}" />
+              </page>
+
+              <page string="Validation" attrs="{'invisible': [('validation_message', '=', False)]}">
+                <field name="validation_message" widget="text" />
+              </page>
+            </notebook>
+          </sheet>
+          <div class="oe_chatter">
+            <field name="message_follower_ids" widget="mail_followers" />
+            <field name="activity_ids" widget="mail_activity" />
+            <field name="message_ids" widget="mail_thread" />
+          </div>
+        </form>
+      </field>
+    </record>
+
+    <!-- NFIU Report Search View -->
+    <record id="view_nfiu_report_search" model="ir.ui.view">
+      <field name="name">nfiu.report.search</field>
+      <field name="model">nfiu.report</field>
+      <field name="arch" type="xml">
+        <search>
+          <field name="name" />
+          <field name="report_code" string="NFIU Report Type" />
+          <field name="reporting_person_id" />
+          <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]" />
+          <filter string="Generated" name="generated" domain="[('state', '=', 'generated')]" />
+          <filter string="Validated" name="validated" domain="[('state', '=', 'validated')]" />
+          <filter string="Submitted" name="submitted" domain="[('state', '=', 'submitted')]" />
+          <group expand="0" string="Group By">
+            <filter string="Report Type" name="group_report_type"
+              context="{'group_by': 'report_type'}" />
+            <filter string="State" name="group_state" context="{'group_by': 'state'}" />
+            <filter string="Reporting Currency" name="group_currency_code_local"
+              context="{'group_by': 'currency_code_local'}" />
+            <filter string="Submission Date" name="group_date"
+              context="{'group_by': 'submission_date:month'}" />
+          </group>
+        </search>
+      </field>
+    </record>
+
+    <!-- Action for NFIU Reports -->
+    <record id="action_nfiu_report" model="ir.actions.act_window">
+      <field name="name">Financial Intelligence Reports</field>
+      <field name="res_model">nfiu.report</field>
+      <field name="view_mode">tree,form</field>
+      <field name="context">{'search_default_group_report_type': 1}</field>
+      <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+          Create a new Report
+        </p>
+        <p>
+          Generate XML reports for financial intelligence reporting.
+        </p>
+      </field>
+    </record>
+  </data>
+</odoo>

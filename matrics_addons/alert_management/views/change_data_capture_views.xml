@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_change_data_capture_tree_alert_history" model="ir.ui.view">
+        <field name="name">change.data.capture.tree.alert.history</field>
+        <field name="model">change.data.capture</field>
+        <field name="inherit_id" ref="compliance_management.view_change_data_capture_tree"/>
+        <field name="active" eval="False"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside"/>
+        </field>
+    </record>
+
+    <record id="view_change_data_capture_form_alert_history" model="ir.ui.view">
+        <field name="name">change.data.capture.form.alert.history</field>
+        <field name="model">change.data.capture</field>
+        <field name="inherit_id" ref="compliance_management.view_change_data_capture_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group/group/field[@name='model_id']" position="after">
+                <field name="alert_history_id" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_change_data_capture_search_alert_history" model="ir.ui.view">
+        <field name="name">change.data.capture.search.alert.history</field>
+        <field name="model">change.data.capture</field>
+        <field name="inherit_id" ref="compliance_management.view_change_data_capture_search"/>
+        <field name="active" eval="False"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside"/>
+        </field>
+    </record>
+</odoo>

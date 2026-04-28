@@ -1,0 +1,2001 @@
+import requests
+import os
+import re
+import logging
+import time
+from datetime import datetime
+import hashlib
+from urllib.parse import urljoin, urlparse
+from bs4 import BeautifulSoup
+import traceback
+import random
+from requests.auth import HTTPBasicAuth
+from dotenv import load_dotenv
+
+_logger = logging.getLogger(__name__)
+
+
+class SanctionScraper:
+    """
+    Handles scraping of sanctions data from various government sources
+    with improved file type prioritization and error handling
+    """
+
+    def __init__(self, env=None, media_dir=None):
+        """
+        Initialize the sanctions scraper
+
+        Args:
+            env: Odoo environment
+            media_dir: Directory for storing downloaded files
+        """
+        self.env = env
+
+        # Set up the base media directory
+        if media_dir:
+            self.media_dir = media_dir
+        else:
+            # Fallback to a local directory
+            self.media_dir = os.path.join(
+                os.path.dirname(os.path.dirname(__file__)), "media", "sanctions_data"
+            )
+
+        # Create the media directory if it doesn't exist
+        os.makedirs(self.media_dir, exist_ok=True)
+
+        # Configure a request session with proper headers
+        self.session = requests.Session()
+        self.session.headers.update(
+            {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.5",
+            }
+        )
+
+        # Retry configuration
+        self.max_retries = 3
+        self.retry_delay = 2  # seconds
+
+        # Configurable timeout
+        self.timeout = 30  # seconds
+        
+        # File type priority (highest to lowest)
+        self.file_type_priority = ["csv", "xlsx", "xls", "ods", "pdf", "xml", "txt"]
+
+    def _get_source_directory(self, source_name):
+        """
+        Get the directory for a specific source
+
+        Args:
+            source_name: Name of the source
+
+        Returns:
+            str: Path to the source directory
+        """
+        source_dir = os.path.join(self.media_dir, source_name)
+        os.makedirs(source_dir, exist_ok=True)
+        return source_dir
+
+    def _generate_filename(self, url, source_name):
+        """
+        Generate a unique filename for a URL with consistent naming
+
+        Args:
+            url: URL of the file
+            source_name: Name of the source
+
+        Returns:
+            str: A unique filename
+        """
+        # Get the original filename from the URL
+        parsed_url = urlparse(url)
+        original_filename = os.path.basename(parsed_url.path)
+
+        # If no filename could be extracted, use the hash of the URL
+        if not original_filename or original_filename == '/' or '?' in original_filename:
+            url_hash = hashlib.md5(url.encode()).hexdigest()[:8]
+            original_filename = f"{source_name}_{url_hash}"
+
+        # Extract the file extension
+        _, file_extension = os.path.splitext(original_filename)
+        if not file_extension:
+            # Try to determine extension from the URL
+            file_extension = self._infer_extension(url)
+
+        # Generate a filename without timestamp to avoid duplicates
+        # This helps with consistent file tracking between runs
+        filename = f"{source_name}_{original_filename}"
+        
+        return filename, file_extension.lstrip('.')
+
+    def _infer_extension(self, url):
+        """
+        Infer file extension from URL or by making a HEAD request
+
+        Args:
+            url: URL of the file
+
+        Returns:
+            str: File extension with leading dot
+        """
+        # First, try to infer from URL patterns
+        url_lower = url.lower()
+        if "csv" in url_lower:
+            return ".csv"
+        elif "xlsx" in url_lower:
+            return ".xlsx"
+        elif "xls" in url_lower and "xlsx" not in url_lower:
+            return ".xls"
+        elif "pdf" in url_lower:
+            return ".pdf"
+        elif "ods" in url_lower:
+            return ".ods"
+        elif "xml" in url_lower:
+            return ".xml"
+
+        # If not obvious from URL, make a HEAD request
+        try:
+            response = self.session.head(url, timeout=10)
+            content_type = response.headers.get("Content-Type", "").lower()
+
+            if "csv" in content_type:
+                return ".csv"
+            elif "spreadsheetml" in content_type or "xlsx" in content_type:
+                return ".xlsx"
+            elif "excel" in content_type or "xls" in content_type and "xlsx" not in content_type:
+                return ".xls"
+            elif "pdf" in content_type:
+                return ".pdf"
+            elif "opendocument.spreadsheet" in content_type:
+                return ".ods"
+            elif "xml" in content_type:
+                return ".xml"
+            elif "text/plain" in content_type:
+                return ".txt"
+            else:
+                # Default to binary file
+                return ".bin"
+        except:
+            # If HEAD request fails, default to binary
+            return ".bin"
+
+    def _download_file(self, url, source_name, retries=None, max_size_mb=30):
+        """
+        Download a file with reliable duplicate prevention and size checking
+        
+        Args:
+            url: URL to download
+            source_name: Name of the source
+            retries: Number of retries, defaults to self.max_retries
+            max_size_mb: Maximum file size in MB to download
+            
+        Returns:
+            tuple: (file_path, file_type) or (None, None) on failure
+        """
+        if retries is None:
+            retries = self.max_retries
+
+        try:
+            # Get the source directory
+            source_dir = self._get_source_directory(source_name)
+
+            # Generate a consistent filename based on URL
+            filename, file_type = self._generate_filename(url, source_name)
+            file_path = os.path.join(source_dir, filename)
+            
+            # Check if this file exists and is recent (less than 24 hours old)
+            if os.path.exists(file_path) and os.path.getsize(file_path) > 100:
+                file_age = datetime.now().timestamp() - os.path.getmtime(file_path)
+                if file_age < 86400:  # 24 hours
+                    _logger.info(f"Using existing file (less than 24h old): {file_path}")
+                    return file_path, file_type
+            
+            # Check file size first with HEAD request
+            try:
+                head_response = self.session.head(url, timeout=10)
+                content_length = int(head_response.headers.get('content-length', 0))
+                size_mb = content_length / (1024 * 1024)
+                
+                _logger.info(f"File size: {size_mb:.2f} MB")
+                
+                # Skip if file is too large
+                if max_size_mb > 0 and size_mb > max_size_mb:
+                    _logger.warning(f"File is too large ({size_mb:.2f} MB > {max_size_mb} MB), skipping: {url}")
+                    return None, None
+                
+                # Set reasonable timeouts based on file size
+                timeout = min(60, max(10, content_length / 100000))  # 10-60 seconds
+            except Exception as e:
+                # If we can't determine size, use default timeout
+                _logger.warning(f"Could not determine file size, using default timeout: {str(e)}")
+                timeout = self.timeout
+                content_length = 0
+            
+            # Download the file
+            _logger.info(f"Downloading {url} to {file_path}")
+            
+            # Create temp file path
+            temp_file_path = f"{file_path}.tmp"
+            
+            # Download with stream=True for memory efficiency
+            response = self.session.get(url, stream=True, timeout=timeout)
+            response.raise_for_status()
+            
+            # Get content type for file type determination
+            content_type = response.headers.get('Content-Type', '').lower()
+            
+            # Download file in chunks to avoid memory issues
+            with open(temp_file_path, 'wb') as f:
+                downloaded_size = 0
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+                        downloaded_size += len(chunk)
+                        
+                        # Check if exceeding max size during download
+                        if max_size_mb > 0 and downloaded_size > max_size_mb * 1024 * 1024:
+                            f.close()
+                            os.remove(temp_file_path)
+                            _logger.warning(f"Download exceeded max size ({max_size_mb} MB), aborting: {url}")
+                            return None, None
+            
+            # Validate downloaded file
+            if os.path.exists(temp_file_path) and os.path.getsize(temp_file_path) > 0:
+                # If we already have a file, only replace if newer file is larger or old file is incomplete
+                if not os.path.exists(file_path) or \
+                os.path.getsize(temp_file_path) > os.path.getsize(file_path) or \
+                os.path.getsize(file_path) < 1000:
+                    os.replace(temp_file_path, file_path)
+                    _logger.info(f"Downloaded file saved to {file_path}")
+                else:
+                    os.remove(temp_file_path)
+                    _logger.info(f"Keeping existing file (larger than new download)")
+            else:
+                _logger.warning(f"Download failed (empty file): {url}")
+                if os.path.exists(temp_file_path):
+                    os.remove(temp_file_path)
+                return None, None
+            
+            # Determine file type if not already known
+            if not file_type:
+                if 'csv' in content_type:
+                    file_type = 'csv'
+                elif 'spreadsheetml' in content_type:
+                    file_type = 'xlsx'
+                elif 'excel' in content_type and 'xlsx' not in content_type:
+                    file_type = 'xls'
+                elif 'pdf' in content_type:
+                    file_type = 'pdf'
+                elif 'opendocument.spreadsheet' in content_type:
+                    file_type = 'ods'
+                elif 'xml' in content_type:
+                    file_type = 'xml'
+                elif 'text/plain' in content_type:
+                    file_type = 'txt'
+                else:
+                    # Fallback to extension from filename
+                    _, ext = os.path.splitext(file_path)
+                    file_type = ext.lstrip('.').lower() or 'bin'
+                    
+            return file_path, file_type
+            
+        except requests.exceptions.RequestException as e:
+            if retries > 0:
+                # Use exponential backoff for retries
+                delay = self.retry_delay * (2 ** (self.max_retries - retries))
+                _logger.warning(f"Download failed, retrying in {delay:.1f}s ({retries} retries left): {url}")
+                time.sleep(delay)
+                return self._download_file(url, source_name, retries - 1, max_size_mb)
+            else:
+                _logger.error(f"Failed to download file after {self.max_retries} attempts: {url}")
+                _logger.error(f"Error: {str(e)}")
+                return None, None
+        except Exception as e:
+            _logger.error(f"Error downloading file: {url}")
+            _logger.error(f"Error: {str(e)}")
+            return None, None
+
+    def _fetch_page(self, url, retries=None, auth_required=False):
+        """
+        Fetch a web page with improved error handling and auth support
+
+        Args:
+            url: URL to fetch
+            retries: Number of retries, defaults to self.max_retries
+            auth_required: Whether authentication is required
+
+        Returns:
+            tuple: (soup, response) or (None, None) on failure
+        """
+        if retries is None:
+            retries = self.max_retries
+
+        try:
+            _logger.info(f"Fetching page: {url}")
+            
+            headers = self.session.headers.copy()
+            
+            # Add authentication if required
+            if auth_required:
+                if self.env:
+                    config = self.env["ir.config_parameter"].sudo()
+                    username = config.get_param("sanctions_scraper.username")
+                    password = config.get_param("sanctions_scraper.password")
+                    if username and password:
+                        auth = HTTPBasicAuth(username, password)
+                    else:
+                        auth = None
+                else:
+                    # Try to load from .env file
+                    credentials = self._get_europa_credentials()
+                    if credentials.get('europa_username') and credentials.get('europa_password'):
+                        auth = HTTPBasicAuth(
+                            credentials['europa_username'], 
+                            credentials['europa_password']
+                        )
+                    else:
+                        auth = None
+            else:
+                auth = None
+                
+            # Add slight random delay to avoid rate limiting (0.5-1.5 seconds)
+            time.sleep(random.uniform(0.5, 1.5))
+                
+            # Use a shorter timeout for initial connection, longer for read
+            response = self.session.get(
+                url, 
+                timeout=(5, self.timeout),  # (connect timeout, read timeout)
+                auth=auth,
+                headers=headers,
+                allow_redirects=True
+            )
+            
+            # Handle redirects explicitly
+            if response.history:
+                _logger.info(f"Request was redirected from {url} to {response.url}")
+                
+            response.raise_for_status()
+
+            # Check for JavaScript redirects or challenges
+            if "Checking your browser" in response.text or "Please enable JavaScript" in response.text:
+                _logger.warning(f"Page {url} requires JavaScript or contains a browser check")
+                
+            soup = BeautifulSoup(response.content, "html.parser")
+            return soup, response
+
+        except requests.exceptions.Timeout:
+            _logger.warning(f"Timeout error fetching {url}")
+            if retries > 0:
+                _logger.warning(f"Retrying with increased timeout ({retries} retries left)")
+                # Increase timeout for retries
+                old_timeout = self.timeout
+                self.timeout = self.timeout * 1.5
+                result = self._fetch_page(url, retries - 1, auth_required)
+                self.timeout = old_timeout  # Reset timeout
+                return result
+            else:
+                _logger.error(f"Failed to fetch page after {self.max_retries} attempts: {url}")
+                _logger.error(f"Error: Timeout")
+                return None, None
+                
+        except requests.exceptions.RequestException as e:
+            if retries > 0:
+                # Use exponential backoff for retries
+                delay = self.retry_delay * (2 ** (self.max_retries - retries))
+                _logger.warning(f"Fetch failed, retrying in {delay:.1f}s ({retries} retries left): {url}")
+                time.sleep(delay)
+                return self._fetch_page(url, retries - 1, auth_required)
+            else:
+                _logger.error(f"Failed to fetch page after {self.max_retries} attempts: {url}")
+                _logger.error(f"Error: {str(e)}")
+                return None, None
+        except Exception as e:
+            _logger.error(f"Unexpected error fetching page: {url}")
+            _logger.error(f"Error: {str(e)}")
+            _logger.error(traceback.format_exc())
+            return None, None
+
+    def _extract_links(self, soup, url, file_extensions=None):
+        """
+        Extract links from a BeautifulSoup object with priority filtering
+
+        Args:
+            soup: BeautifulSoup object
+            url: Base URL for resolving relative links
+            file_extensions: List of file extensions to look for, defaults to common data file types
+
+        Returns:
+            dict: Dictionary of links grouped by file type
+        """
+        if file_extensions is None:
+            file_extensions = [".csv", ".xlsx", ".xls", ".ods", ".pdf", ".xml", ".txt"]
+
+        links_by_type = {}
+
+        try:
+            # Find all links
+            for a_tag in soup.find_all("a", href=True):
+                href = a_tag.get("href")
+
+                # Skip empty, javascript, and anchor links
+                if not href or href.startswith("javascript:") or href.startswith("#"):
+                    continue
+
+                # Make absolute URL if necessary
+                if not href.startswith(("http://", "https://")):
+                    href = urljoin(url, href)
+
+                # Check if the link ends with any of the specified file extensions
+                for ext in file_extensions:
+                    if href.lower().endswith(ext):
+                        # Get link text or a default
+                        link_text = a_tag.get_text(strip=True) or os.path.basename(href)
+                        
+                        # Determine file type
+                        file_type = ext.lstrip(".").lower()
+                        
+                        # Initialize list for this file type if needed
+                        if file_type not in links_by_type:
+                            links_by_type[file_type] = []
+                            
+                        links_by_type[file_type].append({
+                            "url": href, 
+                            "text": link_text, 
+                            "type": file_type
+                        })
+                        break  # Only match one extension per link
+
+            return links_by_type
+
+        except Exception as e:
+            _logger.error(f"Error extracting links from page: {url}")
+            _logger.error(f"Error: {str(e)}")
+            _logger.error(traceback.format_exc())
+            return {}
+
+    def _get_europa_credentials(self):
+        """Get Europa website login credentials from .env file"""
+        try:    
+            # Load from the module directory
+            base_path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+            env_path = os.path.join(base_path, '.env')
+            
+            if os.path.exists(env_path):
+                load_dotenv(env_path)
+                
+                return {
+                    'europa_username': os.getenv('EUROPA_USERNAME', ''),
+                    'europa_password': os.getenv('EUROPA_PASSWORD', '')
+                }
+            return {}
+            
+        except ImportError:
+            _logger.warning("python-dotenv not installed, cannot load Europa credentials")
+            return {}
+        except Exception as e:
+            _logger.error(f"Error loading Europa credentials: {str(e)}")
+            return {}
+    
+    def _download_files_by_priority(self, links_by_type, source_name, max_per_type=1):
+        """
+        Download files following type priority, stopping when a higher priority type is found
+        
+        Args:
+            links_by_type: Dictionary of links grouped by file type
+            source_name: Name of the source
+            max_per_type: Maximum number of files to download per type
+            
+        Returns:
+            list: List of downloaded file information
+        """
+        downloaded_files = []
+        
+        # Process file types in priority order
+        for file_type in self.file_type_priority:
+            if file_type in links_by_type and links_by_type[file_type]:
+                _logger.info(f"Found {len(links_by_type[file_type])} {file_type} files for {source_name}")
+                
+                # Download up to max_per_type files of this type
+                file_count = 0
+                for link in links_by_type[file_type]:
+                    if file_count >= max_per_type:
+                        break
+                        
+                    file_path, actual_type = self._download_file(link["url"], source_name)
+                    if file_path:
+                        downloaded_files.append({
+                            "path": file_path,
+                            "type": actual_type or file_type,
+                            "url": link["url"],
+                            "source": source_name,
+                            "description": link["text"] or f"{source_name} {file_type} file",
+                        })
+                        file_count += 1
+                
+                # If we successfully downloaded files of this type, stop the process
+                # This implements the priority logic (don't go to lower priority if higher is available)
+                if downloaded_files:
+                    _logger.info(f"Downloaded {len(downloaded_files)} {file_type} files for {source_name}, stopping further downloads")
+                    break
+        
+        return downloaded_files
+        
+    def _download_direct_urls(self, urls, source_name, max_files=2):
+        """
+        Try downloading from a list of direct URLs, stopping after first success by file type priority
+        
+        Args:
+            urls: List of direct URLs to try
+            source_name: Name of the source
+            max_files: Maximum number of files to download
+            
+        Returns:
+            list: List of downloaded file information
+        """
+        downloaded_files = []
+        downloaded_types = set()
+        
+        # First pass: try to get highest priority file types
+        for url in urls:
+            # Skip if we already have enough files
+            if len(downloaded_files) >= max_files:
+                break
+                
+            try:
+                _logger.info(f"Trying direct download: {url}")
+                
+                # Get file type before downloading
+                _, file_extension = os.path.splitext(url)
+                guessed_type = file_extension.lstrip('.').lower() or self._infer_extension(url).lstrip('.')
+                
+                # Skip if we already have a higher priority file type
+                if guessed_type in self.file_type_priority:
+                    priority_idx = self.file_type_priority.index(guessed_type)
+                    if any(downloaded_type in self.file_type_priority[:priority_idx] for downloaded_type in downloaded_types):
+                        _logger.info(f"Skipping {guessed_type} file, already have higher priority type")
+                        continue
+                
+                file_path, file_type = self._download_file(url, source_name)
+                if file_path:
+                    downloaded_files.append({
+                        "path": file_path,
+                        "type": file_type,
+                        "url": url,
+                        "source": source_name,
+                        "description": f"{source_name} Direct Download",
+                    })
+                    downloaded_types.add(file_type)
+                    
+                    # If we've downloaded a high priority file type, we can stop
+                    if file_type in self.file_type_priority[:2]:  # CSV or XLSX/XLS
+                        _logger.info(f"Downloaded high priority {file_type} file, stopping direct downloads")
+                        break
+            except Exception as e:
+                _logger.warning(f"Error downloading {url}: {str(e)}")
+        
+        return downloaded_files
+        
+    def fetch_eu_sanctions(self):
+        """
+        Fetch sanctions data from the EU website
+        """
+        source_name = "eu_sanctions"
+        
+        # Known direct URLs for EU sanctions data
+        direct_urls = [
+            # CSV files (highest priority)
+            "https://webgate.ec.europa.eu/fsd/fsf/public/files/csvFullSanctionsList_1_1/content?token=dG9rZW4tMjAxNw",
+            "https://webgate.ec.europa.eu/fsd/fsf/public/files/csvFullSanctionsList/content?token=dG9rZW4tMjAxNw",
+            
+            # PDF files (lower priority)
+            "https://webgate.ec.europa.eu/fsd/fsf/public/files/pdfFullSanctionsList/content?token=dG9rZW4tMjAxNw",
+            
+            # Alternative sources
+            "https://data.europa.eu/data/datasets/consolidated-list-of-persons-groups-and-entities-subject-to-eu-financial-sanctions?locale=en"
+        ]
+        
+        # Base URL for scraping
+        base_url = "https://finance.ec.europa.eu/eu-and-me/sanctions-restrictive-measures_en"
+        
+        files = []
+        
+        try:
+            # First try direct download URLs
+            _logger.info(f"Trying direct EU sanctions downloads")
+            direct_downloads = self._download_direct_urls(direct_urls, source_name)
+            files.extend(direct_downloads)
+                
+            # If direct downloads worked for high priority formats, return the files
+            if files and any(file["type"] in ["csv", "xlsx", "xls"] for file in files):
+                _logger.info(f"Completed EU sanctions data fetch with high priority formats. Found {len(files)} files.")
+                return files
+                
+            # Otherwise, try scraping the website
+            _logger.info(f"No high priority direct downloads found, scraping EU sanctions website: {base_url}")
+            
+            # Check if we need to login
+            credentials = self._get_europa_credentials()
+            auth_required = bool(credentials.get('europa_username') and credentials.get('europa_password'))
+            
+            # Fetch the page
+            soup, response = self._fetch_page(base_url, auth_required=auth_required)
+            if not soup:
+                _logger.error("Failed to fetch EU sanctions page")
+                return files
+                
+            # Extract links by file type
+            links_by_type = self._extract_links(soup, base_url)
+            
+            # Download files according to priority
+            scraped_files = self._download_files_by_priority(links_by_type, source_name)
+            files.extend(scraped_files)
+            
+            # If we still don't have files, try supplementary sites
+            if not files:
+                _logger.info("Trying supplementary EU sanctions sources")
+                supplementary_urls = [
+                    "https://data.europa.eu/data/datasets/consolidated-list-of-persons-groups-and-entities-subject-to-eu-financial-sanctions",
+                    "https://ec.europa.eu/info/business-economy-euro/banking-and-finance/international-relations/sanctions_en"
+                ]
+                
+                for sup_url in supplementary_urls:
+                    sup_soup, _ = self._fetch_page(sup_url)
+                    if sup_soup:
+                        links_by_type = self._extract_links(sup_soup, sup_url)
+                        sup_files = self._download_files_by_priority(links_by_type, source_name)
+                        files.extend(sup_files)
+                        
+                        # If we found high priority files, stop looking
+                        if any(file["type"] in ["csv", "xlsx", "xls"] for file in files):
+                            break
+            
+            _logger.info(f"Completed EU sanctions data fetch. Found {len(files)} files.")
+            return files
+            
+        except Exception as e:
+            _logger.error(f"Error fetching EU sanctions data: {str(e)}")
+            _logger.error(traceback.format_exc())
+            return files
+
+    def fetch_ofac_sanctions(self):
+        """
+        Fetch sanctions data from OFAC with improved file type prioritization
+        """
+        source_name = "ofac_sanctions"
+        
+        # Break OFAC downloads into groups by priority
+        high_priority_urls = [
+            # CSV files (highest priority)
+            "https://www.treasury.gov/ofac/downloads/sdn.csv",
+            "https://www.treasury.gov/ofac/downloads/consolidated/consolidated.csv"
+        ]
+        
+        medium_priority_urls = [
+            # XML files (medium priority)
+            "https://www.treasury.gov/ofac/downloads/sdn_advanced.xml",
+            "https://www.treasury.gov/ofac/downloads/sanctions/1.0/sdn_advanced.xml"
+        ]
+        
+        low_priority_urls = [
+            # Text files (lowest priority)
+            "https://www.treasury.gov/ofac/downloads/sdnlist.txt"
+        ]
+        
+        # Extremely large files that should only be tried if others fail
+        large_files = [
+            "https://www.treasury.gov/ofac/downloads/consolidated/consolidated.xml"
+        ]
+        
+        files = []
+        _logger.info(f"Fetching OFAC sanctions data (processing by priority)")
+        
+        # Process high priority files first
+        high_priority_files = self._download_direct_urls(high_priority_urls, source_name)
+        files.extend(high_priority_files)
+        
+        # If we got high priority files, return them
+        if files and any(file["type"] == "csv" for file in files):
+            _logger.info(f"Found high priority CSV files for OFAC, stopping further downloads")
+            return files
+        
+        # If not, try medium priority files
+        medium_priority_files = self._download_direct_urls(medium_priority_urls, source_name)
+        files.extend(medium_priority_files)
+        
+        # If we got medium priority files, return them
+        if files and any(file["type"] == "xml" for file in files):
+            _logger.info(f"Found medium priority XML files for OFAC, stopping further downloads")
+            return files
+        
+        # If still nothing, try low priority files
+        low_priority_files = self._download_direct_urls(low_priority_urls, source_name)
+        files.extend(low_priority_files)
+        
+        # As a last resort, try large files with higher timeout and size limit
+        if not files:
+            _logger.info("Trying large OFAC files as last resort")
+            for url in large_files:
+                try:
+                    # Use longer timeout and higher size limit
+                    old_timeout = self.timeout
+                    self.timeout = 60
+                    
+                    file_path, file_type = self._download_file(url, source_name, max_size_mb=50)
+                    
+                    # Restore original timeout
+                    self.timeout = old_timeout
+                    
+                    if file_path:
+                        files.append({
+                            "path": file_path,
+                            "type": file_type,
+                            "url": url,
+                            "source": source_name,
+                            "description": os.path.basename(url),
+                        })
+                except Exception as e:
+                    _logger.error(f"Error downloading large file {url}: {str(e)}")
+        
+        _logger.info(f"OFAC sanctions data fetch completed. Found {len(files)} files.")
+        return files
+
+    def fetch_un_sanctions(self):
+        """
+        Fetch sanctions data from the UN consolidated list with priority file handling
+        """
+        source_name = "un_sanctions"
+        url = "https://www.un.org/securitycouncil/content/un-sc-consolidated-list"
+        
+        # Direct URLs to try first (if available)
+        direct_urls = [
+            # Try to get CSV first (if available)
+            "https://www.un.org/securitycouncil/sanctions/list/csv",
+            # XML versions
+            "https://www.un.org/securitycouncil/content/un-sc-consolidated-list.xml",
+            "https://www.un.org/securitycouncil/sanctions/1267/aq_sanctions_list"
+        ]
+
+        files = []
+
+        try:
+            # First try direct URLs
+            _logger.info(f"Trying direct UN sanctions downloads")
+            direct_downloads = self._download_direct_urls(direct_urls, source_name)
+            files.extend(direct_downloads)
+            
+            # If we got high priority files, return them
+            if files and any(file["type"] in ["csv", "xlsx", "xls"] for file in files):
+                _logger.info(f"Found high priority files for UN, stopping further downloads")
+                return files
+            
+            # Otherwise fetch the main page
+            _logger.info(f"Fetching UN sanctions data from {url}")
+            soup, response = self._fetch_page(url)
+            if not soup:
+                return files
+
+            # Extract links by file type
+            links_by_type = self._extract_links(soup, url)
+            
+            # Download files according to priority
+            scraped_files = self._download_files_by_priority(links_by_type, source_name)
+            files.extend(scraped_files)
+            
+            # If still no files, try secondary pages
+            if not files:
+                _logger.info("Trying secondary UN sanctions pages")
+                secondary_urls = [
+                    "https://www.un.org/securitycouncil/sanctions/1267/aq_sanctions_list",
+                    "https://www.un.org/securitycouncil/sanctions/1988/materials"
+                ]
+                
+                for sec_url in secondary_urls:
+                    sec_soup, _ = self._fetch_page(sec_url)
+                    if sec_soup:
+                        sec_links = self._extract_links(sec_soup, sec_url)
+                        sec_files = self._download_files_by_priority(sec_links, source_name)
+                        files.extend(sec_files)
+                        
+                        # If we found files, stop looking
+                        if files:
+                            break
+
+            _logger.info(f"Completed UN sanctions data fetch. Found {len(files)} files.")
+            return files
+
+        except Exception as e:
+            _logger.error(f"Error fetching UN sanctions data: {str(e)}")
+            _logger.error(traceback.format_exc())
+            return files
+
+    def fetch_uk_sanctions(self):
+        """
+        Fetch sanctions data from UK government sources with priority file handling
+        """
+        source_name = "uk_sanctions"
+        
+        # Direct URLs for UK sanctions files (by priority)
+        direct_urls = [
+            # CSV format (highest priority)
+            "https://assets.publishing.service.gov.uk/media/sanctions-list.csv",
+            "https://ofsistorage.blob.core.windows.net/publishlive/ConList.csv",
+            "https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1183423/UK_Sanctions_List.csv",
+            
+            # Excel/ODS format (medium priority)
+            "https://assets.publishing.service.gov.uk/media/sanctions-list.ods",
+            "https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1183425/UK_Sanctions_List.ods",
+            "https://assets.publishing.service.gov.uk/media/67caf893a175f08d198d80f1/UK_Sanctions_List.ods",
+            
+            # PDF format (low priority)
+            "https://assets.publishing.service.gov.uk/media/sanctions-list.pdf",
+            "https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1183422/UK_Sanctions_List.pdf",
+            
+            # XML format (if available)
+            "https://assets.publishing.service.gov.uk/media/sanctions-list.xml"
+        ]
+        
+        # Base URLs to scrape if direct downloads fail
+        base_urls = [
+            "https://www.gov.uk/government/publications/the-uk-sanctions-list",
+            "https://www.gov.uk/government/publications/financial-sanctions-consolidated-list-of-targets",
+            "https://sanctionssearchapp.ofsi.hmtreasury.gov.uk/",
+            "https://www.gov.uk/government/collections/financial-sanctions-regime-specific-consolidated-lists-and-releases",
+        ]
+        
+        files = []
+        
+        try:
+            # First try direct URLs
+            _logger.info(f"Trying direct UK sanctions downloads")
+            
+            # Use a custom User-Agent to avoid blocks
+            old_headers = self.session.headers.copy()
+            self.session.headers.update({
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.5"
+            })
+            
+            # Try direct downloads with prioritization
+            direct_downloads = self._download_direct_urls(direct_urls, source_name, max_files=3)
+            
+            # Restore original headers
+            self.session.headers = old_headers
+            
+            files.extend(direct_downloads)
+            
+            # If direct downloads worked for high priority formats, return the files
+            if files and any(file["type"] in ["csv", "xlsx", "xls", "ods"] for file in files):
+                _logger.info(f"Completed UK sanctions data fetch with high priority formats. Found {len(files)} files.")
+                return files
+            
+            # If direct downloads failed, try scraping each base URL
+            _logger.info("Direct downloads failed or low priority, trying to scrape UK sanctions from base URLs")
+            
+            for base_url in base_urls:
+                try:
+                    _logger.info(f"Scraping UK sanctions from: {base_url}")
+                    
+                    # Get the page content
+                    soup, response = self._fetch_page(base_url)
+                    if not soup:
+                        _logger.warning(f"Could not fetch {base_url}")
+                        continue
+                    
+                    # Extract links by file type
+                    links_by_type = self._extract_links(soup, base_url)
+                    
+                    # Filter for sanctions-related links only
+                    for file_type in links_by_type:
+                        links_by_type[file_type] = [
+                            link for link in links_by_type[file_type]
+                            if any(kw in link["url"].lower() or kw in link["text"].lower() 
+                                for kw in ["sanction", "consolidated", "ofsi", "target", "uk_sanctions"])
+                        ]
+                    
+                    # Download files according to priority
+                    scraped_files = self._download_files_by_priority(links_by_type, source_name)
+                    files.extend(scraped_files)
+                    
+                    # If we found files from this base URL, break early
+                    if files and any(file["type"] in ["csv", "xlsx", "xls", "ods"] for file in files):
+                        break
+                        
+                except Exception as e:
+                    _logger.warning(f"Error scraping {base_url}: {str(e)}")
+            
+            # Final fallback - create a placeholder if no files were found
+            if not files:
+                _logger.warning("Could not find any UK sanctions files, creating placeholder")
+                
+                # Create a placeholder file
+                source_dir = self._get_source_directory(source_name)
+                placeholder_path = os.path.join(source_dir, f"uk_sanctions_placeholder.txt")
+                
+                with open(placeholder_path, 'w') as f:
+                    f.write("# UK Sanctions List Placeholder\n\n")
+                    f.write("No UK sanctions files could be downloaded at this time.\n")
+                    f.write(f"Last attempt: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                    f.write("Please check URLs and try again later.\n")
+                
+                files.append({
+                    "path": placeholder_path,
+                    "type": "txt",
+                    "url": "placeholder",
+                    "source": source_name,
+                    "description": "UK Sanctions Placeholder",
+                })
+            
+            _logger.info(f"Completed UK sanctions data fetch. Found {len(files)} files.")
+            return files
+            
+        except Exception as e:
+            _logger.error(f"Error fetching UK sanctions data: {str(e)}")
+            _logger.error(traceback.format_exc())
+            return files
+
+
+            
+# import requests
+# import os
+# import re
+# import logging
+# import time
+# from datetime import datetime
+# import hashlib
+# from urllib.parse import urljoin, urlparse
+# from bs4 import BeautifulSoup
+# import traceback
+# import os
+# from requests.auth import HTTPBasicAuth
+# import random
+# from dotenv import load_dotenv
+
+
+# _logger = logging.getLogger(__name__)
+
+
+# class SanctionScraper:
+#     """
+#     Handles scraping of sanctions data from various government sources
+#     """
+
+#     def __init__(self, env=None, media_dir=None):
+#         """
+#         Initialize the sanctions scraper
+
+#         Args:
+#             env: Odoo environment
+#             media_dir: Directory for storing downloaded files
+#         """
+#         self.env = env
+
+#         # Set up the base media directory
+#         if media_dir:
+#             self.media_dir = media_dir
+#         # elif env:
+#         #     # Use Odoo's filestore if available
+#         #     self.media_dir = os.path.join(
+#         #         env["ir.attachment"]._filestore(),
+#         #         "compliance_management",
+#         #         "sanctions_data",
+#         #     )
+#         else:
+#             # Fallback to a local directory
+#             self.media_dir = os.path.join(
+#                 os.path.dirname(os.path.dirname(__file__)), "media", "sanctions_data"
+#             )
+
+#         # Create the media directory if it doesn't exist
+#         os.makedirs(self.media_dir, exist_ok=True)
+
+#         # Configure a request session with proper headers
+#         self.session = requests.Session()
+#         self.session.headers.update(
+#             {
+#                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+#                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+#                 "Accept-Language": "en-US,en;q=0.5",
+#             }
+#         )
+
+#         # Retry configuration
+#         self.max_retries = 3
+#         self.retry_delay = 2  # seconds
+
+#         # Configurable timeout
+#         self.timeout = 30  # seconds
+
+#     def _get_source_directory(self, source_name):
+#         """
+#         Get the directory for a specific source
+
+#         Args:
+#             source_name: Name of the source
+
+#         Returns:
+#             str: Path to the source directory
+#         """
+#         source_dir = os.path.join(self.media_dir, source_name)
+#         os.makedirs(source_dir, exist_ok=True)
+#         return source_dir
+
+#     def _generate_filename(self, url, source_name):
+#         """
+#         Generate a unique filename for a URL
+
+#         Args:
+#             url: URL of the file
+#             source_name: Name of the source
+
+#         Returns:
+#             str: A unique filename
+#         """
+#         # Get the original filename from the URL
+#         parsed_url = urlparse(url)
+#         original_filename = os.path.basename(parsed_url.path)
+
+#         # If no filename could be extracted, use the hash of the URL
+#         if not original_filename:
+#             original_filename = hashlib.md5(url.encode()).hexdigest()
+
+#         # Extract the file extension
+#         _, file_extension = os.path.splitext(original_filename)
+#         if not file_extension:
+#             # Try to determine extension from the URL
+#             if "?" in original_filename:
+#                 original_filename = original_filename.split("?")[0]
+#                 _, file_extension = os.path.splitext(original_filename)
+
+#         # If still no extension, try to infer it from the URL or Content-Type
+#         if not file_extension:
+#             file_extension = self._infer_extension(url)
+
+#         # Generate a timestamp prefix
+#         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+#         # Create a unique filename
+#         filename = f"{source_name}_{timestamp}_{original_filename}"
+
+#         return filename
+
+#     def _infer_extension(self, url):
+#         """
+#         Infer file extension from URL or by making a HEAD request
+
+#         Args:
+#             url: URL of the file
+
+#         Returns:
+#             str: File extension with leading dot
+#         """
+#         # First, try to infer from URL patterns
+#         if "csv" in url.lower():
+#             return ".csv"
+#         elif "excel" in url.lower() or "xlsx" in url.lower():
+#             return ".xlsx"
+#         elif "pdf" in url.lower():
+#             return ".pdf"
+#         elif "ods" in url.lower():
+#             return ".ods"
+#         elif "xls" in url.lower():
+#             return ".xls"
+
+#         # If not obvious from URL, make a HEAD request
+#         try:
+#             response = self.session.head(url, timeout=self.timeout)
+#             content_type = response.headers.get("Content-Type", "")
+
+#             if "csv" in content_type:
+#                 return ".csv"
+#             elif "excel" in content_type or "xlsx" in content_type:
+#                 return ".xlsx"
+#             elif "pdf" in content_type:
+#                 return ".pdf"
+#             elif "opendocument.spreadsheet" in content_type:
+#                 return ".ods"
+#             elif "xls" in content_type:
+#                 return ".xls"
+#             else:
+#                 # Default to binary file
+#                 return ".bin"
+#         except:
+#             # If HEAD request fails, default to binary
+#             return ".bin"
+
+#     def _download_file(self, url, source_name, retries=None):
+#         """
+#         Download a file with reliable duplicate prevention
+#         """
+#         if retries is None:
+#             retries = self.max_retries
+
+#         try:
+#             # Get the source directory
+#             source_dir = self._get_source_directory(source_name)
+
+#             # Generate a consistent filename based on URL
+#             url_hash = hashlib.md5(url.encode()).hexdigest()[:8]
+#             parsed_url = urlparse(url)
+#             filename_base = os.path.basename(parsed_url.path)
+            
+#             if not filename_base or filename_base == '/' or '?' in filename_base:
+#                 filename_base = f"{source_name}_{url_hash}"
+                
+#             # Create the filename - don't use timestamps to avoid duplicates
+#             filename = f"{filename_base}"
+#             file_path = os.path.join(source_dir, filename)
+            
+#             # Check if this file exists and is recent (less than 24 hours old)
+#             if os.path.exists(file_path) and os.path.getsize(file_path) > 100:
+#                 file_age = datetime.now().timestamp() - os.path.getmtime(file_path)
+#                 if file_age < 86400:  # 24 hours
+#                     _logger.info(f"Using existing file (less than 24h old): {file_path}")
+                    
+#                     # Determine file type from extension
+#                     _, extension = os.path.splitext(file_path)
+#                     file_type = extension.lstrip(".").lower()
+#                     if not file_type:
+#                         file_type = "csv"  # Default assumption
+                        
+#                     return file_path, file_type
+            
+#             # Download the file - use a temporary file first
+#             _logger.info(f"Downloading {url} to {file_path}")
+            
+#             # Use HEAD request to get file metadata
+#             try:
+#                 head_response = self.session.head(url, timeout=10)
+#                 content_length = int(head_response.headers.get('content-length', 0))
+#                 _logger.info(f"File size: {content_length} bytes")
+#             except:
+#                 content_length = 0
+                
+#             # Set reasonable timeouts based on file size
+#             timeout = min(60, max(10, content_length / 100000))  # 10-60 seconds
+            
+#             # Get file with proper timeout
+#             response = self.session.get(url, stream=True, timeout=timeout)
+#             response.raise_for_status()
+            
+#             # Create temp file path
+#             temp_file_path = f"{file_path}.tmp"
+            
+#             # Download file in chunks to avoid memory issues
+#             with open(temp_file_path, 'wb') as f:
+#                 for chunk in response.iter_content(chunk_size=8192):
+#                     if chunk:
+#                         f.write(chunk)
+            
+#             # Move temp file to final location only if the download was successful
+#             if os.path.exists(temp_file_path) and os.path.getsize(temp_file_path) > 0:
+#                 # If we already have a file, only replace if newer file is larger or old file is incomplete
+#                 if not os.path.exists(file_path) or \
+#                 os.path.getsize(temp_file_path) > os.path.getsize(file_path) or \
+#                 os.path.getsize(file_path) < 1000:
+#                     os.replace(temp_file_path, file_path)
+#                     _logger.info(f"Downloaded file saved to {file_path}")
+#                 else:
+#                     os.remove(temp_file_path)
+#                     _logger.info(f"Keeping existing file (larger than new download)")
+            
+#             # Determine file type from extension or content-type
+#             _, extension = os.path.splitext(file_path)
+#             file_type = extension.lstrip(".").lower()
+            
+#             if not file_type:
+#                 content_type = response.headers.get('Content-Type', '').lower()
+#                 if 'csv' in content_type:
+#                     file_type = 'csv'
+#                 elif 'excel' in content_type or 'xlsx' in content_type:
+#                     file_type = 'xlsx'
+#                 elif 'pdf' in content_type:
+#                     file_type = 'pdf'
+#                 elif "opendocument.spreadsheet" in content_type:
+#                     file_type = "ods"
+#                 elif 'xml' in content_type:
+#                     file_type = 'xml'
+#                 else:
+#                     file_type = 'txt'  # Default to text
+                    
+#             return file_path, file_type
+            
+#         except requests.exceptions.RequestException as e:
+#             if retries > 0:
+#                 # Use a short delay and retry
+#                 _logger.warning(f"Download failed, retrying ({retries} retries left): {url}")
+#                 time.sleep(2)  # Short delay to avoid timeouts
+#                 return self._download_file(url, source_name, retries - 1)
+#             else:
+#                 _logger.error(f"Failed to download file after {self.max_retries} attempts: {url}")
+#                 _logger.error(f"Error: {str(e)}")
+#                 return None, None
+#         except Exception as e:
+#             _logger.error(f"Error downloading file: {url}")
+#             _logger.error(f"Error: {str(e)}")
+#             return None, None
+
+#     def _download_file_with_timeout(self, url, source_name, max_size_mb=10, timeout=30):
+#         """
+#         Download a file with size checking and strict timeout controls
+        
+#         Args:
+#             url: URL to download
+#             source_name: Name of the source
+#             max_size_mb: Maximum file size in MB to download
+#             timeout: Timeout in seconds
+            
+#         Returns:
+#             tuple: (file_path, file_type) or (None, None) if file is too large or timeout occurs
+#         """
+#         try:
+#             # Get source directory
+#             source_dir = self._get_source_directory(source_name)
+            
+#             # Generate filename from URL
+#             url_hash = hashlib.md5(url.encode()).hexdigest()[:8]
+#             filename = os.path.basename(url) or f"{source_name}_{url_hash}"
+#             file_path = os.path.join(source_dir, filename)
+            
+#             # Check if file exists and is recent (less than 24 hours old)
+#             if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+#                 file_age = datetime.now().timestamp() - os.path.getmtime(file_path)
+#                 if file_age < 86400:  # 24 hours
+#                     _logger.info(f"Using existing file (less than 24h old): {file_path}")
+                    
+#                     # Get file type from extension
+#                     _, ext = os.path.splitext(file_path)
+#                     file_type = ext.lstrip('.').lower() or 'txt'
+#                     return file_path, file_type
+            
+#             # Use a HEAD request to check file size first
+#             try:
+#                 _logger.info(f"Checking file size: {url}")
+#                 head_response = self.session.head(url, timeout=5)
+#                 content_length = int(head_response.headers.get('content-length', 0))
+                
+#                 # Convert bytes to MB
+#                 size_mb = content_length / (1024 * 1024)
+#                 _logger.info(f"File size: {size_mb:.2f} MB")
+                
+#                 # Skip if file is too large
+#                 if size_mb > max_size_mb:
+#                     _logger.warning(f"File is too large ({size_mb:.2f} MB > {max_size_mb} MB limit), skipping: {url}")
+#                     return None, None
+#             except Exception as e:
+#                 _logger.warning(f"Could not check file size, proceeding with caution: {str(e)}")
+            
+#             # Download with strict timeout
+#             _logger.info(f"Downloading file: {url}")
+#             temp_path = f"{file_path}.downloading"
+            
+#             # Use stream=True for efficient memory usage
+#             with self.session.get(url, stream=True, timeout=timeout) as response:
+#                 response.raise_for_status()
+                
+#                 # Get content type
+#                 content_type = response.headers.get('Content-Type', '').lower()
+#                 if 'csv' in content_type:
+#                     file_type = 'csv'
+#                 elif 'xml' in content_type:
+#                     file_type = 'xml'
+#                 elif 'text' in content_type:
+#                     file_type = 'txt'
+#                 else:
+#                     # Get from extension
+#                     _, ext = os.path.splitext(url)
+#                     file_type = ext.lstrip('.').lower() or 'txt'
+                
+#                 # Download to temp file
+#                 current_size = 0
+#                 with open(temp_path, 'wb') as f:
+#                     # Use smaller chunks to allow more frequent timeout checks
+#                     for chunk in response.iter_content(chunk_size=4096):
+#                         if chunk:
+#                             f.write(chunk)
+#                             current_size += len(chunk)
+                            
+#                             # Check if exceeding max size
+#                             if current_size > max_size_mb * 1024 * 1024:
+#                                 _logger.warning(f"File exceeded max size during download, aborting: {url}")
+#                                 return None, None
+            
+#             # Only move to final path if download completed successfully
+#             if os.path.exists(temp_path) and os.path.getsize(temp_path) > 0:
+#                 os.replace(temp_path, file_path)
+#                 _logger.info(f"Download completed successfully: {file_path}")
+#                 return file_path, file_type
+#             else:
+#                 _logger.warning(f"Download failed (empty file): {url}")
+#                 return None, None
+                
+#         except requests.Timeout:
+#             _logger.warning(f"Timeout downloading file: {url}")
+#             return None, None
+#         except Exception as e:
+#             _logger.error(f"Error downloading file: {url}, {str(e)}")
+#             return None, None
+
+#     def _fetch_page(self, url, retries=None, auth_required=False):
+#         """
+#         Fetch a web page with improved error handling and auth support
+
+#         Args:
+#             url: URL to fetch
+#             retries: Number of retries, defaults to self.max_retries
+#             auth_required: Whether authentication is required
+
+#         Returns:
+#             tuple: (soup, response) or (None, None) on failure
+#         """
+#         if retries is None:
+#             retries = self.max_retries
+
+#         try:
+#             _logger.info(f"Fetching page: {url}")
+            
+#             headers = self.session.headers.copy()
+            
+#             # Add authentication if required
+#             if auth_required:
+#                 if self.env:
+#                     config = self.env["ir.config_parameter"].sudo()
+#                     username = config.get_param("sanctions_scraper.username")
+#                     password = config.get_param("sanctions_scraper.password")
+#                     if username and password:
+#                         auth = HTTPBasicAuth(username, password)
+#                     else:
+#                         auth = None
+#                 else:
+#                     auth = None
+#             else:
+#                 auth = None
+                
+#             # Add random delay to avoid rate limiting (1-3 seconds)
+#             time.sleep(random.uniform(1, 3))
+                
+#             # Use a shorter timeout for initial connection
+#             response = self.session.get(
+#                 url, 
+#                 timeout=(5, self.timeout),  # (connect timeout, read timeout)
+#                 auth=auth,
+#                 headers=headers,
+#                 allow_redirects=True
+#             )
+            
+#             # Handle redirects explicitly
+#             if response.history:
+#                 _logger.info(f"Request was redirected from {url} to {response.url}")
+                
+#             response.raise_for_status()
+
+#             # Check for JavaScript redirects or challenges
+#             if "Checking your browser" in response.text or "Please enable JavaScript" in response.text:
+#                 _logger.warning(f"Page {url} requires JavaScript or contains a browser check")
+                
+#             soup = BeautifulSoup(response.content, "html.parser")
+#             return soup, response
+
+#         except requests.exceptions.Timeout:
+#             _logger.warning(f"Timeout error fetching {url}")
+#             if retries > 0:
+#                 _logger.warning(f"Retrying with increased timeout ({retries} retries left)")
+#                 # Increase timeout for retries
+#                 old_timeout = self.timeout
+#                 self.timeout = self.timeout * 1.5
+#                 result = self._fetch_page(url, retries - 1, auth_required)
+#                 self.timeout = old_timeout  # Reset timeout
+#                 return result
+#             else:
+#                 _logger.error(f"Failed to fetch page after {self.max_retries} attempts: {url}")
+#                 _logger.error(f"Error: Timeout")
+#                 return None, None
+                
+#         except requests.exceptions.RequestException as e:
+#             if retries > 0:
+#                 _logger.warning(
+#                     f"Fetch failed, retrying ({retries} retries left): {url}"
+#                 )
+#                 time.sleep(self.retry_delay)
+#                 return self._fetch_page(url, retries - 1, auth_required)
+#             else:
+#                 _logger.error(
+#                     f"Failed to fetch page after {self.max_retries} attempts: {url}"
+#                 )
+#                 _logger.error(f"Error: {str(e)}")
+#                 return None, None
+#         except Exception as e:
+#             _logger.error(f"Unexpected error fetching page: {url}")
+#             _logger.error(f"Error: {str(e)}")
+#             _logger.error(traceback.format_exc())
+#             return None, None
+
+#     def _extract_links(self, soup, url, file_extensions=None):
+#         """
+#         Extract links from a BeautifulSoup object
+
+#         Args:
+#             soup: BeautifulSoup object
+#             url: Base URL for resolving relative links
+#             file_extensions: List of file extensions to look for, defaults to ['.csv', '.xlsx', '.xls', '.pdf', '.ods']
+
+#         Returns:
+#             list: List of dictionaries with link information
+#         """
+#         if file_extensions is None:
+#             file_extensions = [".csv", ".xlsx", ".xls", ".pdf", ".ods"]
+
+#         links = []
+
+#         try:
+#             # Find all links
+#             for a_tag in soup.find_all("a", href=True):
+#                 href = a_tag.get("href")
+
+#                 # Skip empty, javascript, and anchor links
+#                 if not href or href.startswith("javascript:") or href.startswith("#"):
+#                     continue
+
+#                 # Make absolute URL if necessary
+#                 if not href.startswith(("http://", "https://")):
+#                     href = urljoin(url, href)
+
+#                 # Check if the link ends with any of the specified file extensions
+#                 if any(href.lower().endswith(ext) for ext in file_extensions):
+#                     # Get link text or a default
+#                     link_text = a_tag.get_text(strip=True) or os.path.basename(href)
+
+#                     # Determine file type
+#                     file_type = None
+#                     for ext in file_extensions:
+#                         if href.lower().endswith(ext):
+#                             file_type = ext.lstrip(".").lower()
+#                             break
+
+#                     links.append({"url": href, "text": link_text, "type": file_type})
+
+#             return links
+
+#         except Exception as e:
+#             _logger.error(f"Error extracting links from page: {url}")
+#             _logger.error(f"Error: {str(e)}")
+#             _logger.error(traceback.format_exc())
+#             return []
+
+#     def _get_europa_credentials(self):
+#         """Get Europa website login credentials from .env file"""
+#         try:    
+#             # Load from the module directory
+#             base_path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+#             env_path = os.path.join(base_path, '.env')
+            
+#             if os.path.exists(env_path):
+#                 load_dotenv(env_path)
+                
+#                 return {
+#                     'europa_username': os.getenv('EUROPA_USERNAME', ''),
+#                     'europa_password': os.getenv('EUROPA_PASSWORD', '')
+#                 }
+#             return {}
+            
+#         except ImportError:
+#             _logger.warning("python-dotenv not installed, cannot load Europa credentials")
+#             return {}
+#         except Exception as e:
+#             _logger.error(f"Error loading Europa credentials: {str(e)}")
+#             return {}
+        
+#     def fetch_eu_sanctions(self):
+#         """
+#         Fetch sanctions data from the EU website with login support if needed
+#         """
+#         source_name = "eu_sanctions"
+        
+#         # Updated URL for EU sanctions
+#         url = "https://finance.ec.europa.eu/eu-and-me/sanctions-restrictive-measures_en"
+        
+#         # Alternative direct URLs that don't require login
+#         direct_urls = [
+#             "https://webgate.ec.europa.eu/fsd/fsf/public/files/csvFullSanctionsList_1_1/content?token=dG9rZW4tMjAxNw",
+#             "https://webgate.ec.europa.eu/fsd/fsf/public/files/csvFullSanctionsList/content?token=dG9rZW4tMjAxNw&checksum=E82F6DC542A1FC05A94773562BF07311D3114F4B",
+#             "https://webgate.ec.europa.eu/fsd/fsf/public/files/pdfFullSanctionsList/content?token=dG9rZW4tMjAxNw",
+#             "https://data.europa.eu/data/datasets/consolidated-list-of-persons-groups-and-entities-subject-to-eu-financial-sanctions?locale=en"
+#         ]
+        
+#         files = []
+        
+#         try:
+#             # First try direct download URLs
+#             for direct_url in direct_urls:
+#                 _logger.info(f"Trying direct EU sanctions download: {direct_url}")
+                
+#                 file_path, file_type = self._download_file(direct_url, source_name)
+#                 if file_path:
+#                     files.append({
+#                         "path": file_path,
+#                         "type": file_type,
+#                         "url": direct_url,
+#                         "source": source_name,
+#                         "description": "EU Sanctions Direct Download",
+#                     })
+                    
+#             # If direct downloads worked, return the files
+#             if files:
+#                 _logger.info(f"Completed EU sanctions data fetch. Found {len(files)} files.")
+#                 return files
+                
+#             # Otherwise, try scraping the website
+#             _logger.info(f"No direct downloads found, scraping EU sanctions website: {url}")
+            
+#             # Check if we need to login
+#             credentials = self._get_europa_credentials()
+            
+#             # Fetch the page
+#             soup, response = self._fetch_page(url)
+#             if not soup:
+#                 _logger.error("Failed to fetch EU sanctions page")
+#                 return files
+                
+#             # Look for download links
+#             links = []
+            
+#             # Look for links with download-related text
+#             for a_tag in soup.find_all('a', href=True):
+#                 href = a_tag.get('href')
+#                 text = a_tag.get_text().lower()
+                
+#                 # Skip if not a potential download link
+#                 if not href:
+#                     continue
+                    
+#                 # Look for likely sanctions files
+#                 if ('sanction' in href or 'restriction' in href or 
+#                     'consolidated' in href or 'financial' in href) and \
+#                 any(ext in href.lower() for ext in ['.csv', '.xlsx', '.pdf', '.xml']):
+                    
+#                     # Make absolute URL if needed
+#                     if not href.startswith(('http://', 'https://')):
+#                         href = urljoin(url, href)
+                        
+#                     links.append({
+#                         'url': href,
+#                         'text': a_tag.get_text().strip()
+#                     })
+                    
+#             # Try to download each link
+#             for link in links:
+#                 _logger.info(f"Trying to download EU sanctions link: {link['url']}")
+                
+#                 file_path, file_type = self._download_file(link['url'], source_name)
+#                 if file_path:
+#                     files.append({
+#                         "path": file_path,
+#                         "type": file_type,
+#                         "url": link['url'],
+#                         "source": source_name,
+#                         "description": link['text'] or "EU Sanctions File",
+#                     })
+                    
+#             _logger.info(f"Completed EU sanctions data fetch. Found {len(files)} files.")
+#             return files
+            
+#         except Exception as e:
+#             _logger.error(f"Error fetching EU sanctions data: {str(e)}")
+#             return files
+
+#     def fetch_ofac_sanctions(self):
+#         """
+#         Fetch sanctions data from OFAC with improved timeout handling
+
+#         Returns:
+#         list: List of dictionaries with file information
+#         """
+#         source_name = "ofac_sanctions"
+        
+#         # Break OFAC downloads into very small groups to avoid timeout
+#         direct_urls = [
+#             # File 1: Small CSV (high priority)
+#             "https://www.treasury.gov/ofac/downloads/sdn.csv",
+            
+#             # File 2: Small XML
+#             "https://www.treasury.gov/ofac/downloads/sdn_advanced.xml",
+            
+#             # File 3: Medium TXT file
+#             "https://www.treasury.gov/ofac/downloads/sdnlist.txt"
+
+#             "https://www.treasury.gov/ofac/downloads/consolidated/consolidated.xml",
+#             "https://www.treasury.gov/ofac/downloads/sanctions/1.0/sdn_advanced.xml",
+#         ]
+        
+#         # These are separate because they're larger files (process optionally)
+#         large_files = [
+#             "https://www.treasury.gov/ofac/downloads/consolidated/consolidated.xml",
+#             "https://www.treasury.gov/ofac/downloads/consolidated/consolidated.csv"
+#         ]
+        
+#         files = []
+#         _logger.info(f"Fetching OFAC sanctions data (processing small files first)")
+        
+#         # Process each small file individually with a timeout
+#         for direct_url in direct_urls:
+#             try:
+#                 _logger.info(f"Downloading OFAC file: {direct_url}")
+#                 file_path, file_type = self._download_file_with_timeout(direct_url, source_name, 
+#                                                                         max_size_mb=10, timeout=30)
+#                 if file_path:
+#                     files.append({
+#                         "path": file_path,
+#                         "type": file_type,
+#                         "url": direct_url,
+#                         "source": source_name,
+#                         "description": os.path.basename(direct_url),
+#                     })
+#             except Exception as e:
+#                 _logger.error(f"Error downloading {direct_url}: {str(e)}")
+        
+#         # Process large files only if we have time (but don't block if they're too large)
+#         for large_file in large_files:
+#             try:
+#                 _logger.info(f"Checking large OFAC file: {large_file}")
+#                 # Only download if under 30MB, else create placeholder record
+#                 file_path, file_type = self._download_file_with_timeout(large_file, source_name,
+#                                                                     max_size_mb=30, timeout=45)
+#                 if file_path:
+#                     files.append({
+#                         "path": file_path,
+#                         "type": file_type,
+#                         "url": large_file,
+#                         "source": source_name, 
+#                         "description": os.path.basename(large_file),
+#                     })
+#                 else:
+#                     _logger.warning(f"Skipped large file {large_file} to prevent timeout")
+#                     # Create a record about the file but don't include its content
+#                     source_dir = self._get_source_directory(source_name)
+#                     placeholder_path = os.path.join(source_dir, f"placeholder_{os.path.basename(large_file)}.txt")
+#                     with open(placeholder_path, 'w') as f:
+#                         f.write(f"Large file available at: {large_file}\n")
+#                         f.write(f"File was skipped to prevent timeouts. Download manually if needed.")
+                    
+#                     files.append({
+#                         "path": placeholder_path,
+#                         "type": "txt",
+#                         "url": large_file,
+#                         "source": source_name,
+#                         "description": f"PLACEHOLDER: {os.path.basename(large_file)} (too large)",
+#                     })
+#             except Exception as e:
+#                 _logger.error(f"Error checking large file {large_file}: {str(e)}")
+        
+#         _logger.info(f"OFAC sanctions data fetch completed. Found {len(files)} files.")
+#         return files
+
+#     def fetch_un_sanctions(self):
+#         """
+#         Fetch sanctions data from the UN consolidated list
+
+#         Returns:
+#             list: List of dictionaries with file information
+#         """
+#         source_name = "un_sanctions"
+#         url = "https://www.un.org/securitycouncil/content/un-sc-consolidated-list"
+
+#         files = []
+
+#         try:
+#             _logger.info(f"Fetching UN sanctions data from {url}")
+
+#             # Fetch the main page
+#             soup, response = self._fetch_page(url)
+#             if not soup:
+#                 return files
+
+#             # Extract downloadable file links
+#             links = self._extract_links(soup, url)
+
+#             # UN site has some specific file formats, so look for XML files too
+#             xml_links = []
+#             for a_tag in soup.find_all("a", href=True):
+#                 href = a_tag.get("href")
+#                 if href.lower().endswith(".xml"):
+#                     if not href.startswith(("http://", "https://")):
+#                         href = urljoin(url, href)
+
+#                     xml_links.append(
+#                         {
+#                             "url": href,
+#                             "text": a_tag.get_text(strip=True)
+#                             or os.path.basename(href),
+#                             "type": "xml",
+#                         }
+#                     )
+
+#             # Combine regular links with XML links
+#             links.extend(xml_links)
+
+#             # Download each file
+#             for link in links:
+#                 file_path, file_type = self._download_file(link["url"], source_name)
+#                 if file_path:
+#                     files.append(
+#                         {
+#                             "path": file_path,
+#                             "type": file_type,
+#                             "url": link["url"],
+#                             "source": source_name,
+#                             "description": link["text"],
+#                         }
+#                     )
+
+#             _logger.info(
+#                 f"Completed UN sanctions data fetch. Found {len(files)} files."
+#             )
+#             return files
+
+#         except Exception as e:
+#             _logger.error(f"Error fetching UN sanctions data")
+#             _logger.error(f"Error: {str(e)}")
+#             _logger.error(traceback.format_exc())
+#             return files
+
+#     def fetch_uk_sanctions(self):
+#         """
+#         Enhanced UK sanctions scraper with direct file downloads
+#         """
+#         source_name = "uk_sanctions"
+        
+#         # Direct URLs for UK sanctions files (latest as of 2025)
+#         direct_urls = [
+#             # CSV format - most recent
+#             "https://assets.publishing.service.gov.uk/media/sanctions-list.csv",
+#             "https://ofsistorage.blob.core.windows.net/publishlive/ConList.csv",
+#             "https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1183423/UK_Sanctions_List.csv",
+#             "https://assets.publishing.service.gov.uk/media/652e5c5df5762f001356c0e6/UK_Sanctions_List.csv",
+            
+#             # Excel format
+#             "https://assets.publishing.service.gov.uk/media/sanctions-list.ods",
+#             "https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1183425/UK_Sanctions_List.ods",
+#             "https://assets.publishing.service.gov.uk/media/67caf893a175f08d198d80f1/UK_Sanctions_List.ods",
+#             "https://assets.publishing.service.gov.uk/media/652e5c5e6a75b5001312d064/UK_Sanctions_List.ods",
+            
+#             # XML format (if available)
+#             "https://assets.publishing.service.gov.uk/media/sanctions-list.xml",
+            
+#             # PDF format
+#             "https://assets.publishing.service.gov.uk/media/sanctions-list.pdf",
+#             "https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1183422/UK_Sanctions_List.pdf",
+#         ]
+        
+#         # Alternative base URLs to try
+#         base_urls = [
+#             "https://www.gov.uk/government/publications/the-uk-sanctions-list",
+#             "https://www.gov.uk/government/publications/financial-sanctions-consolidated-list-of-targets",
+#             "https://sanctionssearchapp.ofsi.hmtreasury.gov.uk/",
+#             "https://www.gov.uk/government/collections/financial-sanctions-regime-specific-consolidated-lists-and-releases",
+#         ]
+        
+#         files = []
+        
+#         try:
+#             _logger.info("Attempting direct downloads for UK sanctions")
+            
+#             # First try direct URLs
+#             for url in direct_urls:
+#                 try:
+#                     _logger.info(f"Trying direct UK sanctions download: {url}")
+                    
+#                     # Use a longer timeout for UK files
+#                     self.timeout = 60
+                    
+#                     # Use a custom User-Agent to avoid blocks
+#                     old_headers = self.session.headers.copy()
+#                     self.session.headers.update({
+#                         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+#                         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+#                         "Accept-Language": "en-US,en;q=0.5"
+#                     })
+                    
+#                     # Attempt to download with 3 retries
+#                     file_path, file_type = self._download_file(url, source_name, retries=3)
+                    
+#                     # Restore original headers
+#                     self.session.headers = old_headers
+                    
+#                     if file_path:
+#                         files.append({
+#                             "path": file_path,
+#                             "type": file_type,
+#                             "url": url,
+#                             "source": source_name,
+#                             "description": "UK Sanctions Direct Download",
+#                         })
+                        
+#                         # If we've found a CSV or Excel file, we can break early
+#                         if file_type in ['csv', 'xlsx', 'xls', 'ods']:
+#                             _logger.info(f"Successfully downloaded {file_type} file for UK sanctions")
+#                             break
+#                 except Exception as e:
+#                     _logger.warning(f"Could not download {url}: {str(e)}")
+            
+#             # If we got files from direct downloads, return them
+#             if files:
+#                 _logger.info(f"Successfully downloaded {len(files)} UK sanctions files")
+#                 return files
+            
+#             # If direct downloads failed, try scraping each base URL
+#             _logger.info("Direct downloads failed, trying to scrape UK sanctions from base URLs")
+            
+#             for base_url in base_urls:
+#                 try:
+#                     _logger.info(f"Scraping UK sanctions from: {base_url}")
+                    
+#                     # Get the page content
+#                     soup, response = self._fetch_page(base_url)
+#                     if not soup:
+#                         _logger.warning(f"Could not fetch {base_url}")
+#                         continue
+                    
+#                     # Look for download links
+#                     for a_tag in soup.find_all('a', href=True):
+#                         href = a_tag.get('href', '')
+#                         text = a_tag.get_text().lower()
+                        
+#                         # Skip if not a potential download link
+#                         if not href:
+#                             continue
+                        
+#                         # Check if it looks like a sanctions file
+#                         if (('sanction' in href.lower() or 'consolidated' in href.lower()) and 
+#                             any(ext in href.lower() for ext in ['.csv', '.xlsx', '.xls', '.ods', '.pdf', '.xml'])):
+                            
+#                             # Make absolute URL if needed
+#                             if not href.startswith(('http://', 'https://')):
+#                                 href = urljoin(base_url, href)
+                            
+#                             _logger.info(f"Found potential UK sanctions file: {href}")
+                            
+#                             try:
+#                                 file_path, file_type = self._download_file(href, source_name)
+#                                 if file_path:
+#                                     files.append({
+#                                         "path": file_path,
+#                                         "type": file_type,
+#                                         "url": href,
+#                                         "source": source_name,
+#                                         "description": text or "UK Sanctions File",
+#                                     })
+                                    
+#                                     # If we've found a CSV or Excel file, we can break early
+#                                     if file_type in ['csv', 'xlsx', 'xls', 'ods']:
+#                                         _logger.info(f"Successfully downloaded {file_type} file for UK sanctions")
+#                                         break
+#                             except Exception as e:
+#                                 _logger.warning(f"Could not download {href}: {str(e)}")
+                    
+#                     # If we found files from this base URL, break early
+#                     if files:
+#                         break
+                        
+#                 except Exception as e:
+#                     _logger.warning(f"Error scraping {base_url}: {str(e)}")
+            
+#             # If we still don't have files, try one more approach with a specific search
+#             if not files:
+#                 _logger.info("Trying UK sanctions search page for files")
+#                 try:
+#                     search_url = "https://www.gov.uk/search/all?keywords=sanctions+list&content_store_document_type=all&organisations%5B%5D=office-of-financial-sanctions-implementation&order=relevance"
+                    
+#                     soup, response = self._fetch_page(search_url)
+#                     if soup:
+#                         # Look for search results with files
+#                         for a_tag in soup.find_all('a', href=True):
+#                             href = a_tag.get('href', '')
+                            
+#                             if 'sanctions' in href.lower() and '/government/' in href.lower():
+#                                 # Visit this page to look for files
+#                                 _logger.info(f"Checking page for UK sanctions files: {href}")
+                                
+#                                 result_soup, _ = self._fetch_page(href)
+#                                 if not result_soup:
+#                                     continue
+                                    
+#                                 # Look for attachments with data formats
+#                                 for file_link in result_soup.find_all('a', href=True):
+#                                     file_href = file_link.get('href', '')
+                                    
+#                                     if any(ext in file_href.lower() for ext in ['.csv', '.xlsx', '.xls', '.ods', '.pdf', '.xml']):
+#                                         # Make absolute URL if needed
+#                                         if not file_href.startswith(('http://', 'https://')):
+#                                             file_href = urljoin(href, file_href)
+                                        
+#                                         _logger.info(f"Found potential UK sanctions file: {file_href}")
+                                        
+#                                         try:
+#                                             file_path, file_type = self._download_file(file_href, source_name)
+#                                             if file_path:
+#                                                 files.append({
+#                                                     "path": file_path,
+#                                                     "type": file_type,
+#                                                     "url": file_href,
+#                                                     "source": source_name,
+#                                                     "description": file_link.get_text() or "UK Sanctions File",
+#                                                 })
+#                                         except Exception as e:
+#                                             _logger.warning(f"Could not download {file_href}: {str(e)}")
+#                 except Exception as e:
+#                     _logger.warning(f"Error with UK sanctions search: {str(e)}")
+            
+#             # Final fallback - use a dummy file with a placeholder if no files were found
+#             if not files:
+#                 _logger.warning("Could not find any UK sanctions files, creating placeholder")
+                
+#                 # Create a placeholder file
+#                 source_dir = self._get_source_directory(source_name)
+#                 placeholder_path = os.path.join(source_dir, f"uk_sanctions_placeholder.txt")
+                
+#                 with open(placeholder_path, 'w') as f:
+#                     f.write("# UK Sanctions List Placeholder\n\n")
+#                     f.write("No UK sanctions files could be downloaded at this time.\n")
+#                     f.write(f"Last attempt: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+#                     f.write("Please check URLs and try again later.\n")
+                
+#                 files.append({
+#                     "path": placeholder_path,
+#                     "type": "txt",
+#                     "url": "placeholder",
+#                     "source": source_name,
+#                     "description": "UK Sanctions Placeholder",
+#                 })
+            
+#             _logger.info(f"Completed UK sanctions data fetch. Found {len(files)} files.")
+#             return files
+            
+#         except Exception as e:
+#             _logger.error(f"Error fetching UK sanctions data: {str(e)}")
+#             _logger.error(traceback.format_exc())
+#             return files
+
+#     # def fetch_all_sanctions(self):
+#     #     """
+#     #     Fetch sanctions data from all sources, one at a time
+
+#     #     Returns:
+#     #         list: List of dictionaries with file information
+#     #     """
+#     #     all_files = []
+
+#     #     try:
+#     #         # Define sources with corresponding fetch methods
+#     #         sources = [
+#     #             ("eu_sanctions", self.fetch_eu_sanctions),
+#     #             ("un_sanctions", self.fetch_un_sanctions),
+#     #             ("ofac_sanctions", self.fetch_ofac_sanctions),
+#     #             ("uk_sanctions", self.fetch_uk_sanctions)
+#     #         ]
+            
+#     #         # Process one source at a time to avoid timeout issues
+#     #         for source_name, fetch_method in sources:
+#     #             try:
+#     #                 _logger.info(f"Starting fetch from {source_name}")
+#     #                 files = fetch_method()
+#     #                 _logger.info(f"Completed fetch from {source_name}. Found {len(files)} files.")
+#     #                 all_files.extend(files)
+                    
+#     #                 # Add a short pause between sources to prevent overwhelming server
+#     #                 time.sleep(2)
+                    
+#     #             except Exception as e:
+#     #                 _logger.error(f"Error fetching from {source_name}: {str(e)}")
+#     #                 _logger.error(traceback.format_exc())
+#     #                 # Continue with next source even if this one fails
+#     #                 continue
+
+#     #         _logger.info(f"Completed fetch from all sources. Total files: {len(all_files)}")
+#     #         return all_files
+
+#     #     except Exception as e:
+#     #         _logger.error(f"Error in fetch_all_sanctions method")
+#     #         _logger.error(f"Error: {str(e)}")
+#     #         _logger.error(traceback.format_exc())
+#     #         return all_files

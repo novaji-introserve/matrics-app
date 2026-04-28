@@ -1,0 +1,139 @@
+<odoo>
+  <data>
+    <!-- Make menus visible/invisible based on groups -->
+    <record id="base.menu_management" model="ir.ui.menu">
+      <field name="groups_id" eval="[(6, 0, [ref('base.group_system')])]"/>
+    </record>
+
+    <!-- rule book theme -->
+    <!-- <record id="action_rulebook_theme" model="ir.actions.act_window">
+      <field name="name">Rulebook Themes</field>
+      <field name="res_model">rulebook.theme</field>
+      <field name="view_mode">tree,form</field>
+    </record> -->
+
+    <!-- rule book source -->
+    <record id="action_rulebook_sources" model="ir.actions.act_window">
+      <field name="name">Rulebook Sources</field>
+      <field name="res_model">rulebook.sources</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+
+    <record id="action_rulebook_title" model="ir.actions.act_window">
+      <field name="name">Rulebook Source</field>
+      <field name="res_model">rulebook.title</field>
+      <field name="view_mode">tree,form</field>
+      <field name="help" type="html">
+        <p class="oe_view_nocontent_create">
+          Create your rule book Source
+        </p>
+      </field>
+    </record>
+
+
+    <!-- Branch -->
+    <!-- <record id="action_rulebook_branch" model="ir.actions.act_window">
+      <field name="name">Branches</field>
+      <field name="res_model">rulebook.branch</field>
+      <field name="view_mode">tree,form</field>
+    </record> -->
+
+    <!-- Risk Categories -->
+    <record id="action_rulebook_risk_category" model="ir.actions.act_window">
+      <field name="name">Risk Categories</field>
+      <field name="res_model">rulebook.risk_category</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Responsible -->
+    <!-- <record id="action_rulebook_responsible" model="ir.actions.act_window">
+      <field name="name">Responsibles</field>
+      <field name="res_model">rulebook.responsible</field>
+      <field name="view_mode">tree,form</field>
+    </record> -->
+
+
+    <!-- rule book -->
+    <record id="open_rulebooks" model="ir.actions.server">
+      <field name="name">Open RuleBooks</field>
+      <field name="model_id" ref="model_rulebook"/>
+      <!-- Reference to the res.users model -->
+      <field name="state">code</field>
+      <field name="code">action = model.open_rulebooks()</field>
+    </record>
+
+
+
+
+    <!-- Reply log -->
+    <record id="open_reply_log" model="ir.actions.server">
+      <field name="name">Open Reply Log</field>
+      <field name="model_id" ref="model_reply_log"/>
+      <!-- Reference to the res.users model -->
+      <field name="state">code</field>
+      <field name="code">action = model.open_reply_log()</field>
+    </record>
+
+
+    <record id="action_pdf_chat" model="ir.actions.act_window">
+      <field name="name">PDF Chat</field>
+      <field name="res_model">pdf.chat</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+
+
+    <record id="action_cusotomer_details_js" model="ir.actions.client">
+      <field name="name">Dashboard</field>
+      <field name="tag">rule_book.action_cusotomer_details_js</field>
+    </record>
+
+
+    <!-- Menu Item -->
+
+
+    <!-- Main Rulebook Menu -->
+    <menuitem id="menu_rulebook_theme_root" name="Rulebook" sequence="1" />
+
+
+
+    <!-- Submenu for Rulebook Details (Title, Theme, Rulebook, Reply Logs) -->
+    <menuitem id="menu_rulebook_details" name="Rulebook" parent="menu_rulebook_theme_root" sequence="1" />
+    <menuitem id="menu_rulebook_rulebook" name="Rulebook" parent="menu_rulebook_details" action="open_rulebooks" sequence="1" />
+    <menuitem id="menu_rulebook_title" name="Source" parent="menu_rulebook_details" action="action_rulebook_title" sequence="2" groups="rule_book.group_compliance_manager_" />
+    <menuitem id="menu_pdf_chat" name="AI Assistance" parent="menu_rulebook_details" action="action_pdf_chat" sequence="3" groups="rule_book.group_compliance_manager_"/>
+
+    <!-- Alerts -->
+    <menuitem id="menu_rulebook_alert" name="Alert" parent="menu_rulebook_theme_root" sequence="3" groups="rule_book.group_compliance_manager_"/>
+    <menuitem id="menu_owl_alert_dashboard" name="Alert" parent="menu_rulebook_alert" action="action_owl_alert_dashboard" sequence="1" />
+
+
+    
+    <!-- Reply Logs -->
+    <menuitem id="menu_reply_log" name="Rulebook Logs" parent="menu_rulebook_details" action="open_reply_log" sequence="5" />
+
+    <!-- Submenu for Sources (Regulatory Source and Regulatory Records) -->
+    <menuitem id="menu_rulebook_sources_root" name="Regulatory Sources" parent="menu_rulebook_theme_root" sequence="2" groups="rule_book.group_compliance_manager_" />
+    <!-- Submenu for Configuration (with Exception Management) -->
+    <menuitem id="menu_rulebook_configuration" name="Configuration" parent="menu_rulebook_theme_root" sequence="4" groups="rule_book.group_compliance_manager_" />
+
+    <!-- Risk Categories -->
+    <menuitem id="menu_rulebook_risk_category" name="Risk Categories" parent="menu_rulebook_configuration" action="action_rulebook_risk_category" sequence="7" />
+    
+    <!-- Tracking Keywords -->
+
+    <!--Regulatory Sources  -->
+    <menuitem id="menu_regulatory_sources" name="Regulatory Sources" parent="menu_rulebook_configuration" action="action_rulebook_sources" />
+
+    <!-- <menuitem id="menu_rulebook_dashboard" name="Dashboard" parent="menu_rulebook_theme_root" action="action_rulebook_dashboard" sequence="1" groups="base.group_user" /> -->
+
+
+    <menuitem id="helpdesk_rule_book_dashbaord" name="Dashboard" parent="menu_rulebook_theme_root" action="action_cusotomer_details_js" sequence="-1" />
+
+
+
+  </data>
+
+
+</odoo>

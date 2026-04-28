@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Redis ORM Cache - Supercharge Your Odoo Performance</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <section class="container">
+            <div class="row">
+                <div class="col-12 text-center"
+                     style="padding: 40px 20px; background-color: #71639e; color: white; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
+                    <h1 style="font-size: 3rem; font-weight: bold; margin-bottom: 20px;">🚀 Redis ORM Cache Integration</h1>
+                    <p style="font-size: 1.3rem; margin-bottom: 0; opacity: 0.95;">Transform Your Odoo Performance with Distributed Redis Caching</p>
+                </div>
+            </div>
+
+            <div class="row" style="margin-bottom: 40px;">
+                <div class="col-12">
+                    <div style="background-color: #f8f9fa; padding: 30px; border-left: 5px solid #71639e; border-radius: 5px;">
+                        <h3 style="color: #71639e; margin-bottom: 15px;">⚡ The Problem</h3>
+                        <p style="font-size: 1.1rem; line-height: 1.7; color: #333;">
+                            Odoo's default in-memory cache creates serious challenges in both
+                            <strong>multi-worker</strong>
+                            (single server with multiple workers) and
+                            <strong>multi-instance</strong>
+                            (load balancing, horizontal scaling) environments:
+                        </p>
+                        <ul style="font-size: 1.05rem; line-height: 1.8; color: #555;">
+                            <li>
+                                <strong>Isolated Cache Per Worker/Instance:</strong>
+                                Each Odoo worker process maintains its own isolated in-memory cache. Even on a single server with 4 workers, you have 4 separate cache stores that don't communicate with each other
+                            </li>
+                            <li>
+                                <strong>Cache Inconsistency:</strong>
+                                When Worker 1 updates data and invalidates its cache, Workers 2-4 still serve stale cached data. Users hitting different workers see inconsistent information, leading to unpredictable behavior and data integrity issues
+                            </li>
+                            <li>
+                                <strong>Database Overload:</strong>
+                                Each worker must rebuild its own cache independently, causing repeated identical queries to PostgreSQL. A query cached in Worker 1 must be re-executed in Workers 2, 3, and 4
+                            </li>
+                            <li>
+                                <strong>Limited Scalability:</strong>
+                                Adding more workers or instances doesn't improve cache efficiency—it multiplies the problem. More workers = more cache duplication = more database load
+                            </li>
+                            <li>
+                                <strong>Memory Waste:</strong>
+                                Duplicate cache data across all worker processes and servers consuming valuable RAM. With 4 workers on 3 servers, the same data is cached 12 times!
+                            </li>
+                        </ul>
+                        <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 5px; margin-top: 20px;">
+                            <p style="margin-bottom: 0; color: #856404; font-size: 1rem; line-height: 1.7;">
+                                <strong>📌 Important:</strong>
+                                This issue affects <strong>ANY Odoo deployment running more than 1 worker</strong>, not just multi-server setups. Even a single Odoo server with the recommended 4-8 workers suffers from cache fragmentation and inconsistency.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-bottom: 40px;">
+                <div class="col-12">
+                    <div style="background-color: RGBA(1, 128, 165, var(--text-opacity, 1)); padding: 30px; border-radius: 8px; color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);">
+                        <h3 style="margin-bottom: 20px; font-size: 2rem;">✨ The Solution: Redis-Powered ORM Cache</h3>
+                        <p style="font-size: 1.15rem; line-height: 1.8; margin-bottom: 0;">
+                            This module seamlessly replaces Odoo's default local memory cache with a <strong>centralized Redis cache</strong>,
+                            enabling lightning-fast data access with perfect consistency across all your Odoo instances.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-bottom: 40px;">
+                <div class="col-12">
+                    <h2 style="color: #333; font-size: 2.2rem; margin-bottom: 30px; text-align: center; font-weight: bold;">🎯 Key Benefits</h2>
+                </div>
+
+                <div class="col-md-6" style="margin-bottom: 20px;">
+                    <div style="border: 2px solid #71639e; border-radius: 8px; padding: 25px; height: 100%; background-color: white;">
+                        <h4 style="color: #71639e; margin-bottom: 15px;">
+                            <span style="font-size: 2rem;">📊</span>
+                            Massive PostgreSQL Load Reduction
+                        </h4>
+                        <p style="line-height: 1.7; color: #555;">
+                            Reduce database queries by
+                            <strong>60-80%</strong>
+                            by serving frequently accessed ORM data directly from Redis.
+                            Your PostgreSQL server can focus on write operations and complex queries, dramatically improving overall system performance.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6" style="margin-bottom: 20px;">
+                    <div style="border: 2px solid #71639e; border-radius: 8px; padding: 25px; height: 100%; background-color: white;">
+                        <h4 style="color: #71639e; margin-bottom: 15px;">
+                            <span style="font-size: 2rem;">⚡</span>
+                            Blazing Fast RAM-Speed Data Access
+                        </h4>
+                        <p style="line-height: 1.7; color: #555;">
+                            Redis stores cache in RAM with sub-millisecond response times (<strong>&lt;1ms</strong>).
+                            Experience
+                            <strong>10-50x faster</strong>
+                            data retrieval compared to PostgreSQL disk I/O operations.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6" style="margin-bottom: 20px;">
+                    <div style="border: 2px solid #71639e; border-radius: 8px; padding: 25px; height: 100%; background-color: white;">
+                        <h4 style="color: #71639e; margin-bottom: 15px;">
+                            <span style="font-size: 2rem;">🔄</span>
+                            Perfect Data Consistency Across Workers & Instances
+                        </h4>
+                        <p style="line-height: 1.7; color: #555;">
+                            All Odoo workers and instances share the <strong>same centralized Redis cache</strong>. Whether you have 4 workers on one server or 10 instances in a cluster, when data changes anywhere,
+                            cache invalidation propagates instantly to all processes—eliminating stale data issues and ensuring every user sees the same up-to-date information, regardless of which worker handles their request.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6" style="margin-bottom: 20px;">
+                    <div style="border: 2px solid #71639e; border-radius: 8px; padding: 25px; height: 100%; background-color: white;">
+                        <h4 style="color: #71639e; margin-bottom: 15px;">
+                            <span style="font-size: 2rem;">📈</span>
+                            Unlimited Scalability (Vertical & Horizontal)
+                        </h4>
+                        <p style="line-height: 1.7; color: #555;">
+                            Scale up by adding more workers per server or scale out by adding more instances—without cache duplication. Each new worker or server leverages the shared Redis cache,
+                            making your infrastructure truly scalable and cost-effective. More capacity = same cache efficiency!
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-bottom: 40px;">
+                <div class="col-12">
+                    <div style="background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 30px;">
+                        <h3 style="color: #856404; margin-bottom: 20px; text-align: center;">📊 Expected Performance Improvements</h3>
+
+                        <div class="row">
+                            <div class="col-md-6" style="margin-bottom: 15px;">
+                                <div style="background-color: #f8d7da; border: 2px solid #dc3545; border-radius: 5px; padding: 20px;">
+                                    <h5 style="color: #721c24; margin-bottom: 15px;">❌ Without Redis Cache</h5>
+                                    <ul style="color: #721c24; line-height: 1.8;">
+                                        <li>Slower page loads due to repeated database queries</li>
+                                        <li>High number of concurrent database connections</li>
+                                        <li>Increased database CPU and I/O usage</li>
+                                        <li>Lower cache hit rate (isolated per worker)</li>
+                                        <li>ORM queries hitting disk storage</li>
+                                        <li>Cache inconsistency between workers/instances</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="margin-bottom: 15px;">
+                                <div style="background-color: #d4edda; border: 2px solid #28a745; border-radius: 5px; padding: 20px;">
+                                    <h5 style="color: #155724; margin-bottom: 15px;">✅ With Redis Cache</h5>
+                                    <ul style="color: #155724; line-height: 1.8;">
+                                        <li>
+                                            <strong>Faster page loads</strong>
+                                            - RAM-speed data access 🚀
+                                        </li>
+                                        <li>
+                                            <strong>Reduced database load</strong>
+                                            - Fewer connections needed ⬇️
+                                        </li>
+                                        <li>
+                                            <strong>Lower DB resource usage</strong>
+                                            - CPU and I/O relief ✅
+                                        </li>
+                                        <li>
+                                            <strong>Higher cache hit rate</strong>
+                                            - Shared across all workers ⬆️
+                                        </li>
+                                        <li>
+                                            <strong>Sub-millisecond queries</strong>
+                                            - Direct RAM access 🎯
+                                        </li>
+                                        <li>
+                                            <strong>Perfect consistency</strong>
+                                            - Synchronized cache 🔄
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p style="text-align: center; margin-top: 20px; margin-bottom: 0; font-size: 1.15rem; color: #856404;">
+                            <strong>💡 Performance Impact:</strong>
+                            Expect
+                            <strong>significantly faster</strong>
+                            response times and
+                            <strong>substantially reduced</strong>
+                            database load. Actual improvements vary based on your workload, data access patterns, and system configuration.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-bottom: 40px;">
+                <div class="col-12">
+                    <h2 style="color: #333; font-size: 2.2rem; margin-bottom: 30px; text-align: center; font-weight: bold;">🛠️ Installation Guide</h2>
+                </div>
+
+                <div class="col-12">
+                    <div style="background-color: white; border: 2px solid #dee2e6; border-radius: 8px; padding: 30px;">
+                        <h4 style="color: #71639e; margin-bottom: 20px;">Step 1: Install Required Dependencies</h4>
+                        <p style="margin-bottom: 10px; font-size: 1.05rem;">Install the Redis Python client library on all Odoo servers:</p>
+                        <div style="background-color: #2d2d2d; padding: 15px; border-radius: 5px; overflow-x: auto;">
+                            <code style="color: #f8f8f2; display: block; background-color: transparent; background-color: transparent;">pip install redis~=7.1</code>
+                        </div>
+
+                        <h4 style="color: #71639e; margin-bottom: 20px; margin-top: 30px;">Step 2: Install Redis Server</h4>
+                        <p style="margin-bottom: 10px; font-size: 1.05rem;">If you don't have a Redis server yet, install it:</p>
+
+                        <p style="margin-bottom: 5px; font-weight: bold;">Ubuntu/Debian:</p>
+                        <div style="background-color: #2d2d2d; padding: 15px; border-radius: 5px; overflow-x: auto;">
+                            <code style="color: #f8f8f2; display: block; background-color: transparent;">sudo apt update</code>
+                            <code style="color: #f8f8f2; display: block; background-color: transparent;">sudo apt install redis-server</code>
+                            <code style="color: #f8f8f2; display: block; background-color: transparent;">sudo systemctl enable redis-server</code>
+                            <code style="color: #f8f8f2; display: block; background-color: transparent;">sudo systemctl start redis-server</code>
+                        </div>
+
+                        <p style="margin-bottom: 5px; margin-top: 15px; font-weight: bold;">CentOS/RHEL:</p>
+                        <div style="background-color: #2d2d2d; padding: 15px; border-radius: 5px; overflow-x: auto;">
+                            <code style="color: #f8f8f2; display: block; background-color: transparent;">sudo yum install redis</code>
+                            <code style="color: #f8f8f2; display: block; background-color: transparent;">sudo systemctl enable redis</code>
+                            <code style="color: #f8f8f2; display: block; background-color: transparent;">sudo systemctl start redis</code>
+                        </div>
+
+                        <p style="margin-bottom: 5px; margin-top: 15px; font-weight: bold;">Docker (Quick Start):</p>
+                        <div style="background-color: #2d2d2d; padding: 15px; border-radius: 5px; overflow-x: auto;">
+                            <code style="color: #f8f8f2; display: block; background-color: transparent;">docker run -d --name redis-cache -p 6379:6379 redis:latest</code>
+                        </div>
+
+                        <h4 style="color: #71639e; margin-bottom: 20px; margin-top: 30px;">Step 3: Configure Odoo</h4>
+                        <p style="margin-bottom: 15px; font-size: 1.05rem;">
+                            Download and extract this module to your Odoo addons directory, then add the following parameters to your
+                            <code style="background-color: #f5f5f5; padding: 2px 6px; border-radius: 3px; color: #d63384;">odoo.conf</code>
+                            file:
+                        </p>
+
+                        <div style="background-color: #2d2d2d; padding: 15px; border-radius: 5px; overflow-x: auto; margin-bottom: 20px;">
+                            <code style="color: #f8f8f2; display: block; background-color: transparent;">[options]</code>
+                            <code style="color: #f8f8f2; display: block; background-color: transparent;"># Your existing configuration options...</code>
+                            <code style="color: #f8f8f2; display: block; background-color: transparent;"># REQUIRED: Load this module at server startup (before database initialization)</code>
+                            <code style="color: #f8f8f2; display: block; background-color: transparent;">server_wide_modules = base,web,ro_cache_redis</code>
+                            <code style="color: #f8f8f2; display: block; background-color: transparent;">&nbsp;</code>
+                            <code style="color: #f8f8f2; display: block; background-color: transparent;"># REQUIRED: Redis server connection URL</code>
+                            <code style="color: #f8f8f2; display: block; background-color: transparent;">redis_cache_url = redis://localhost:6379/0</code>
+                            <code style="color: #f8f8f2; display: block; background-color: transparent;">&nbsp;</code>
+                            <code style="color: #f8f8f2; display: block; background-color: transparent;"># Optional: Cache expiration time in seconds (default: 3600 = 1 hour)</code>
+                            <code style="color: #f8f8f2; display: block; background-color: transparent;">redis_cache_expiration = 3600</code>
+                            <code style="color: #f8f8f2; display: block; background-color: transparent;">&nbsp;</code>
+                            <code style="color: #f8f8f2; display: block; background-color: transparent;"># Optional: Custom prefix for cache keys (default: odoo_orm_cache)</code>
+                            <code style="color: #f8f8f2; display: block; background-color: transparent;">redis_cache_prefix = odoo_orm_cache</code>
+                        </div>
+
+                        <div style="background-color: #d1ecf1; border: 1px solid #17a2b8; border-radius: 5px; padding: 15px; margin-bottom: 20px;">
+                            <h5 style="color: #0c5460; margin-bottom: 10px;">ℹ️ Why server_wide_modules?</h5>
+                            <p style="margin-bottom: 0; color: #0c5460; font-size: 0.95rem; line-height: 1.7;">
+                                This module must be loaded <strong>before</strong> Odoo initializes the database registry and cache system.
+                                By adding it to <code style="background-color: #b8e6f0; padding: 2px 6px; border-radius: 3px; color: #0c5460;">server_wide_modules</code>, it loads at server startup and can properly replace
+                                the default cache implementation. Without this configuration, the module will not work.
+                            </p>
+                        </div>
+
+                        <div style="background-color: #e7f3ff; border: 1px solid #b3d9ff; border-radius: 5px; padding: 15px; margin: 20px 0;">
+                            <h5 style="color: #004085; margin-bottom: 10px;">📝 Configuration Options Explained:</h5>
+                            <table class="table table-sm" style="margin-bottom: 0; background-color: white;">
+                                <tbody>
+                                    <tr>
+                                        <td style="font-weight: bold; padding: 8px; border-top: 1px solid #dee2e6;">server_wide_modules</td>
+                                        <td style="padding: 8px; border-top: 1px solid #dee2e6;">
+                                            <strong>(Required)</strong>
+                                            Must include <code style="background-color: #e7f3ff; padding: 2px 6px; border-radius: 3px; color: #004085;">ro_cache_redis</code> to load the module at server startup.
+                                            <br>
+                                            Default value: <code style="background-color: #e7f3ff; padding: 2px 6px; border-radius: 3px; color: #004085;">base,web</code> - Add <code style="background-color: #e7f3ff; padding: 2px 6px; border-radius: 3px; color: #004085;">,ro_cache_redis</code> to the end
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: bold; padding: 8px; border-top: 1px solid #dee2e6;">redis_cache_url</td>
+                                        <td style="padding: 8px; border-top: 1px solid #dee2e6;">
+                                            <strong>(Required)</strong>
+                                            Redis connection string. Format:
+                                            <code style="background-color: #e7f3ff; padding: 2px 6px; border-radius: 3px; color: #004085;">redis://[user:password@]host:port/db</code>
+                                            <br>
+                                            Examples:
+                                            <ul style="margin-top: 5px; margin-bottom: 0;">
+                                                <li>
+                                                    <code style="background-color: #e7f3ff; padding: 2px 6px; border-radius: 3px; color: #004085;">redis://localhost:6379/0</code>
+                                                    - Local server, database 0
+                                                </li>
+                                                <li>
+                                                    <code style="background-color: #e7f3ff; padding: 2px 6px; border-radius: 3px; color: #004085;">redis://:mypassword@10.0.0.5:6379/1</code>
+                                                    - Remote server with password
+                                                </li>
+                                                <li>
+                                                    <code style="background-color: #e7f3ff; padding: 2px 6px; border-radius: 3px; color: #004085;">redis://user:pass@redis.example.com:6379/0</code>
+                                                    - Full authentication
+                                                </li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: bold; padding: 8px; border-top: 1px solid #dee2e6;">redis_cache_expiration</td>
+                                        <td style="padding: 8px; border-top: 1px solid #dee2e6;">
+                                            <strong>(Optional)</strong>
+                                            Time-to-live for cache entries in seconds. Default: 3600 (1 hour)
+                                            <br>
+                                            Recommended: 3600-7200 for most cases
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: bold; padding: 8px; border-top: 1px solid #dee2e6;">redis_cache_prefix</td>
+                                        <td style="padding: 8px; border-top: 1px solid #dee2e6;">
+                                            <strong>(Optional)</strong>
+                                            Prefix for all cache keys. Default:
+                                            <code style="background-color: #e7f3ff; padding: 2px 6px; border-radius: 3px; color: #004085;">odoo_orm_cache</code>
+                                            <br>
+                                            Useful when sharing Redis with multiple applications
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h4 style="color: #71639e; margin-bottom: 20px; margin-top: 30px;">Step 4: Restart Odoo and Verify</h4>
+                        <div style="background-color: #2d2d2d; padding: 15px; border-radius: 5px; overflow-x: auto; margin-bottom: 15px;">
+                            <code style="color: #f8f8f2; display: block; background-color: transparent;">sudo systemctl restart odoo</code>
+                        </div>
+
+                        <p style="font-size: 1.05rem; margin-bottom: 10px;">Check your Odoo logs for the confirmation message:</p>
+                        <div style="background-color: #d4edda; padding: 15px; border-radius: 5px; overflow-x: auto;">
+                            <code style="color: #155724; display: block;">INFO: Connected to Redis cache server at redis://localhost:6379/0</code>
+                        </div>
+
+                        <div style="background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 5px; padding: 15px; margin-top: 20px;">
+                            <h5 style="color: #856404; margin-bottom: 10px;">⚠️ Important Notes:</h5>
+                            <ul style="color: #856404; margin-bottom: 0; line-height: 1.7;">
+                                <li>
+                                    <strong>The module will NOT work without <code style="background-color: #ffeaa7; padding: 2px 6px; border-radius: 3px; color: #856404;">server_wide_modules</code> configuration!</strong>
+                                    It must be loaded at server startup, not through the Apps menu.
+                                </li>
+                                <li>If Redis connection fails, Odoo will automatically fall back to local in-memory cache (graceful degradation)</li>
+                                <li>Apply the same configuration to
+                                    <strong>all Odoo instances/workers</strong>
+                                    in your deployment to ensure they share the cache
+                                </li>
+                                <li>The module automatically handles cache serialization using pickle protocol</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-bottom: 40px;">
+                <div class="col-12">
+                    <h2 style="color: #333; font-size: 2.2rem; margin-bottom: 30px; text-align: center; font-weight: bold;">🎯 Perfect For</h2>
+                </div>
+
+                <div class="col-md-3" style="margin-bottom: 20px;">
+                    <div style="text-align: center; padding: 25px; background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); height: 100%;">
+                        <div style="font-size: 3rem; margin-bottom: 15px;">👥</div>
+                        <h5 style="color: #71639e; margin-bottom: 15px;">Multi-Worker Deployments</h5>
+                        <p style="color: #555; line-height: 1.7;">Any Odoo server running 2+ workers (the default recommended configuration)</p>
+                    </div>
+                </div>
+
+                <div class="col-md-3" style="margin-bottom: 20px;">
+                    <div style="text-align: center; padding: 25px; background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); height: 100%;">
+                        <div style="font-size: 3rem; margin-bottom: 15px;">⚖️</div>
+                        <h5 style="color: #71639e; margin-bottom: 15px;">Load Balanced Clusters</h5>
+                        <p style="color: #555; line-height: 1.7;">Multi-instance deployments requiring consistent cache across all servers</p>
+                    </div>
+                </div>
+
+                <div class="col-md-3" style="margin-bottom: 20px;">
+                    <div style="text-align: center; padding: 25px; background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); height: 100%;">
+                        <div style="font-size: 3rem; margin-bottom: 15px;">🏢</div>
+                        <h5 style="color: #71639e; margin-bottom: 15px;">Enterprise Systems</h5>
+                        <p style="color: #555; line-height: 1.7;">Large-scale installations with thousands of concurrent users</p>
+                    </div>
+                </div>
+
+                <div class="col-md-3" style="margin-bottom: 20px;">
+                    <div style="text-align: center; padding: 25px; background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); height: 100%;">
+                        <div style="font-size: 3rem; margin-bottom: 15px;">🐌</div>
+                        <h5 style="color: #71639e; margin-bottom: 15px;">Performance Issues</h5>
+                        <p style="color: #555; line-height: 1.7;">Systems with slow queries and database bottlenecks</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-bottom: 40px;">
+                <div class="col-12">
+                    <h2 style="color: #333; font-size: 2.2rem; margin-bottom: 30px; text-align: center; font-weight: bold;">💡 Technical Features</h2>
+                </div>
+
+                <div class="col-12">
+                    <div style="background-color: white; border: 2px solid #dee2e6; border-radius: 8px; padding: 30px;">
+                        <ul style="font-size: 1.05rem; line-height: 2; color: #555;">
+                            <li>✅
+                                <strong>Seamless Integration:</strong>
+                                Drop-in replacement for Odoo's native LRU cache—no code changes required
+                            </li>
+                            <li>✅
+                                <strong>Intelligent Serialization:</strong>
+                                Automatic pickle-based serialization with fallback for unpicklable objects
+                            </li>
+                            <li>✅
+                                <strong>Connection Resilience:</strong>
+                                Exponential backoff retry strategy with automatic failover to local cache
+                            </li>
+                            <li>✅
+                                <strong>Health Monitoring:</strong>
+                                Built-in connection health checks every 30 seconds
+                            </li>
+                            <li>✅
+                                <strong>Efficient Key Management:</strong>
+                                MD5-hashed cache keys with customizable prefixes per database and cache type
+                            </li>
+                            <li>✅
+                                <strong>TTL Support:</strong>
+                                Configurable expiration times with automatic key refresh on access
+                            </li>
+                            <li>✅
+                                <strong>Thread-Safe:</strong>
+                                All cache operations protected with locks for concurrent access
+                            </li>
+                            <li>✅
+                                <strong>Graceful Degradation:</strong>
+                                Continues working with local cache if Redis becomes unavailable
+                            </li>
+                            <li>✅
+                                <strong>Zero Maintenance:</strong>
+                                Automatic cache invalidation when data changes in the ORM
+                            </li>
+                            <li>✅
+                                <strong>Test Mode Compatible:</strong>
+                                Automatically disabled during Odoo test runs to prevent interference
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-bottom: 40px;">
+                <div class="col-12">
+                    <div style="background-color: RGBA(1, 128, 165, var(--text-opacity, 1)); padding: 40px; border-radius: 8px; color: white; text-align: center; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);">
+                        <h3 style="font-size: 2rem; margin-bottom: 20px;">🚀 Ready to Supercharge Your Odoo?</h3>
+                        <p style="font-size: 1.2rem; margin-bottom: 25px; opacity: 0.95;">
+                            Stop letting database bottlenecks slow down your business. Install Redis ORM Cache today and experience the difference!
+                        </p>
+                        <div style="background-color: #714B67; border-radius: 8px; padding: 20px; margin-top: 20px; box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);">
+                            <p style="font-size: 1.1rem; margin-bottom: 10px;">
+                                <strong>💰 Pricing:</strong>
+                                $23.99 USD (One-time payment)
+                            </p>
+                            <p style="font-size: 1rem; margin-bottom: 0; opacity: 0.9;">Includes lifetime updates and basic email support</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-bottom: 40px;">
+                <div class="col-12">
+                    <h2 style="color: #333; font-size: 2.2rem; margin-bottom: 30px; text-align: center; font-weight: bold;">📞 Support & Contact</h2>
+                </div>
+
+                <div class="col-md-6 offset-md-3">
+                    <div style="background-color: white; border: 2px solid #71639e; border-radius: 8px; padding: 30px; text-align: center;">
+                        <h4 style="color: #71639e; margin-bottom: 20px;">Get in Touch</h4>
+                        <p style="font-size: 1.1rem; color: #555; margin-bottom: 20px;">
+                            Need help with installation, configuration, or have questions about the module?
+                        </p>
+                        <div style="background-color: #f8f9fa; border-radius: 5px; padding: 20px; margin-bottom: 15px;">
+                            <p style="margin-bottom: 10px; color: #666;">
+                                <strong>Email Support:</strong>
+                            </p>
+                            <p style="font-size: 1.2rem; margin-bottom: 0;">
+                                <a href="mailto:techroverit@gmail.com" style="color: #71639e; text-decoration: none; font-weight: bold;">
+                                    ✉️ techroverit@gmail.com
+                                </a>
+                            </p>
+                        </div>
+                        <p style="color: #888; font-size: 0.95rem; margin-bottom: 0;">
+                            Average response time: 6 hours
+                            <br>
+                            We're here to help you succeed! 🎉
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-bottom: 20px;">
+                <div class="col-12">
+                    <div style="background-color: #f8f9fa; border-radius: 8px; padding: 20px; text-align: center;">
+                        <p style="color: #666; margin-bottom: 0; font-size: 0.95rem;">
+                            <strong>Developed by TechRover</strong>
+                            | Odoo 16.0 Compatible | Version 1.0.0
+                            <br>
+                            Licensed under OPL-1 (Odoo Proprietary License v1.0)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </body>
+</html>
+

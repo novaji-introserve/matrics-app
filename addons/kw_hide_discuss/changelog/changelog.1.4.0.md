@@ -1,0 +1,2 @@
+- Updated documentation structure
+- Fixed manifest file references

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_res_resource_uri_tree" model="ir.ui.view">
+        <field name="name">res.resource.uri.tree</field>
+        <field name="model">res.resource.uri</field>
+        <field name="arch" type="xml">
+            <tree string="Resource URI" delete="false">
+                <field name="name" />
+                <field name="model_uri" />
+                <field name="create_uid" optional="hide" />
+                <field name="create_date" optional="hide" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_res_resource_uri_form" model="ir.ui.view">
+        <field name="name">res.resource.uri.form</field>
+        <field name="model">res.resource.uri</field>
+        <field name="arch" type="xml">
+            <form string="Resource URI" class="o_form_document">
+                <sheet>
+                    <div class="oe_title">
+                        <span class="text-muted">Configuration</span>
+                        <h1>
+                            <field name="name" placeholder="Resource name" />
+                        </h1>
+                    </div>
+                    <group string="Resource Details" col="2">
+                        <group>
+                            <field name="name" />
+                        </group>
+                        <group>
+                            <field name="model_uri" placeholder="res.partner" />
+                        </group>
+                    </group>
+                    <group string="Audit Trail" col="2">
+                        <group>
+                            <field name="create_uid" readonly="1" />
+                            <field name="create_date" readonly="1" />
+                        </group>
+                        <group>
+                            <field name="write_uid" readonly="1" />
+                            <field name="write_date" readonly="1" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_res_resource_uri_search" model="ir.ui.view">
+        <field name="name">res.resource.uri.search</field>
+        <field name="model">res.resource.uri</field>
+        <field name="arch" type="xml">
+            <search string="Resource URI">
+                <field name="name" />
+                <field name="model_uri" />
+            </search>
+        </field>
+    </record>
+
+    <record id="action_list_res_resource_uri" model="ir.actions.act_window">
+        <field name="name">Resource URI</field>
+        <field name="res_model">res.resource.uri</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_res_resource_uri_tree" />
+        <field name="search_view_id" ref="view_res_resource_uri_search" />
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create resource URI mappings for reusable model navigation.
+            </p>
+        </field>
+    </record>
+</odoo>

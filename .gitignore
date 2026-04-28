@@ -6,6 +6,7 @@ __pycache__/
 *$py.class
 *.pyo
 *.pyd
+*.pyc
 
 # Python virtual environments
 venv/
@@ -19,12 +20,15 @@ ENV/
 # -----------------------------
 *.log
 *.log.*
+etc/odoo-server.log
 
 # -----------------------------
 # Odoo runtime files
 # -----------------------------
 *.pid
 *.sock
+etc/sessions/
+etc/filestore/
 
 # -----------------------------
 # Odoo media / uploaded files
@@ -57,7 +61,8 @@ Thumbs.db
 # -----------------------------
 # Windows downloaded file metadata
 # -----------------------------
-*:Zone.Identifier
+*Zone.Identifier*
+*:Zone.Identifier*
 
 # -----------------------------
 # Build / temporary files
@@ -87,3 +92,19 @@ htmlcov/
 *.bak
 *.old
 *.orig
+
+# -----------------------------
+# matrics-app specific
+# -----------------------------
+postgresql/
+fastapi/logs/
+fastapi/.env
+seatunnel/logs/
+seatunnel/jobs/
+apache-seatunnel-2.3.12.tar.gz
+custom/*
+!custom/.gitkeep
+!custom/addons/
+custom/addons/*
+!custom/addons/.gitkeep
+.docker/seatunnel/lib/*.jar

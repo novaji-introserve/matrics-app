@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="alert_management.AlertDashboard" owl="1">
+        <div class="alert-dashboard-shell">
+            <div class="alert-dashboard-hero">
+                <div class="alert-dashboard-hero__copy">
+                    <span class="alert-dashboard-hero__eyebrow">Alert Management</span>
+                    <h1 class="alert-dashboard-hero__title">Alert Monitoring</h1>
+                    <p class="alert-dashboard-hero__subtitle">
+                        Monitor alert volume, configuration coverage, and daily alert activity from one view.
+                    </p>
+                </div>
+                <div class="alert-dashboard-hero__controls">
+                    <label class="alert-dashboard-filter">
+                        <span>Period</span>
+                        <select class="form-select" t-att-value="state.period" t-on-change="onPeriodChange">
+                            <option value="0">Today</option>
+                            <option value="1">Yesterday</option>
+                            <option value="7">Last 7 Days</option>
+                            <option value="30">Last 1 Month</option>
+                        </select>
+                    </label>
+                    <label class="alert-dashboard-filter">
+                        <span>Refresh</span>
+                        <select class="form-select" t-att-value="state.refreshRate" t-on-change="onRefreshRateChange">
+                            <option value="1">1 min</option>
+                            <option value="5">5 mins</option>
+                            <option value="10">10 mins</option>
+                            <option value="30">30 mins</option>
+                            <option value="60">60 mins</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+
+            <div class="alert-dashboard-meta">
+                <div class="alert-dashboard-meta__card">
+                    <span class="alert-dashboard-meta__label">Module</span>
+                    <strong>Alert Management</strong>
+                </div>
+                <div class="alert-dashboard-meta__card">
+                    <span class="alert-dashboard-meta__label">Window</span>
+                    <strong t-esc="currentPeriodLabel" />
+                </div>
+                <div class="alert-dashboard-meta__card">
+                    <span class="alert-dashboard-meta__label">Cards</span>
+                    <strong t-esc="state.cards.length" />
+                </div>
+            </div>
+
+            <div t-if="state.isLoading" class="alert-dashboard-loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p>Loading alert dashboard...</p>
+            </div>
+
+            <div t-else="">
+                <div class="alert-dashboard-cards">
+                    <t t-foreach="state.cards" t-as="card" t-key="card.id">
+                        <div
+                            t-att-class="getCardClass(card)"
+                            t-att-data-card-id="card.id"
+                            t-on-click="onCardClick"
+                        >
+                            <div class="alert-kpi-card__value" t-esc="card.value" />
+                            <div class="alert-kpi-card__label" t-esc="card.title" />
+                            <t t-if="card.display_summary">
+                                <div class="alert-kpi-card__summary" t-esc="card.display_summary" />
+                            </t>
+                        </div>
+                    </t>
+                </div>
+
+                <div class="alert-dashboard-grid">
+                    <t t-foreach="state.charts" t-as="chart" t-key="chart.id">
+                        <section class="alert-dashboard-panel">
+                            <div class="alert-dashboard-panel__header">
+                                <div>
+                                    <h2 t-esc="chart.title"/>
+                                    <p t-esc="chart.display_summary"/>
+                                </div>
+                            </div>
+                            <div class="alert-dashboard-panel__body">
+                                <AlertDashboardChart data="chart" onPointClick.bind="openChartPoint" />
+                            </div>
+                        </section>
+                    </t>
+                    <div t-if="!state.charts.length" class="alert-dashboard-panel">
+                        <div class="alert-dashboard-panel__header">
+                            <div>
+                                <h2>Dashboard Charts</h2>
+                                <p>No alert dashboard charts are currently available from <code>res.dashboard.charts</code>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

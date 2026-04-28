@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="owl.card" owl="1">
+        <div
+            t-att-class="cardClassName"
+            t-att-style="'--cm-kpi-accent: ' + accentColor"
+            t-on-click="handleClick"
+        >
+            <div class="cm-kpi-card__badge">
+                <t t-out="props.scope ? props.scope.slice(0,2) : '--'" />
+            </div>
+            <div class="cm-kpi-card__value">
+                <t t-out="props.total" />
+            </div>
+            <div class="cm-kpi-card__label">
+                <t t-out="props.title" />
+            </div>
+            <t t-if="props.summary">
+                <div class="cm-kpi-card__summary">
+                    <t t-out="props.summary" />
+                </div>
+            </t>
+            <div class="cm-kpi-card__scope">
+                <t t-out="props.scope || 'Metric'" />
+            </div>
+        </div>
+    </t>
+</templates>
