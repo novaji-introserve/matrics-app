@@ -487,6 +487,30 @@ class ResCharts(models.Model):
     def create(self, vals):
         return super().create(vals)
 
+    @api.model
+    def _load_records_create(self, vals_list):
+        # On re-install/upgrade, a chart record may already exist in the DB
+        # without a linked external ID (e.g. installed before external ID
+        # tracking). Reuse the existing record so the unique constraint on
+        # `name` is not violated and the external ID gets properly linked.
+        records = [None] * len(vals_list)
+        to_create_vals = []
+        to_create_indices = []
+        for i, vals in enumerate(vals_list):
+            name = vals.get('name')
+            if name:
+                existing = self.search([('name', '=', name)], limit=1)
+                if existing:
+                    existing.write(vals)
+                    records[i] = existing
+                    continue
+            to_create_vals.append(vals)
+            to_create_indices.append(i)
+        if to_create_vals:
+            for i, record in zip(to_create_indices, super()._load_records_create(to_create_vals)):
+                records[i] = record
+        return self.browse([r.id for r in records])
+
     def write(self, vals):
         cache_sensitive_fields = {
             "query",

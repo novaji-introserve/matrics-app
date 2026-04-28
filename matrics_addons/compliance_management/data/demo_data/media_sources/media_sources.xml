@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="media_source_aproko247" model="media.source">
+        <field name="name">Aproko247</field>
+        <field name="url">https://www.aproko247.com/feed/</field>
+        <field name="source_type">rss</field>
+        <field name="credibility_score">0.7</field>
+        <field name="active">True</field>
+        <field name="sequence">10</field>
+        <field name="notes">Nigerian news and entertainment portal</field>
+    </record>
+
+    <record id="media_source_channels_tv" model="media.source">
+        <field name="name">Channels TV</field>
+        <field name="url">https://www.channelstv.com/feed/</field>
+        <field name="source_type">rss</field>
+        <field name="credibility_score">0.9</field>
+        <field name="active">True</field>
+        <field name="sequence">20</field>
+        <field name="notes">Leading Nigerian broadcast and online news outlet</field>
+    </record>
+
+    <record id="media_source_pm_news" model="media.source">
+        <field name="name">PM News Nigeria</field>
+        <field name="url">https://pmnewsnigeria.com/feed/</field>
+        <field name="source_type">rss</field>
+        <field name="credibility_score">0.8</field>
+        <field name="active">True</field>
+        <field name="sequence">30</field>
+        <field name="notes">Nigerian political and business news</field>
+    </record>
+</odoo>

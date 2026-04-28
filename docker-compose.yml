@@ -1,4 +1,5 @@
 #version: '2'
+name: matrics-app
 services:
   db:
     image: postgres:15
@@ -71,6 +72,14 @@ services:
       - PORT=5433
       - USER=${ODOO_USER}
       - PASSWORD=${ODOO_PASSWORD}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4.1-mini}
+      - OPENAI_TIMEOUT=${OPENAI_TIMEOUT:-30}
+      - OPENAI_PROJECT=${OPENAI_PROJECT:-}
+      - NewsApiKey=${NewsApiKey}
+      - NewsApiUrl=${NewsApiUrl:-https://newsapi.org/v2/everything}
+      - EmailFrom=${EmailFrom}
     volumes:
       #- /etc/timezone:/etc/timezone:ro
       #- /etc/localtime:/etc/localtime:ro

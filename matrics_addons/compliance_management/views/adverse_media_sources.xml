@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_media_source_tree" model="ir.ui.view">
+        <field name="name">media.source.tree</field>
+        <field name="model">media.source</field>
+        <field name="arch" type="xml">
+            <tree string="Media RSS Feeds">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="url"/>
+                <field name="source_type" widget="badge"/>
+                <field name="credibility_score"/>
+                <field name="last_fetched"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_media_source_form" model="ir.ui.view">
+        <field name="name">media.source.form</field>
+        <field name="model">media.source</field>
+        <field name="arch" type="xml">
+            <form string="Media RSS Feed">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Source Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="url" placeholder="https://example.com/feed/"/>
+                            <field name="source_type"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                        <group>
+                            <field name="credibility_score" widget="percentage"/>
+                            <field name="sequence"/>
+                            <field name="last_fetched" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes" placeholder="Optional notes about this source..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_media_source_search" model="ir.ui.view">
+        <field name="name">media.source.search</field>
+        <field name="model">media.source</field>
+        <field name="arch" type="xml">
+            <search string="Search RSS Feeds">
+                <field name="name"/>
+                <field name="url"/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Inactive" name="inactive" domain="[('active', '=', False)]"/>
+                <filter string="All" name="all" domain="['|', ('active', '=', True), ('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Window Action -->
+    <record id="action_media_source" model="ir.actions.act_window">
+        <field name="name">Media RSS Feeds</field>
+        <field name="res_model">media.source</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add your first RSS feed source
+            </p>
+            <p>
+                RSS feeds are scanned during adverse media checks.
+                Articles are filtered locally for partner name and keyword matches.
+            </p>
+        </field>
+    </record>
+</odoo>

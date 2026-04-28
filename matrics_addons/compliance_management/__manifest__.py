@@ -15,7 +15,7 @@
     # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     "category": "MATRICS",
-    "version": "0.5.3",
+    "version": "0.5.6",
     # any module necessary for this one to work correctly
     
     'depends': ['base', 'web', 'bus', 'hr', 'access_apps', 'web_field_slider', 'gamification', 'hide_powered_by_odoo','web_widget_numeric_step','legion_hide_odoo','base_automation', 'google_gmail', 'gamification','project',
@@ -45,6 +45,7 @@
         "views/ledger.xml",
         "views/ledger_type.xml",
         "data/demo_data/keyword/media_keywords.xml",
+        "data/demo_data/media_sources/media_sources.xml",
         "data/schedules/adverse_media_cron.xml",
         'data/schedules/run_risk_assessment_cron.xml',
         'data/schedules/clean_cache.xml',
@@ -67,6 +68,7 @@
         "views/kyc.xml",
         "views/adverse_media_logs.xml",
         "views/adverse_media_keywords.xml",
+        "views/adverse_media_sources.xml",
         "views/pep_source.xml",
         # "data/schedules/queue_job_config.xml",
         "data/demo_data/score/fcra_score.xml",

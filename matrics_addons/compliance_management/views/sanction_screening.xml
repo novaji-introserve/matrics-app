@@ -247,7 +247,7 @@
             <field name="arch" type="xml">
                 <form string="Global PEP List">
                     <header>
-                        <button name="action_find_person" class="oe_highlight" type="object" string="Find Biography" groups="compliance_management.group_compliance_compliance_risk_manager" attrs="{'invisible': [('job_status', '=', 'running')]}" />
+                        <button name="action_find_person" class="oe_highlight" type="object" string="Find Biography" groups="compliance_management.group_compliance_compliance_risk_manager" />
                         <field name="job_status" widget="statusbar" statusbar_visible="pending,running,completed,failed"/>
                     </header>
                     <sheet>

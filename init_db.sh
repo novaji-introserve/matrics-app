@@ -15,8 +15,8 @@ if [ -f "$SCRIPT_DIR/.env" ]; then
   set +o allexport
 fi
 
-CONTAINER_NAME="${CONTAINER_NAME:-matrics-odoo16-1}"
-DB_CONTAINER="${DB_CONTAINER:-matrics-db-1}"
+CONTAINER_NAME="${CONTAINER_NAME:-matrics-app-odoo16-1}"
+DB_CONTAINER="${DB_CONTAINER:-matrics-app-db-1}"
 DB_NAME="${DB_NAME:-icomply_dev}"
 DB_HOST="${DB_HOST:-pgbouncer}"
 DB_PORT="${DB_PORT:-5433}"

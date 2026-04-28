@@ -2260,6 +2260,11 @@ class Customer(models.Model):
 class Partner(models.Model):
     _inherit = 'res.partner'
 
+    alias_names = fields.Char(
+        string='Alias Names',
+        help='Comma-separated known aliases or former names used in adverse media searches.',
+    )
+
     @api.model
     def remove_unwanted_partner_actions(self):
         """Remove unwanted actions from partner view"""

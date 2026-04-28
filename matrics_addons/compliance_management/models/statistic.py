@@ -211,8 +211,8 @@ class Statistic(models.Model):
 
         try:
             for record in stats:
-                with self.env.cr.savepoint():
-                    try:
+                try:
+                    with self.env.cr.savepoint():
                         value, execution_time_ms = self._compute_stat_value_for_refresh(
                             record, timeout_ms
                         )
@@ -223,19 +223,28 @@ class Statistic(models.Model):
                             status="success",
                             error_message=None,
                         )
-                    except Exception as exc:
-                        _logger.warning(
-                            "Statistic refresh failed for %s (%s): %s",
+                except Exception as exc:
+                    # Savepoint has already rolled back — transaction is clean here.
+                    _logger.warning(
+                        "Statistic refresh failed for %s (%s): %s",
+                        record.name,
+                        record.code,
+                        exc,
+                    )
+                    try:
+                        with self.env.cr.savepoint():
+                            self._update_stat_refresh_metadata(
+                                record.id,
+                                value=record.val or "0",
+                                execution_time_ms=0.0,
+                                status="error",
+                                error_message=str(exc),
+                            )
+                    except Exception:
+                        _logger.exception(
+                            "Failed to write error metadata for statistic %s (%s)",
                             record.name,
                             record.code,
-                            exc,
-                        )
-                        self._update_stat_refresh_metadata(
-                            record.id,
-                            value=record.val or "0",
-                            execution_time_ms=0.0,
-                            status="error",
-                            error_message=str(exc),
                         )
 
             stats.invalidate_recordset(
