@@ -67,4 +67,9 @@
             </search>
         </field>
     </record>
+    <record id="action_regulatory_report_template_item" model="ir.actions.act_window">
+        <field name="name">Report Template Items</field>
+        <field name="res_model">res.regulatory.report.template.item</field>
+        <field name="view_mode">tree,form</field>
+    </record>
 </odoo>

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <menuitem id="menu_compliance_transactions_blocked" action="action_view_blocked_transactions"
-        parent="compliance_management.menu_compliance_transaction_monitoring"
-        name="Blocked / On-Hold"
-        groups="compliance_management.group_compliance_compliance_officer,compliance_management.group_compliance_branch_compliance_officer,compliance_management.group_compliance_transaction_monitoring_team"
-        sequence="1" />
-</odoo>

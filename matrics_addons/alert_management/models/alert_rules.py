@@ -1,19 +1,14 @@
 from odoo import models, fields, api
 from datetime import timedelta, datetime
 from dateutil.relativedelta import relativedelta
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 import pytz
-from pytz import timezone
 import csv
 import io
-import base64, time, uuid
-import smtplib
-from time import sleep
+import base64
+import time
+import uuid
 import logging
-import smtplib
-from time import sleep
-import logging
-from collections import defaultdict
 import re
 import hashlib
 import json
@@ -398,8 +393,7 @@ class alert_rules(models.Model):
         self, original_query, select_part_lower, from_part_lower
     ):
         """
-        Attempt to add branch_id column by finding a branch table in the FROM clause.
-        Returns original query if no suitable branch table is found.
+        Apply filter to query intelligently
         """
         try:
             # Look for potential branch tables in different patterns
@@ -692,13 +686,30 @@ class alert_rules(models.Model):
             signatures_json = json.dumps(list(signatures))
             self.env["ir.config_parameter"].sudo().set_param(hash_key, signatures_json)
         except Exception as e:
-            _logger.warning(f"Error storing record signatures: {e}")
+            _logger.error(f"Rule {rule.id} smart query generation error: {str(e)}")
+            # Fallback to basic logic
+            return self._fallback_query_logic(rule)
+    
+    def _fallback_query_logic(self, rule):
+        """
+        Fallback to returning the exact raw query string when smart analysis fails entirely.
+        This prevents silent failures and ensures the user's raw SQL is respected.
+        """
+        try:
+            query = rule.sql_text.query.strip()
+            if query.endswith(";"):
+                query = query[:-1]
+            return query
+            
+        except Exception as e:
+            _logger.error(f"Rule {rule.id} fallback query error: {str(e)}")
+            return ""
 
-    def _get_new_records_only(self, rule, current_rows, columns, branch_id=None):
-        """
-        Compare current data with previous data and return only new records
-        Returns: (new_records, has_new_records)
-        """
+    # ========================================
+    # SIGNATURE DETECTION METHODS (PRESERVED)
+    # ========================================
+    def _get_new_records_optimized(self, rule, current_rows, columns):
+        """Get new records with enhanced signature management"""
         if not current_rows:
             return [], False
 

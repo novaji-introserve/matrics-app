@@ -15,7 +15,7 @@
     # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     "category": "MATRICS",
-    "version": "0.5.3",
+    "version": "0.5.1",
     # any module necessary for this one to work correctly
     
     'depends': ['base', 'web', 'bus', 'hr', 'access_apps', 'web_field_slider', 'gamification', 'hide_powered_by_odoo','web_widget_numeric_step','legion_hide_odoo','base_automation', 'google_gmail', 'gamification','project',
@@ -33,10 +33,11 @@
         "data/settings/email_smtp.xml",
         "data/settings/disable_email_digest.xml",
         "data/demo_data/department/department.xml",
+        "data/demo_data/score/fcra_score.xml",    
         "data/demo_data/risk_assessment/risk_assessment_control_data.xml",
         "data/demo_data/branch/res.branch.csv", #BRANCH
         "data/demo_data/region/res.partner.region.csv",#REGION
-        "data/demo_data/industries/customer.industry.csv",#INDUSTRY
+
         "data/demo_data/risk_assessment/risk_assessment_mitigation.xml",
         "data/demo_data/risk_assessment/res_risk_implication.xml",
         "security/security.xml",
@@ -56,7 +57,6 @@
         'data/email_templates/edd_notifications_template.xml',
         "data/email_templates/customer_screening_template.xml",
 
-
         "data/schedules/update_customer_risk_level.xml",
         "data/schedules/global_pep_list_cron.xml",
         "data/schedules/count-weight-avg.xml",
@@ -72,6 +72,7 @@
         "data/demo_data/score/fcra_score.xml",
         'data/resource_uri_data.xml',
         "data/data.xml",
+        "data/customer_type_config.xml",
         "data/demo_data/risk_assessment/category.xml",
         "data/demo_data/risk_assessment/risk_universe.xml",
         "data/demo_data/risk_assessment/risk_type.xml",         
@@ -94,21 +95,22 @@
         "data/demo_data/account/ledger.xml",
         "data/demo_data/education/educational_level.xml",
         "data/demo_data/tier/customer_tier.xml",
-        "data/demo_data/customer/sector.xml",
-        "data/demo_data/customer/products.xml",
-        "data/demo_data/customer/region.xml",
         "data/demo_data/customer/account_officers.xml",
         "views/risk_assessment.xml",
         "views/sanction_screening.xml",
         "views/open_sanctions.xml",
         # remove unwanted partner/customer actions
-        'views/remove_partner_actions.xml',
+        # 'views/remove_partner_actions.xml',
         "views/customer.xml",
+        "views/customer_type_config_views.xml",
         "views/statistics.xml",
         "views/resource_uri.xml",
         "views/dashboard.xml",
         "views/card_dashboard_template.xml",
         "views/risk_assessment_plan.xml",
+        "views/risk_assessment_control.xml",
+        "views/risk_assessment_mitigation.xml",
+        "views/risk_assessment_implication.xml",
         "views/settings.xml",
         "views/customer_accounts.xml",
         "views/transaction.xml",
@@ -123,12 +125,8 @@
         'data/demo_data/chart/charts.xml',
         'data/settings.xml',
         'data/demo_data/plan/risk_plan.xml',
-        'data/demo_data/plan/jurisdiction_plan.xml',
-       
-       
-        'data/demo_data/account/customer_product.xml',
-        'data/demo_data/partner/sectors.xml',
-        'data/blacklist.xml',
+        
+        'data/blacklist.xml', 
         "views/customer_screening.xml",
         'views/transaction_screening_history.xml',
         "views/change_data_capture.xml",
@@ -146,6 +144,9 @@
     'post_init_hook': 'post_init_hook',
     'uninstall_hook': 'uninstall_hook',
     'assets': {
+        'web.assets_frontend_minimal': [
+            'compliance_management/static/src/js/login_toggle.js',
+        ],
         'web.assets_backend': [
             # Styles
             'compliance_management/static/src/components/file_upload/scss/csv_import.scss',
@@ -185,7 +186,7 @@
             'compliance_management/static/src/js/custom_title_service.js',
             'compliance_management/static/src/js/cache_service.js',
 
-            'compliance_management/static/src/img/logov.png',
+            'compliance_management/static/src/img/matrics-logo.png',
             'compliance_management/static/img/alt_bank_logo.png',
         ]
     },

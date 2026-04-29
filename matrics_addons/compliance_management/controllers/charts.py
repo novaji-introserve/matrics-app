@@ -422,13 +422,13 @@ class DynamicChartController(http.Controller):
             actual_is_co = self.security_service.is_co_user()
 
             if actual_is_co:
-                _logger.info(f"CO user {user_id} accessing charts")
+                # _logger.info(f"CO user {user_id} accessing charts")
                 cco = True
             elif actual_is_cco and cco:
-                _logger.warning(f"CCO user {user_id} accessing charts")
+                # _logger.warning(f"CCO user {user_id} accessing charts")
                 cco = True
             elif not actual_is_cco and cco:
-                _logger.warning(f"Non-CCO/CO user {user_id} attempted to use CCO parameter")
+                # _logger.warning(f"Non-CCO/CO user {user_id} attempted to use CCO parameter")
                 cco = False
 
             _logger.info(
@@ -454,7 +454,10 @@ class DynamicChartController(http.Controller):
                 charts = self._get_default_compliance_chart_records()
             results = []
 
+
             chart_data_service = ChartDataService(request.env)
+            snapshot_model = request.env['dashboard.snapshot']
+
             for chart in charts:
                 try:
                     _logger.info(f"Processing chart {chart.id}: {chart.name}")
@@ -470,9 +473,6 @@ class DynamicChartController(http.Controller):
 
                     if chart_data:
                         results.append(chart_data)
-                        _logger.info(
-                            f"Chart {chart.id} returned {len(chart_data.get('labels', []))} results"
-                        )
                 except Exception as e:
                     _logger.error(f"Error processing chart {chart.id}: {e}")
                     results.append(

@@ -160,7 +160,7 @@ class Customer(models.Model):
         string='Identification Number', tracking=True, readonly=True)
     identification_expiry_date = fields.Date(
         string='Identification Expiry Date', index=True, tracking=True, readonly=True)
-    dob = fields.Date(
+    dob = fields.Char(
         string='Date of Birth', tracking=True, readonly=True)
     vat = fields.Char(string='Tax ID/TIN', index=True,
                       help="The Tax Identification Number. Values here will be validated based on the country format. You can use '/' to indicate that the partner is not subject to tax.", readonly=True)
@@ -182,7 +182,7 @@ class Customer(models.Model):
     middlename = fields.Char(string='Middle Name', readonly=True)
     othername = fields.Char(string='Other Name', readonly=True)
     town = fields.Char(string='Town', readonly=True)
-    registration_date = fields.Date(
+    registration_date = fields.Char(
         string='Registration Date', tracking=True, required=False, readonly=True)
     company_reg_date = fields.Date(
         string='Company Registration Date', tracking=True)
@@ -220,13 +220,38 @@ class Customer(models.Model):
         comodel_name='res.risk.assessment', inverse_name='partner_id', string='Risk Assessments')
     is_pep = fields.Boolean(
         string="Is PEP", default=False, tracking=True, index=True)
+    pep_result = fields.Char(
+        string = "PEP Result",
+        compute="_compute_screening_results",
+        store =False
+    )
     is_watchlist = fields.Boolean(
         string="Is Watchlist", default=False, tracking=True)
+    watchlist_result = fields.Char(
+        string = "Watchlist Result",
+        compute="_compute_screening_results",
+        store =False
+    )
     is_fep = fields.Boolean(string="Is FEP", default=False, tracking=True)
+    fep_result = fields.Char(
+        string = "FEP Result",
+        compute="_compute_screening_results",
+        store =False
+    )
     is_blacklist = fields.Boolean(
         string="Is Blacklist", default=False, tracking=True)
+    blacklist_result = fields.Char(
+        string = "Blacklist Result",
+        compute="_compute_screening_results",
+        store =False
+    )
     global_pep = fields.Boolean(
         string="Global PEP",  index=True, default=False)
+    global_pep_result = fields.Char(
+        string = "Global PEP Result",
+        compute="_compute_screening_results",
+        store =False
+    )
     current_branch_id = fields.Integer(
         string='Current Branch', compute='_get_current_branch')
     internal_category = fields.Selection(string='Internal Category', selection=[('customer', 'Customer'), (
@@ -265,6 +290,11 @@ class Customer(models.Model):
 
     is_greylist = fields.Boolean(
         string="Is Greylist", default=False, tracking=True)
+    greylist_result = fields.Char(
+        string = "Greylist Result",
+        compute="_compute_screening_results",
+        store =False
+    )
 
     origin = fields.Selection(string='Data Origin', selection=[('demo', 'Demo Data'), (
         'test', 'Test Data'), ('prod', 'Production Data')], index=True)
@@ -278,14 +308,15 @@ class Customer(models.Model):
         string='Phone Number(s)', index=True, compute='_compute_formatted_phone')
 
     likely_sanction = fields.Boolean(string='Is Sanctioned', tracking=True)
+    sanction_result = fields.Char(
+        string = "Sanction Result",
+        compute="_compute_screening_results",
+        store =False
+    )
     likely_pep = fields.Boolean()
     branch_code = fields.Char(string="Branch Code", index=True)
 
     formatted_gender = fields.Char(string='Gender', compute='_compute_gender')
-
-    digital_product_view_ids = fields.One2many(
-        'res.partner.digital.product.view', 'partner_id',
-        string='Digital Products', readonly=True, auto_join=True)
 
     channel_subscription_ids = fields.One2many(
         'customer.channel.subscription', 'partner_id',
@@ -294,7 +325,7 @@ class Customer(models.Model):
     composite_risk_score = fields.Float(
         string='Composite Risk Score', digits=(10, 2))
 
-    last_risk_calculation = fields.Datetime(string='Last Risk Calculation', readonly=True,
+    last_risk_calculation = fields.Datetime(string='Last Analysis', readonly=True,
                                             help="When the risk score was last calculated")
 
     # universe_weight_ids = fields.One2many('res.partner.risk.universe.weight', 'partner_id',
@@ -447,8 +478,22 @@ class Customer(models.Model):
         for record in self:
             record.show_create_case = has_module
             # Debug logging
-            _logger.info(
-                f"Case module installed: {has_module}")
+            # _logger.info(
+            #     f"Case module installed: {has_module}")
+
+    def _screening_text(self, matched):
+        return "Matched" if matched else "No Match"
+
+    @api.depends('is_pep','is_watchlist','is_fep','is_blacklist','global_pep','is_greylist','likely_sanction')
+    def _compute_screening_results(self):
+        for rec in self:
+            rec.pep_result = self._screening_text(rec.is_pep)
+            rec.watchlist_result = self._screening_text(rec.is_watchlist)
+            rec.fep_result = self._screening_text(rec.is_fep)
+            rec.blacklist_result = self._screening_text(rec.is_blacklist)
+            rec.global_pep_result = self._screening_text(rec.global_pep)
+            rec.greylist_result = self._screening_text(rec.is_greylist)
+            rec.sanction_result = self._screening_text(rec.likely_sanction)
 
     def action_create_customer_case(self):
         self.ensure_one()
@@ -749,6 +794,8 @@ class Customer(models.Model):
         risk_score = records[0] if records is not None else 0.00
         # Store the risk score directly
         self.risk_score = risk_score
+        
+       
         return risk_score
 
     def calculate_risk_batch(self, batch_size=1000):
@@ -1026,7 +1073,7 @@ class Customer(models.Model):
         if plan_setting not in ['avg', 'max', 'sum']:
             plan_setting = 'avg'
 
-        _logger.info(f"Using risk calculation method: {plan_setting.upper()}")
+        # _logger.info(f"Using risk calculation method: {plan_setting.upper()}")
 
         # Clear previous composite plan lines
         self.env['res.partner.composite.plan.line'].sudo().search(
@@ -1134,13 +1181,13 @@ class Customer(models.Model):
                 universe_data['total_score'] = 0.0
 
             # Log the calculation details for debugging
-            if subject_scores:
-                _logger.info(
-                    f"Universe {universe_data['name']}: "
-                    f"Subject scores={subject_scores}, "
-                    f"Method={plan_setting.upper()}, "
-                    f"Universe total={universe_data['total_score']:.2f}"
-                )
+            # if subject_scores:
+            #     _logger.info(
+            #         f"Universe {universe_data['name']}: "
+            #         f"Subject scores={subject_scores}, "
+            #         f"Method={plan_setting.upper()}, "
+            #         f"Universe total={universe_data['total_score']:.2f}"
+            #     )
 
         # Create records for ALL universes and ALL subjects and calculate composite score
         for universe_id, universe_data in universe_scores.items():
@@ -1151,12 +1198,10 @@ class Customer(models.Model):
             # Only add to CCR if there's a violation (score > 0)
             if universe_data['total_score'] > 0:
                 composite_score += weighted_score
-                _logger.info(
-                    f"Universe {universe_data['name']} : Score={universe_data['total_score']:.2f}, "
-                    f"Weight={universe_data['weight']:.2f}, Weighted Score={weighted_score:.2f}")
+                
 
-        _logger.info(
-            f"Final CCR for customer recordid: {record_id} score: {composite_score:.2f}")
+        # _logger.info(
+        #     f"Final CCR for customer recordid: {record_id} score: {composite_score:.2f}")
         return round(composite_score, 2)
 
     def action_sync_channels(self):
@@ -1301,6 +1346,8 @@ class Customer(models.Model):
             formatted = ', '.join(parts)
 
             record.formatted_phone = formatted
+            
+    
 
     @api.model
     def cron_run_risk_assessment(self):
@@ -1450,12 +1497,6 @@ class Customer(models.Model):
             'watchlist_updated': len(watchlist_ids)
         }
 
-    def init(self):
-
-        self.env.cr.execute(
-            "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)")
-        
-        self.create_customer_trigger()
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -1495,39 +1536,25 @@ class Customer(models.Model):
 
         return records
 
-    # Override email/phone to enable tracking so form views receive "record modified" notification
-    email = fields.Char(tracking=True)
-    phone = fields.Char(tracking=True)
-
-    _RISK_TRIGGER_FIELDS = frozenset({
-        'email', 'phone', 'bvn', 'customer_id',
-        'is_pep', 'is_watchlist', 'is_fep', 'is_blacklist', 'global_pep',
-    })
-
     def write(self, vals):
+        # Apply updates from vals
         result = super(Customer, self).write(vals)
 
-        # Refresh dashboard widgets
+        # Trigger notification for UI refresh
         self.env['bus.bus']._sendmany([
             ('dashboard_refresh_channel', 'refresh', {
                 'type': 'refresh',
                 'channelName': 'dashboard_refresh_channel',
-                'model': self._name,
+                'model': self._name
             })
         ])
 
-        # Notify open form views — triggers "Record has been modified" banner
-        # mail.thread uses partner as the bus channel for connected clients
-        self.env['bus.bus']._sendmany([
-            (partner, 'res.partner/write', {'id': partner.id})
-            for partner in self
-        ])
-
-        # Trigger risk assessment when compliance-relevant fields change.
-        # Guarded by computing_risk to prevent recursion from action_compute_risk_score_with_plan
-        # writing risk_score/risk_level back.
-        if not self.env.context.get('computing_risk') and self._RISK_TRIGGER_FIELDS.intersection(vals):
-            self.with_context(computing_risk=True).action_enqueue_risk_score_with_plan(priority=15)
+        # Only update risk scores if we're not already in a risk score update
+        # This prevents recursion
+        if not self.env.context.get('computing_risk', False):
+            # Create a new context to mark that we're computing risk
+            new_ctx = dict(self.env.context, computing_risk=True)
+            self = self.with_context(new_ctx)
 
         return result
 
@@ -2027,11 +2054,13 @@ class Customer(models.Model):
         for record in self:
             # Calculate the risk score and level
             score = record._get_risk_score_from_plan()
-            risk_level = self.compute_customer_rating(score)
 
             if record.composite_risk_score and record.composite_risk_score > 0:
                 composite_risk_score = record.composite_risk_score
                 score = composite_risk_score + score
+                
+            risk_level = self.compute_customer_rating(score)
+            
             if score > float(self.env['res.compliance.settings'].get_setting('maximum_risk_threshold')):
                 score = float(self.env['res.compliance.settings'].get_setting(
                     'maximum_risk_threshold'))
@@ -2039,30 +2068,11 @@ class Customer(models.Model):
             # Use ORM write method to update and track changes
             record.sudo().write({
                 'risk_score': score,
-                'risk_level': risk_level
+                'risk_level': risk_level,
+                'last_risk_calculation': fields.Datetime.now()
+
             })
 
-        return True
-
-    def action_enqueue_risk_score_with_plan(self, priority=10):
-        """Enqueue risk scoring via queue_job — returns immediately.
-
-        priority=20  → onboarding (new customer, runs before background jobs)
-        priority=15  → write-triggered (field changed by CDC sync)
-        priority=10  → background / bulk recalculation
-
-        Uses channel='root.compliance' so risk jobs never compete with ETL jobs.
-        identity_key deduplicates bursts: multiple updates to the same partner
-        before a worker picks it up result in only one risk job running.
-        """
-        for partner in self:
-            identity_key = f"risk_score_{partner.id}"
-            partner.with_delay(
-                priority=priority,
-                identity_key=identity_key,
-                description=f"Risk score: {partner.name or partner.id}",
-                channel='root.compliance',
-            ).action_compute_risk_score_with_plan()
         return True
 
     def action_greylist(self):
@@ -2088,7 +2098,10 @@ class Customer(models.Model):
             'context': {'default_customer_id': self.customer_id}
         }
 
+    @api.model
     def create_customer_trigger(self):
+        
+        self.change_column_datatype()
 
         self.env.cr.execute("""
         SELECT EXISTS (
@@ -2131,6 +2144,7 @@ class Customer(models.Model):
                             NEW.lang = 'en_US';
                             NEW.color = 0;
                             NEW.tz = 'Africa/Lagos';
+                            NEW.origin = 'test';
                                                         
                             
                             -- Restore the original risk_level if it was set
@@ -2172,6 +2186,10 @@ class Customer(models.Model):
                     
                     IF NEW.tz IS NULL THEN
                         NEW.tz = 'Africa/Lagos';
+                    END IF;
+                                        
+                    IF (NEW.origin IS NULL OR TRIM(NEW.origin) = '') AND NEW.customer_id IS NOT NULL THEN
+                        NEW.origin = 'test';
                     END IF;
                     
                     IF NEW.write_date IS NULL THEN
@@ -2239,6 +2257,11 @@ class Customer(models.Model):
                 BEGIN
                     IF NEW.commercial_partner_id IS NULL THEN
                         UPDATE res_partner SET commercial_partner_id = NEW.id WHERE id = NEW.id;
+                    END IF;                   
+                    
+                    IF (NEW.origin IS NULL OR TRIM(NEW.origin) = '') AND NEW.customer_id IS NOT NULL THEN
+                        UPDATE res_partner SET origin = 'test' WHERE id = NEW.id;
+
                     END IF;
                     
                     RETURN NEW;
@@ -2253,6 +2276,45 @@ class Customer(models.Model):
                 FOR EACH ROW
                 EXECUTE FUNCTION set_partner_defaults_after_func();
             """)
+            
+        self.env.cr.execute(
+            "CREATE INDEX IF NOT EXISTS res_partner_id_idx ON res_partner (id)")
+    
+    def change_column_datatype(self):
+        # Check and alter start_date column if not already VARCHAR/TEXT
+        self.env.cr.execute("""
+            SELECT data_type 
+            FROM information_schema.columns
+            WHERE table_name = 'res_partner'
+            AND column_name = 'registration_date'
+        """)
+        
+        start_date_type = self.env.cr.fetchone()
+        
+        if start_date_type and start_date_type[0] not in ('character varying', 'text'):
+            self.env.cr.execute("""
+                ALTER TABLE my_table
+                ALTER COLUMN registration_date TYPE VARCHAR
+                USING TO_CHAR(registration_date, 'YYYY-MM-DD')
+            """)
+
+        # Check and alter end_date column if not already VARCHAR/TEXT
+        self.env.cr.execute("""
+            SELECT data_type 
+            FROM information_schema.columns
+            WHERE table_name = 'res_partner'
+            AND column_name = 'dob'
+        """)
+        
+        end_date_type = self.env.cr.fetchone()
+        
+        if end_date_type and end_date_type[0] not in ('character varying', 'text'):
+            self.env.cr.execute("""
+                ALTER TABLE my_table
+                ALTER COLUMN dob TYPE VARCHAR
+                USING TO_CHAR(dob, 'YYYY-MM-DD')
+            """)
+
 
 
 

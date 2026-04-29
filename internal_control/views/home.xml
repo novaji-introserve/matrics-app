@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<odoo>
-  <template id='landing_page' name='landing page for my module'>
-   <record id="">
-
-   </record>
-  </template>
-</odoo>

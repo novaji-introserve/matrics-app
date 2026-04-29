@@ -15,10 +15,14 @@ class ResPartner(models.Model):
             # Skip partners linked to internal users (e.g. Administrator, Public User)
             if partner.user_ids:
                 continue
+            # Skip private addresses (employee personal contacts created by hr module)
+            if partner.type == "private":
+                continue
             domain = [
                 ("id", "!=", partner.id),
                 ("name", "=ilike", partner.name),
                 ("user_ids", "=", False),
+                ("type", "!=", "private"),
             ]
             other = self.search(domain)
             if other:

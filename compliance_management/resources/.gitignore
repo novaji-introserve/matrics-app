@@ -1,6 +1,0 @@
-ETL_scripts/update_script/csv_data
-ETL_scripts/UpdateScript.log
-ETL_scripts/ETL.log
-ETL_scripts/cron_execution.log
-ETL_scripts/etl_scripts/configs/db_config.json
-ETL_scripts/Logs*

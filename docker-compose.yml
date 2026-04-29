@@ -162,8 +162,8 @@ services:
 
   seatunnel:
     build:
-      context: .
-      dockerfile: .docker/seatunnel/Dockerfile
+      context: ./seatunnel
+      dockerfile: Dockerfile
     container_name: seatunnel
     restart: always
     deploy:

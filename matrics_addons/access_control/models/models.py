@@ -60,14 +60,6 @@ class ViewAccessRule(models.Model):
             else:
                 rule.menu_id_numbers = False
 
-    # NEW: Sync server action groups with access rule groups (KEY INTEGRATION)
-    # def _sync_server_action_groups(self):
-    #     """Sync server action groups with access rule groups"""
-    #     for rule in self:
-    #         if rule.server_action_ids and rule.group_ids:
-    #             for server_action in rule.server_action_ids:
-    #                 # Set server action groups to match rule's allowed groups
-    #                 server_action.write({'groups_id': [(6, 0, rule.group_ids.ids)]})
 
     @api.model
     def create(self, vals):
@@ -81,8 +73,7 @@ class ViewAccessRule(models.Model):
     def write(self, vals):
         """Override write to sync server action and menu groups"""
         result = super().write(vals)
-        # if 'server_action_ids' in vals or 'group_ids' in vals:
-        #     self._sync_server_action_groups()
+       
         if 'menu_ids' in vals or 'group_ids' in vals:  # Add this block
             self._sync_menu_groups()
         return result
@@ -246,28 +237,7 @@ class ViewAccessRule(models.Model):
                 for menu in rule.menu_ids:
                     # Set menu groups to match rule's allowed groups
                     menu.write({'groups_id': [(6, 0, rule.group_ids.ids)]})
-
-    
-
-    # def unlink(self):
-    #     """Override unlink to cleanup server actions when rules are deleted"""
-    #     # Store server actions before deletion
-    #     server_actions_to_cleanup = self.env['ir.actions.server']
-    #     for rule in self:
-    #         server_actions_to_cleanup |= rule.server_action_ids
-
-    #     result = super().sudo().unlink()
-
-    #     # Clear groups from actions that are no longer managed by any rule
-    #     for action in server_actions_to_cleanup:
-    #         remaining_rules = self.env['view.access.rule'].search([
-    #             ('server_action_ids', 'in', [action.id])
-    #         ])
-    #         if not remaining_rules:
-    #             # No more rules managing this action, clear groups
-    #             action.write({'groups_id': [(5, 0, 0)]})
-
-    #     return result
+                    
 
 class ViewAccessModelList(models.TransientModel):
     _name = 'view.access.model.list'

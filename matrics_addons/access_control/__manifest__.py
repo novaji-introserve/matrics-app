@@ -12,6 +12,7 @@
         'security/ir.model.access.csv',
         'views/menu_actions.xml',
         'views/view_access_views.xml',
+        'data/demo_view_access_rules.xml'
     ],
     'qweb': [],
     'installable': True,

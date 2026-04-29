@@ -688,3 +688,36 @@ pip install python-magic
 ```
 
 This will ensure proper file type detection functionality for the CSV Import System.
+
+
+### Demo data 
+python odoo-bin shell -d fsdhdb --no-http < generate_demo_data.py
+
+What it generates:
+
+Category	Records
+Regions (6 geo-political zones)	6
+Branches (Lagos, Abuja, PHC, Kano, Enugu)	5
+Sectors (Agriculture, Banking, Oil & Gas…)	12
+Customer Tiers (T1/T2/T3)	3
+Account Officers	6
+Transaction Types (TRF, DEP, WDR, POS…)	10
+Account Types (Savings, Current, FXD…)	6
+Customer Statuses + Type Configs	7 each
+Individual customers (various risk levels)	25
+Corporate customers (with directors/shareholders)	15
+Bank accounts per customer (1–3 each)	~80–120
+PEP list entries	10
+Watchlist entries	7
+Blacklist entries	5
+Sanction list entries	5
+Screening results (high-risk customers)	~10–15
+Transactions per account (3–10 each)	~300–500
+The script is idempotent — running it twice won't create duplicates. It skips any record that already exists.
+
+### for manual csv upload for peplist,sanctionlist and all
+# Default — 10 rows, outputs in current dir
+python3 /icomply_odoo/compliance_management/scripts/generate_csv.py
+
+# Custom — 50 rows, save to specific folder
+python3 /icomply_odoo/compliance_management/scripts/generate_csv.py --rows 50 --out /dir/

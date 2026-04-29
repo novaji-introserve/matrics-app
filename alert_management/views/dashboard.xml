@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <record id="action_alert_dashboard" model="ir.actions.client">
-        <field name="name">Alert Monitoring</field>
-        <field name="tag">alert_management_dashboard</field>
-    </record>
-</odoo>

@@ -70,10 +70,12 @@
                 <field name="region_id" />
                 <field name="registration_date" />
                 <field name="company_reg_date" />
+                <field name="last_risk_calculation" invisible="True"/>
             </xpath>
             <xpath expr="//field[@name='category_id']" position="after">
                 <field name="internal_category" />
             </xpath>
+
             <xpath expr="//page[@name='contact_addresses']" position="attributes">
                 <attribute name="invisible">True</attribute>
             </xpath>
@@ -245,7 +247,7 @@
 
 
                 <!-- <notebook position="inside"> -->
-                <page string="EDD" name="edd_record">
+                <page string="Enhanced Due Diligence" name="edd_record">
                     <field name="edd_ids" nolabel="1"
                         context="{'form_view_ref': 'compliance_management.edd_form_view'}">
                         <tree string="EDD Record" create="False" edit="False" delete="False">

@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from . import controllers
+from ....session_control.controllers import controllers

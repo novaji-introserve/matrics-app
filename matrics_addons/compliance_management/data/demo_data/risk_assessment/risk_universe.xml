@@ -43,11 +43,10 @@
         <field name="code">account_activity</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_25"/>
     </record>
-     <record id="compliance_inst_fc_risk_subj_109" model="res.risk.subject">
+    <record id="compliance_inst_fc_risk_subj_109" model="res.risk.subject">
         <field name="name">Payment Transactions</field>
         <field name="code">payment_transactions</field>
         <field name="universe_id" ref="compliance_inst_fc_risk_univ_25"/>
     </record>
-
 
 </odoo>

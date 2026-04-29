@@ -17,7 +17,6 @@
         'data/demo/exception_process_type.xml',
         'data/demo/exception_process.xml',
         'data/demo/settings.xml',
-        'data/demo/case_charts.xml',
         'data/case_stats.xml',
         'views/case.xml',
         'views/menu_items.xml',
@@ -25,7 +24,8 @@
         'views/settings.xml',
         'data/sequence/case_sequence.xml',
         'data/emails/case_template.xml',
-        'data/schedules/case_schedules.xml'
+        'data/schedules/case_schedules.xml',
+        'data/charts.xml'
     ],
     # only loaded in demonstration mode
     'demo': [],

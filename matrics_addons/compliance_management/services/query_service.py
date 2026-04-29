@@ -226,7 +226,7 @@ class QueryService:
         if field_lower == "id" and "branch_id" in column_names:
             _logger.debug(f"Found special case match 'branch_id' for 'id' field")
             return "branch_id"
-        _logger.warning(f"Could not find column match for {original_field} in columns: {column_names}")
+        _logger.debug(f"Could not find column match for {original_field} in columns: {column_names}")
         return None
 
     @staticmethod
@@ -313,7 +313,7 @@ class QueryService:
         condition_string = condition_string.strip()
 
         def parse_expression(expr, depth=0):
-            _logger.info(f"Parsing expression (depth {depth}): {expr}")
+            # _logger.info(f"Parsing expression (depth {depth}): {expr}")
             if not expr.strip():
                 return []
             
@@ -342,7 +342,7 @@ class QueryService:
 
         try:
             domain = parse_expression(condition_string)
-            _logger.info(f"Parsed domain: {domain}")
+            # _logger.info(f"Parsed domain: {domain}")
             return domain
         except Exception as e:
             _logger.error(f"Error parsing condition: {e}")

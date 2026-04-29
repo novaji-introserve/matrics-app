@@ -5,7 +5,7 @@
         <field name="name">res_customer_account_tree</field>
         <field name="model">res.partner.account</field>
         <field name="arch" type="xml">
-            <tree string="Account" create="false">
+            <tree string="Account" create="false" limit="40">
                 <field name="name" string="Account Number" />
                 <field name="account_name" optional="show"/>
                 <field name="ledger_id" readonly="1" optional="show"/>
@@ -26,7 +26,7 @@
 
 
                 <field name="state" widget="badge" decoration-success="state == 'Active'" decoration-warning="state in ('Dormant', 'Flagged')" decoration-danger="state in ('Inactive', 'Closed')" optional="show"/>
-                <field name="date_created" optional="show"/>
+                <field name="opening_date" optional="show"/>
             </tree>
         </field>
     </record>
@@ -37,12 +37,12 @@
         <field name="arch" type="xml">
             <form readonly="1">
                 <header>
-                    <field name="state" widget="statusbar" statusbar_visible="Active,Inactive,Dormant,Flagged,Closed" clickable="True" />
+                    <field name="state" widget="statusbar" statusbar_visible="Active,Inactive,Dormant,Flagged,Closed,Opened,Suspended" clickable="True" />
                 </header>
                 <sheet string="Account">
                     <div class="oe_button_box" name="button_box">
                         <button class="oe_stat_button" type="object" name="get_risk_level" icon="fa-thermometer-0">
-                            <span>Risk 
+                            <span>Risk
                                 <field string="Risk Level" name="risk_level" widget="badge" decoration-danger="risk_level == 'high'" decoration-warning="risk_level in ('medium')" decoration-success="risk_level in ('low')"/>
                             </span>
 
@@ -180,12 +180,13 @@
         <field name="priority" eval="10" />
         <field name="arch" type="xml">
             <search string="Search Account">
+                <field name="account_name" />
                 <field name="name" />
                 <field name="customer_id" string="Customer Id"/>
                 <field name="ledger_id"/>
                 <field name="ledger_type_id"/>
                 <field name="category"/>
-             
+
 
                <filter string="Tier 1 Account" name="tier_1" domain="[('tier_level', '=', '1')]"/>
                 <filter string="Tier 2 Account" name="tier_2" domain="[('tier_level', '=', '2')]"/>

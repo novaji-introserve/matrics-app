@@ -45,15 +45,15 @@
           <button name="action_mark_unusual" string="Mark Unusual"
             type="object" class="btn-info"
             attrs="{'invisible': [('state', '=', 'unusual')]}"
-            groups="regulatory_reports.group_regulatory_report,base.group_system" />
+            groups="compliance_management.group_compliance_chief_compliance_officer,regulatory_reports.group_regulatory_report,base.group_system" />
           <button name="action_mark_as_suspicious" string="Mark Suspicious"
             type="object" class="btn-warning"
             attrs="{'invisible': [('suspicious_transaction', '=', True)]}"
-            groups="regulatory_reports.group_regulatory_report,base.group_system" />
+            groups="compliance_management.group_compliance_chief_compliance_officer,regulatory_reports.group_regulatory_report,base.group_system" />
           <button name="action_unmark_as_suspicious" string="Not Suspicious"
             type="object" class="btn-info"
             attrs="{'invisible': [('state', 'in', ['new'])]}"
-            groups="regulatory_reports.group_regulatory_report,base.group_system" />
+            groups="compliance_management.group_compliance_chief_compliance_officer,regulatory_reports.group_regulatory_report,base.group_system" />
         </xpath>
         <xpath expr="//page[@name='internal_notes']" position="before">
           <page name="suspicious_transaction_history" string="Suspicious Transaction History">
@@ -64,6 +64,7 @@
                 <field name="name" />
                 <field name="customer_id" />
                 <field name="account_id" />
+                <field name="rule_id" string="Triggered By Rule" />
                 <field name="date_reported" />
                 <field name="reported_by" />
               </tree>
@@ -116,5 +117,24 @@
         </xpath>
       </field>
     </record>
+
+    <!-- Inject Investigation Outcome into the case form — only shown when
+         the case is linked to a transaction. -->
+    <record id="view_case_manager_form_nfiu_inherit" model="ir.ui.view">
+      <field name="name">case.manager.form.nfiu.inherit</field>
+      <field name="model">case.manager</field>
+      <field name="inherit_id" ref="case_management.view_case_manager_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='close_remarks']" position="after">
+          <field name="close_outcome"
+            attrs="{
+              'invisible': [('transaction_id', '=', False)],
+              'readonly':  [('case_status', '=', 'closed')]
+            }"
+          />
+        </xpath>
+      </field>
+    </record>
+
   </data>
 </odoo>

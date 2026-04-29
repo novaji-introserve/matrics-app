@@ -14,10 +14,6 @@ _logger = logging.getLogger(__name__)
 
 class CustomerDigitalProduct(models.Model):
     _name = 'customer.digital.product'
-    _sql_constraints = [
-        ('uniq_customer_id', 'unique(customer_id)',
-         "Customer already exists. Customer must be unique!"),
-    ]
 
     customer_id = fields.Text(string='Customer ID',
                               index=True, readonly=True)  # customer,
@@ -25,15 +21,10 @@ class CustomerDigitalProduct(models.Model):
     customer_segment = fields.Char(
         string='Customer Segment', readonly=True)
     ussd = fields.Char(string='Uses USSD', index=True, readonly=True)
-    onebank = fields.Char(string='Uses One Bank', index=True, readonly=True)
     carded_customer = fields.Char(
         string='Has A Card', index=True, readonly=True)
     alt_bank = fields.Char(string='Is On Alt Bank', readonly=True)
-    sterling_pro = fields.Char(string='Has Sterling Pro', readonly=True)
-    banca = fields.Char(string='Has Banca', readonly=True)
-    doubble = fields.Char(string='Has Doubble', readonly=True)
-    specta = fields.Char(string='Has Specta', readonly=True)
-    switch = fields.Char(string='Has Switch', readonly=True)
+    
 
   
     def init(self):
@@ -79,65 +70,38 @@ class PartnerDigitalProductView(models.Model):
     
     def init(self):
         """Create a lightweight SQL view backed by channel subscriptions."""
-        tools.drop_view_if_exists(self.env.cr, self._table)
-
+        # Guard against fresh-install ordering: dependency tables may not exist yet
         self.env.cr.execute("""
-            SELECT EXISTS (
-                SELECT 1 FROM information_schema.tables
-                WHERE table_name = 'customer_channel_subscription'
-            ) AND EXISTS (
-                SELECT 1 FROM information_schema.tables
-                WHERE table_name = 'digital_delivery_channel'
+            SELECT COUNT(*) FROM information_schema.tables
+            WHERE table_schema = 'public'
+            AND table_name IN ('customer_channel_subscription', 'digital_delivery_channel')
+        """)
+        if self.env.cr.fetchone()[0] < 2:
+            return
+        tools.drop_view_if_exists(self.env.cr, self._table)
+        self.env.cr.execute(f"""
+            CREATE OR REPLACE VIEW {self._table} AS (
+                SELECT
+                    MIN(ccs.id) AS id,
+                    ccs.partner_id,
+                    ccs.customer_id,
+                    NULL::varchar AS customer_segment,
+                    MAX(CASE WHEN ddc.code = 'ussd' THEN ccs.value END) AS ussd,
+                    MAX(CASE WHEN ddc.code = 'onebank' THEN ccs.value END) AS onebank,
+                    MAX(CASE WHEN ddc.code = 'carded_customer' THEN ccs.value END) AS carded_customer,
+                    MAX(CASE WHEN ddc.code = 'alt_bank' THEN ccs.value END) AS alt_bank,
+                    MAX(CASE WHEN ddc.code = 'sterling_pro' THEN ccs.value END) AS sterling_pro,
+                    MAX(CASE WHEN ddc.code = 'banca' THEN ccs.value END) AS banca,
+                    MAX(CASE WHEN ddc.code = 'doubble' THEN ccs.value END) AS doubble,
+                    MAX(CASE WHEN ddc.code = 'specta' THEN ccs.value END) AS specta,
+                    MAX(CASE WHEN ddc.code = 'switch' THEN ccs.value END) AS switch
+                FROM customer_channel_subscription ccs
+                JOIN digital_delivery_channel ddc
+                    ON ddc.id = ccs.channel_id
+                WHERE ccs.partner_id IS NOT NULL
+                GROUP BY ccs.partner_id, ccs.customer_id
             )
         """)
-        tables_ready = self.env.cr.fetchone()[0]
-
-        if tables_ready:
-            self.env.cr.execute(f"""
-                CREATE OR REPLACE VIEW {self._table} AS (
-                    SELECT
-                        MIN(ccs.id) AS id,
-                        ccs.partner_id,
-                        ccs.customer_id,
-                        NULL::varchar AS customer_segment,
-                        MAX(CASE WHEN ddc.code = 'ussd' THEN ccs.value END) AS ussd,
-                        MAX(CASE WHEN ddc.code = 'onebank' THEN ccs.value END) AS onebank,
-                        MAX(CASE WHEN ddc.code = 'carded_customer' THEN ccs.value END) AS carded_customer,
-                        MAX(CASE WHEN ddc.code = 'alt_bank' THEN ccs.value END) AS alt_bank,
-                        MAX(CASE WHEN ddc.code = 'sterling_pro' THEN ccs.value END) AS sterling_pro,
-                        MAX(CASE WHEN ddc.code = 'banca' THEN ccs.value END) AS banca,
-                        MAX(CASE WHEN ddc.code = 'doubble' THEN ccs.value END) AS doubble,
-                        MAX(CASE WHEN ddc.code = 'specta' THEN ccs.value END) AS specta,
-                        MAX(CASE WHEN ddc.code = 'switch' THEN ccs.value END) AS switch
-                    FROM customer_channel_subscription ccs
-                    JOIN digital_delivery_channel ddc
-                        ON ddc.id = ccs.channel_id
-                    WHERE ccs.partner_id IS NOT NULL
-                    GROUP BY ccs.partner_id, ccs.customer_id
-                )
-            """)
-        else:
-            # Stub view during fresh install — replaced on next module update
-            # once the underlying tables have been created.
-            self.env.cr.execute(f"""
-                CREATE VIEW {self._table} AS (
-                    SELECT
-                        NULL::integer AS id,
-                        NULL::integer AS partner_id,
-                        NULL::integer AS customer_id,
-                        NULL::varchar AS customer_segment,
-                        NULL::varchar AS ussd,
-                        NULL::varchar AS onebank,
-                        NULL::varchar AS carded_customer,
-                        NULL::varchar AS alt_bank,
-                        NULL::varchar AS sterling_pro,
-                        NULL::varchar AS banca,
-                        NULL::varchar AS doubble,
-                        NULL::varchar AS specta,
-                        NULL::varchar AS switch
-                    WHERE false
-                )
-            """)
 
 
    
@@ -986,7 +950,7 @@ class DigitalDeliveryChannel(models.Model):
             }
         }
     
-    
+
 
 class CustomerChannelSubscription(models.Model):
     """Optimized subscription model for large datasets"""

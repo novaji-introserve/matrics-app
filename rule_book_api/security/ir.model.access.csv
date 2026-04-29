@@ -1,7 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_rulebook_api,regulatory.document,model_regulatory_document,base.group_user,1,1,1,1
-access_rulebook_api,regulatory.document,model_regulatory_document,base.group_user,1,1,1,1
-
-
-access_api_request_user,api.request.user,model_api_request,base.group_user,1,1,1,1
-access_api_request_history_user,api.request.history.user,model_api_request_history,base.group_user,1,1,1,1

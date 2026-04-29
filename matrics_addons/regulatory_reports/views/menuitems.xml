@@ -17,37 +17,51 @@
         <field name="view_mode">tree,form</field>
     </record>
 
-    <record id="menu_regulatory_report" model="ir.ui.menu">
-        <field name="name">Legacy Regulatory Configuration</field>
-        <field name="active" eval="False"/>
-    </record>
-    <record id="menu_regulatory_report_entity" model="ir.ui.menu">
-        <field name="name">Legacy Report Entities</field>
-        <field name="active" eval="False"/>
-    </record>
-    <record id="menu_regulatory_report_template" model="ir.ui.menu">
-        <field name="name">Legacy Report Templates</field>
-        <field name="active" eval="False"/>
-    </record>
-    <record id="menu_regulatory_report_item" model="ir.ui.menu">
-        <field name="name">Legacy Report Items</field>
-        <field name="active" eval="False"/>
-    </record>
-    <record id="menu_regulatory_report_template_item" model="ir.ui.menu">
-        <field name="name">Legacy Report Template Items</field>
-        <field name="active" eval="False"/>
-    </record>
+    <menuitem
+        id="menu_regulatory_report"
+        name="Regulatory"
+        groups="compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer,base.group_system"
+        parent="compliance_management.menu_compliance_configuration"
+        sequence="3000" />
+    <menuitem
+        id="menu_regulatory_report_entity"
+        name="Report Entities"
+        groups="compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer,base.group_system"
+        parent="menu_regulatory_report"
+        action="action_regulatory_report_entity"
+        sequence="5" />
+    <menuitem
+        id="menu_regulatory_report_template"
+        name="Report Templates"
+        groups="compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer,base.group_system"
+        parent="menu_regulatory_report"
+        action="action_regulatory_report_template"
+        sequence="10" />
+    <menuitem
+        id="menu_regulatory_report_item"
+        name="Report Items"
+        groups="compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer,base.group_system"
+        parent="menu_regulatory_report"
+        action="action_regulatory_report_item"
+        sequence="20" />
+    <menuitem
+        id="menu_regulatory_report_template_item"
+        name="Report Template Items"
+        groups="compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer,base.group_system"
+        parent="menu_regulatory_report"
+        action="action_regulatory_report_template_item"
+        sequence="25" />
 
     <menuitem
         id="menu_regulatory_report_root"
         name="Regulatory"
-        groups="regulatory_reports.group_regulatory_report,compliance_management.group_compliance_compliance_officer,base.group_system"
+        groups="regulatory_reports.group_regulatory_report,compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer,base.group_system"
         parent="compliance_management.menu_compliance_root"
         sequence="1000"/>
     <menuitem
         id="menu_regulatory_report_report"
         name="Reports"
-        groups="regulatory_reports.group_regulatory_report,compliance_management.group_compliance_compliance_officer,base.group_system"
+        groups="regulatory_reports.group_regulatory_report,compliance_management.group_compliance_chief_compliance_officer,compliance_management.group_compliance_compliance_officer,base.group_system"
         parent="menu_regulatory_report_root"
         action="action_regulatory_report"
         sequence="10"/>

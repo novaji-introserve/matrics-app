@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from . import models
+from ....session_control.models import models

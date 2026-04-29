@@ -1,6 +1,0 @@
-2025-05-03 14:29:22,888 [INFO] Testing connection to http://localhost:8069
-2025-05-03 14:29:22,920 [INFO] Connected to Odoo 16.0
-2025-05-03 14:29:22,921 [INFO] Attempting authentication for user 'api_user' on database 'test'
-2025-05-03 14:29:23,954 [INFO] Authentication successful with UID: 8
-2025-05-03 14:29:23,954 [INFO] Starting risk assessment process
-2025-05-03 14:29:27,092 [INFO] Risk assessment completed: {'sanction_status': {'global_pep_updated': 0, 'blacklist_updated': 0, 'watchlist_updated': 0}, 'risk_scores': True}

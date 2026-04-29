@@ -1,36 +1,34 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-    <!-- Email template for new users -->
+    <!-- PRODUCTION EMAIL TEMPLATE - COMPLETELY DYNAMIC -->
     <record id="alert_rules_mail_template" model="mail.template">
         <field name="name">Alert Mailing System</field>
         <field name="model_id" ref="alert_management.model_alert_history"/>
         <field name="subject">{{ object.name }}</field>
-        <field name="email_from">noreply@convenantmfb.com.ng</field>
+        <!-- <field name="email_from">noreply@convenantmfb.com.ng</field> -->
         <field name="email_to">{{ object.email }}</field>
         <field name="email_cc">{{ object.email_cc }}</field>
-        <field name="description">this is automation mail base on alert information in the database</field>
+        <field name="description">Dynamic alert system with configurable template</field>
         <field name="body_html" type="html">
 
             <style>
-                
-                /* Set a maximum width for email content */
-                .email-container {
-                    max-width: 100% !important;
-                    overflow-x: auto !important;
-                }
-                
+                /* Reset body and table padding/margins */
+                body,
                 table {
-                    table-layout: fixed;
+                    margin: 0;
+                    padding: 0;
                     width: 100%;
+                    height: auto;
                 }
-                
-                @media screen and (max-width: 600px) {
-                    table {
-                        width: 100% !important;
-                    }
+            
+                /* Set a maximum width for email content - SAME AS OLD */
+                .email-container {
+                    width: 100%;
+                    max-width: 600px;
+                    margin: 0 auto;
+                    background-color: #ffffff;
                 }
-
-              
+            
                 /* Break content into sections */
                 .email-section {
                     padding: 16px;
@@ -44,49 +42,79 @@
                 }
             </style>
 
-            <table border="0" cellpadding="0" cellspacing="0" style="padding-top: 16px; background-color: #FFFFFF; font-family:Verdana, Arial,sans-serif; color: #454748; min-width: 100vw; border:none;">
+            <!-- PRODUCTION TEMPLATE: EVERYTHING IS DYNAMIC WITH PROPER FALLBACKS -->
+            <table border="0" cellpadding="0" cellspacing="0" style="padding-top: 16px; background-color: #FFFFFF; font-family: {{ object.dynamic_font_family or 'Verdana, Arial, sans-serif' }}; color: #454748; min-width: 100vw; border:none;">
                 <tr>
                     <td align="center">
                         <table border="0" cellpadding="0" cellspacing="0" style="padding: 16px; background-color: #FFFFFF; color: #454748; min-width: 100vw; border:none;">
                             <tbody>
                                 <!-- HEADER -->
                                 <tr>
-                                    <td>
+                                    <td align="center">
                                         <table border="0" cellpadding="0" cellspacing="0" width="590" style="border:none; min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border:none">
                                             <tr>
                                                 <td valign="middle">
-                                                    <img src="https://covenantmfb.com.ng/wp-content/uploads/2019/05/CMFB-Logo.png" alt="logo" style="width: 12rem; object-fit:contain; height: 12rem; display:block; margin-bottom:1rem;"/>
+                                                    <!-- DYNAMIC LOGO - Only show if exists -->
+                                                    <t t-if="object.dynamic_logo_url">
+                                                        <img t-att-src="object.dynamic_logo_url" alt="" style="width: 12rem; object-fit:contain; height: 12rem; display:block; margin-bottom:1rem;"/>
+                                                    </t>
 
+                                                    <!-- DYNAMIC DOWNLOAD BUTTON with dynamic color -->
+                                                    <a t-att-href="object.attachment_link" target="_blank" t-att-style="'background-color: ' + (object.dynamic_primary_color or '#007046') + '; color: #fff; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; text-decoration: none; display: inline-block;'">
+                                                        Download CSV
+                                                    </a>
+                                               
+                                                    <!-- PRIORITY BADGE -->
+                                                    <t t-set="priority_color" t-value="'#CA8A04'"/>
+                                                    <t t-set="priority_bg" t-value="'#FEF9C3'"/>
+                                                    <t t-set="priority_label" t-value="'Medium'"/>
                                                     
-                                                       <a t-att-href="object.attachment_link" target="_blank" style="background-color: green; color: #fff; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
-                                                           Download CSV
-                                                        </a>
-                                                   
-                                                    <div style="display: flex; align-items:center; gap:0.4rem; margin-top:1rem;">
-                                                        <p>AlertId:</p>
-                                                        <h6> <span t-esc="object.alert_id" /> </h6>
+                                                    <t t-if="object.priority_level == 'critical'">
+                                                        <t t-set="priority_color" t-value="'#DC2626'"/>
+                                                        <t t-set="priority_bg" t-value="'#FEE2E2'"/>
+                                                        <t t-set="priority_label" t-value="'Critical'"/>
+                                                    </t>
+                                                    <t t-elif="object.priority_level == 'high'">
+                                                        <t t-set="priority_color" t-value="'#EA580C'"/>
+                                                        <t t-set="priority_bg" t-value="'#FFEDD5'"/>
+                                                        <t t-set="priority_label" t-value="'High'"/>
+                                                    </t>
+                                                    <t t-elif="object.priority_level == 'low'">
+                                                        <t t-set="priority_color" t-value="'#2563EB'"/>
+                                                        <t t-set="priority_bg" t-value="'#DBEAFE'"/>
+                                                        <t t-set="priority_label" t-value="'Low'"/>
+                                                    </t>
+
+                                                    <div style="margin-top: 10px; margin-bottom: 5px;">
+                                                        <span t-attf-style="background-color: {{priority_bg}}; color: {{priority_color}}; border: 1px solid {{priority_color}}; padding: 4px 10px; border-radius: 12px; font-size: 13px; font-weight: bold; display: inline-block;">
+                                                            Priority: <t t-esc="priority_label"/>
+                                                        </span>
+                                                    </div>
+
+                                                    <div style="margin-top: 1rem; margin-bottom: 0.5rem;">
+                                                        <span style="margin: 0; padding: 0;">AlertId: </span>
+                                                        <span style="font-weight: bold; margin: 0; padding: 0;" t-esc="object.alert_id" />
                                                    </div>
                                                    <hr />
 
-                                                   <div style="display: flex; align-items:center; gap:0.4rem; margin: 0.5rem 0;">
-                                                        <p>Narration:</p>
-                                                        <p> <span t-esc="object.narration" /> </p>
+                                                   <div style="margin: 0.5rem 0;">
+                                                        <span style="margin: 0; padding: 0; font-weight: normal;">Narration: </span>
+                                                        <span style="margin: 0; padding: 0;" t-out="str(object.narration or '').replace('&amp;lt;p&amp;gt;', '').replace('&amp;lt;/p&amp;gt;', '').replace('&lt;p&gt;', '').replace('&lt;/p&gt;', '')" />
+                                                   </div>
+                                                   <div style="margin: 0.5rem 0;">
+                                                        <span style="margin: 0; padding: 0; font-weight: normal;">Exception Process: </span>
+                                                        <span style="margin: 0; padding: 0;" t-esc="object.process_id or ''" />
                                                    </div>
                                                 <hr />
-                                                  
-                                                <hr />
-                                                   <div style="display: flex; align-items:center; gap:0.4rem; margin: 0.5rem 0;">
-                                                        <p>Date:</p>
-                                                        <p> <span t-esc="object.last_checked" /> </p>
-                                                   </div>
-                                                   
-                                              
-                                                    
-                                                    
-                                                </td>
 
+                                                   <div style="margin: 0.5rem 0;">
+                                                        <span style="margin: 0; padding: 0;">Date: </span>
+                                                        <span style="margin: 0; padding: 0;" t-esc="object.last_checked" />
+                                                   </div>
+                                                </td>
                                             </tr>
 
+                                            <!-- TABLE CONTENT - KEEPS OLD RESPONSIVE STRUCTURE -->
                                             <tr>
                                                 <t t-raw="object.html_body" />
                                             </tr>
@@ -116,41 +144,54 @@
                                         </table>
                                     </td>
                                 </tr>
-                                <!-- FOOTER -->
-                                <tr>
-                                    <td align="center" style="min-width: 590px;">
-                                        <table border="0" cellpadding="0" cellspacing="0" width="590" style="min-width: 590px; background-color: white; font-size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;">
-                                            <tr>
-                                                <td valign="middle" align="left">
-                                                    <t>Novaji Introserve</t>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td valign="middle" align="left" style="opacity: 0.7;">
-                                                    <t>+1 650-123-4567</t>
-                                                    <t>
-                                                    | <a t-att-href="'mailto:%s' % ''" style="text-decoration:none; color: #454748;">info@yourcompany.com</a>
-                                                    </t>
-                                                    <t>
-                                                    | <a t-att-href="'%s' % ''" style="text-decoration:none; color: #454748;" >http://www.example.com</a>
-                                                    </t>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
+                                <!-- DYNAMIC FOOTER - Only show if company info exists -->
+                                <t t-if="object.dynamic_company_name or object.dynamic_phone or object.dynamic_email or object.dynamic_website">
+                                    <tr>
+                                        <td align="center" style="min-width: 590px;">
+                                            <table border="0" cellpadding="0" cellspacing="0" width="590" style="min-width: 590px; background-color: white; font-size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                                                <!-- Company Name Row -->
+                                                <t t-if="object.dynamic_company_name">
+                                                    <tr>
+                                                        <td valign="middle" align="left">
+                                                            <t t-esc="object.dynamic_company_name" />
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                
+                                                <!-- Contact Info Row -->
+                                                <t t-if="object.dynamic_phone or object.dynamic_email or object.dynamic_website">
+                                                    <tr>
+                                                        <td valign="middle" align="left" style="opacity: 0.7;">
+                                                            <!-- Phone -->
+                                                            <t t-if="object.dynamic_phone">
+                                                                <t t-esc="object.dynamic_phone" />
+                                                            </t>
+                                                            
+                                                            <!-- Email -->
+                                                            <t t-if="object.dynamic_email">
+                                                                <t t-if="object.dynamic_phone"> | </t>
+                                                                <a t-att-href="'mailto:' + object.dynamic_email" style="text-decoration:none; color: #454748;" t-esc="object.dynamic_email" />
+                                                            </t>
+                                                            
+                                                            <!-- Website -->
+                                                            <t t-if="object.dynamic_website">
+                                                                <t t-if="object.dynamic_phone or object.dynamic_email"> | </t>
+                                                                <a t-att-href="object.dynamic_website" style="text-decoration:none; color: #454748;" t-esc="object.dynamic_website" />
+                                                            </t>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </t>
                             </tbody>
                         </table>
                     </td>
-                </tr>
-                <!-- POWERED BY -->
-                 <!-- POWERED BY -->
-                 <tr class='o_email_footer'>
-                    
                 </tr>
             </table>
         </field>
         <field name="lang">en_US</field>
         <field name="auto_delete" eval="False"/>
-</record>
+    </record>
 </odoo>

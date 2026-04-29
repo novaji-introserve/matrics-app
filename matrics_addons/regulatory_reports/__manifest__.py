@@ -31,8 +31,19 @@
         'security/security.xml',
         'security/ir.model.access.csv',
         'views/report.xml',
+        'views/report_entity.xml',
+        'views/report_template.xml',
+        'views/report_item.xml',
+        'views/report_template_items.xml',
         'views/menuitems.xml',
+        'data/report_entity_data.xml',
+        'data/report_items_demo_data.xml',
+        'data/report_template_data.xml',
+        'data/report_template_items_data.xml',
     ],
-    'demo': [],
+    # only loaded in demonstration mode
+    'demo': [
+        'demo/demo.xml',
+    ],
     'license': 'LGPL-3',
 }

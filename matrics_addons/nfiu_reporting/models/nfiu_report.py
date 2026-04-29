@@ -438,7 +438,7 @@ class NFIUReport(models.Model):
             self._add_text_element(parent, 'source_of_wealth', person.source_of_wealth, 255, 'Reporting person source of wealth')
 
     def _add_person_xml(self, parent, person):
-        """Add person XML elements"""
+        """Add person XML elements. person is a res.partner record."""
         if not person:
             return
         # Add basic person details   

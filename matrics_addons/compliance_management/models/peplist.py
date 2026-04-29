@@ -20,17 +20,39 @@ class PepCustomer(models.Model):
                             default=lambda self: str(uuid.uuid4()), readonly=True,  copy=False)
     position = fields.Text(string='Position', tracking=True)
     
-    active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
-    def init(self):
-        # Add performance-critical indexes for large datasets
+    def init(self):        
+        # --- Index 1: pep_list_name_normalized_idx ---
         self.env.cr.execute("""
-            CREATE INDEX IF NOT EXISTS pep_list_name_normalized_idx 
-            ON pep_list (LOWER(REPLACE(name, ' ', '')));
-            
-            CREATE INDEX IF NOT EXISTS pep_list_firstname_lastname_idx 
-            ON pep_list (LOWER(REPLACE(firstname, ' ', '')), LOWER(REPLACE(lastname, ' ', '')));          
-           
+            SELECT 1 
+            FROM pg_indexes 
+            WHERE indexname = 'pep_list_name_normalized_idx'
         """)
-        self.env.cr.execute(
-            "CREATE INDEX IF NOT EXISTS pep_list_id_idx ON pep_list (id)")
+        if not self.env.cr.fetchone():
+            self.env.cr.execute("""
+                CREATE INDEX pep_list_name_normalized_idx 
+                ON pep_list (LOWER(REPLACE(name, ' ', '')));
+            """)
+        
+        # --- Index 2: pep_list_firstname_lastname_idx ---
+        self.env.cr.execute("""
+            SELECT 1 
+            FROM pg_indexes 
+            WHERE indexname = 'pep_list_firstname_lastname_idx'
+        """)
+        if not self.env.cr.fetchone():
+            self.env.cr.execute("""
+                CREATE INDEX pep_list_firstname_lastname_idx 
+                ON pep_list (LOWER(REPLACE(firstname, ' ', '')), LOWER(REPLACE(lastname, ' ', '')));
+            """)
+        
+        # --- Index 3: pep_list_id_idx ---
+        self.env.cr.execute("""
+            SELECT 1 
+            FROM pg_indexes 
+            WHERE indexname = 'pep_list_id_idx'
+        """)
+        if not self.env.cr.fetchone():
+            self.env.cr.execute(
+                "CREATE INDEX pep_list_id_idx ON pep_list (id)"
+            )
         

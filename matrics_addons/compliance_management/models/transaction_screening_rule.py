@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import textwrap
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
@@ -81,32 +82,33 @@ class TransactionScreeningRule(models.Model):
         for e in self:
             e.write({'state': 'inactive'})
 
+        
     def _satisfy_condition(self, localdict):
         """
-        This method is used to compute the rule based on the local dictionary.
-        It evaluates the condition_python or executes the sql_query based on the condition_select.
+        Evaluate the python condition against the transaction.
 
-        # Available variables in localdict:
-        #----------------------
-        # transaction: object containing the transaction<br />
-        # customer: object containing the customer
-        # branch: object containing the branch
-        # account: object containing the account
-        # currency: object containing the currency
-        # env: environment  object
-        #----------------------
-        # Note: returned value have to be set in the variable 'result'
+        Available variables in localdict:
+            result      : False   
+            transaction : the transaction record
+            customer    : the customer record
+            branch      : the branch record
+            account     : the account record
+            currency    : the currency record
+            env         : the Odoo environment
+
+        Returns:
+            bool — True if rule matched, False otherwise.
         """
         self.ensure_one()
         try:
-            safe_eval(self.condition_python, localdict,
-                      mode='exec', nocopy=True)
-            if 'result' in localdict and localdict['result'] is not None:
-                return localdict['result']
-            return False
-        except:
-            raise UserError(_('Wrong python code defined for transaction screening rule %s (%s).') % (
-                self.name, self.code))
+            code = textwrap.dedent(self.condition_python)
+            safe_eval(code, localdict, mode='exec', nocopy=True)
+            return bool(localdict.get('result', False))
+        except Exception as ex:
+            raise UserError(
+                _("Wrong python code defined for transaction screening rule '%s' (%s):\n%s")
+                % (self.name, self.code, ex)
+            )
             
 
 

@@ -33,6 +33,9 @@ RUN sh bin/install-plugin.sh ${SEATUNNEL_VERSION}
 COPY .docker/seatunnel/lib/ /tmp/extra-jars/
 RUN find /tmp/extra-jars -name "*.jar" -exec cp {} ${SEATUNNEL_HOME}/lib/ \; && rm -rf /tmp/extra-jars
 
+COPY seatunnel/run_etl.sh ${SEATUNNEL_HOME}/run_etl.sh
+RUN chmod +x ${SEATUNNEL_HOME}/run_etl.sh
+
 COPY .docker/seatunnel/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 

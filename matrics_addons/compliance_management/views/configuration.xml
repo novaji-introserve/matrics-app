@@ -82,7 +82,7 @@
             <field name="name">res.partner.account.product.tree</field>
             <field name="model">res.partner.account.product</field>
             <field name="arch" type="xml">
-                <tree string="Account Products" delete="False">
+                <tree string="Account Products"  create="False" delete="False">
                     <field name="name" string="Name" />
                     <field name="code" string="Code" />
                     <field name="risk_assessment" string="Risk Assessment" />
@@ -518,7 +518,7 @@
             <field name="name">digital.delivery.channel.form</field>
             <field name="model">digital.delivery.channel</field>
             <field name="arch" type="xml">
-                <form string="Digital Delivery Channel">
+                <form string="Digital Delivery Channel" create="True">
                     <sheet>
                         <group>
                             <group>

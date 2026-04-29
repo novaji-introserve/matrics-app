@@ -159,4 +159,118 @@
             </div>
         </div>
     </t>
+
+    <t t-name="owl.ComplianceDashboard" owl="1">
+        <div class="vh-100 overflow-auto bg-muted ">
+            <!-- Header section -->
+            <div class="col-12">
+                <div class="col-12 m-0 p-0">
+                    <div class="d-flex bg-white rounded shadow px-4 py-1 shadow-1 justify-content-between align-items-center">
+                        <div class="flex-grow-1 me-3">
+                            <img t-att-src="'/compliance_management/static/src/img/matrics-logo.png'" alt="Dashboard Icon"
+                                class="img-fluid" style="width: 300; max-height: 70px; object-fit: contain; " />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <div class="container-fluid" >
+                <div class="row second-section mb-4 pt-2 g-md-5 justify-content-between align-items-center">
+                    <div class="position-relative card-container" t-ref="cardContainer">
+                        <!-- Card section with placeholders during loading -->
+                        <t t-if="state.loadingStates.stats">
+                            <!-- Show placeholder cards while loading -->
+                            <div class="d-flex flex-nowrap overflow-auto">
+                                <t t-foreach="[1,2,3,4,5,6,7,8]" t-as="placeholder" t-key="placeholder">
+                                    <div class="px-4 py-2 mx-2 box cursor-pointer shadow bg-white position-relative">
+                                        <h2 class="my-3 fs-1 placeholder-glow">
+                                            <span class="placeholder col-8"></span>
+                                        </h2>
+                                        <p class="text-muted text-capitalize fs-3 placeholder-glow">
+                                            <span class="placeholder col-6"></span>
+                                        </p>
+                                        <div class="text-uppercase fw-bold text-center bg-dark text-white fs-6 position-absolute catbox">
+                                            <p>--</p>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </t>
+                        
+                        <t t-else="">
+                            <!-- Update only the card rendering part of your template -->
+                            <t t-if="state.stats and state.stats.length > 0">
+                                <div class="d-flex flex-nowrap overflow-auto">
+                                    <t t-foreach="state.stats" t-as="stat" t-key="stat.id">
+                                        <div class="mx-2">
+                                            <Card 
+                                                onClick="() => stat.query ? displayOdooView(stat.scope, stat.query, null, null, stat.name) : null"
+                                                title="stat.name" 
+                                                scope="stat.scope" 
+                                                total="stat.val" 
+                                                bgcolor="stat.scope_color"
+                                                isClickable="stat.query and stat.name !== 'Avg. Customer Risk Score'" 
+                                            />
+                                        </div>
+                                    </t>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <h4 class="" style="padding: 5rem; cursor:pointer;">No Data!! Please click on the configuration menu then statistic and start creating</h4>
+                            </t>
+                        </t>
+                    </div>
+                </div>
+
+                <!-- Chart section with progressive loading -->
+                <div class="row g-md-2 mt-4" style="margin-bottom:10rem;">
+                    <t t-if="state.loadingStates.charts">
+                        <t t-foreach="[1,2]" t-as="placeholder" t-key="placeholder">
+                            <div class="col-md-6 mb-4">
+                                <div class="d-flex bg-white shadow shadow-1 p-3 rounded justify-content-between p-2 align-items-center">
+                                    <h6 class="fw-bold text-capitalize text-dark">
+                                        Loading chart data...
+                                    </h6>
+                                </div>
+                                <div class="chart mt-4 ml-1 shadow shadow-1 bg-white">
+                                    <div class="chart-container position-relative" style="width: 100%; height: 44vh;">
+                                        <div class="position-absolute top-0 start-0 end-0 bottom-0 d-flex justify-content-center align-items-center">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </t>
+                    
+                    <div class="row g-md-2 mt-md-0">
+                    <!-- <div class="row g-md-2 mt-md-3 mt-5 "> -->
+                        <t t-foreach="state.dynamic_chart" t-as="chart" t-key="chart_index">
+                        <!-- <h1 t-out="chart.column"/> -->
+                            <div t-attf-class="col-md-{{ chart.column || 6 }}">
+                                <div class="d-flex bg-white shadow shadow-1 p-3 rounded justify-content-between p-2 align-items-center">
+                                    <h6 class="fw-bold text-capitalize text-dark">
+                                        <t t-out="chart.title"/>
+                                    </h6>
+                                </div>
+                                <div class="chart mt-4 ml-1 shadow shadow-1 bg-white">
+                                    <ChartRenderer 
+                                        data="chart" 
+                                        admin="state.cco" 
+                                        branches_id="state.branches_id" 
+                                        date="state.datepicked" 
+                                        isLoading="state.loadingStates.charts"
+                                        dynamic="state.useDynamicLoading" 
+                                        />
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
 </templates>
