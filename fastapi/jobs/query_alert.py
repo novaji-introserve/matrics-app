@@ -1,17 +1,21 @@
 import html
 import logging
+import time
 from pathlib import Path
 from uuid import uuid4
 
 from config.logger import setup_job_logging
 from config.settings import load_settings
 from jobs.emailer import send_email
-from repo.alert_jobs import create_alert_history, get_alert_job
+from repo.alert_jobs import AlertMailTemplate, create_alert_history, get_alert_job, get_alert_mail_template
 from router.utils import get_postgres_dsn
 
 
 logger = logging.getLogger("app")
 DEFAULT_EMAIL_CSS_PATH = Path(__file__).with_name("styles") / "query_alert.css"
+
+_TEMPLATE_TTL = 300  # seconds
+_template_cache: dict[str, tuple[float, AlertMailTemplate]] = {}
 
 
 def _validate_query(query: str) -> str:
@@ -21,6 +25,22 @@ def _validate_query(query: str) -> str:
     if not normalized.lower().startswith("select"):
         raise ValueError("ALERT_QUERY_SQL must start with SELECT")
     return normalized
+
+
+def _load_cached_template(code: str = "alert") -> AlertMailTemplate | None:
+    now = time.monotonic()
+    cached = _template_cache.get(code)
+    if cached:
+        cached_at, tmpl = cached
+        if now - cached_at < _TEMPLATE_TTL:
+            return tmpl
+    try:
+        tmpl = get_alert_mail_template(code)
+        _template_cache[code] = (now, tmpl)
+        return tmpl
+    except Exception as exc:
+        logger.warning("Could not load alert mail template code=%s: %s", code, exc)
+        return None
 
 
 def _load_email_css_rules() -> str:
@@ -58,19 +78,19 @@ def _build_logo_markup() -> str:
 
 def _build_table(rows: list[dict]) -> str:
     header_cells = "".join(
-        f"<th class='query-alert__header'>{html.escape(_format_column_label(key))}</th>"
+        f"<th>{html.escape(_format_column_label(key))}</th>"
         for key in rows[0].keys()
     )
     body_rows = []
     for row in rows:
         cells = "".join(
-            f"<td class='query-alert__cell'>{html.escape(str(value))}</td>"
+            f"<td>{html.escape(str(value))}</td>"
             for value in row.values()
         )
         body_rows.append(f"<tr>{cells}</tr>")
 
     return (
-        "<table class='query-alert__table'>"
+        "<table>"
         f"<thead><tr>{header_cells}</tr></thead>"
         f"<tbody>{''.join(body_rows)}</tbody>"
         "</table>"
@@ -85,10 +105,23 @@ def _build_email_body(
     query: str,
 ) -> str:
     row_count = len(rows)
-    css_rules = _load_email_css_rules()
     logo = _build_logo_markup()
     table = _build_table(rows)
 
+    tmpl = _load_cached_template()
+    if tmpl:
+        header = tmpl.html_header.replace("{inline_style}", tmpl.inline_style)
+        body = tmpl.html_body.format(
+            logo=logo,
+            alert_name=html.escape(name),
+            alert_id=html.escape(alert_id),
+            row_count=row_count,
+            table=table,
+        )
+        return header + body + tmpl.html_footer
+
+    # Fallback: build inline if template is unavailable
+    css_rules = _load_email_css_rules()
     return (
         "<!DOCTYPE html>"
         "<html>"

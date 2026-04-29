@@ -45,13 +45,15 @@
         'views/control_officer.xml',
         'views/frequency_view.xml',
         'views/mail_template.xml',
-        'views/sql_view.xml', 
+        'views/sql_view.xml',
+        'views/alert_mail_template.xml',
 
         # demo data
 
         'data/hr/hr_dpt.xml',
         'data/hr/hr_job.xml',
         'data/alert.xml',
+        'data/alert_mail_template.xml',
         # 'data/hr/hr_employee.xml',
         # 'data/users.xml',
 

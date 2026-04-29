@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from . import alert_mail_template
 from . import reference_selections
 from . import change_data_capture
 from . import alert_group
