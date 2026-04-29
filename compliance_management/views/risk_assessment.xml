@@ -78,7 +78,7 @@
             <tree string="Risk Assessment">
               <!-- This header adds buttons to the top of the tree view -->
                 <header>
-                    <button name="cron_update_all_risk_scores"
+                    <button name="action_update_risk_score"
                             type="object"
                             string="Recalculate All Risk Scores"
                             class="btn-primary"/>

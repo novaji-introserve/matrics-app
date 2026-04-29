@@ -75,9 +75,7 @@
             <xpath expr="//field[@name='category_id']" position="after">
                 <field name="internal_category" />
             </xpath>
-            <xpath expr="//field[@name='internal_category']" position="after">
-                <field name="last_risk_calculation_raw" />
-            </xpath>
+
             <xpath expr="//page[@name='contact_addresses']" position="attributes">
                 <attribute name="invisible">True</attribute>
             </xpath>

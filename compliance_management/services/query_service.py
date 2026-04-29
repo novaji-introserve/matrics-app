@@ -226,7 +226,7 @@ class QueryService:
         if field_lower == "id" and "branch_id" in column_names:
             _logger.debug(f"Found special case match 'branch_id' for 'id' field")
             return "branch_id"
-        _logger.warning(f"Could not find column match for {original_field} in columns: {column_names}")
+        _logger.debug(f"Could not find column match for {original_field} in columns: {column_names}")
         return None
 
     @staticmethod

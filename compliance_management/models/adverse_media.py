@@ -7,6 +7,7 @@ import re
 from dotenv import load_dotenv
 import os
 import json
+from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import requests
@@ -16,7 +17,8 @@ import base64
 import logging
 
 
-load_dotenv()
+# Load .env from icomply_odoo root (two levels up from this file's models/ directory)
+load_dotenv(Path(__file__).resolve().parent.parent.parent / '.env')
 _logger = logging.getLogger(__name__)
 
 
@@ -99,15 +101,13 @@ class AdverseMedia(models.Model):
                     "Partner name is required for media screening")
 
             keywords = self.keyword_id.mapped('name')
-            _logger.critical(f"keywords to be used {keywords}")
-            if not keywords:
-                _logger.error(
-                    f"No keywords configured for record ID: {self.id}")
-                raise ValidationError(
-                    "At least one keyword is required for media screening")
+            _logger.info(f"keywords to be used {keywords}")
 
-            keyword_clause = ' OR '.join(f'"{k}"' for k in keywords)
-            query = f'"{partner_name}" AND ({keyword_clause})'
+            # Search by partner name only — the AND (keywords) condition was
+            # dropping valid articles where the crime phrase didn't appear
+            # verbatim. Keyword matching and scoring is done locally on the
+            # returned articles (lines below in scan_news_articles).
+            query = f'"{partner_name}"'
             _logger.info(
                 f"Generated search query for partner {partner_name}: {query}")
             return query

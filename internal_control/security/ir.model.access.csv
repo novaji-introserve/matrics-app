@@ -32,4 +32,4 @@ access_res_imal_customer_address,access res imal customer address,internal_contr
 access_res_imal_branches,access res imal branches,internal_control.model_res_imal_branches,base.group_user,1,1,1,1
 access_res_imal_account,access res imal account,internal_control.model_res_imal_account,base.group_user,1,1,1,1
 access_res_imal_companies,access res imal companies,internal_control.model_res_imal_companies,base.group_user,1,1,1,1
-access_res_transaction_screening_rule,access res transaction screening rule,internal_control.model_res_transaction_screening_rule,base.group_user,1,1,1,1
+access_res_transaction_screening_rule,access res transaction screening rule,compliance_management.model_res_transaction_screening_rule,base.group_user,1,1,1,1

@@ -37,5 +37,10 @@
                 </tree>
             </field>
         </record>
+        <record id="action_regulatory_report_entity" model="ir.actions.act_window">
+            <field name="name">Report Entities</field>
+            <field name="res_model">res.regulatory.report.entity</field>
+            <field name="view_mode">tree,form</field>
+        </record>
     </data>
 </odoo>

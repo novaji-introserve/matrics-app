@@ -303,29 +303,31 @@ class ResCharts(models.Model):
         self.ensure_one()
         now = fields.Datetime.now()
         ttl_minutes = max(int(self.cache_ttl_minutes or 60), 1)
-        try:
-            cached_payloads = json.loads(self.cached_payload) if self.cached_payload else {}
-        except (TypeError, ValueError):
-            cached_payloads = {}
-        if not isinstance(cached_payloads, dict):
-            cached_payloads = {}
         cache_key = self._cache_payload_key(
             cco=cco, branches_id=branches_id, datepicked=datepicked
         )
-        cached_payloads[cache_key] = {
-            "payload": payload,
-            "computed_at": fields.Datetime.to_string(now),
-            "expires_at": fields.Datetime.to_string(
-                fields.Datetime.add(now, minutes=ttl_minutes)
-            ),
-        }
         try:
             registry = self.env.registry
             with registry.cursor() as cr:
                 cr.execute(
-                    "SELECT id FROM res_dashboard_charts WHERE id = %s FOR UPDATE NOWAIT",
+                    "SELECT cached_payload FROM res_dashboard_charts WHERE id = %s FOR UPDATE NOWAIT",
                     (self.id,),
                 )
+                row = cr.fetchone()
+                db_payload_raw = row[0] if row else None
+                try:
+                    cached_payloads = json.loads(db_payload_raw) if db_payload_raw else {}
+                except (TypeError, ValueError):
+                    cached_payloads = {}
+                if not isinstance(cached_payloads, dict):
+                    cached_payloads = {}
+                cached_payloads[cache_key] = {
+                    "payload": payload,
+                    "computed_at": fields.Datetime.to_string(now),
+                    "expires_at": fields.Datetime.to_string(
+                        fields.Datetime.add(now, minutes=ttl_minutes)
+                    ),
+                }
                 cr.execute(
                     """
                     UPDATE res_dashboard_charts

@@ -123,7 +123,7 @@
     <record id="view_case_manager_form_nfiu_inherit" model="ir.ui.view">
       <field name="name">case.manager.form.nfiu.inherit</field>
       <field name="model">case.manager</field>
-      <field name="inherit_id" ref="case_management_v2.view_case_manager_form"/>
+      <field name="inherit_id" ref="case_management.view_case_manager_form"/>
       <field name="arch" type="xml">
         <xpath expr="//field[@name='close_remarks']" position="after">
           <field name="close_outcome"

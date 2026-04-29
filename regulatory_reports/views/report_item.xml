@@ -58,5 +58,10 @@
             </field>
         </record>
 
+        <record id="action_regulatory_report_item" model="ir.actions.act_window">
+            <field name="name">Report Items</field>
+            <field name="res_model">res.regulatory.report.item</field>
+            <field name="view_mode">tree,form</field>
+        </record>
     </data>
 </odoo>

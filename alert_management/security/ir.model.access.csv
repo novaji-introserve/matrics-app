@@ -8,4 +8,3 @@ access_alert_control_officer,alert control officer,alert_management.model_contro
 access_email_template_config,email template config,alert_management.model_email_template_config,base.group_user,1,1,1,1
 access_email_template_config_confirm,email template config confirm,alert_management.model_email_template_config_confirm,base.group_user,1,1,1,1
 access_email_template_preview,email template preview,alert_management.model_email_template_preview,base.group_user,1,1,1,1
-access_alert_signature,alert signature,alert_management.model_alert_signature,base.group_user,1,1,1,1
