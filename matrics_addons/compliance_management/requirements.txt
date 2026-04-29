@@ -1,3 +1,4 @@
+feedparser
 aiosmtplib
 aiosqlite
 annotated-types

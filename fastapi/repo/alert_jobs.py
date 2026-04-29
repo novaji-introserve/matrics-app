@@ -1,8 +1,17 @@
 import re
+from dataclasses import dataclass
 from typing import Any
 
 from config import get_odoo_client
 from config.settings import AlertJobConfig, load_settings
+
+
+@dataclass
+class AlertMailTemplate:
+    html_header: str
+    inline_style: str
+    html_body: str
+    html_footer: str
 
 
 def _get_env():
@@ -114,3 +123,24 @@ def get_alert_job(job_id: str) -> AlertJobConfig:
         if job.job_id == job_id:
             return job
     raise KeyError(f"Alert job not found: {job_id}")
+
+
+def get_alert_mail_template(code: str = "alert") -> AlertMailTemplate:
+    env = _get_env()
+    model = env["alert.mail.template"]
+    record_ids = model.search([("code", "=", code)])
+    if not record_ids:
+        raise KeyError(f"Alert mail template not found: {code}")
+    records = model.read(
+        record_ids[:1],
+        ["html_header", "inline_style", "html_body", "html_footer"],
+    )
+    if not records:
+        raise KeyError(f"Alert mail template not found: {code}")
+    rec = records[0]
+    return AlertMailTemplate(
+        html_header=str(rec.get("html_header") or ""),
+        inline_style=str(rec.get("inline_style") or ""),
+        html_body=str(rec.get("html_body") or ""),
+        html_footer=str(rec.get("html_footer") or ""),
+    )

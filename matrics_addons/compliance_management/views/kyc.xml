@@ -91,6 +91,7 @@
                             <field name="lastname" />
                             <field name="middlename" />
                             <field name="othername" />
+                            <field name="alias_names" placeholder="e.g. Jane Doe, J. Doe"/>
                             <field name="dob" />
                             <field name="education_level_id" />
                             <field name="gender" invisible="1" />

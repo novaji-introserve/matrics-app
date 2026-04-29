@@ -6,18 +6,19 @@
         <field name="model">adverse.media</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="partner_id" />
-                <field name="partner_risk_level" widget="badge" decoration-danger="partner_risk_level == 'high'" decoration-warning="partner_risk_level in ('medium')" decoration-success="partner_risk_level in ('low')" />
-                <!-- <field name="partner_risk_level"/> -->
-                <!-- <field name="partner_risk_score" /> -->
+                <field name="partner_id"/>
+                <field name="partner_risk_level" widget="badge"
+                    decoration-danger="partner_risk_level == 'high'"
+                    decoration-warning="partner_risk_level == 'medium'"
+                    decoration-success="partner_risk_level == 'low'"/>
                 <field name="risk_score_decoration" invisible="1"/>
-
-                <field name="partner_risk_score" decoration-danger="risk_score_decoration == 'danger'" decoration-warning="risk_score_decoration == 'warning'" decoration-success="risk_score_decoration == 'success'" />
+                <field name="partner_risk_score"
+                    decoration-danger="risk_score_decoration == 'danger'"
+                    decoration-warning="risk_score_decoration == 'warning'"
+                    decoration-success="risk_score_decoration == 'success'"/>
                 <field name="monitoring_status"/>
                 <field name="monitoring_frequency"/>
-                <field name="last_scan_date" />
-
-
+                <field name="last_scan_date"/>
             </tree>
         </field>
     </record>
@@ -30,41 +31,93 @@
             <form string="Media Watchlist">
 
                 <header>
-                    <button type="object" class="oe_highlight bg-dark" name="open_media_log" string="View Media Log(s)" attrs="{'invisible': [('alert_ids', '=', [])]}" />
-                    <button type="object" class="oe_highlight bg-dark" name="scan_news_articles" string="Run Media Screening" attrs="{'invisible': [('id', '=', False)]}" />
+                    <button type="object" name="scan_news_articles"
+                        string="Run Media Screening"
+                        class="oe_highlight"
+                        attrs="{'invisible': [('id', '=', False)]}"/>
+                    <button type="object" name="open_media_log"
+                        string="View Alerts"
+                        attrs="{'invisible': [('alert_ids', '=', [])]}"/>
+                    <field name="scan_status" widget="statusbar"
+                        statusbar_visible="idle,queued,running,error"
+                        readonly="1"/>
                 </header>
 
-
                 <sheet>
-                    <group>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="open_media_log" type="object"
+                            class="oe_stat_button" icon="fa-newspaper-o"
+                            attrs="{'invisible': [('alert_ids', '=', [])]}">
+                            <field name="alert_ids" widget="statinfo" string="Alerts"/>
+                        </button>
+                        <button name="action_open_scan_logs" type="object"
+                            class="oe_stat_button" icon="fa-history"
+                            attrs="{'invisible': [('scan_log_ids', '=', [])]}">
+                            <field name="scan_log_ids" widget="statinfo" string="Scan Logs"/>
+                        </button>
+                    </div>
+
+                    <!-- Entity heading — full width -->
+                    <div class="oe_title">
+                        <label for="partner_id" class="oe_edit_only"/>
+                        <h1>
+                            <field name="partner_id"
+                                placeholder="Select a partner to monitor..."
+                                options="{'no_create': True}"/>
+                        </h1>
+                    </div>
+
+                    <!-- Hidden binding fields -->
+                    <field name="alert_ids" invisible="1"/>
+                    <field name="scan_log_ids" invisible="1"/>
+                    <field name="risk_score_decoration" invisible="1"/>
+
+                    <!-- Monitoring Configuration -->
+                    <group string="Monitoring Configuration">
                         <group>
-                            <field name="partner_id" string="Partner"/>
-                            <!-- <field name="partner_risk_level" readonly="1"/> -->
-                            <field name="risk_score_decoration" invisible="1"/>
-
-                            <field name="partner_risk_level" widget="badge" decoration-danger="partner_risk_level == 'high'" decoration-warning="partner_risk_level in ('medium')" decoration-success="partner_risk_level in ('low')" />
-                            <!-- <field name="partner_risk_score"/> -->
-                            <field name="partner_risk_score" decoration-danger="risk_score_decoration == 'danger'" decoration-warning="risk_score_decoration == 'warning'" decoration-success="risk_score_decoration == 'success'" />
-
                             <field name="monitoring_status"/>
-                           
-                            <field name="alert_ids" invisible="1"/>
-
+                            <field name="monitoring_frequency"/>
                         </group>
                         <group>
-                            <field name="monitoring_frequency"/>
-                            <field name="last_scan_date" />
-                            <!-- <field name="keyword_id"/> -->
-                            <field name="keyword_id" widget="many2many_tags" />
-
+                            <field name="last_scan_date" readonly="1"/>
+                            <field name="next_scan_date" readonly="1"/>
                         </group>
                     </group>
 
+                    <!-- Keywords -->
+                    <group string="Screening Keywords">
+                        <field name="keyword_id" widget="many2many_tags" nolabel="1"/>
+                    </group>
+
+                    <!-- Risk Profile -->
+                    <group string="Current Risk Profile">
+                        <group>
+                            <field name="partner_risk_level" widget="badge"
+                                decoration-danger="partner_risk_level == 'high'"
+                                decoration-warning="partner_risk_level == 'medium'"
+                                decoration-success="partner_risk_level == 'low'"/>
+                        </group>
+                        <group>
+                            <field name="partner_risk_score"
+                                decoration-danger="risk_score_decoration == 'danger'"
+                                decoration-warning="risk_score_decoration == 'warning'"
+                                decoration-success="risk_score_decoration == 'success'"/>
+                        </group>
+                    </group>
+
+                    <!-- Last Scan Error — only shown when present -->
+                    <group string="Last Scan Error"
+                        attrs="{'invisible': [('last_scan_error', '=', False)]}">
+                        <field name="last_scan_error" nolabel="1" readonly="1"/>
+                    </group>
+
                 </sheet>
+
                 <div class="oe_chatter">
                     <field name="activity_ids" widget="mail_activity"/>
                     <field name="message_ids" widget="mail_thread"/>
                 </div>
+
             </form>
         </field>
     </record>
@@ -75,16 +128,288 @@
         <field name="model">adverse.media</field>
         <field name="arch" type="xml">
             <search>
-                <field name="partner_id" />
+                <field name="partner_id"/>
                 <separator/>
-                <filter string="Active Monitoring" name="active_monitoring" domain="[('monitoring_status', '=', 'active')]"/>
-                <filter string="Inactive Monitoring" name="inactive_monitoring" domain="[('monitoring_status', '=', 'inactive')]"/>
+                <filter string="Active Monitoring" name="active_monitoring"
+                    domain="[('monitoring_status', '=', 'active')]"/>
+                <filter string="Inactive Monitoring" name="inactive_monitoring"
+                    domain="[('monitoring_status', '=', 'inactive')]"/>
                 <separator/>
                 <group expand="0" string="Group By">
-                    <filter string="Risk Level" name="group_risk" context="{'group_by': 'partner_risk_level'}"/>
-                    <filter string="Monitoring Status" name="group_monitoring_status" context="{'group_by': 'monitoring_status'}"/>
+                    <filter string="Risk Level" name="group_risk"
+                        context="{'group_by': 'partner_risk_level'}"/>
+                    <filter string="Monitoring Status" name="group_monitoring_status"
+                        context="{'group_by': 'monitoring_status'}"/>
                 </group>
             </search>
         </field>
     </record>
+
+    <!-- Scan Log Tree View -->
+    <record id="view_adverse_media_scan_log_tree" model="ir.ui.view">
+        <field name="name">adverse.media.scan.log.tree</field>
+        <field name="model">adverse.media.scan.log</field>
+        <field name="arch" type="xml">
+            <tree string="Scan History" create="false" edit="false">
+                <field name="partner_id"/>
+                <field name="scan_date"/>
+                <field name="triggered_by"/>
+                <field name="articles_fetched"/>
+                <field name="articles_skipped"/>
+                <field name="alerts_created"/>
+                <field name="status" widget="badge"
+                    decoration-success="status == 'success'"
+                    decoration-warning="status == 'partial'"
+                    decoration-danger="status == 'failed'"/>
+                <field name="error_message" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Scan Log Form View -->
+    <record id="view_adverse_media_scan_log_form" model="ir.ui.view">
+        <field name="name">adverse.media.scan.log.form</field>
+        <field name="model">adverse.media.scan.log</field>
+        <field name="arch" type="xml">
+            <form string="Scan Log" create="false" edit="false">
+                <sheet>
+                    <!-- Stat buttons -->
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_articles" type="object"
+                            class="oe_stat_button" icon="fa-newspaper-o">
+                            <field name="article_count" widget="statinfo" string="Articles"/>
+                        </button>
+                    </div>
+
+                    <!-- Heading — shows partner name -->
+                    <div class="oe_title">
+                        <h1>
+                            <field name="partner_id" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <!-- Summary metrics -->
+                    <group string="Scan Summary">
+                        <group>
+                            <field name="scan_date" readonly="1"/>
+                            <field name="triggered_by" readonly="1"/>
+                            <field name="status" widget="badge"
+                                decoration-success="status == 'success'"
+                                decoration-warning="status == 'partial'"
+                                decoration-danger="status == 'failed'"
+                                readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="articles_fetched" readonly="1"/>
+                            <field name="articles_skipped" readonly="1"/>
+                            <field name="alerts_created" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <!-- Error details — only shown when present -->
+                    <group string="Error Details"
+                        attrs="{'invisible': [('error_message', '=', False)]}">
+                        <field name="error_message" nolabel="1" readonly="1"/>
+                    </group>
+
+                    <!-- Articles — notebook page guarantees full width -->
+                    <notebook>
+                        <page string="Articles Processed">
+                            <field name="article_ids" nolabel="1">
+                                <tree string="Articles" create="false" edit="false"
+                                    decoration-success="outcome == 'alert'"
+                                    decoration-warning="outcome in ('below_threshold', 'suppressed')"
+                                    decoration-muted="outcome in ('duplicate', 'no_match')"
+                                    decoration-danger="outcome == 'error'">
+                                    <field name="outcome" widget="badge"
+                                        decoration-success="outcome == 'alert'"
+                                        decoration-warning="outcome in ('below_threshold', 'suppressed')"
+                                        decoration-muted="outcome in ('duplicate', 'no_match')"
+                                        decoration-danger="outcome == 'error'"/>
+                                    <field name="title"/>
+                                    <field name="source_name"/>
+                                    <field name="published_at" string="Published"/>
+                                    <field name="risk_score"
+                                        decoration-danger="risk_score &gt;= 20"
+                                        decoration-warning="risk_score &gt;= 5"/>
+                                    <field name="matched_keywords"/>
+                                    <field name="url" widget="url" optional="show"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Scan Log Search View -->
+    <record id="view_adverse_media_scan_log_search" model="ir.ui.view">
+        <field name="name">adverse.media.scan.log.search</field>
+        <field name="model">adverse.media.scan.log</field>
+        <field name="arch" type="xml">
+            <search string="Search Scan History">
+                <field name="partner_id"/>
+                <separator/>
+                <filter string="Today" name="today"
+                    domain="[('scan_date', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"/>
+                <filter string="Last 7 Days" name="last_week"
+                    domain="[('scan_date', '&gt;=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Last 30 Days" name="last_month"
+                    domain="[('scan_date', '&gt;=', (context_today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter string="Successful" name="success"
+                    domain="[('status', '=', 'success')]"/>
+                <filter string="Failed" name="failed"
+                    domain="[('status', '=', 'failed')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Partner" name="group_by_partner"
+                        context="{'group_by': 'partner_id'}"/>
+                    <filter string="Status" name="group_by_status"
+                        context="{'group_by': 'status'}"/>
+                    <filter string="Date" name="group_by_date"
+                        context="{'group_by': 'scan_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Scan Log Window Action (standalone) -->
+    <record id="action_adverse_media_scan_log" model="ir.actions.act_window">
+        <field name="name">Scanning History</field>
+        <field name="res_model">adverse.media.scan.log</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_adverse_media_scan_log_search"/>
+        <field name="context">{'search_default_today': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No scans recorded yet</p>
+            <p>Scan history will appear here after running media screenings.</p>
+        </field>
+    </record>
+
+    <!-- ── Scan Log Article standalone views ── -->
+
+    <!-- Article Tree View -->
+    <record id="view_scan_log_article_tree" model="ir.ui.view">
+        <field name="name">adverse.media.scan.log.article.tree</field>
+        <field name="model">adverse.media.scan.log.article</field>
+        <field name="arch" type="xml">
+            <tree string="Article Log" create="false" edit="false"
+                decoration-success="outcome == 'alert'"
+                decoration-warning="outcome in ('below_threshold', 'suppressed')"
+                decoration-muted="outcome in ('duplicate', 'no_match')"
+                decoration-danger="outcome == 'error'">
+                <field name="outcome" widget="badge"
+                    decoration-success="outcome == 'alert'"
+                    decoration-warning="outcome in ('below_threshold', 'suppressed')"
+                    decoration-muted="outcome in ('duplicate', 'no_match')"
+                    decoration-danger="outcome == 'error'"/>
+                <field name="title"/>
+                <field name="source_name"/>
+                <field name="published_at" string="Published"/>
+                <field name="risk_score"
+                    decoration-danger="risk_score &gt;= 20"
+                    decoration-warning="risk_score &gt;= 5"/>
+                <field name="matched_keywords"/>
+                <field name="scan_log_id" optional="show"/>
+                <field name="url" widget="url" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Article Form View -->
+    <record id="view_scan_log_article_form" model="ir.ui.view">
+        <field name="name">adverse.media.scan.log.article.form</field>
+        <field name="model">adverse.media.scan.log.article</field>
+        <field name="arch" type="xml">
+            <form string="Article Screening Detail" create="false" edit="false">
+                <sheet>
+
+                    <!-- Article title — full width heading -->
+                    <div class="oe_title">
+                        <h1>
+                            <field name="title" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <!-- Outcome banner -->
+                    <group string="Screening Outcome">
+                        <group>
+                            <field name="outcome" widget="badge"
+                                decoration-success="outcome == 'alert'"
+                                decoration-warning="outcome in ('below_threshold', 'suppressed')"
+                                decoration-muted="outcome in ('duplicate', 'no_match')"
+                                decoration-danger="outcome == 'error'"
+                                readonly="1"/>
+                            <field name="risk_score" readonly="1"/>
+                            <field name="matched_keywords" string="Matched Keywords" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="scan_log_id" string="Scan Log" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <!-- Publication details -->
+                    <group string="Publication Details">
+                        <group>
+                            <field name="source_name" string="Source" readonly="1"/>
+                            <field name="published_at" string="Published" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="url" widget="url" string="Article URL" readonly="1"/>
+                        </group>
+                    </group>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Article Search View -->
+    <record id="view_scan_log_article_search" model="ir.ui.view">
+        <field name="name">adverse.media.scan.log.article.search</field>
+        <field name="model">adverse.media.scan.log.article</field>
+        <field name="arch" type="xml">
+            <search string="Search Articles">
+                <field name="title"/>
+                <field name="source_name"/>
+                <field name="matched_keywords"/>
+                <field name="scan_log_id"/>
+                <separator/>
+                <filter string="Alert Created" name="alert"
+                    domain="[('outcome', '=', 'alert')]"/>
+                <filter string="No Keyword Match" name="no_match"
+                    domain="[('outcome', '=', 'no_match')]"/>
+                <filter string="Duplicate" name="duplicate"
+                    domain="[('outcome', '=', 'duplicate')]"/>
+                <filter string="Below Threshold" name="below_threshold"
+                    domain="[('outcome', '=', 'below_threshold')]"/>
+                <filter string="Suppressed" name="suppressed"
+                    domain="[('outcome', '=', 'suppressed')]"/>
+                <filter string="Error" name="error"
+                    domain="[('outcome', '=', 'error')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Outcome" name="group_outcome"
+                        context="{'group_by': 'outcome'}"/>
+                    <filter string="Source" name="group_source"
+                        context="{'group_by': 'source_name'}"/>
+                    <filter string="Scan" name="group_scan"
+                        context="{'group_by': 'scan_log_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Article Window Action -->
+    <record id="action_scan_log_article" model="ir.actions.act_window">
+        <field name="name">Article Log</field>
+        <field name="res_model">adverse.media.scan.log.article</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No article entries yet</p>
+            <p>Run a media screening scan to populate this log.</p>
+        </field>
+    </record>
+
 </odoo>

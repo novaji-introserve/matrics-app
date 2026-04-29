@@ -80,6 +80,54 @@
         <field name="val">9</field>
         <field name="narration">Maximum Risk Threshold</field>
     </record>
+    <record id="res_compl_settings_minimum_alert_threshold" model="res.compliance.settings">
+        <field name="name">Minimum Alert Threshold</field>
+        <field name="code">minimum_alert_threshold</field>
+        <field name="val">1.0</field>
+        <field name="narration">Adverse media alerts with a risk score below this value are suppressed. Default: 1.0</field>
+    </record>
+    <record id="res_compl_settings_am_sla_critical_hours" model="res.compliance.settings">
+        <field name="name">Adverse Media SLA — Critical (hours)</field>
+        <field name="code">am_sla_critical_hours</field>
+        <field name="val">4</field>
+        <field name="narration">Hours to review a Critical-priority adverse media alert before SLA breach</field>
+    </record>
+    <record id="res_compl_settings_am_sla_high_hours" model="res.compliance.settings">
+        <field name="name">Adverse Media SLA — High (hours)</field>
+        <field name="code">am_sla_high_hours</field>
+        <field name="val">24</field>
+        <field name="narration">Hours to review a High-priority adverse media alert before SLA breach</field>
+    </record>
+    <record id="res_compl_settings_am_sla_medium_hours" model="res.compliance.settings">
+        <field name="name">Adverse Media SLA — Medium (hours)</field>
+        <field name="code">am_sla_medium_hours</field>
+        <field name="val">48</field>
+        <field name="narration">Hours to review a Medium-priority adverse media alert before SLA breach</field>
+    </record>
+    <record id="res_compl_settings_am_sla_low_hours" model="res.compliance.settings">
+        <field name="name">Adverse Media SLA — Low (hours)</field>
+        <field name="code">am_sla_low_hours</field>
+        <field name="val">72</field>
+        <field name="narration">Hours to review a Low/Informational-priority adverse media alert before SLA breach</field>
+    </record>
+    <record id="res_compl_settings_am_escalation_threshold" model="res.compliance.settings">
+        <field name="name">Adverse Media Escalation Threshold</field>
+        <field name="code">am_escalation_threshold</field>
+        <field name="val">7.0</field>
+        <field name="narration">Risk score at or above which an alert is auto-escalated to High priority</field>
+    </record>
+    <record id="res_compl_settings_am_suppression_expiry_days" model="res.compliance.settings">
+        <field name="name">Adverse Media Suppression Expiry (days)</field>
+        <field name="code">am_suppression_expiry_days</field>
+        <field name="val">90</field>
+        <field name="narration">Number of days before a false-positive suppression rule expires. Default: 90</field>
+    </record>
+    <record id="res_compl_settings_am_retention_days" model="res.compliance.settings">
+        <field name="name">Adverse Media Retention Period (days)</field>
+        <field name="code">am_retention_days</field>
+        <field name="val">2555</field>
+        <field name="narration">Days to retain adverse media alert records (CBN requirement: 7 years = 2555 days)</field>
+    </record>
     <function model="ir.config_parameter" name="set_param"
         eval="('gemini_api_key', 'AIzaSyAvRsSTIahJWVT-iwPC1nPrSqUoK_fsBq4')" />
     <function model="ir.config_parameter" name="set_param"

@@ -63,6 +63,34 @@
     <field name="category_id" ref="module_category_compliance"/>
 </record>
 
+<record id="group_adverse_media_analyst" model="res.groups">
+  <field name="name">Adverse Media Analyst</field>
+  <field name="implied_ids" eval="[Command.link(ref('group_compliance_branch_compliance_officer'))]"/>
+  <field name="comment">View alerts; move to under_review; add notes; mark false positive</field>
+  <field name="category_id" ref="module_category_compliance"/>
+</record>
+
+<record id="group_adverse_media_senior_analyst" model="res.groups">
+  <field name="name">Adverse Media Senior Analyst</field>
+  <field name="implied_ids" eval="[Command.link(ref('group_adverse_media_analyst')), Command.link(ref('group_compliance_compliance_officer'))]"/>
+  <field name="comment">Confirm or close alerts; assign to others; all analyst permissions</field>
+  <field name="category_id" ref="module_category_compliance"/>
+</record>
+
+<record id="group_adverse_media_manager" model="res.groups">
+  <field name="name">Adverse Media Manager / MLRO</field>
+  <field name="implied_ids" eval="[Command.link(ref('group_adverse_media_senior_analyst')), Command.link(ref('group_compliance_chief_compliance_officer'))]"/>
+  <field name="comment">Override decisions; access all records; configure keywords; MLRO escalation target</field>
+  <field name="category_id" ref="module_category_compliance"/>
+</record>
+
+<record id="group_adverse_media_auditor" model="res.groups">
+  <field name="name">Adverse Media Auditor</field>
+  <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+  <field name="comment">Read-only access to all adverse media records, scan logs, and audit trail</field>
+  <field name="category_id" ref="module_category_compliance"/>
+</record>
+
 <record id="group_tech_support" model="res.groups">
   <field name="name">Tech Support</field>
   <field name="implied_ids" eval="[

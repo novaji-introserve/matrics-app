@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="alert_mail_template_default" model="alert.mail.template">
+            <field name="name">Alert Template</field>
+            <field name="code">alert</field>
+            <field name="html_header"><![CDATA[<!DOCTYPE html><html><head><meta charset='utf-8'><style>{inline_style}</style></head><body>]]></field>
+            <field name="inline_style">.query-alert {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    color: #24292f;
+}
+
+.query-alert__logo-wrap {
+    margin: 0 0 16px;
+}
+
+.query-alert__logo {
+    display: block;
+    max-width: 180px;
+    max-height: 56px;
+    height: auto;
+}
+
+.query-alert__meta {
+    margin: 0 0 12px;
+}
+
+.query-alert__table {
+    border-collapse: collapse;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.query-alert__header {
+    text-align: left;
+    padding: 5px;
+    border: 1px solid #d0d7de;
+    background: #f6f8fa;
+}
+
+.query-alert__cell {
+    padding: 5px;
+    border: 1px solid #d0d7de;
+    vertical-align: top;
+}</field>
+            <field name="html_body"><![CDATA[<div class='query-alert'>{logo}<p class='query-alert__meta'><strong>Alert Rule</strong>: <code>{alert_name}</code></p><p class='query-alert__meta'><strong>Alert ID</strong>: <code>{alert_id}</code></p><p class='query-alert__meta'>Alert manager alert query found <strong>{row_count}</strong> record(s).</p>{table}</div>]]></field>
+            <field name="html_footer"><![CDATA[</body></html>]]></field>
+        </record>
+    </data>
+</odoo>

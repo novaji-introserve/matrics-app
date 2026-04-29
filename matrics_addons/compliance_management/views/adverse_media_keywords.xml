@@ -45,6 +45,9 @@
                             <field name="adverse_media_officers" widget="many2many_tags" help="Officer(s) to get alerted if media keyword is found"/>
                         </group>
                         <group>
+                            <field name="exclusion_terms" help="Comma-separated terms. If any appear in an article, this keyword will not trigger an alert for that article."/>
+                        </group>
+                        <group>
                             <field name="active" widget="boolean_toggle"/>
                         </group>
                     </group>
