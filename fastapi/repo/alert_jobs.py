@@ -2,7 +2,7 @@ import re
 from dataclasses import dataclass
 from typing import Any
 
-from config import get_odoo_client
+from config.odoo import get_odoo_client_with_retry
 from config.settings import AlertJobConfig, load_settings
 
 
@@ -15,7 +15,7 @@ class AlertMailTemplate:
 
 
 def _get_env():
-    return get_odoo_client()
+    return get_odoo_client_with_retry()
 
 
 def _slugify_job_id(name: str) -> str:

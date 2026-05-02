@@ -1,6 +1,9 @@
 import html
+import hashlib
+import json
 import logging
 import time
+from contextlib import contextmanager
 from pathlib import Path
 from uuid import uuid4
 
@@ -8,7 +11,7 @@ from config.logger import setup_job_logging
 from config.settings import load_settings
 from jobs.emailer import send_email
 from repo.alert_jobs import AlertMailTemplate, create_alert_history, get_alert_job, get_alert_mail_template
-from router.utils import get_postgres_dsn
+from router.utils import get_postgres_dsn, get_redis_client
 
 
 logger = logging.getLogger("app")
@@ -25,6 +28,81 @@ def _validate_query(query: str) -> str:
     if not normalized.lower().startswith("select"):
         raise ValueError("ALERT_QUERY_SQL must start with SELECT")
     return normalized
+
+
+def _alert_lock_key(job_id: str) -> str:
+    return f"alert-job-lock:{job_id}"
+
+
+def _alert_seen_key(job_id: str) -> str:
+    return f"alert-job-seen:{job_id}"
+
+
+def _row_fingerprint(row: dict) -> str:
+    payload = json.dumps(row, sort_keys=True, default=str, separators=(",", ":"))
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+@contextmanager
+def _job_execution_lock(job_id: str):
+    settings = load_settings(refresh=True)
+    redis_client = get_redis_client()
+    lock_key = _alert_lock_key(job_id)
+    lock_value = uuid4().hex
+    acquired = redis_client.set(
+        lock_key,
+        lock_value,
+        ex=max(1, settings.alert_job_lock_ttl_seconds),
+        nx=True,
+    )
+    try:
+        yield bool(acquired)
+    finally:
+        if not acquired:
+            return
+        current_value = redis_client.get(lock_key)
+        if current_value == lock_value:
+            redis_client.delete(lock_key)
+
+
+def _filter_unseen_rows(job_id: str, rows: list[dict]) -> list[dict]:
+    settings = load_settings(refresh=True)
+    redis_client = get_redis_client()
+    seen_key = _alert_seen_key(job_id)
+    now = int(time.time())
+    min_score = 0
+    max_score = now - max(1, settings.alert_job_seen_ttl_seconds)
+
+    pipeline = redis_client.pipeline()
+    pipeline.zremrangebyscore(seen_key, min_score, max_score)
+    fingerprints = [_row_fingerprint(row) for row in rows]
+    if fingerprints:
+        for fingerprint in fingerprints:
+            pipeline.zscore(seen_key, fingerprint)
+    else:
+        pipeline.expire(seen_key, settings.alert_job_seen_ttl_seconds)
+    results = pipeline.execute()
+
+    existing_scores = results[1:] if fingerprints else []
+    unseen_rows = [
+        row for row, score in zip(rows, existing_scores)
+        if score is None
+    ]
+    return unseen_rows
+
+
+def _mark_rows_seen(job_id: str, rows: list[dict]) -> None:
+    if not rows:
+        return
+    settings = load_settings(refresh=True)
+    redis_client = get_redis_client()
+    seen_key = _alert_seen_key(job_id)
+    now = int(time.time())
+    mapping = {_row_fingerprint(row): now for row in rows}
+    pipeline = redis_client.pipeline()
+    pipeline.zadd(seen_key, mapping)
+    pipeline.expire(seen_key, max(1, settings.alert_job_seen_ttl_seconds))
+    pipeline.execute()
 
 
 def _load_cached_template(code: str = "alert") -> AlertMailTemplate | None:
@@ -160,51 +238,66 @@ def run_database_alert_query(job_id: str) -> None:
         logger.warning("Skipping scheduled database alert job=%s because mail settings are incomplete", job_id)
         return
 
-    logger.info("Running scheduled database alert query for job=%s", job_id)
-    with psycopg.connect(get_postgres_dsn(), row_factory=dict_row) as connection:
-        with connection.cursor() as cursor:
-            cursor.execute(query)
-            rows = cursor.fetchall()
+    with _job_execution_lock(job_id) as acquired:
+        if not acquired:
+            logger.info("Skipping scheduled database alert job=%s because another worker already holds the lock", job_id)
+            return
 
-    if not rows:
-        logger.info("Scheduled database alert query returned no rows for job=%s", job_id)
-        return
+        logger.info("Running scheduled database alert query for job=%s", job_id)
+        with psycopg.connect(get_postgres_dsn(), row_factory=dict_row) as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                rows = cursor.fetchall()
 
-    alert_id = uuid4().hex
-    final_subject = f"{job.subject} ({len(rows)})"
-    body = _build_email_body(job_id, alert_id, job.subject, rows, query)
-    send_email(
-        subject=final_subject,
-        body=body,
-        recipients=job.recipients,
-        mail_from_name=job.mail_from_name,
-    )
-    history_email = ", ".join(job.recipients)
-    history_source = job.name
-    logger.info(
-        "Creating alert.history for job=%s alert_id=%s ref_id=%s source=%s email=%s",
-        job_id,
-        alert_id,
-        job.model_id,
-        history_source,
-        history_email,
-    )
-    create_alert_history(
-        alert_id=alert_id,
-        ref_id=job.model_id,
-        risk_rating=job.risk_rating,
-        html_body=body,
-        email=history_email,
-        source=history_source,
-    )
-    logger.info(
-        "Created alert.history for job=%s alert_id=%s",
-        job_id,
-        alert_id,
-    )
-    logger.info(
-        "Scheduled database alert email sent for job=%s alert_id=%s to %s",
-        job_id,
-        alert_id,
-        ", ".join(job.recipients),
-    )
+        if not rows:
+            logger.info("Scheduled database alert query returned no rows for job=%s", job_id)
+            return
+
+        unseen_rows = _filter_unseen_rows(job_id, rows)
+        if not unseen_rows:
+            logger.info("Skipping scheduled database alert job=%s because all %s row(s) were already sent", job_id, len(rows))
+            return
+
+        alert_id = uuid4().hex
+        final_subject = f"{job.subject} ({len(unseen_rows)})"
+        body = _build_email_body(job_id, alert_id, job.subject, unseen_rows, query)
+        send_email(
+            subject=final_subject,
+            body=body,
+            recipients=job.recipients,
+            mail_from_name=job.mail_from_name,
+        )
+        _mark_rows_seen(job_id, unseen_rows)
+        history_email = ", ".join(job.recipients)
+        history_source = job.name
+        logger.info(
+            "Creating alert.history for job=%s alert_id=%s ref_id=%s source=%s email=%s rows=%s/%s",
+            job_id,
+            alert_id,
+            job.model_id,
+            history_source,
+            history_email,
+            len(unseen_rows),
+            len(rows),
+        )
+        create_alert_history(
+            alert_id=alert_id,
+            ref_id=job.model_id,
+            risk_rating=job.risk_rating,
+            html_body=body,
+            email=history_email,
+            source=history_source,
+        )
+        logger.info(
+            "Created alert.history for job=%s alert_id=%s",
+            job_id,
+            alert_id,
+        )
+        logger.info(
+            "Scheduled database alert email sent for job=%s alert_id=%s unseen_rows=%s total_rows=%s to %s",
+            job_id,
+            alert_id,
+            len(unseen_rows),
+            len(rows),
+            ", ".join(job.recipients),
+        )

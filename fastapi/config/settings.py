@@ -67,7 +67,11 @@ class Settings(BaseSettings):
     odoo_base_url: str = "http://odoo16:8069"
     odoo_db: str | None = None
     odoo_username: str = "admin"
-    odoo_password: str = Field(default="")
+    odoo_admin_password: str = Field(default="")
+    odoo_connect_max_attempts: int = 5
+    odoo_connect_retry_delay_seconds: int = 3
+    alert_job_lock_ttl_seconds: int = 240
+    alert_job_seen_ttl_seconds: int = 604800
 
     @property
     def resolved_odoo_db(self) -> str:
@@ -75,14 +79,14 @@ class Settings(BaseSettings):
 
     @property
     def odoo_config(self) -> OdooConfig:
-        if not self.odoo_password:
-            raise RuntimeError("ODOO_PASSWORD is required to run partner actions")
+        if not self.odoo_admin_password:
+            raise RuntimeError("ODOO_ADMIN_PASSWORD is required to run partner actions")
 
         return OdooConfig(
             base_url=self.odoo_base_url.rstrip("/"),
             database=self.resolved_odoo_db,
             username=self.odoo_username,
-            password=self.odoo_password,
+            password=self.odoo_admin_password,
         )
 
 

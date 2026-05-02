@@ -8,29 +8,55 @@
 
 set -euo pipefail
 
+load_dotenv() {
+  local env_file="$1"
+  local line key value
+
+  while IFS= read -r line || [ -n "$line" ]; do
+    [[ "$line" =~ ^[[:space:]]*$ ]] && continue
+    [[ "$line" =~ ^[[:space:]]*# ]] && continue
+    [[ "$line" != *=* ]] && continue
+
+    key="${line%%=*}"
+    value="${line#*=}"
+
+    key="${key#"${key%%[![:space:]]*}"}"
+    key="${key%"${key##*[![:space:]]}"}"
+    value="${value#"${value%%[![:space:]]*}"}"
+    value="${value%"${value##*[![:space:]]}"}"
+
+    if [[ "$value" =~ ^\".*\"$ || "$value" =~ ^\'.*\'$ ]]; then
+      value="${value:1:${#value}-2}"
+    fi
+
+    export "$key=$value"
+  done < "$env_file"
+}
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 if [ -f "$SCRIPT_DIR/.env" ]; then
-  set -o allexport
-  source "$SCRIPT_DIR/.env"
-  set +o allexport
+  load_dotenv "$SCRIPT_DIR/.env"
 fi
 
 DB_NAME="${DB_NAME:-icomply_dev}"
 DB_USER="${DB_USER:-odoo}"
 DB_PASSWORD="${DB_PASSWORD:-odoo16@2022}"
+ODOO_SERVICE="${ODOO_SERVICE:-odoo16}"
+POSTGRES_SERVICE="${POSTGRES_SERVICE:-db}"
 
 # Odoo upgrade must connect directly to PostgreSQL, NOT through pgbouncer.
 # The upgrade process calls _create_empty_database() which connects to the
 # 'postgres' system database — pgbouncer only proxies app databases, so
 # connections through it fail at upgrade time.
-ODOO_DB_HOST="${ODOO_DB_HOST:-db}"
-ODOO_DB_PORT="${ODOO_DB_PORT:-5432}"
+POSTGRES_SERVICE_HOST="${POSTGRES_SERVICE_HOST:-db}"
+POSTGRES_SERVICE_PORT="${POSTGRES_SERVICE_PORT:-5432}"
 
 ODOO_CONF="/etc/odoo/odoo.conf"
 COMPOSE_FILE="$SCRIPT_DIR/docker-compose.yml"
 
 # Canonical deployment order — respects module dependency graph
 FULL_DEPLOY_SEQUENCE=(
+  access_apps 
   compliance_management
   alert_management
   case_management
@@ -42,10 +68,19 @@ FULL_DEPLOY_SEQUENCE=(
 # Runs psql inside the db container (direct PostgreSQL, no pgbouncer needed).
 get_module_state() {
   local module="$1"
-  docker compose -f "$COMPOSE_FILE" exec -T -e PGPASSWORD="$DB_PASSWORD" db \
-    psql -U "$DB_USER" -d "$DB_NAME" -tAc \
-    "SELECT state FROM ir_module_module WHERE name='$module' LIMIT 1;" \
-    2>/dev/null | tr -d '[:space:]'
+  local state
+
+  if ! state="$(
+    docker compose -f "$COMPOSE_FILE" exec -T -e PGPASSWORD="$DB_PASSWORD" "$POSTGRES_SERVICE" \
+      psql -U "$DB_USER" -d "$DB_NAME" -tAc \
+      "SELECT state FROM ir_module_module WHERE name='$module' LIMIT 1;" \
+      | tr -d '[:space:]'
+  )"; then
+    echo "Failed to query module state for '$module' from PostgreSQL." >&2
+    return 1
+  fi
+
+  printf '%s' "$state"
 }
 
 run_module() {
@@ -62,13 +97,13 @@ run_module() {
     echo ">>> Installing: $module"
   fi
 
-  docker compose -f "$COMPOSE_FILE" exec -T odoo16 \
+  docker compose -f "$COMPOSE_FILE" exec -T "$ODOO_SERVICE" \
     /usr/bin/odoo \
     -c "$ODOO_CONF" \
     -d "$DB_NAME" \
     "$flag" "$module" \
-    --db_host="$ODOO_DB_HOST" \
-    --db_port="$ODOO_DB_PORT" \
+    --db_host="$POSTGRES_SERVICE_HOST" \
+    --db_port="$POSTGRES_SERVICE_PORT" \
     --db_user="$DB_USER" \
     --db_password="$DB_PASSWORD" \
     --stop-after-init
@@ -110,13 +145,13 @@ ODOO_FLAGS=()
 [ -n "$INSTALL_MODULES" ] && ODOO_FLAGS+=(-i "$INSTALL_MODULES")
 [ -n "$UPDATE_MODULES"  ] && ODOO_FLAGS+=(-u "$UPDATE_MODULES")
 
-docker compose -f "$COMPOSE_FILE" exec -T odoo16 \
+docker compose -f "$COMPOSE_FILE" exec -T "$ODOO_SERVICE" \
   /usr/bin/odoo \
   -c "$ODOO_CONF" \
   -d "$DB_NAME" \
   "${ODOO_FLAGS[@]}" \
-  --db_host="$ODOO_DB_HOST" \
-  --db_port="$ODOO_DB_PORT" \
+  --db_host="$POSTGRES_SERVICE_HOST" \
+  --db_port="$POSTGRES_SERVICE_PORT" \
   --db_user="$DB_USER" \
   --db_password="$DB_PASSWORD" \
   --stop-after-init

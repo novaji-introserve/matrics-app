@@ -7,7 +7,7 @@ services:
     networks:
       - odoo-net
     ports:
-      - "5432:5432"
+      - "${POSTGRES_HOST_PORT}:5432"
     environment:
       - POSTGRES_USER=${ODOO_USER}
       - POSTGRES_PASSWORD=${ODOO_PASSWORD}
@@ -33,12 +33,20 @@ services:
       dockerfile: .docker/pgbouncer/Dockerfile
     container_name: pgbouncer
     restart: unless-stopped
+    env_file:
+      - ./.env
+    environment:
+      - POSTGRES_SERVICE_HOST=${POSTGRES_SERVICE_HOST}
+      - POSTGRES_SERVICE_PORT=${POSTGRES_SERVICE_PORT}
+      - PGBOUNCER_DB_USER=${PGBOUNCER_DB_USER}
+      - PGBOUNCER_DB_PASSWORD=${PGBOUNCER_DB_PASSWORD}
+      - PGBOUNCER_ADMIN_USERS=${PGBOUNCER_ADMIN_USERS}
     depends_on:
       - db
     networks:
       - odoo-net
     ports:
-      - "5433:5433"
+      - "${DB_PORT}:5433"
 
   redis:
     image: redis:7-alpine
@@ -64,7 +72,7 @@ services:
     ports:
       - "${ODOO_PORT}:8069"
       - "${ODOO_GEVENT_PORT}:8072" # gevent port for longpolling/websocket traffic
-      - "8073:8073" # custom compliance_management websocket server
+      - "${ODOO_WEBSOCKET_PORT}:8073" # custom compliance_management websocket server
     tty: true
     command: --
     environment:
@@ -107,7 +115,7 @@ services:
     ports:
       - "${FASTAPI_PORT}:8000"
     env_file:
-      - ./fastapi/.env
+      - ./.env
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -130,7 +138,7 @@ services:
       - ./fastapi:/app
       - ./custom/fastapi:/app/custom
     env_file:
-      - ./fastapi/.env
+      - ./.env
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -156,7 +164,7 @@ services:
       - ./fastapi:/app
       - ./custom/fastapi:/app/custom
     env_file:
-      - ./fastapi/.env
+      - ./.env
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -186,14 +194,15 @@ services:
     environment:
       - JAVA_TOOL_OPTIONS=-Xms1g -Xmx3g -XX:+UseG1GC -XX:MaxGCPauseMillis=100
     ports:
-      - "5801:5801"   # Hazelcast cluster
-      - "9080:9080"   # REST API v2
+      - "${SEATUNNEL_HAZELCAST_PORT}:5801"   # Hazelcast cluster
+      - "${SEATUNNEL_API_PORT}:9080"   # REST API v2
     volumes:
       - ./seatunnel/config/hazelcast.yaml:/opt/seatunnel/config/hazelcast.yaml
       - ./seatunnel/config/seatunnel.yaml:/opt/seatunnel/config/seatunnel.yaml
       - ./seatunnel/jobs:/opt/seatunnel/jobs
       - ./custom:/opt/seatunnel/custom
       - ${STORAGE_PATH}/seatunnel/logs:/opt/seatunnel/logs
+      - ${STORAGE_PATH}/seatunnel/checkpoint:/tmp/seatunnel/checkpoint_snapshot
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
