@@ -1507,20 +1507,15 @@ class Customer(models.Model):
     def write(self, vals):
         result = super(Customer, self).write(vals)
 
-        # Refresh dashboard widgets
+        # Refresh dashboard widgets and notify open customer form views.
+        # Include ids so form view patches can reload only the affected record.
         self.env['bus.bus']._sendmany([
             ('dashboard_refresh_channel', 'refresh', {
                 'type': 'refresh',
                 'channelName': 'dashboard_refresh_channel',
                 'model': self._name,
+                'ids': self.ids,
             })
-        ])
-
-        # Notify open form views — triggers "Record has been modified" banner
-        # mail.thread uses partner as the bus channel for connected clients
-        self.env['bus.bus']._sendmany([
-            (partner, 'res.partner/write', {'id': partner.id})
-            for partner in self
         ])
 
         # Trigger risk assessment when compliance-relevant fields change.

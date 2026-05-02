@@ -29,16 +29,16 @@
                     </group>
                     <notebook>
                         <page string="Header">
-                            <field name="html_header" widget="html" options="{'style-inline': true}" />
+                            <field name="html_header" widget="ace" options="{'style-inline': true}" />
                         </page>
                         <page string="Inline Style (CSS)">
-                            <field name="inline_style" widget="code" options="{'mode': 'css'}" />
+                            <field name="inline_style" widget="ace" options="{'mode': 'css'}" />
                         </page>
                         <page string="Body">
-                            <field name="html_body" widget="html" options="{'style-inline': true}" />
+                            <field name="html_body" widget="ace" options="{'style-inline': true}" />
                         </page>
                         <page string="Footer">
-                            <field name="html_footer" widget="html" options="{'style-inline': true}" />
+                            <field name="html_footer" widget="ace" options="{'style-inline': true}" />
                         </page>
                     </notebook>
                 </sheet>

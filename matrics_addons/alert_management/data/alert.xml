@@ -58,5 +58,35 @@ where rb.branch_id = 1</field>
             <field name="frequency_id" ref="exception_frequency_4" />
             <field name="alert_id" ref="alert_group_internal_control" />
         </record>
+
+        <!-- Adverse Media Alert Rule -->
+        <record id="sql_process_adverse_media_alerts" model="process.sql">
+            <field name="name">New Adverse Media Alerts</field>
+            <field name="query">SELECT
+    p.name AS partner,
+    a.name AS alert_title,
+    a.risk_score,
+    a.priority,
+    a.status,
+    a.source_name,
+    to_char(a.create_date, 'YYYY-MM-DD HH24:MI') AS detected_at
+FROM adverse_media_alert a
+JOIN res_partner p ON p.id = a.partner_id
+WHERE a.active = true
+  AND a.status = 'new'
+ORDER BY a.create_date DESC</field>
+        </record>
+
+        <record id="alert_rule_adverse_media_alerts" model="alert.rules">
+            <field name="name">New Adverse Media Alerts Detected</field>
+            <field name="narration">Sends an email alert when new adverse media articles are detected for monitored partners.</field>
+            <field name="risk_rating">high</field>
+            <field name="model_id">adverse.media</field>
+            <field name="sql_text" ref="sql_process_adverse_media_alerts" />
+            <field name="frequency_id" ref="exception_frequency_4" />
+            <field name="alert_id" ref="alert_group_compliance" />
+            <field name="cron_string">0 */6 * * *</field>
+            <field name="status">0</field>
+        </record>
     </data>
 </odoo>

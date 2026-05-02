@@ -27,6 +27,7 @@
         <field name="arch" type="xml">
             <form string="Alert Rule" create="False">
                 <header>
+                    <button name="run_alert_rule" string="Run" type="object" class="btn-primary" />
                     <field name="status" widget="statusbar" options="{'clickable':'1'}" />
                 </header>
                 <sheet>

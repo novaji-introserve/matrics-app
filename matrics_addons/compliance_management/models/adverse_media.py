@@ -413,90 +413,116 @@ class AdverseMedia(models.Model):
             _logger.error(f"Error creating alert: {str(e)}", exc_info=True)
             raise ValidationError(f"Failed to create alert: {str(e)}")
 
+    def _build_adverse_media_table(self, alerts):
+        """Build HTML table for the adverse media alert notification email."""
+        rows = ""
+        for i, alert in enumerate(alerts):
+            bg = '#ffffff' if i % 2 == 0 else '#f5f7fa'
+            source_link = (
+                f'<a href="{alert.source_url}" style="color: #3498db; text-decoration: none;">View Source</a>'
+                if alert.source_url else ''
+            )
+            rows += (
+                f'<tr style="background-color: {bg};">'
+                f'<td style="border-bottom: 1px solid #ddd; padding: 12px;">{alert.partner_id.name or ""}</td>'
+                f'<td style="border-bottom: 1px solid #ddd; padding: 12px;">{alert.name or ""}</td>'
+                f'<td style="border-bottom: 1px solid #ddd; padding: 12px;">{alert.risk_score}</td>'
+                f'<td style="border-bottom: 1px solid #ddd; padding: 12px;">{source_link}</td>'
+                f'</tr>'
+            )
+        return (
+            '<table style="border-collapse: separate; border-spacing: 0; width: 100%; margin-top: 8px;'
+            ' font-size: 12px; border-radius: 3px; overflow: hidden;'
+            ' border-left: 1px solid #ddd; border-right: 1px solid #ddd;">'
+            '<tr style="background-color: #e8e8e8;">'
+            '<th style="border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 8px; text-align: left;">Partner</th>'
+            '<th style="border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 8px; text-align: left;">Title</th>'
+            '<th style="border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 8px; text-align: left;">Risk Score</th>'
+            '<th style="border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 8px; text-align: left;">Source</th>'
+            f'</tr>{rows}</table>'
+        )
+
+    def _build_adverse_media_email_body(self, officers_name, company_logo_url, table_html, action_url):
+        """Build the full HTML email body for adverse media notifications."""
+        scan_datetime = datetime.now().replace(microsecond=0)
+        return (
+            '<div style="margin: 10px 12px 0px 12px; padding: 0px; font-family: Arial, sans-serif; font-size: 12px;">'
+            f'<div style="padding: 8px; text-align: left; margin-bottom: 45px;">'
+            f'<img src="{company_logo_url}" alt="Company Logo" class="h-6" /></div>'
+            '<div style="padding: 20px;">'
+            f'<p>Dear <b><i>{officers_name}</i></b>,</p>'
+            '<p>New adverse media alerts have been detected.</p>'
+            f'<p style="line-height: 1.4;"><strong style="color: #2c3e50; font-size: 1.17em;">Date and Time Entry: </strong>{scan_datetime}</p>'
+            '<p><strong style="color: #2c3e50; font-size: 1.17em;">Alert Summary:</strong></p>'
+            f'{table_html}'
+            f'<p style="margin-top: 20px;">Click <a href="{action_url}" style="color: #3498db; text-decoration: none;">here</a> to view all new alerts in the system.</p>'
+            '<p>Please review these alerts and take appropriate action.</p>'
+            '<p style="margin-top: 30px; color: #7f8c8d;">Best regards</p>'
+            '</div></div>'
+        )
+
     def _notify_officers(self, new_alerts):
-        """Send consolidated email notification to responsible officers."""
+        """Send adverse media alert notification via the Alert Templates configuration."""
         try:
-            template = self.env.ref('compliance_management.alert_notification_template')
-            if not template:
-                raise ValidationError("Email template not found")
+            mail_tpl = self.env['alert.mail.template'].search(
+                [('code', '=', 'adverse_media')], limit=1
+            )
+            if not mail_tpl:
+                raise ValidationError(
+                    "Adverse media alert template not found (code='adverse_media'). "
+                    "Please create it under Alert Templates."
+                )
 
             officers = self.keyword_id.mapped('adverse_media_officers')
             if not officers:
-                _logger.warning("No officers configured for alerts")
+                _logger.warning("No officers configured for adverse media alerts")
                 return
+
+            officers_email = ", ".join(filter(None, officers.mapped('email')))
+            if not officers_email:
+                _logger.warning("Officers have no email addresses configured")
+                return
+
+            email_from = os.getenv("EmailFrom")
+            if not email_from:
+                raise ValidationError("Email sender address not configured (EmailFrom env var)")
 
             base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
             action_id = self.env.ref('compliance_management.action_adverse_media_alert').id
             action_url = f"{base_url}/web#action={action_id}&model=adverse.media.alert&view_type=list"
 
-            email_from = os.getenv("EmailFrom")
-            if not email_from:
-                raise ValidationError("Email sender address not configured")
-
-            _logger.info(f"Sending notification for {len(new_alerts)} alert(s)")
-
             officers_name = ", ".join(officers.mapped('name')) or ""
-            ctx = {
-                'alerts': new_alerts,
-                'action_url': action_url,
+            company_logo_url = self.get_company_logo(base_url)
+            alerts_table = self._build_adverse_media_table(new_alerts)
+
+            body_html = mail_tpl.render(
+                company_logo_url=company_logo_url,
+                officers_name=officers_name,
+                scan_datetime=str(datetime.now().replace(microsecond=0)),
+                alerts_table=alerts_table,
+                action_url=action_url,
+            )
+
+            _logger.info(
+                f"Sending adverse media notification for {len(new_alerts)} alert(s) to {officers_email}"
+            )
+
+            mail = self.env['mail.mail'].sudo().create({
+                'subject': 'New Adverse Media Alerts Detected',
+                'email_to': officers_email,
                 'email_from': email_from,
-                'officers_name': officers_name,
-                'datetime': datetime.now().replace(microsecond=0),
-                'company_logo': self.get_company_logo(base_url)
-            }
+                'body_html': body_html,
+                'auto_delete': False,
+            })
+            mail.send()
 
-            officers_email = ", ".join(officers.mapped('email')) or ""
-
-            try:
-                template_id = template.with_context(**ctx)
-
-                rendered_html = template_id._render_template(
-                    template_id.body_html,
-                    template_id.model,
-                    [self.id],
-                    engine='qweb',
-                    add_context=ctx
-                )[self.id]
-
-                risk_scores = new_alerts.mapped('risk_score')
-                highest_risk_score = max(risk_scores) if risk_scores else 0
-
-                if highest_risk_score <= float(self.env['res.compliance.settings'].get_setting('low_risk_threshold')):
-                    alert_risk_level = "low"
-                elif highest_risk_score <= float(self.env['res.compliance.settings'].get_setting('medium_risk_threshold')):
-                    alert_risk_level = "medium"
-                else:
-                    alert_risk_level = "high"
-
-                email_result = template_id.send_mail(
-                    self.id,
-                    force_send=True,
-                    raise_exception=True,
-                    email_values={
-                        'email_to': officers_email,
-                        'email_from': email_from,
-                    }
+            if mail.state in ['exception', 'cancel']:
+                _logger.error(
+                    f"Failed to send adverse media notification: {mail.failure_reason}"
                 )
-
-                mail = self.env['mail.mail'].browse(email_result)
-                if mail.state == 'sent':
-                    self.env['alert.history'].sudo().create({
-                        "ref_id": self._name,
-                        'html_body': rendered_html,
-                        'attachment_data': None,
-                        'attachment_link': None,
-                        'last_checked': fields.Datetime.now(),
-                        'risk_rating': alert_risk_level,
-                        'process_id': None,
-                        'source': self._description,
-                        'date_created': fields.Datetime.now(),
-                        'email': officers_email
-                    })
-                    _logger.info(f"Notification sent to: {officers_email}")
-
-            except Exception as e:
-                _logger.error(f"Failed to send notification: {str(e)}")
-                raise
+            else:
+                new_alerts.write({'officer_notified': True})
+                _logger.info(f"Adverse media notification sent to: {officers_email}")
 
         except Exception as e:
             _logger.error(f"Error in notification process: {str(e)}", exc_info=True)
@@ -943,6 +969,10 @@ class AdverseMediaAlert(models.Model):
     risk_score_decoration = fields.Char(compute='_compute_risk_score_decoration')
 
     active = fields.Boolean(default=True, help='Set to false to hide the record without deleting it.')
+    officer_notified = fields.Boolean(
+        string='Officer Notified', default=False,
+        help='Set to True once keyword officers have been emailed about this alert.',
+    )
 
     _sql_constraints = [
         ('name_uniq', 'unique (media_id, name)',

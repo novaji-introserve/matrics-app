@@ -626,26 +626,25 @@ class NFIUReport(models.Model):
                 with open(schema_file_path, 'rb') as schema_file:
                     return schema_file.read()
 
+        # Odoo 16 catches FileNotFoundError in _file_read and returns b'' when a
+        # filestore file is missing, so we check for falsy datas rather than catching
+        # FileNotFoundError here — just skip to the next source if data is absent.
         attachment_id = params.get_param('nfiu_reporting.xsd_attachment_id')
         if attachment_id:
             attachment = self.env['ir.attachment'].sudo().browse(int(attachment_id)).exists()
-            if attachment:
-                try:
-                    if not attachment.datas:
-                        raise ValidationError(_("Configured NFIU XSD attachment is empty."))
-                    return base64.b64decode(attachment.datas)
-                except FileNotFoundError:
-                    pass
+            if attachment and attachment.datas:
+                return base64.b64decode(attachment.datas)
 
         # Backward-compatible fallback for databases that still use the legacy attachment xmlid.
         attachment = self.env.ref('nfiu_reporting.nfiu_schema_attachment', raise_if_not_found=False)
-        if attachment:
-            try:
-                if not attachment.datas:
-                    raise ValidationError(_("NFIU XSD schema attachment is empty."))
-                return base64.b64decode(attachment.datas)
-            except FileNotFoundError:
-                pass
+        if attachment and attachment.datas:
+            return base64.b64decode(attachment.datas)
+
+        # Always try the bundled module XSD as a last resort.
+        bundled_path = get_module_resource('nfiu_reporting', 'data', 'NFIU_goAML_4_5_Schema.xsd')
+        if bundled_path:
+            with open(bundled_path, 'rb') as f:
+                return f.read()
 
         raise ValidationError(SCHEMA_NOT_FOUND_MESSAGE)
 

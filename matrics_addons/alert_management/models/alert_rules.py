@@ -1,3 +1,5 @@
+import os
+
 from odoo import models, fields, api
 from datetime import timedelta, datetime
 from dateutil.relativedelta import relativedelta
@@ -146,6 +148,137 @@ class alert_rules(models.Model):
                 raise ValidationError(
                     f"alert rules for {self.sql_text.name} already exist"
                 )
+
+    def _check_manual_run_cooldown(self):
+        """Raise UserError if this rule was manually run within the last 5 minutes."""
+        from odoo.exceptions import UserError
+
+        param_key = f"alert_rules.last_manual_run_{self.id}"
+        last_run_str = self.env["ir.config_parameter"].sudo().get_param(param_key, "")
+        if last_run_str:
+            try:
+                last_run = datetime.fromisoformat(last_run_str)
+                elapsed = (datetime.utcnow() - last_run).total_seconds()
+                if elapsed < 300:
+                    remaining = int(300 - elapsed)
+                    mins, secs = divmod(remaining, 60)
+                    wait = f"{mins}m {secs}s" if mins else f"{secs}s"
+                    raise UserError(
+                        f'This rule was already run manually less than 5 minutes ago. '
+                        f'Please wait {wait} before running it again.'
+                    )
+            except UserError:
+                raise
+            except Exception:
+                pass
+
+    def _record_manual_run(self):
+        """Store the current UTC timestamp as the last manual run time for this rule."""
+        param_key = f"alert_rules.last_manual_run_{self.id}"
+        self.env["ir.config_parameter"].sudo().set_param(
+            param_key, datetime.utcnow().isoformat()
+        )
+
+    def run_alert_rule(self):
+        """Manually trigger this alert rule, sending all current query results."""
+        from odoo.exceptions import UserError
+
+        self.ensure_one()
+        self._check_manual_run_cooldown()
+        self._record_manual_run()
+
+        if self.model_id == 'adverse.media':
+            return self._run_adverse_media_alert_rule(force=True)
+
+        if not self.recipients:
+            raise UserError(
+                f'No recipients configured for rule "{self.name}". '
+                'Please add recipients under the Recipients tab before running.'
+            )
+
+        try:
+            self._clear_alert_record_signatures(self)
+            self.send_alert(self)
+            self.write({'last_checked': fields.Datetime.now()})
+        except Exception as e:
+            _logger.error(f"Manual run failed for rule '{self.name}': {str(e)}")
+            raise
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Alert Sent',
+                'message': f'Alert rule "{self.name}" executed successfully.',
+                'type': 'success',
+                'sticky': False,
+            },
+        }
+
+    def _run_adverse_media_alert_rule(self, force=False):
+        """Notify keyword officers about unnotified new adverse media alerts.
+
+        When force=True (manual Run), all current 'new' alerts are re-notified
+        regardless of whether they were previously sent.  In scheduled mode only
+        alerts that have not yet been notified are processed.
+        """
+        domain = [('status', '=', 'new'), ('active', '=', True)]
+        if not force:
+            domain.append(('officer_notified', '=', False))
+
+        new_alerts = self.env['adverse.media.alert'].search(domain)
+
+        if not new_alerts:
+            _logger.info("Adverse media alert rule: no qualifying alerts to notify about")
+            self.write({'last_checked': fields.Datetime.now()})
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'No New Alerts',
+                    'message': 'No new adverse media alerts found.',
+                    'type': 'info',
+                    'sticky': False,
+                },
+            }
+
+        media_records = new_alerts.mapped('media_id')
+        sent = 0
+        errors = []
+        for am_rec in media_records:
+            am_alerts = new_alerts.filtered(lambda a: a.media_id.id == am_rec.id)
+            try:
+                am_rec._notify_officers(am_alerts)
+                sent += 1
+            except Exception as e:
+                partner_name = am_rec.partner_id.name or str(am_rec.id)
+                _logger.error(
+                    f"Adverse media alert rule: notification failed for {partner_name}: {str(e)}",
+                    exc_info=True,
+                )
+                errors.append(partner_name)
+
+        self.write({'last_checked': fields.Datetime.now()})
+
+        if errors:
+            msg = (
+                f'Notified {sent} partner(s); failed for: {", ".join(errors)}. '
+                'Check server logs for details.'
+            )
+            notif_type = 'warning'
+        else:
+            msg = f'Adverse media notifications sent for {sent} partner(s) ({len(new_alerts)} alert(s)).'
+            notif_type = 'success'
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Alert Sent',
+                'message': msg,
+                'type': notif_type,
+                'sticky': False,
+            },
+        }
 
     @api.model
     def process_alert_rules(self):
@@ -559,83 +692,102 @@ class alert_rules(models.Model):
 
         return table_html
 
-    def prepare_email(self, rule, table_html, encoded_content, email, emailcc):
-        _logger.info(f"emailcc is {emailcc}")
+    def prepare_email(self, rule, table_html, encoded_content, email, emailcc, row_count=0):
+        """Render an alert.mail.template and send via mail.mail.
 
-        template = self.env.ref("alert_management.alert_rules_mail_template")
-
-        if template:
-            source_label = dict(ALERT_SOURCE_SELECTION).get(
-                rule.model_id, rule.model_id or "Alert Rules"
+        Template lookup order: rule's model_id slug → 'alert' (default).
+        All layout is driven by the Alert Templates configuration.
+        """
+        # --- resolve alert.mail.template ---
+        model_code = (rule.model_id or '').replace('.', '_')
+        mail_tpl = (
+            self.env['alert.mail.template'].search([('code', '=', model_code)], limit=1)
+            if model_code else
+            self.env['alert.mail.template']
+        )
+        if not mail_tpl:
+            mail_tpl = self.env['alert.mail.template'].search([('code', '=', 'alert')], limit=1)
+        if not mail_tpl:
+            raise ValidationError(
+                "Default alert mail template (code='alert') not found. "
+                "Please create it under Alert Templates."
             )
 
-            # generate random string attached for each alert to be send
-            alert_id = f"Alert{int(time.time() * 1000)}_{uuid.uuid4().hex[:8]}"
+        source_label = dict(ALERT_SOURCE_SELECTION).get(
+            rule.model_id, rule.model_id or "Alert Rules"
+        )
+        alert_id = f"Alert{int(time.time() * 1000)}_{uuid.uuid4().hex[:8]}"
 
-            attachment = {
-                "name": "report.csv",
-                "mimetype": "text/csv",  # The MIME type for CSV files
-                "type": "binary",
-                "datas": encoded_content,
-            }
+        email_from = (
+            os.getenv("EmailFrom")
+            or self.env.user.company_id.email
+            or self.env.user.email
+        )
 
-            attachment_id = self.env["ir.attachment"].create(attachment)
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        company = self.env.user.company_id
+        logo_url = f"{base_url}/web/image/res.company/{company.id}/logo_web"
+        logo_html = f'<img src="{logo_url}" alt="{company.name}" style="max-height:60px;display:block;" />'
 
-            # record the history
-            new_alert_history = self.env["alert.history"].create(
-                {
-                    "alert_id": alert_id,
-                    "attachment_data": attachment_id.id,
-                    "attachment_link": f"/web/content/{attachment_id.id}?download=true",
-                    "html_body": table_html,
-                    "alert_rule_id": rule.id,
-                    "ref_id": rule.model_id or "alert.rules",
-                    "process_id": rule.process_id,
-                    "risk_rating": rule.risk_rating,
-                    "last_checked": rule.last_checked,
-                    "email": (
-                        ",".join([str(e) for e in email])
-                        if email
-                        else "techsupport@novajii.com"
-                    ),
-                    # "email_cc": ",".join(list(emailcc)),
-                    "email_cc": ",".join([str(e) for e in emailcc]) if emailcc else "",
-                    "narration": rule.narration,
-                    "name": rule.name,
-                    "source": source_label,
-                }
-            )
+        # --- render the full email body from the configurable template ---
+        full_html = mail_tpl.render(
+            logo=logo_html,
+            alert_name=rule.name,
+            alert_id=alert_id,
+            row_count=row_count,
+            table=table_html,
+        )
 
-            try:
-                mail_id = template.send_mail(new_alert_history.id, force_send=True)
+        # --- create CSV attachment (stored in DB, not filestore) ---
+        attachment_id = self.env["ir.attachment"].create({
+            "name": "report.csv",
+            "mimetype": "text/csv",
+            "type": "binary",
+            "db_datas": encoded_content,
+        })
 
-                # mail_for_novajii = template.mail()
+        to_str = ",".join([str(e) for e in email]) if email else "techsupport@novajii.com"
+        cc_str = ",".join([str(e) for e in emailcc]) if emailcc else ""
 
-                mail_record = self.env["mail.mail"].browse(mail_id)
+        # --- audit history ---
+        new_alert_history = self.env["alert.history"].create({
+            "alert_id": alert_id,
+            "attachment_data": attachment_id.id,
+            "attachment_link": f"/web/content/{attachment_id.id}?download=true",
+            "html_body": full_html,
+            "ref_id": rule.model_id or "alert.rules",
+            "process_id": rule.process_id,
+            "risk_rating": rule.risk_rating,
+            "last_checked": rule.last_checked,
+            "email": to_str,
+            "email_cc": cc_str,
+            "narration": rule.narration,
+            "name": rule.name,
+            "source": source_label,
+        })
 
-                if mail_record.state in ["exception", "cancel"]:
-                    # Log the failure reason
-                    _logger.error(
-                        f"Failed to send alert email: {mail_record.failure_reason}"
-                    )
-                    history = self.env["alert.history"].browse(new_alert_history.id)
-                    if history.exists():
-                        history.unlink()
-                else:
-                    history = (
-                        self.env["alert.history"]
-                        .browse(new_alert_history.id)
-                        .write({"html_body": mail_record.body_html})
-                    )
+        try:
+            mail = self.env["mail.mail"].sudo().create({
+                "subject": rule.name,
+                "email_to": to_str,
+                "email_cc": cc_str,
+                "email_from": email_from,
+                "body_html": full_html,
+                "attachment_ids": [(4, attachment_id.id)],
+                "auto_delete": False,
+            })
+            mail.send()
 
-            except Exception as e:
-                history = self.env["alert.history"].browse(new_alert_history.id)
+            if mail.state in ["exception", "cancel"]:
+                _logger.error(f"Failed to send alert email: {mail.failure_reason}")
+                new_alert_history.unlink()
+            else:
+                _logger.info(f"Alert email sent to {to_str} for rule '{rule.name}'")
 
-                if history.exists():
-                    history.unlink()
-
-        else:
-            raise ValidationError("Mail Template Not Found")
+        except Exception as e:
+            if new_alert_history.exists():
+                new_alert_history.unlink()
+            raise
 
     def get_first_table_alias(self, query):
         pattern = r'FROM\s+[a-zA-Z0-9_"]+\s+([a-zA-Z0-9_"]+)'
@@ -794,12 +946,7 @@ class alert_rules(models.Model):
         if (len(mailto) > 0 or len(mailcc) > 0) and new_records:
             encoded_content = self.create_csv(columns, new_records)
             table_html = self.generate_table(columns, new_records)
-
-            # Add info about new records count to the email
-            info_html = f"<p><strong>Alert Summary:</strong> {len(new_records)} new record(s) found</p>"
-            table_html = info_html + table_html
-
-            self.prepare_email(rule, table_html, encoded_content, mailto, mailcc)
+            self.prepare_email(rule, table_html, encoded_content, mailto, mailcc, row_count=len(new_records))
 
     def _send_branch_officer_alert_with_new_records_only(
         self, rule, query, branch_officer, branch_id
@@ -855,12 +1002,9 @@ class alert_rules(models.Model):
         encoded_content = self.create_csv(branch_columns, new_records)
         table_html = self.generate_table(branch_columns, new_records)
 
-        # Add info about new records count
-        info_html = f"<p><strong>Branch Alert Summary:</strong> {len(new_records)} new record(s) found for {branch_officer.branch_id.name}</p>"
-        table_html = info_html + table_html
-
         self.prepare_email(
-            rule, table_html, encoded_content, [branch_officer.officer.login], ""
+            rule, table_html, encoded_content, [branch_officer.officer.login], "",
+            row_count=len(new_records),
         )
 
     def _send_internal_alert_with_new_records_only(self, rule, query, rows, columns):
@@ -893,16 +1037,9 @@ class alert_rules(models.Model):
         # Remove duplicates: if email exists in mailto, exclude from mailcc
         mailcc = mailcc - mailto
 
-        # encoded_content = self.create_csv(columns, new_records)
         encoded_content = self.create_csv(columns, rows)
-        # table_html = self.generate_table(columns, new_records)
         table_html = self.generate_table(columns, rows)
-
-        # Add info about new records count
-        # info_html = f"<p><strong>Internal Alert Summary:</strong> {len(new_records)} new record(s) found</p>"
-        # table_html = info_html + table_html
-
-        self.prepare_email(rule, table_html, encoded_content, mailto, mailcc)
+        self.prepare_email(rule, table_html, encoded_content, mailto, mailcc, row_count=len(rows))
 
     def _handle_branch_specific_alerts_with_new_records_only(
         self, rule, query, rows, columns, branchcode_index
@@ -944,6 +1081,10 @@ class alert_rules(models.Model):
         Main method to send alerts with new records only detection
         This prevents duplicate notifications by only sending records that haven't been seen before
         """
+        if rule.model_id == 'adverse.media':
+            rule._run_adverse_media_alert_rule(force=False)
+            return
+
         try:
             query: str = self.format_query(rule)
 

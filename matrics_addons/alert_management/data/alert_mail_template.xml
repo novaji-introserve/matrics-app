@@ -47,5 +47,28 @@
             <field name="html_body"><![CDATA[<div class='query-alert'>{logo}<p class='query-alert__meta'><strong>Alert Rule</strong>: <code>{alert_name}</code></p><p class='query-alert__meta'><strong>Alert ID</strong>: <code>{alert_id}</code></p><p class='query-alert__meta'>Alert manager alert query found <strong>{row_count}</strong> record(s).</p>{table}</div>]]></field>
             <field name="html_footer"><![CDATA[</body></html>]]></field>
         </record>
+        <record id="alert_mail_template_adverse_media" model="alert.mail.template">
+            <field name="name">Adverse Media Alert Template</field>
+            <field name="code">adverse_media</field>
+            <field name="inline_style">body { font-family: Arial, sans-serif; font-size: 12px; color: #333; }
+table { border-collapse: separate; border-spacing: 0; width: 100%; margin-top: 8px; font-size: 12px; }
+th { background-color: #e8e8e8; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 8px; text-align: left; }
+td { border-bottom: 1px solid #ddd; padding: 12px; }</field>
+            <field name="html_body"><![CDATA[<div style="margin: 10px 12px 0px 12px; padding: 0px; font-family: Arial, sans-serif; font-size: 12px;">
+    <div style="padding: 8px; text-align: left; margin-bottom: 45px;">
+        <img src="{company_logo_url}" alt="Company Logo" style="max-height: 60px;" />
+    </div>
+    <div style="padding: 20px;">
+        <p>Dear <b><i>{officers_name}</i></b>,</p>
+        <p>New adverse media alerts have been detected.</p>
+        <p style="line-height: 1.4;"><strong style="color: #2c3e50; font-size: 1.17em;">Date and Time Entry: </strong>{scan_datetime}</p>
+        <p><strong style="color: #2c3e50; font-size: 1.17em;">Alert Summary:</strong></p>
+        {alerts_table}
+        <p style="margin-top: 20px;">Click <a href="{action_url}" style="color: #3498db; text-decoration: none;">here</a> to view all new alerts in the system.</p>
+        <p>Please review these alerts and take appropriate action.</p>
+        <p style="margin-top: 30px; color: #7f8c8d;">Best regards</p>
+    </div>
+</div>]]></field>
+        </record>
     </data>
 </odoo>

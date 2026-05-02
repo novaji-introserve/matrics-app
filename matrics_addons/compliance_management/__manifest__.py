@@ -15,7 +15,7 @@
     # Check https://github.com/odoo/odoo/blob/16.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     "category": "MATRICS",
-    "version": "0.5.6",
+    "version": "0.5.9",
     # any module necessary for this one to work correctly
     
     'depends': ['base', 'web', 'bus', 'hr', 'access_apps', 'web_field_slider', 'gamification', 'hide_powered_by_odoo','web_widget_numeric_step','legion_hide_odoo','base_automation', 'google_gmail', 'gamification','project',
@@ -184,6 +184,7 @@
             
             'compliance_management/static/src/js/pep_auto_refresh.js',
             'compliance_management/static/src/xml/pep_auto_refresh.xml',
+            'compliance_management/static/src/js/customer_form_refresh.js',
             'compliance_management/static/src/js/custom_title_service.js',
             'compliance_management/static/src/js/cache_service.js',
 

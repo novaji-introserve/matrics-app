@@ -207,10 +207,9 @@ class NFIUTransaction(models.Model):
         currency = 'NGN'
         for e in setting:
             currency = e.val.strip()
-        currency_ids = self.env['res.currency'].search(
-            [('name', '=', currency.upper())])
-        for i in currency_ids:
-            currency_id = i.id
+        currency_rec = self.env['res.currency'].search(
+            [('name', '=', currency.upper())], limit=1)
+        currency_id = currency_rec.id if currency_rec else False
         domain = [('report_nfiu', '=', True),
                   ('currency_id', '=', currency_id)]
         return {
@@ -231,10 +230,9 @@ class NFIUTransaction(models.Model):
         currency = 'NGN'
         for e in setting:
             currency = e.val.strip()
-        currency_ids = self.env['res.currency'].search(
-            [('name', '=', currency.upper())])
-        for i in currency_ids:
-            currency_id = i.id
+        currency_rec = self.env['res.currency'].search(
+            [('name', '=', currency.upper())], limit=1)
+        currency_id = currency_rec.id if currency_rec else False
         domain = [('report_nfiu', '=', True),
                   ('currency_id', '!=', currency_id)]
         return {
